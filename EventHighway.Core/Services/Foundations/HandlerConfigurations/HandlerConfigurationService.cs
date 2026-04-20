@@ -81,6 +81,8 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             Guid handlerConfigurationId) =>
         TryCatch(async () =>
         {
+            ValidateHandlerConfigurationId(handlerConfigurationId);
+
             HandlerConfiguration maybeHandlerConfiguration =
                 await this.storageBroker.SelectHandlerConfigurationByIdAsync(
                     handlerConfigurationId);
