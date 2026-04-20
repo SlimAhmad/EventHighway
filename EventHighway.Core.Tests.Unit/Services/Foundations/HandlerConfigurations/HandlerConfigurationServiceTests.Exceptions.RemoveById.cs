@@ -110,5 +110,53 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRemoveByIdIfDatabaseUpdateErrorOccursAndLogItAsync()
+        {
+            // given
+            Guid someHandlerConfigurationId = Guid.NewGuid();
+            var dbUpdateException = new DbUpdateException();
+
+            var failedHandlerConfigurationStorageException =
+                new FailedHandlerConfigurationStorageException(
+                    message: "Failed handler configuration storage error occurred, contact support.",
+                    innerException: dbUpdateException);
+
+            var expectedHandlerConfigurationDependencyException =
+                new HandlerConfigurationDependencyException(
+                    message: "Handler configuration dependency error occurred, contact support.",
+                    innerException: failedHandlerConfigurationStorageException);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()))
+                    .ThrowsAsync(dbUpdateException);
+
+            // when
+            ValueTask<HandlerConfiguration> removeHandlerConfigurationByIdTask =
+                this.handlerConfigurationService.RemoveHandlerConfigurationByIdAsync(
+                    someHandlerConfigurationId);
+
+            HandlerConfigurationDependencyException actualHandlerConfigurationDependencyException =
+                await Assert.ThrowsAsync<HandlerConfigurationDependencyException>(
+                    removeHandlerConfigurationByIdTask.AsTask);
+
+            // then
+            actualHandlerConfigurationDependencyException.Should()
+                .BeEquivalentTo(expectedHandlerConfigurationDependencyException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedHandlerConfigurationDependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
