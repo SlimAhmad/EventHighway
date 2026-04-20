@@ -103,6 +103,16 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
                     failedHandlerConfigurationStorageException);
             }
+            catch (Exception serviceException)
+            {
+                var failedHandlerConfigurationServiceException =
+                    new FailedHandlerConfigurationServiceException(
+                        message: "Failed handler configuration service error occurred, contact support.",
+                        innerException: serviceException);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedHandlerConfigurationServiceException);
+            }
         }
 
         private async ValueTask<HandlerConfigurationValidationException>
