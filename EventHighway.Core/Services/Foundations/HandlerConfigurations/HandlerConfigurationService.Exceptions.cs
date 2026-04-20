@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
@@ -16,6 +17,7 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
     internal partial class HandlerConfigurationService
     {
         private delegate ValueTask<HandlerConfiguration> ReturningHandlerConfigurationFunction();
+        private delegate ValueTask<IQueryable<HandlerConfiguration>> ReturningHandlerConfigurationsFunction();
 
         private async ValueTask<HandlerConfiguration> TryCatch(
             ReturningHandlerConfigurationFunction returningHandlerConfigurationFunction)
@@ -70,6 +72,35 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                         innerException: dbUpdateException);
 
                 throw await CreateAndLogDependencyExceptionAsync(
+                    failedHandlerConfigurationStorageException);
+            }
+            catch (Exception serviceException)
+            {
+                var failedHandlerConfigurationServiceException =
+                    new FailedHandlerConfigurationServiceException(
+                        message: "Failed handler configuration service error occurred, contact support.",
+                        innerException: serviceException);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedHandlerConfigurationServiceException);
+            }
+        }
+
+        private async ValueTask<IQueryable<HandlerConfiguration>> TryCatch(
+            ReturningHandlerConfigurationsFunction returningHandlerConfigurationsFunction)
+        {
+            try
+            {
+                return await returningHandlerConfigurationsFunction();
+            }
+            catch (SqlException sqlException)
+            {
+                var failedHandlerConfigurationStorageException =
+                    new FailedHandlerConfigurationStorageException(
+                        message: "Failed handler configuration storage error occurred, contact support.",
+                        innerException: sqlException);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(
                     failedHandlerConfigurationStorageException);
             }
             catch (Exception serviceException)

@@ -37,7 +37,7 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             return await storageBroker.InsertHandlerConfigurationAsync(handlerConfiguration);
         });
 
-        public async ValueTask<IQueryable<HandlerConfiguration>> RetrieveAllHandlerConfigurationsAsync() =>
-            await this.storageBroker.SelectAllHandlerConfigurationsAsync();
+        public ValueTask<IQueryable<HandlerConfiguration>> RetrieveAllHandlerConfigurationsAsync() =>
+            TryCatch(async () => await this.storageBroker.SelectAllHandlerConfigurationsAsync());
     }
 }
