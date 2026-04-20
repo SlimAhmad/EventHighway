@@ -51,6 +51,13 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
 
         public ValueTask<HandlerConfiguration> RetrieveHandlerConfigurationByNameAsync(
             string handlerConfigurationName) =>
-                throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            IQueryable<HandlerConfiguration> handlerConfigurations =
+                await this.storageBroker.SelectAllHandlerConfigurationsAsync();
+
+            return handlerConfigurations.FirstOrDefault(handlerConfiguration =>
+                handlerConfiguration.Name == handlerConfigurationName);
+        });
     }
 }
