@@ -87,6 +87,8 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                 await this.storageBroker.SelectHandlerConfigurationByIdAsync(
                     handlerConfigurationId);
 
+            ValidateHandlerConfigurationExists(maybeHandlerConfiguration, handlerConfigurationId);
+
             return await this.storageBroker.DeleteHandlerConfigurationAsync(
                 maybeHandlerConfiguration);
         });
