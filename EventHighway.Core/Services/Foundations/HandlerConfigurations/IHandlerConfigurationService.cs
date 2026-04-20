@@ -17,5 +17,6 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
         ValueTask<IQueryable<HandlerConfiguration>> RetrieveAllHandlerConfigurationsAsync();
         ValueTask<HandlerConfiguration> RetrieveHandlerConfigurationByIdAsync(Guid handlerConfigurationId);
         ValueTask<HandlerConfiguration> RetrieveHandlerConfigurationByNameAsync(string handlerConfigurationName);
+        ValueTask<HandlerConfiguration> ModifyHandlerConfigurationAsync(HandlerConfiguration handlerConfiguration);
     }
 }

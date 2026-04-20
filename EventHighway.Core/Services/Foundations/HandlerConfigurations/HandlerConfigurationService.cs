@@ -61,5 +61,9 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             return handlerConfigurations.FirstOrDefault(handlerConfiguration =>
                 handlerConfiguration.Name == handlerConfigurationName);
         });
+
+        public ValueTask<HandlerConfiguration> ModifyHandlerConfigurationAsync(
+            HandlerConfiguration handlerConfiguration) =>
+                throw new NotImplementedException();
     }
 }
