@@ -79,6 +79,14 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
 
         public ValueTask<HandlerConfiguration> RemoveHandlerConfigurationByIdAsync(
             Guid handlerConfigurationId) =>
-                throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            HandlerConfiguration maybeHandlerConfiguration =
+                await this.storageBroker.SelectHandlerConfigurationByIdAsync(
+                    handlerConfigurationId);
+
+            return await this.storageBroker.DeleteHandlerConfigurationAsync(
+                maybeHandlerConfiguration);
+        });
     }
 }
