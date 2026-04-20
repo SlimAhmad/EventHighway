@@ -102,7 +102,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                     values:
                     [
                         "Required",
-                        $"Date is the same as {nameof(HandlerConfiguration.CreatedDate)}"
+                        $"Date is the same as {nameof(HandlerConfiguration.CreatedDate)}",
+                        "Date is not recent"
                     ]);
 
                 var expectedHandlerConfigurationValidationException =

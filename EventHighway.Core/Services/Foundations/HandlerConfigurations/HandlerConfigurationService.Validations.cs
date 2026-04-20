@@ -81,6 +81,11 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                     firstDate: handlerConfiguration.UpdatedDate,
                     secondDate: handlerConfiguration.CreatedDate,
                     secondDateName: nameof(HandlerConfiguration.CreatedDate)),
+                Parameter: nameof(HandlerConfiguration.UpdatedDate)),
+
+                (Rule: IsNotRecent(
+                    date: handlerConfiguration.UpdatedDate,
+                    currentDateTime: currentDateTime),
                 Parameter: nameof(HandlerConfiguration.UpdatedDate)));
         }
 
