@@ -156,6 +156,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             HandlerConfiguration randomHandlerConfiguration = CreateRandomHandlerConfiguration(randomDateTimeOffset);
             HandlerConfiguration invalidHandlerConfiguration = randomHandlerConfiguration;
+            invalidHandlerConfiguration.CreatedDate = randomDateTimeOffset.AddDays(GetRandomNegativeNumber());
             invalidHandlerConfiguration.Name = GetRandomStringWithLengthOf(451);
 
             var invalidHandlerConfigurationException =

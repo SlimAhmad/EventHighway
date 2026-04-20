@@ -68,6 +68,9 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                 (Rule: IsInvalid(handlerConfiguration.Value),
                 Parameter: nameof(HandlerConfiguration.Value)),
 
+                (Rule: IsInvalidLength(handlerConfiguration.Name, 450),
+                Parameter: nameof(HandlerConfiguration.Name)),
+
                 (Rule: IsInvalid(handlerConfiguration.CreatedDate),
                 Parameter: nameof(HandlerConfiguration.CreatedDate)),
 
