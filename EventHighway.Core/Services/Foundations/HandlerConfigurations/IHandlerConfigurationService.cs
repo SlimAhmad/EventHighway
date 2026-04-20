@@ -18,5 +18,6 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
         ValueTask<HandlerConfiguration> RetrieveHandlerConfigurationByIdAsync(Guid handlerConfigurationId);
         ValueTask<HandlerConfiguration> RetrieveHandlerConfigurationByNameAsync(string handlerConfigurationName);
         ValueTask<HandlerConfiguration> ModifyHandlerConfigurationAsync(HandlerConfiguration handlerConfiguration);
+        ValueTask<HandlerConfiguration> RemoveHandlerConfigurationByIdAsync(Guid handlerConfigurationId);
     }
 }
