@@ -40,8 +40,13 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
         public ValueTask<IQueryable<HandlerConfiguration>> RetrieveAllHandlerConfigurationsAsync() =>
             TryCatch(async () => await this.storageBroker.SelectAllHandlerConfigurationsAsync());
 
-        public async ValueTask<HandlerConfiguration> RetrieveHandlerConfigurationByIdAsync(
+        public ValueTask<HandlerConfiguration> RetrieveHandlerConfigurationByIdAsync(
             Guid handlerConfigurationId) =>
-                await this.storageBroker.SelectHandlerConfigurationByIdAsync(handlerConfigurationId);
+        TryCatch(async () =>
+        {
+            ValidateHandlerConfigurationId(handlerConfigurationId);
+
+            return await this.storageBroker.SelectHandlerConfigurationByIdAsync(handlerConfigurationId);
+        });
     }
 }
