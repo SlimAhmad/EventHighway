@@ -156,6 +156,18 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             return Math.Abs(difference.TotalMinutes) > 1;
         }
 
+        private static void ValidateHandlerConfigurationExists(
+            HandlerConfiguration handlerConfiguration,
+            Guid handlerConfigurationId)
+        {
+            if (handlerConfiguration is null)
+            {
+                throw new NotFoundHandlerConfigurationException(
+                    message: $"Could not find handler configuration " +
+                        $"with id: {handlerConfigurationId}.");
+            }
+        }
+
         private static void ValidateHandlerConfigurationId(Guid handlerConfigurationId) =>
             Validate(
                 (Rule: IsInvalid(handlerConfigurationId),

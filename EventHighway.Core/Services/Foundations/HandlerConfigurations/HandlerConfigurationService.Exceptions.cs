@@ -34,6 +34,10 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             {
                 throw await CreateAndLogValidationExceptionAsync(invalidHandlerConfigurationException);
             }
+            catch (NotFoundHandlerConfigurationException notFoundHandlerConfigurationException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(notFoundHandlerConfigurationException);
+            }
             catch (SqlException sqlException)
             {
                 var failedHandlerConfigurationStorageException =
