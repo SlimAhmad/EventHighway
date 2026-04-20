@@ -40,13 +40,12 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             }
             catch (SqlException sqlException)
             {
-                var failedHandlerConfigurationStorageException =
-                    new FailedHandlerConfigurationStorageException(
+                var failedStorageHandlerConfigurationException =
+                    new FailedStorageHandlerConfigurationException(
                         message: "Failed handler configuration storage error occurred, contact support.",
                         innerException: sqlException);
 
-                throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedHandlerConfigurationStorageException);
+                throw await CreateAndLogCriticalDependencyExceptionAsync(failedStorageHandlerConfigurationException);
             }
             catch (DuplicateKeyException duplicateKeyException)
             {
@@ -60,13 +59,12 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             }
             catch (ForeignKeyConstraintConflictException foreignKeyConstraintConflictException)
             {
-                var invalidHandlerConfigurationReferenceException =
-                    new InvalidHandlerConfigurationReferenceException(
+                var invalidReferenceHandlerConfigurationException =
+                    new InvalidReferenceHandlerConfigurationException(
                         message: "Invalid handler configuration reference error occurred.",
                         innerException: foreignKeyConstraintConflictException);
 
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    invalidHandlerConfigurationReferenceException);
+                throw await CreateAndLogDependencyValidationExceptionAsync(invalidReferenceHandlerConfigurationException);
             }
             catch (DbUpdateConcurrencyException dbUpdateConcurrencyException)
             {
@@ -80,13 +78,12 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             }
             catch (DbUpdateException dbUpdateException)
             {
-                var failedHandlerConfigurationStorageException =
-                    new FailedHandlerConfigurationStorageException(
+                var failedStorageHandlerConfigurationException =
+                    new FailedStorageHandlerConfigurationException(
                         message: "Failed handler configuration storage error occurred, contact support.",
                         innerException: dbUpdateException);
 
-                throw await CreateAndLogDependencyExceptionAsync(
-                    failedHandlerConfigurationStorageException);
+                throw await CreateAndLogDependencyExceptionAsync(failedStorageHandlerConfigurationException);
             }
             catch (Exception serviceException)
             {
@@ -109,13 +106,12 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             }
             catch (SqlException sqlException)
             {
-                var failedHandlerConfigurationStorageException =
-                    new FailedHandlerConfigurationStorageException(
+                var failedStorageHandlerConfigurationException =
+                    new FailedStorageHandlerConfigurationException(
                         message: "Failed handler configuration storage error occurred, contact support.",
                         innerException: sqlException);
 
-                throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedHandlerConfigurationStorageException);
+                throw await CreateAndLogCriticalDependencyExceptionAsync(failedStorageHandlerConfigurationException);
             }
             catch (Exception serviceException)
             {

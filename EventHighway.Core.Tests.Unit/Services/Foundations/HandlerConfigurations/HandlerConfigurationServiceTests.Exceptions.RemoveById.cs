@@ -22,15 +22,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             Guid someHandlerConfigurationId = Guid.NewGuid();
             SqlException sqlException = GetSqlException();
 
-            var failedHandlerConfigurationStorageException =
-                new FailedHandlerConfigurationStorageException(
+            var failedStorageHandlerConfigurationException =
+                new FailedStorageHandlerConfigurationException(
                     message: "Failed handler configuration storage error occurred, contact support.",
                     innerException: sqlException);
 
             var expectedHandlerConfigurationDependencyException =
                 new HandlerConfigurationDependencyException(
                     message: "Handler configuration dependency error occurred, contact support.",
-                    innerException: failedHandlerConfigurationStorageException);
+                    innerException: failedStorageHandlerConfigurationException);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()))
@@ -118,15 +118,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             Guid someHandlerConfigurationId = Guid.NewGuid();
             var dbUpdateException = new DbUpdateException();
 
-            var failedHandlerConfigurationStorageException =
-                new FailedHandlerConfigurationStorageException(
+            var failedStorageHandlerConfigurationException =
+                new FailedStorageHandlerConfigurationException(
                     message: "Failed handler configuration storage error occurred, contact support.",
                     innerException: dbUpdateException);
 
             var expectedHandlerConfigurationDependencyException =
                 new HandlerConfigurationDependencyException(
                     message: "Handler configuration dependency error occurred, contact support.",
-                    innerException: failedHandlerConfigurationStorageException);
+                    innerException: failedStorageHandlerConfigurationException);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()))

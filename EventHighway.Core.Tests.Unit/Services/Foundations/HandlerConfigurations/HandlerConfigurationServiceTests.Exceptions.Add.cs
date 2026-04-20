@@ -24,15 +24,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             HandlerConfiguration someHandlerConfiguration = CreateRandomHandlerConfiguration();
             SqlException sqlException = GetSqlException();
 
-            var failedHandlerConfigurationStorageException =
-                new FailedHandlerConfigurationStorageException(
+            var failedStorageHandlerConfigurationException =
+                new FailedStorageHandlerConfigurationException(
                     message: "Failed handler configuration storage error occurred, contact support.",
                     innerException: sqlException);
 
             var expectedHandlerConfigurationDependencyException =
                 new HandlerConfigurationDependencyException(
                     message: "Handler configuration dependency error occurred, contact support.",
-                    innerException: failedHandlerConfigurationStorageException);
+                    innerException: failedStorageHandlerConfigurationException);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
@@ -128,15 +128,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             string someMessage = GetRandomString();
             var foreignKeyConstraintConflictException = new ForeignKeyConstraintConflictException(someMessage);
 
-            var invalidHandlerConfigurationReferenceException =
-                new InvalidHandlerConfigurationReferenceException(
+            var invalidReferenceHandlerConfigurationException =
+                new InvalidReferenceHandlerConfigurationException(
                     message: "Invalid handler configuration reference error occurred.",
                     innerException: foreignKeyConstraintConflictException);
 
             var expectedHandlerConfigurationDependencyValidationException =
                 new HandlerConfigurationDependencyValidationException(
                     message: "Handler configuration validation error occurred, fix the errors and try again.",
-                    innerException: invalidHandlerConfigurationReferenceException);
+                    innerException: invalidReferenceHandlerConfigurationException);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
@@ -179,15 +179,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             HandlerConfiguration someHandlerConfiguration = CreateRandomHandlerConfiguration();
             var dbUpdateException = new DbUpdateException();
 
-            var failedHandlerConfigurationStorageException =
-                new FailedHandlerConfigurationStorageException(
+            var failedStorageHandlerConfigurationException =
+                new FailedStorageHandlerConfigurationException(
                     message: "Failed handler configuration storage error occurred, contact support.",
                     innerException: dbUpdateException);
 
             var expectedHandlerConfigurationDependencyException =
                 new HandlerConfigurationDependencyException(
                     message: "Handler configuration dependency error occurred, contact support.",
-                    innerException: failedHandlerConfigurationStorageException);
+                    innerException: failedStorageHandlerConfigurationException);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
