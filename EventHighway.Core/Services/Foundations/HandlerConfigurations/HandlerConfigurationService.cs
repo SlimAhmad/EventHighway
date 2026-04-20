@@ -62,15 +62,18 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                 handlerConfiguration.Name == handlerConfigurationName);
         });
 
-        public async ValueTask<HandlerConfiguration> ModifyHandlerConfigurationAsync(
-            HandlerConfiguration handlerConfiguration)
+        public ValueTask<HandlerConfiguration> ModifyHandlerConfigurationAsync(
+            HandlerConfiguration handlerConfiguration) =>
+        TryCatch(async () =>
         {
+            ValidateHandlerConfigurationIsNotNull(handlerConfiguration);
+
             await this.dateTimeBroker.GetDateTimeOffsetAsync();
 
             await this.storageBroker.SelectHandlerConfigurationByIdAsync(
                 handlerConfiguration.Id);
 
             return await this.storageBroker.UpdateHandlerConfigurationAsync(handlerConfiguration);
-        }
+        });
     }
 }
