@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
@@ -39,6 +40,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
 
         private static HandlerConfiguration CreateRandomHandlerConfiguration() =>
             CreateHandlerConfigurationFiller(GetRandomDateTimeOffset()).Create();
+
+        private static IQueryable<HandlerConfiguration> CreateRandomHandlerConfigurations() =>
+            CreateHandlerConfigurationFiller(GetRandomDateTimeOffset())
+                .Create(count: GetRandomNumber())
+                    .AsQueryable();
 
         private static HandlerConfiguration CreateRandomHandlerConfiguration(DateTimeOffset dates) =>
             CreateHandlerConfigurationFiller(dates).Create();
