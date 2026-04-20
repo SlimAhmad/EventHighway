@@ -273,5 +273,74 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(MinutesBeforeAndAfterNow))]
+        public async Task ShouldThrowValidationExceptionOnModifyIfUpdatedDateIsNotRecentAndLogItAsync(
+            int minutesBeforeAndAfter)
+        {
+            // given
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+
+            HandlerConfiguration randomHandlerConfiguration =
+                CreateRandomHandlerConfiguration(dates: randomDateTimeOffset);
+
+            HandlerConfiguration invalidHandlerConfiguration = randomHandlerConfiguration;
+            invalidHandlerConfiguration.CreatedDate = randomDateTimeOffset.AddDays(GetRandomNegativeNumber());
+
+            invalidHandlerConfiguration.UpdatedDate =
+                randomDateTimeOffset.AddMinutes(minutesBeforeAndAfter);
+
+            var invalidHandlerConfigurationException =
+                new InvalidHandlerConfigurationException(
+                    message: "Handler configuration is invalid, fix the errors and try again.");
+
+            invalidHandlerConfigurationException.AddData(
+                key: nameof(HandlerConfiguration.UpdatedDate),
+                values: "Date is not recent");
+
+            var expectedHandlerConfigurationValidationException =
+                new HandlerConfigurationValidationException(
+                    message: "Handler configuration validation error occurred, fix the errors and try again.",
+                    innerException: invalidHandlerConfigurationException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTimeOffset);
+
+            // when
+            ValueTask<HandlerConfiguration> modifyHandlerConfigurationTask =
+                this.handlerConfigurationService.ModifyHandlerConfigurationAsync(
+                    invalidHandlerConfiguration);
+
+            HandlerConfigurationValidationException actualHandlerConfigurationValidationException =
+                await Assert.ThrowsAsync<HandlerConfigurationValidationException>(
+                    modifyHandlerConfigurationTask.AsTask);
+
+            // then
+            actualHandlerConfigurationValidationException.Should()
+                .BeEquivalentTo(expectedHandlerConfigurationValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedHandlerConfigurationValidationException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
+                    Times.Never);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.UpdateHandlerConfigurationAsync(It.IsAny<HandlerConfiguration>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
