@@ -68,6 +68,16 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     invalidHandlerConfigurationReferenceException);
             }
+            catch (DbUpdateConcurrencyException dbUpdateConcurrencyException)
+            {
+                var lockedHandlerConfigurationException =
+                    new LockedHandlerConfigurationException(
+                        message: "Handler configuration is locked, try again.",
+                        innerException: dbUpdateConcurrencyException);
+
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    lockedHandlerConfigurationException);
+            }
             catch (DbUpdateException dbUpdateException)
             {
                 var failedHandlerConfigurationStorageException =
