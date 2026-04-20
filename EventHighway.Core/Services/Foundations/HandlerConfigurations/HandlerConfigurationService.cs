@@ -53,6 +53,8 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             string handlerConfigurationName) =>
         TryCatch(async () =>
         {
+            ValidateHandlerConfigurationName(handlerConfigurationName);
+
             IQueryable<HandlerConfiguration> handlerConfigurations =
                 await this.storageBroker.SelectAllHandlerConfigurationsAsync();
 
