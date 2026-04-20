@@ -66,9 +66,7 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             HandlerConfiguration handlerConfiguration) =>
         TryCatch(async () =>
         {
-            ValidateHandlerConfigurationIsNotNull(handlerConfiguration);
-
-            await this.dateTimeBroker.GetDateTimeOffsetAsync();
+            await ValidateHandlerConfigurationOnModifyAsync(handlerConfiguration);
 
             await this.storageBroker.SelectHandlerConfigurationByIdAsync(
                 handlerConfiguration.Id);
