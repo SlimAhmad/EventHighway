@@ -113,6 +113,11 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                 (Rule: IsInvalid(handlerConfigurationId),
                 Parameter: nameof(HandlerConfiguration.Id)));
 
+        private static void ValidateHandlerConfigurationName(string handlerConfigurationName) =>
+            Validate(
+                (Rule: IsInvalid(handlerConfigurationName),
+                Parameter: nameof(HandlerConfiguration.Name)));
+
         private static void Validate(params (dynamic Rule, string Parameter)[] validations)
         {
             var invalidHandlerConfigurationException =
