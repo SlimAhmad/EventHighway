@@ -108,6 +108,11 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             return Math.Abs(difference.TotalMinutes) > 1;
         }
 
+        private static void ValidateHandlerConfigurationId(Guid handlerConfigurationId) =>
+            Validate(
+                (Rule: IsInvalid(handlerConfigurationId),
+                Parameter: nameof(HandlerConfiguration.Id)));
+
         private static void Validate(params (dynamic Rule, string Parameter)[] validations)
         {
             var invalidHandlerConfigurationException =
