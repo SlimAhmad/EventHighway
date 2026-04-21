@@ -50,6 +50,45 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                 Parameter: nameof(HandlerConfiguration.CreatedDate)));
         }
 
+        private async ValueTask ValidateHandlerConfigurationOnModifyAsync(
+            HandlerConfiguration handlerConfiguration)
+        {
+            ValidateHandlerConfigurationIsNotNull(handlerConfiguration);
+
+            DateTimeOffset currentDateTime =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            Validate(
+                (Rule: IsInvalid(handlerConfiguration.Id),
+                Parameter: nameof(HandlerConfiguration.Id)),
+
+                (Rule: IsInvalid(handlerConfiguration.Name),
+                Parameter: nameof(HandlerConfiguration.Name)),
+
+                (Rule: IsInvalid(handlerConfiguration.Value),
+                Parameter: nameof(HandlerConfiguration.Value)),
+
+                (Rule: IsInvalidLength(handlerConfiguration.Name, 450),
+                Parameter: nameof(HandlerConfiguration.Name)),
+
+                (Rule: IsInvalid(handlerConfiguration.CreatedDate),
+                Parameter: nameof(HandlerConfiguration.CreatedDate)),
+
+                (Rule: IsInvalid(handlerConfiguration.UpdatedDate),
+                Parameter: nameof(HandlerConfiguration.UpdatedDate)),
+
+                (Rule: IsSameAs(
+                    firstDate: handlerConfiguration.UpdatedDate,
+                    secondDate: handlerConfiguration.CreatedDate,
+                    secondDateName: nameof(HandlerConfiguration.CreatedDate)),
+                Parameter: nameof(HandlerConfiguration.UpdatedDate)),
+
+                (Rule: IsNotRecent(
+                    date: handlerConfiguration.UpdatedDate,
+                    currentDateTime: currentDateTime),
+                Parameter: nameof(HandlerConfiguration.UpdatedDate)));
+        }
+
         private static void ValidateHandlerConfigurationIsNotNull(
             HandlerConfiguration handlerConfiguration)
         {
@@ -93,6 +132,15 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
                 Message = $"Date is not the same as {secondDateName}"
             };
 
+        private static dynamic IsSameAs(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate,
+            string secondDateName) => new
+            {
+                Condition = firstDate == secondDate,
+                Message = $"Date is the same as {secondDateName}"
+            };
+
         private static dynamic IsNotRecent(DateTimeOffset date, DateTimeOffset currentDateTime) => new
         {
             Condition = IsDateMoreThanOneMinuteApart(date, currentDateTime),
@@ -106,6 +154,18 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             TimeSpan difference = currentDateTime.Subtract(date);
 
             return Math.Abs(difference.TotalMinutes) > 1;
+        }
+
+        private static void ValidateHandlerConfigurationExists(
+            HandlerConfiguration handlerConfiguration,
+            Guid handlerConfigurationId)
+        {
+            if (handlerConfiguration is null)
+            {
+                throw new NotFoundHandlerConfigurationException(
+                    message: $"Could not find handler configuration " +
+                        $"with id: {handlerConfigurationId}.");
+            }
         }
 
         private static void ValidateHandlerConfigurationId(Guid handlerConfigurationId) =>
@@ -128,9 +188,9 @@ namespace EventHighway.Core.Services.Foundations.HandlerConfigurations
             {
                 if (rule.Condition)
                 {
-                    invalidHandlerConfigurationException.AddData(
+                    invalidHandlerConfigurationException.UpsertDataList(
                         key: parameter,
-                        values: rule.Message);
+                        value: rule.Message);
                 }
             }
 

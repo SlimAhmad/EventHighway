@@ -73,6 +73,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 9).GetValue();
 
+        private static int GetRandomNegativeNumber() =>
+            -1 * GetRandomNumber();
+
         private static SqlException GetSqlException() =>
             (SqlException)RuntimeHelpers.GetUninitializedObject(type: typeof(SqlException));
 
