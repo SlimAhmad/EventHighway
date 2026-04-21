@@ -4,7 +4,6 @@
 
 using System;
 using System.Threading.Tasks;
-using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations.Exceptions;
 using FluentAssertions;
@@ -17,10 +16,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
     public partial class HandlerConfigurationServiceTests
     {
         [Fact]
-        public async Task ShouldThrowCriticalDependencyExceptionOnModifyIfSqlErrorOccursAndLogItAsync()
+        public async Task ShouldThrowCriticalDependencyExceptionOnRemoveByIdIfSqlErrorOccursAndLogItAsync()
         {
             // given
-            HandlerConfiguration someHandlerConfiguration = CreateRandomHandlerConfiguration();
+            Guid someHandlerConfigurationId = Guid.NewGuid();
             SqlException sqlException = GetSqlException();
 
             var failedStorageHandlerConfigurationException =
@@ -33,25 +32,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                     message: "Handler configuration dependency error occurred, contact support.",
                     innerException: failedStorageHandlerConfigurationException);
 
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetDateTimeOffsetAsync())
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()))
                     .ThrowsAsync(sqlException);
 
             // when
-            ValueTask<HandlerConfiguration> modifyHandlerConfigurationTask =
-                this.handlerConfigurationService.ModifyHandlerConfigurationAsync(
-                    someHandlerConfiguration);
+            ValueTask<HandlerConfiguration> removeHandlerConfigurationByIdTask =
+                this.handlerConfigurationService.RemoveHandlerConfigurationByIdAsync(
+                    someHandlerConfigurationId);
 
             HandlerConfigurationDependencyException actualHandlerConfigurationDependencyException =
                 await Assert.ThrowsAsync<HandlerConfigurationDependencyException>(
-                    modifyHandlerConfigurationTask.AsTask);
+                    removeHandlerConfigurationByIdTask.AsTask);
 
             // then
             actualHandlerConfigurationDependencyException.Should()
                 .BeEquivalentTo(expectedHandlerConfigurationDependencyException);
 
-            this.dateTimeBrokerMock.Verify(broker =>
-                broker.GetDateTimeOffsetAsync(),
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -59,75 +58,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                     expectedHandlerConfigurationDependencyException))),
                         Times.Once);
 
-            this.storageBrokerMock.Verify(broker =>
-                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
-                    Times.Never);
-
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public async Task ShouldThrowDependencyValidationExceptionOnModifyIfReferenceErrorOccursAndLogItAsync()
+        public async Task ShouldThrowDependencyValidationExceptionOnRemoveByIdIfDatabaseUpdateConcurrencyErrorOccursAndLogItAsync()
         {
             // given
-            HandlerConfiguration someHandlerConfiguration = CreateRandomHandlerConfiguration();
-            string someMessage = GetRandomString();
-
-            var foreignKeyConstraintConflictException =
-                new ForeignKeyConstraintConflictException(someMessage);
-
-            var invalidReferenceHandlerConfigurationException =
-                new InvalidReferenceHandlerConfigurationException(
-                    message: "Invalid handler configuration reference error occurred.",
-                    innerException: foreignKeyConstraintConflictException);
-
-            var expectedHandlerConfigurationDependencyValidationException =
-                new HandlerConfigurationDependencyValidationException(
-                    message: "Handler configuration validation error occurred, fix the errors and try again.",
-                    innerException: invalidReferenceHandlerConfigurationException);
-
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetDateTimeOffsetAsync())
-                    .ThrowsAsync(foreignKeyConstraintConflictException);
-
-            // when
-            ValueTask<HandlerConfiguration> modifyHandlerConfigurationTask =
-                this.handlerConfigurationService.ModifyHandlerConfigurationAsync(
-                    someHandlerConfiguration);
-
-            HandlerConfigurationDependencyValidationException actualHandlerConfigurationDependencyValidationException =
-                await Assert.ThrowsAsync<HandlerConfigurationDependencyValidationException>(
-                    modifyHandlerConfigurationTask.AsTask);
-
-            // then
-            actualHandlerConfigurationDependencyValidationException.Should()
-                .BeEquivalentTo(expectedHandlerConfigurationDependencyValidationException);
-
-            this.dateTimeBrokerMock.Verify(broker =>
-                broker.GetDateTimeOffsetAsync(),
-                    Times.Once);
-
-            this.loggingBrokerMock.Verify(broker =>
-                broker.LogErrorAsync(It.Is(SameExceptionAs(
-                    expectedHandlerConfigurationDependencyValidationException))),
-                        Times.Once);
-
-            this.storageBrokerMock.Verify(broker =>
-                broker.UpdateHandlerConfigurationAsync(It.IsAny<HandlerConfiguration>()),
-                    Times.Never);
-
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.storageBrokerMock.VerifyNoOtherCalls();
-        }
-
-        [Fact]
-        public async Task ShouldThrowDependencyValidationExceptionOnModifyIfDatabaseUpdateConcurrencyOccursAndLogItAsync()
-        {
-            // given
-            HandlerConfiguration someHandlerConfiguration = CreateRandomHandlerConfiguration();
+            Guid someHandlerConfigurationId = Guid.NewGuid();
             var dbUpdateConcurrencyException = new DbUpdateConcurrencyException();
 
             var lockedHandlerConfigurationException =
@@ -140,25 +80,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                     message: "Handler configuration validation error occurred, fix the errors and try again.",
                     innerException: lockedHandlerConfigurationException);
 
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetDateTimeOffsetAsync())
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()))
                     .ThrowsAsync(dbUpdateConcurrencyException);
 
             // when
-            ValueTask<HandlerConfiguration> modifyHandlerConfigurationTask =
-                this.handlerConfigurationService.ModifyHandlerConfigurationAsync(
-                    someHandlerConfiguration);
+            ValueTask<HandlerConfiguration> removeHandlerConfigurationByIdTask =
+                this.handlerConfigurationService.RemoveHandlerConfigurationByIdAsync(
+                    someHandlerConfigurationId);
 
             HandlerConfigurationDependencyValidationException actualHandlerConfigurationDependencyValidationException =
                 await Assert.ThrowsAsync<HandlerConfigurationDependencyValidationException>(
-                    modifyHandlerConfigurationTask.AsTask);
+                    removeHandlerConfigurationByIdTask.AsTask);
 
             // then
             actualHandlerConfigurationDependencyValidationException.Should()
                 .BeEquivalentTo(expectedHandlerConfigurationDependencyValidationException);
 
-            this.dateTimeBrokerMock.Verify(broker =>
-                broker.GetDateTimeOffsetAsync(),
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -166,20 +106,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                     expectedHandlerConfigurationDependencyValidationException))),
                         Times.Once);
 
-            this.storageBrokerMock.Verify(broker =>
-                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
-                    Times.Never);
-
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public async Task ShouldThrowDependencyExceptionOnModifyIfDatabaseUpdateExceptionOccursAndLogItAsync()
+        public async Task ShouldThrowDependencyExceptionOnRemoveByIdIfDatabaseUpdateErrorOccursAndLogItAsync()
         {
             // given
-            HandlerConfiguration someHandlerConfiguration = CreateRandomHandlerConfiguration();
+            Guid someHandlerConfigurationId = Guid.NewGuid();
             var dbUpdateException = new DbUpdateException();
 
             var failedStorageHandlerConfigurationException =
@@ -192,25 +128,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                     message: "Handler configuration dependency error occurred, contact support.",
                     innerException: failedStorageHandlerConfigurationException);
 
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetDateTimeOffsetAsync())
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()))
                     .ThrowsAsync(dbUpdateException);
 
             // when
-            ValueTask<HandlerConfiguration> modifyHandlerConfigurationTask =
-                this.handlerConfigurationService.ModifyHandlerConfigurationAsync(
-                    someHandlerConfiguration);
+            ValueTask<HandlerConfiguration> removeHandlerConfigurationByIdTask =
+                this.handlerConfigurationService.RemoveHandlerConfigurationByIdAsync(
+                    someHandlerConfigurationId);
 
             HandlerConfigurationDependencyException actualHandlerConfigurationDependencyException =
                 await Assert.ThrowsAsync<HandlerConfigurationDependencyException>(
-                    modifyHandlerConfigurationTask.AsTask);
+                    removeHandlerConfigurationByIdTask.AsTask);
 
             // then
             actualHandlerConfigurationDependencyException.Should()
                 .BeEquivalentTo(expectedHandlerConfigurationDependencyException);
 
-            this.dateTimeBrokerMock.Verify(broker =>
-                broker.GetDateTimeOffsetAsync(),
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -218,20 +154,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                     expectedHandlerConfigurationDependencyException))),
                         Times.Once);
 
-            this.storageBrokerMock.Verify(broker =>
-                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
-                    Times.Never);
-
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public async Task ShouldThrowServiceExceptionOnModifyIfExceptionOccursAndLogItAsync()
+        public async Task ShouldThrowServiceExceptionOnRemoveByIdIfExceptionOccursAndLogItAsync()
         {
             // given
-            HandlerConfiguration someHandlerConfiguration = CreateRandomHandlerConfiguration();
+            Guid someHandlerConfigurationId = Guid.NewGuid();
             var serviceException = new Exception();
 
             var failedHandlerConfigurationServiceException =
@@ -244,25 +176,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                     message: "Handler configuration service error occurred, contact support.",
                     innerException: failedHandlerConfigurationServiceException);
 
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetDateTimeOffsetAsync())
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()))
                     .ThrowsAsync(serviceException);
 
             // when
-            ValueTask<HandlerConfiguration> modifyHandlerConfigurationTask =
-                this.handlerConfigurationService.ModifyHandlerConfigurationAsync(
-                    someHandlerConfiguration);
+            ValueTask<HandlerConfiguration> removeHandlerConfigurationByIdTask =
+                this.handlerConfigurationService.RemoveHandlerConfigurationByIdAsync(
+                    someHandlerConfigurationId);
 
             HandlerConfigurationServiceException actualHandlerConfigurationServiceException =
                 await Assert.ThrowsAsync<HandlerConfigurationServiceException>(
-                    modifyHandlerConfigurationTask.AsTask);
+                    removeHandlerConfigurationByIdTask.AsTask);
 
             // then
             actualHandlerConfigurationServiceException.Should()
                 .BeEquivalentTo(expectedHandlerConfigurationServiceException);
 
-            this.dateTimeBrokerMock.Verify(broker =>
-                broker.GetDateTimeOffsetAsync(),
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -270,13 +202,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                     expectedHandlerConfigurationServiceException))),
                         Times.Once);
 
-            this.storageBrokerMock.Verify(broker =>
-                broker.SelectHandlerConfigurationByIdAsync(It.IsAny<Guid>()),
-                    Times.Never);
-
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

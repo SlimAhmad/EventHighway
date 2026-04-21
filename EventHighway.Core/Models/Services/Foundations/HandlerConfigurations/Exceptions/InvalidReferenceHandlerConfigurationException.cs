@@ -7,9 +7,9 @@ using Xeptions;
 
 namespace EventHighway.Core.Models.Services.Foundations.HandlerConfigurations.Exceptions
 {
-    public class InvalidHandlerConfigurationReferenceException : Xeption
+    public class InvalidReferenceHandlerConfigurationException : Xeption
     {
-        public InvalidHandlerConfigurationReferenceException(string message, Exception innerException)
+        public InvalidReferenceHandlerConfigurationException(string message, Exception innerException)
             : base(message, innerException)
         { }
     }
