@@ -29,11 +29,14 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
         }
 
         public ValueTask<EventV1Archive> AddEventV1ArchiveAsync(
-            EventV1Archive eventV1Archive) => TryCatch(async () =>
+            EventV1Archive eventV1Archive) => 
+        TryCatch(async () =>
         {
-            await ValidateEventV1ArchiveOnAddAsync(eventV1Archive);
+            await ValidateEventV1ArchiveOnAddAsync(
+                eventV1Archive);
 
-            return await this.storageBroker.InsertEventV1ArchiveAsync(eventV1Archive);
+            return await this.storageBroker.InsertEventV1ArchiveAsync(
+                eventV1Archive);
         });
 
         public ValueTask<IQueryable<EventV1Archive>> RetrieveAllEventV1ArchivesAsync() =>
