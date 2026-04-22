@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V1;
@@ -18,5 +19,8 @@ namespace EventHighway.Core.Brokers.Storages
 
         public async ValueTask<IQueryable<EventV1Archive>> SelectAllEventV1ArchivesAsync() =>
             SelectAll<EventV1Archive>();
+
+        public async ValueTask<EventV1Archive> SelectEventV1ArchiveByIdAsync(Guid eventV1ArchiveId) =>
+            await SelectAsync<EventV1Archive>(eventV1ArchiveId);
     }
 }
