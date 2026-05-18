@@ -22,7 +22,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
             Xeption validationException)
         {
             // given
-            EventV1Archive someEventV1Archive = CreateRandomEventV1Archive();
+            EventArchiveV1 someEventV1Archive = CreateRandomEventV1Archive();
 
             var expectedEventV1ArchiveOrchestrationDependencyValidationException =
                 new EventV1ArchiveOrchestrationDependencyValidationException(
@@ -30,7 +30,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                     innerException: validationException.InnerException as Xeption);
 
             this.listenerEventV1ArchiveServiceMock.Setup(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()))
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()))
                     .ThrowsAsync(validationException);
 
             // when
@@ -48,7 +48,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                 .BeEquivalentTo(expectedEventV1ArchiveOrchestrationDependencyValidationException);
 
             this.listenerEventV1ArchiveServiceMock.Verify(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -57,7 +57,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                         Times.Once);
 
             this.eventV1ArchiveServiceMock.Verify(broker =>
-                broker.AddEventV1ArchiveAsync(It.IsAny<EventV1Archive>()),
+                broker.AddEventArchiveV1Async(It.IsAny<EventArchiveV1>()),
                     Times.Never);
 
             this.listenerEventV1ArchiveServiceMock.VerifyNoOtherCalls();
@@ -72,7 +72,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
             Xeption validationException)
         {
             // given
-            EventV1Archive someEventV1Archive = CreateRandomEventV1Archive();
+            EventArchiveV1 someEventV1Archive = CreateRandomEventV1Archive();
 
             var expectedEventV1ArchiveOrchestrationDependencyException =
                 new EventV1ArchiveOrchestrationDependencyException(
@@ -80,7 +80,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                     innerException: validationException.InnerException as Xeption);
 
             this.listenerEventV1ArchiveServiceMock.Setup(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()))
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()))
                     .ThrowsAsync(validationException);
 
             // when
@@ -98,7 +98,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                 .BeEquivalentTo(expectedEventV1ArchiveOrchestrationDependencyException);
 
             this.listenerEventV1ArchiveServiceMock.Verify(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -107,7 +107,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                         Times.Once);
 
             this.eventV1ArchiveServiceMock.Verify(broker =>
-                broker.AddEventV1ArchiveAsync(It.IsAny<EventV1Archive>()),
+                broker.AddEventArchiveV1Async(It.IsAny<EventArchiveV1>()),
                     Times.Never);
 
             this.listenerEventV1ArchiveServiceMock.VerifyNoOtherCalls();
@@ -119,7 +119,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
-            EventV1Archive someEventV1Archive = CreateRandomEventV1Archive();
+            EventArchiveV1 someEventV1Archive = CreateRandomEventV1Archive();
             var exception = new Exception();
 
             var failedEventV1ArchiveOrchestrationServiceException =
@@ -133,7 +133,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                     innerException: failedEventV1ArchiveOrchestrationServiceException);
 
             this.listenerEventV1ArchiveServiceMock.Setup(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()))
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()))
                     .ThrowsAsync(exception);
 
             // when
@@ -151,7 +151,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                 .BeEquivalentTo(expectedEventV1ArchiveOrchestrationServiceException);
 
             this.listenerEventV1ArchiveServiceMock.Verify(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -160,7 +160,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                         Times.Once);
 
             this.eventV1ArchiveServiceMock.Verify(broker =>
-                broker.AddEventV1ArchiveAsync(It.IsAny<EventV1Archive>()),
+                broker.AddEventArchiveV1Async(It.IsAny<EventArchiveV1>()),
                     Times.Never);
 
             this.listenerEventV1ArchiveServiceMock.VerifyNoOtherCalls();

@@ -7,13 +7,13 @@ using EventHighway.Core.Models.Services.Processings.EventArchives.V1.Exceptions;
 
 namespace EventHighway.Core.Services.Processings.EventArchives.V1
 {
-    internal partial class EventV1ArchiveProcessingService
+    internal partial class EventArchiveV1ProcessingService
     {
-        private static void ValidateEventV1ArchiveIsNotNull(EventV1Archive eventV1Archive)
+        private static void ValidateEventV1ArchiveIsNotNull(EventArchiveV1 eventV1Archive)
         {
             if (eventV1Archive is null)
             {
-                throw new NullEventV1ArchiveProcessingException(
+                throw new NullEventArchiveV1ProcessingException(
                     message: "Event archive is null.");
             }
         }

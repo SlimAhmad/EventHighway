@@ -10,48 +10,48 @@ using Moq;
 
 namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
 {
-    public partial class EventV1ArchiveProcessingServiceTests
+    public partial class EventArchiveV1ProcessingServiceTests
     {
         [Fact]
-        public async Task ShouldThrowValidationExceptionOnAddIfEventV1ArchiveIsNullAndLogItAsync()
+        public async Task ShouldThrowValidationExceptionOnAddIfEventArchiveV1IsNullAndLogItAsync()
         {
             // given
-            EventV1Archive nullEventV1Archive = null;
+            EventArchiveV1 nullEventArchiveV1 = null;
 
-            var nullEventV1ArchiveProcessingException =
-                new NullEventV1ArchiveProcessingException(
+            var nullEventArchiveV1ProcessingException =
+                new NullEventArchiveV1ProcessingException(
                     message: "Event archive is null.");
 
-            var expectedEventV1ArchiveProcessingValidationException =
-                new EventV1ArchiveProcessingValidationException(
+            var expectedEventArchiveV1ProcessingValidationException =
+                new EventArchiveV1ProcessingValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
-                    innerException: nullEventV1ArchiveProcessingException);
+                    innerException: nullEventArchiveV1ProcessingException);
 
             // when
-            ValueTask<EventV1Archive> addEventV1ArchiveTask =
-                this.eventV1ArchiveProcessingService.AddEventV1ArchiveAsync(nullEventV1Archive);
+            ValueTask<EventArchiveV1> addEventArchiveV1Task =
+                this.eventArchiveV1ProcessingService.AddEventArchiveV1Async(nullEventArchiveV1);
 
-            EventV1ArchiveProcessingValidationException
-                actualEventV1ArchiveProcessingValidationException =
-                    await Assert.ThrowsAsync<EventV1ArchiveProcessingValidationException>(
-                        addEventV1ArchiveTask.AsTask);
+            EventArchiveV1ProcessingValidationException
+                actualEventArchiveV1ProcessingValidationException =
+                    await Assert.ThrowsAsync<EventArchiveV1ProcessingValidationException>(
+                        addEventArchiveV1Task.AsTask);
 
             // then
-            actualEventV1ArchiveProcessingValidationException.Should().BeEquivalentTo(
-                expectedEventV1ArchiveProcessingValidationException);
+            actualEventArchiveV1ProcessingValidationException.Should().BeEquivalentTo(
+                expectedEventArchiveV1ProcessingValidationException);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
-                    expectedEventV1ArchiveProcessingValidationException))),
+                    expectedEventArchiveV1ProcessingValidationException))),
                         Times.Once);
 
-            this.eventV1ArchiveServiceMock.Verify(service =>
-                service.AddEventV1ArchiveAsync(
-                    It.IsAny<EventV1Archive>()),
+            this.eventArchiveV1ServiceMock.Verify(service =>
+                service.AddEventArchiveV1Async(
+                    It.IsAny<EventArchiveV1>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.eventV1ArchiveServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV1ServiceMock.VerifyNoOtherCalls();
         }
     }
 }

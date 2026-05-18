@@ -17,22 +17,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowValidationExceptionOnAddIfListenerEventV1ArchiveIsNullAndLogItAsync()
         {
             // given
-            ListenerEventV1Archive nullListenerEventV1Archive = null;
+            ListenerEventArchiveV1 nullListenerEventV1Archive = null;
 
             var nullListenerEventV1ArchiveException =
-                new NullListenerEventV1ArchiveException(message: "Listener event archive is null.");
+                new NullListenerEventArchiveV1Exception(message: "Listener event archive is null.");
 
             var expectedListenerEventV1ArchiveValidationException =
-                new ListenerEventV1ArchiveValidationException(
+                new ListenerEventArchiveV1ValidationException(
                     message: "Listener event archive validation error occurred, fix the errors and try again.",
                     innerException: nullListenerEventV1ArchiveException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveService.AddListenerEventV1ArchiveAsync(nullListenerEventV1Archive);
 
-            ListenerEventV1ArchiveValidationException actualListenerEventV1ArchiveValidationException =
-                await Assert.ThrowsAsync<ListenerEventV1ArchiveValidationException>(
+            ListenerEventArchiveV1ValidationException actualListenerEventV1ArchiveValidationException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV1ValidationException>(
                     addListenerEventV1ArchiveTask.AsTask);
 
             // then
@@ -49,7 +49,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     Times.Never);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -64,10 +64,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         private async Task ShouldThrowValidationExceptionOnAddIfListenerEventV1ArchiveIsInvalidAndLogItAsync(
             string invalidText)
         {
-            ListenerEventV1ArchiveStatus invalidListenerEventV1ArchiveStatus =
-                GetInvalidEnum<ListenerEventV1ArchiveStatus>();
+            ListenerEventArchiveV1Status invalidListenerEventV1ArchiveStatus =
+                GetInvalidEnum<ListenerEventArchiveV1Status>();
 
-            var invalidListenerEventV1Archive = new ListenerEventV1Archive
+            var invalidListenerEventV1Archive = new ListenerEventArchiveV1
             {
                 Id = Guid.Empty,
                 Response = invalidText,
@@ -79,52 +79,52 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             };
 
             var invalidListenerEventV1ArchiveException =
-                new InvalidListenerEventV1ArchiveException(
+                new InvalidListenerEventArchiveV1Exception(
                     message: "Listener event archive is invalid, fix the errors and try again.");
 
             invalidListenerEventV1ArchiveException.AddData(
-                key: nameof(ListenerEventV1Archive.Id),
+                key: nameof(ListenerEventArchiveV1.Id),
                 values: "Required");
 
             invalidListenerEventV1ArchiveException.AddData(
-                key: nameof(ListenerEventV1Archive.EventId),
+                key: nameof(ListenerEventArchiveV1.EventId),
                 values: "Required");
 
             invalidListenerEventV1ArchiveException.AddData(
-                key: nameof(ListenerEventV1Archive.EventAddressId),
+                key: nameof(ListenerEventArchiveV1.EventAddressId),
                 values: "Required");
 
             invalidListenerEventV1ArchiveException.AddData(
-                key: nameof(ListenerEventV1Archive.EventListenerId),
+                key: nameof(ListenerEventArchiveV1.EventListenerId),
                 values: "Required");
 
             invalidListenerEventV1ArchiveException.AddData(
-                key: nameof(ListenerEventV1Archive.Status),
+                key: nameof(ListenerEventArchiveV1.Status),
                 values: "Value is not recognized");
 
             invalidListenerEventV1ArchiveException.AddData(
-                key: nameof(ListenerEventV1Archive.CreatedDate),
+                key: nameof(ListenerEventArchiveV1.CreatedDate),
                 values: "Required");
 
             invalidListenerEventV1ArchiveException.AddData(
-                key: nameof(ListenerEventV1Archive.UpdatedDate),
+                key: nameof(ListenerEventArchiveV1.UpdatedDate),
                 values: "Required");
 
             invalidListenerEventV1ArchiveException.AddData(
-                key: nameof(ListenerEventV1Archive.ArchivedDate),
+                key: nameof(ListenerEventArchiveV1.ArchivedDate),
                 values: "Required");
 
             var expectedListenerEventV1ArchiveValidationException =
-                new ListenerEventV1ArchiveValidationException(
+                new ListenerEventArchiveV1ValidationException(
                     message: "Listener event archive validation error occurred, fix the errors and try again.",
                     innerException: invalidListenerEventV1ArchiveException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveService.AddListenerEventV1ArchiveAsync(invalidListenerEventV1Archive);
 
-            ListenerEventV1ArchiveValidationException actualListenerEventV1ArchiveValidationException =
-                await Assert.ThrowsAsync<ListenerEventV1ArchiveValidationException>(
+            ListenerEventArchiveV1ValidationException actualListenerEventV1ArchiveValidationException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV1ValidationException>(
                     addListenerEventV1ArchiveTask.AsTask);
 
             // then
@@ -141,7 +141,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -157,22 +157,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             // given
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
-            ListenerEventV1Archive randomListenerEventV1Archive =
+            ListenerEventArchiveV1 randomListenerEventV1Archive =
                 CreateRandomListenerEventV1Archive(randomDateTimeOffset
                     .AddMinutes(minutes: minutesBeforeAndAfter));
 
-            ListenerEventV1Archive invalidListenerEventV1Archive = randomListenerEventV1Archive;
+            ListenerEventArchiveV1 invalidListenerEventV1Archive = randomListenerEventV1Archive;
 
             var invalidListenerEventV1ArchiveException =
-                new InvalidListenerEventV1ArchiveException(
+                new InvalidListenerEventArchiveV1Exception(
                     message: "Listener event archive is invalid, fix the errors and try again.");
 
             invalidListenerEventV1ArchiveException.AddData(
-                key: nameof(ListenerEventV1Archive.ArchivedDate),
+                key: nameof(ListenerEventArchiveV1.ArchivedDate),
                 values: "Date is not recent");
 
             var expectedListenerEventV1ArchiveValidationException =
-                new ListenerEventV1ArchiveValidationException(
+                new ListenerEventArchiveV1ValidationException(
                     message: "Listener event archive validation error occurred, fix the errors and try again.",
                     innerException: invalidListenerEventV1ArchiveException);
 
@@ -181,11 +181,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     .ReturnsAsync(randomDateTimeOffset);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveService.AddListenerEventV1ArchiveAsync(invalidListenerEventV1Archive);
 
-            ListenerEventV1ArchiveValidationException actualListenerEventV1ArchiveValidationException =
-                await Assert.ThrowsAsync<ListenerEventV1ArchiveValidationException>(
+            ListenerEventArchiveV1ValidationException actualListenerEventV1ArchiveValidationException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV1ValidationException>(
                     addListenerEventV1ArchiveTask.AsTask);
 
             // then
@@ -202,7 +202,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();

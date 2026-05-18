@@ -26,8 +26,8 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<ListenerEventV1Archive> AddListenerEventV1ArchiveAsync(
-            ListenerEventV1Archive listenerEventV1Archive) => TryCatch(async () =>
+        public ValueTask<ListenerEventArchiveV1> AddListenerEventV1ArchiveAsync(
+            ListenerEventArchiveV1 listenerEventV1Archive) => TryCatch(async () =>
         {
             await ValidateListenerEventV1ArchiveOnAddAsync(listenerEventV1Archive);
 

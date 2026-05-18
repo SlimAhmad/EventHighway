@@ -10,45 +10,45 @@ using Moq;
 
 namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
 {
-    public partial class EventV1ArchiveProcessingServiceTests
+    public partial class EventArchiveV1ProcessingServiceTests
     {
         [Fact]
-        public async Task ShouldAddEventV1ArchiveAsync()
+        public async Task ShouldAddEventArchiveV1Async()
         {
             // given
-            EventV1Archive randomEventV1Archive =
-                CreateRandomEventV1Archive();
+            EventArchiveV1 randomEventArchiveV1 =
+                CreateRandomEventArchiveV1();
 
-            EventV1Archive inputEventV1Archive =
-                randomEventV1Archive;
+            EventArchiveV1 inputEventArchiveV1 =
+                randomEventArchiveV1;
 
-            EventV1Archive addedEventV1Archive =
-                inputEventV1Archive;
+            EventArchiveV1 addedEventArchiveV1 =
+                inputEventArchiveV1;
 
-            EventV1Archive expectedEventV1Archive =
-                addedEventV1Archive.DeepClone();
+            EventArchiveV1 expectedEventArchiveV1 =
+                addedEventArchiveV1.DeepClone();
 
-            this.eventV1ArchiveServiceMock.Setup(service =>
-                service.AddEventV1ArchiveAsync(
-                    inputEventV1Archive))
-                        .ReturnsAsync(addedEventV1Archive);
+            this.eventArchiveV1ServiceMock.Setup(service =>
+                service.AddEventArchiveV1Async(
+                    inputEventArchiveV1))
+                        .ReturnsAsync(addedEventArchiveV1);
 
             // when
-            EventV1Archive actualEventV1Archive =
-                await this.eventV1ArchiveProcessingService
-                    .AddEventV1ArchiveAsync(
-                        inputEventV1Archive);
+            EventArchiveV1 actualEventArchiveV1 =
+                await this.eventArchiveV1ProcessingService
+                    .AddEventArchiveV1Async(
+                        inputEventArchiveV1);
 
             // then
-            actualEventV1Archive.Should().BeEquivalentTo(
-                expectedEventV1Archive);
+            actualEventArchiveV1.Should().BeEquivalentTo(
+                expectedEventArchiveV1);
 
-            this.eventV1ArchiveServiceMock.Verify(service =>
-                service.AddEventV1ArchiveAsync(
-                    inputEventV1Archive),
+            this.eventArchiveV1ServiceMock.Verify(service =>
+                service.AddEventArchiveV1Async(
+                    inputEventArchiveV1),
                         Times.Once);
 
-            this.eventV1ArchiveServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV1ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

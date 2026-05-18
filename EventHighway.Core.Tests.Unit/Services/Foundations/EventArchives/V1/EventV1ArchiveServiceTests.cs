@@ -23,7 +23,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
         private readonly Mock<IStorageBroker> storageBrokerMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
-        private readonly IEventV1ArchiveService eventV1ArchiveService;
+        private readonly IEventArchiveV1Service eventV1ArchiveService;
 
         public EventV1ArchiveServiceTests()
         {
@@ -70,16 +70,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 10).GetValue();
 
-        private static EventV1Archive CreateRandomEventV1Archive(DateTimeOffset date) =>
+        private static EventArchiveV1 CreateRandomEventV1Archive(DateTimeOffset date) =>
             CreateEventV1ArchiveFiller(date).Create();
 
-        private static EventV1Archive CreateRandomEventV1Archive() =>
+        private static EventArchiveV1 CreateRandomEventV1Archive() =>
             CreateEventV1ArchiveFiller(date: GetRandomDateTimeOffset()).Create();
 
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
 
-        private static IQueryable<EventV1Archive> CreateRandomEventV1Archives()
+        private static IQueryable<EventArchiveV1> CreateRandomEventV1Archives()
         {
             return CreateEventV1ArchiveFiller(date: GetRandomDateTimeOffset())
                 .Create(count: GetRandomNumber())
@@ -107,10 +107,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             }
         }
 
-        private static Filler<EventV1Archive> CreateEventV1ArchiveFiller(
+        private static Filler<EventArchiveV1> CreateEventV1ArchiveFiller(
             DateTimeOffset date)
         {
-            var filler = new Filler<EventV1Archive>();
+            var filler = new Filler<EventArchiveV1>();
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(date)

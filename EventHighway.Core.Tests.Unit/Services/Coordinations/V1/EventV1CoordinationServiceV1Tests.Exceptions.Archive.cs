@@ -59,7 +59,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
 
             this.eventV1ArchiveOrchestrationServiceMock.Verify(service =>
                 service.AddEventV1ArchiveWithListenerEventV1ArchivesAsync(
-                    It.IsAny<EventV1Archive>()),
+                    It.IsAny<EventArchiveV1>()),
                         Times.Never);
 
             this.eventV1OrchestrationServiceV1Mock.Verify(service =>
@@ -117,7 +117,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
 
             this.eventV1ArchiveOrchestrationServiceMock.Verify(service =>
                 service.AddEventV1ArchiveWithListenerEventV1ArchivesAsync(
-                    It.IsAny<EventV1Archive>()),
+                    It.IsAny<EventArchiveV1>()),
                         Times.Never);
 
             this.eventV1OrchestrationServiceV1Mock.Verify(service =>
@@ -179,7 +179,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
 
             this.eventV1ArchiveOrchestrationServiceMock.Verify(service =>
                 service.AddEventV1ArchiveWithListenerEventV1ArchivesAsync(
-                    It.IsAny<EventV1Archive>()),
+                    It.IsAny<EventArchiveV1>()),
                         Times.Never);
 
             this.eventV1OrchestrationServiceV1Mock.Verify(service =>

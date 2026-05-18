@@ -9,7 +9,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V1
 {
     internal partial class ListenerEventV1ArchiveProcessingService
     {
-        private void ValidateListenerEventV1Archive(ListenerEventV1Archive listenerEventV1Archive)
+        private void ValidateListenerEventV1Archive(ListenerEventArchiveV1 listenerEventV1Archive)
         {
             if (listenerEventV1Archive is null)
             {

@@ -20,7 +20,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             Xeption validationException)
         {
             // given
-            ListenerEventV1Archive someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
+            ListenerEventArchiveV1 someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
 
             var expectedListenerEventV1ArchiveProcessingDependencyValidationException =
                 new ListenerEventV1ArchiveProcessingDependencyValidationException(
@@ -29,11 +29,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
 
             this.listenerEventV1ArchiveServiceMock.Setup(service =>
                 service.AddListenerEventV1ArchiveAsync(
-                    It.IsAny<ListenerEventV1Archive>()))
+                    It.IsAny<ListenerEventArchiveV1>()))
                         .ThrowsAsync(validationException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveProcessingService.AddListenerEventV1ArchiveAsync(
                     someListenerEventV1Archive);
 
@@ -47,7 +47,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 expectedListenerEventV1ArchiveProcessingDependencyValidationException);
 
             this.listenerEventV1ArchiveServiceMock.Verify(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -65,7 +65,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             Xeption dependencyException)
         {
             // given
-            ListenerEventV1Archive someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
+            ListenerEventArchiveV1 someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
 
             var expectedListenerEventV1ArchiveProcessingDependencyException =
                 new ListenerEventV1ArchiveProcessingDependencyException(
@@ -73,11 +73,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     innerException: dependencyException.InnerException as Xeption);
 
             this.listenerEventV1ArchiveServiceMock.Setup(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()))
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()))
                     .ThrowsAsync(dependencyException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveProcessingService.AddListenerEventV1ArchiveAsync(someListenerEventV1Archive);
 
             ListenerEventV1ArchiveProcessingDependencyException
@@ -90,7 +90,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 expectedListenerEventV1ArchiveProcessingDependencyException);
 
             this.listenerEventV1ArchiveServiceMock.Verify(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -106,7 +106,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
-            ListenerEventV1Archive someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
+            ListenerEventArchiveV1 someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
             var serviceException = new Exception();
 
             var failedListenerEventV1ArchiveProcessingServiceException =
@@ -120,11 +120,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     innerException: failedListenerEventV1ArchiveProcessingServiceException);
 
             this.listenerEventV1ArchiveServiceMock.Setup(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()))
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()))
                     .ThrowsAsync(serviceException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveProcessingService.AddListenerEventV1ArchiveAsync(
                     someListenerEventV1Archive);
 
@@ -139,7 +139,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
 
             this.listenerEventV1ArchiveServiceMock.Verify(service =>
                 service.AddListenerEventV1ArchiveAsync(
-                    It.IsAny<ListenerEventV1Archive>()),
+                    It.IsAny<ListenerEventArchiveV1>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

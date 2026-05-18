@@ -16,16 +16,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         public async Task ShouldAddListenerEventV1ArchiveAsync()
         {
             // given
-            ListenerEventV1Archive randomListenerEventV1Archive =
+            ListenerEventArchiveV1 randomListenerEventV1Archive =
                 CreateRandomListenerEventV1Archive();
 
-            ListenerEventV1Archive inputListenerEventV1Archive =
+            ListenerEventArchiveV1 inputListenerEventV1Archive =
                 randomListenerEventV1Archive;
 
-            ListenerEventV1Archive storageListenerEventV1Archive =
+            ListenerEventArchiveV1 storageListenerEventV1Archive =
                 inputListenerEventV1Archive;
 
-            ListenerEventV1Archive expectedListenerEventV1Archive =
+            ListenerEventArchiveV1 expectedListenerEventV1Archive =
                 storageListenerEventV1Archive.DeepClone();
 
             this.listenerEventV1ArchiveServiceMock.Setup(broker =>
@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     .ReturnsAsync(storageListenerEventV1Archive);
 
             // when
-            ListenerEventV1Archive actualListenerEventV1Archive =
+            ListenerEventArchiveV1 actualListenerEventV1Archive =
                 await this.listenerEventV1ArchiveProcessingService
                     .AddListenerEventV1ArchiveAsync(
                         inputListenerEventV1Archive);

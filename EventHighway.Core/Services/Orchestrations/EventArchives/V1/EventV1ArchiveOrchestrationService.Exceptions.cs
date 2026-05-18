@@ -34,49 +34,49 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V1
                 throw await CreateAndLogValidationExceptionAsync(
                     nullListenerEventV1ArchivesOrchestrationException);
             }
-            catch (EventV1ArchiveValidationException
+            catch (EventArchiveV1ValidationException
                 eventV1ArchiveValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventV1ArchiveValidationException);
             }
-            catch (EventV1ArchiveDependencyValidationException
+            catch (EventArchiveV1DependencyValidationException
                 eventV1ArchiveDependencyValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventV1ArchiveDependencyValidationException);
             }
-            catch (ListenerEventV1ArchiveValidationException
+            catch (ListenerEventArchiveV1ValidationException
                 listenerEventV1ArchiveValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     listenerEventV1ArchiveValidationException);
             }
-            catch (ListenerEventV1ArchiveDependencyValidationException
+            catch (ListenerEventArchiveV1DependencyValidationException
                 listenerEventV1ArchiveDependencyValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     listenerEventV1ArchiveDependencyValidationException);
             }
-            catch (EventV1ArchiveDependencyException
+            catch (EventArchiveV1DependencyException
                 eventV1ArchiveDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
                     eventV1ArchiveDependencyException);
             }
-            catch (EventV1ArchiveServiceException
+            catch (EventArchiveV1ServiceException
                 eventV1ArchiveServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
                     eventV1ArchiveServiceException);
             }
-            catch (ListenerEventV1ArchiveDependencyException
+            catch (ListenerEventArchiveV1DependencyException
                 listenerListenerEventV1ArchiveDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
                     listenerListenerEventV1ArchiveDependencyException);
             }
-            catch (ListenerEventV1ArchiveServiceException
+            catch (ListenerEventArchiveV1ServiceException
                 listenerListenerEventV1ArchiveServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(

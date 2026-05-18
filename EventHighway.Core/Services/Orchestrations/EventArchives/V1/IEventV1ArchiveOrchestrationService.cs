@@ -9,6 +9,6 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V1
 {
     public interface IEventV1ArchiveOrchestrationService
     {
-        ValueTask AddEventV1ArchiveWithListenerEventV1ArchivesAsync(EventV1Archive eventV1Archive);
+        ValueTask AddEventV1ArchiveWithListenerEventV1ArchivesAsync(EventArchiveV1 eventV1Archive);
     }
 }

@@ -22,26 +22,26 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             SqlException sqlException = CreateSqlException();
 
             var failedEventV1ArchiveStorageException =
-                new FailedEventV1ArchiveStorageException(
+                new FailedEventArchiveV1StorageException(
                     message: "Failed event archive storage error occurred, contact support.",
                     innerException: sqlException);
 
             var expectedEventV1ArchiveDependencyException =
-                new EventV1ArchiveDependencyException(
+                new EventArchiveV1DependencyException(
                     message: "Event archive dependency error occurred, contact support.",
                     innerException: failedEventV1ArchiveStorageException);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectEventV1ArchiveByIdAsync(It.IsAny<Guid>()))
+                broker.SelectEventArchiveV1ByIdAsync(It.IsAny<Guid>()))
                     .ThrowsAsync(sqlException);
 
             // when
-            ValueTask<EventV1Archive> retrieveEventV1ArchiveByIdTask =
-                this.eventV1ArchiveService.RetrieveEventV1ArchiveByIdAsync(
+            ValueTask<EventArchiveV1> retrieveEventV1ArchiveByIdTask =
+                this.eventV1ArchiveService.RetrieveEventArchiveV1ByIdAsync(
                     someEventV1ArchiveId);
 
-            EventV1ArchiveDependencyException actualEventV1ArchiveDependencyException =
-                await Assert.ThrowsAsync<EventV1ArchiveDependencyException>(
+            EventArchiveV1DependencyException actualEventV1ArchiveDependencyException =
+                await Assert.ThrowsAsync<EventArchiveV1DependencyException>(
                     retrieveEventV1ArchiveByIdTask.AsTask);
 
             // then
@@ -49,7 +49,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
                 .BeEquivalentTo(expectedEventV1ArchiveDependencyException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectEventV1ArchiveByIdAsync(It.IsAny<Guid>()),
+                broker.SelectEventArchiveV1ByIdAsync(It.IsAny<Guid>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -70,26 +70,26 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             var serviceException = new Exception();
 
             var failedEventV1ArchiveServiceException =
-                new FailedEventV1ArchiveServiceException(
+                new FailedEventArchiveV1ServiceException(
                     message: "Failed event archive service error occurred, contact support.",
                     innerException: serviceException);
 
             var expectedEventV1ArchiveServiceException =
-                new EventV1ArchiveServiceException(
+                new EventArchiveV1ServiceException(
                     message: "Event archive service error occurred, contact support.",
                     innerException: failedEventV1ArchiveServiceException);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectEventV1ArchiveByIdAsync(It.IsAny<Guid>()))
+                broker.SelectEventArchiveV1ByIdAsync(It.IsAny<Guid>()))
                     .ThrowsAsync(serviceException);
 
             // when
-            ValueTask<EventV1Archive> retrieveEventV1ArchiveByIdTask =
-                this.eventV1ArchiveService.RetrieveEventV1ArchiveByIdAsync(
+            ValueTask<EventArchiveV1> retrieveEventV1ArchiveByIdTask =
+                this.eventV1ArchiveService.RetrieveEventArchiveV1ByIdAsync(
                     someEventV1ArchiveId);
 
-            EventV1ArchiveServiceException actualEventV1ArchiveServiceException =
-                await Assert.ThrowsAsync<EventV1ArchiveServiceException>(
+            EventArchiveV1ServiceException actualEventV1ArchiveServiceException =
+                await Assert.ThrowsAsync<EventArchiveV1ServiceException>(
                     retrieveEventV1ArchiveByIdTask.AsTask);
 
             // then
@@ -97,7 +97,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
                 .BeEquivalentTo(expectedEventV1ArchiveServiceException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectEventV1ArchiveByIdAsync(It.IsAny<Guid>()),
+                broker.SelectEventArchiveV1ByIdAsync(It.IsAny<Guid>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

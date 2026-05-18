@@ -15,22 +15,22 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
 {
     internal partial class ListenerEventV1ArchiveService
     {
-        private delegate ValueTask<ListenerEventV1Archive> ReturningListenerEventV1ArchiveFunction();
+        private delegate ValueTask<ListenerEventArchiveV1> ReturningListenerEventV1ArchiveFunction();
 
-        private async ValueTask<ListenerEventV1Archive> TryCatch(
+        private async ValueTask<ListenerEventArchiveV1> TryCatch(
             ReturningListenerEventV1ArchiveFunction returningListenerEventV1ArchiveFunction)
         {
             try
             {
                 return await returningListenerEventV1ArchiveFunction();
             }
-            catch (NullListenerEventV1ArchiveException
+            catch (NullListenerEventArchiveV1Exception
                 nullListenerEventV1ArchiveException)
             {
                 throw await CreateAndLogValidationExceptionAsync(
                     nullListenerEventV1ArchiveException);
             }
-            catch (InvalidListenerEventV1ArchiveException
+            catch (InvalidListenerEventArchiveV1Exception
                 invalidListenerEventV1ArchiveException)
             {
                 throw await CreateAndLogValidationExceptionAsync(
@@ -39,7 +39,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             catch (SqlException sqlException)
             {
                 var failedListenerEventV1ArchiveStorageException =
-                    new FailedListenerEventV1ArchiveStorageException(
+                    new FailedListenerEventArchiveV1StorageException(
                         message: "Failed listener event archive storage error occurred, contact support.",
                         innerException: sqlException);
 
@@ -49,7 +49,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             catch (DuplicateKeyException duplicateKeyException)
             {
                 var alreadyExistsListenerEventV1ArchiveException =
-                    new AlreadyExistsListenerEventV1ArchiveException(
+                    new AlreadyExistsListenerEventArchiveV1Exception(
                         message: "Listener event archive with the same id already exists.",
                         innerException: duplicateKeyException);
 
@@ -59,7 +59,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             catch (DbUpdateException dbUpdateException)
             {
                 var failedListenerEventV1ArchiveStorageException =
-                    new FailedListenerEventV1ArchiveStorageException(
+                    new FailedListenerEventArchiveV1StorageException(
                         message: "Failed listener event archive storage error occurred, contact support.",
                         innerException: dbUpdateException);
 
@@ -69,7 +69,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             catch (Exception serviceException)
             {
                 var failedListenerEventV1ArchiveServiceException =
-                    new FailedListenerEventV1ArchiveServiceException(
+                    new FailedListenerEventArchiveV1ServiceException(
                         message: "Failed listener event archive service error occurred, contact support.",
                         innerException: serviceException);
 
@@ -78,11 +78,11 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             }
         }
 
-        private async ValueTask<ListenerEventV1ArchiveValidationException> CreateAndLogValidationExceptionAsync(
+        private async ValueTask<ListenerEventArchiveV1ValidationException> CreateAndLogValidationExceptionAsync(
             Xeption exception)
         {
             var listenerEventV1ArchiveValidationException =
-                new ListenerEventV1ArchiveValidationException(
+                new ListenerEventArchiveV1ValidationException(
                     message: "Listener event archive validation error occurred, fix the errors and try again.",
                     innerException: exception);
 
@@ -91,11 +91,11 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             return listenerEventV1ArchiveValidationException;
         }
 
-        private async ValueTask<ListenerEventV1ArchiveDependencyException> CreateAndLogCriticalDependencyExceptionAsync(
+        private async ValueTask<ListenerEventArchiveV1DependencyException> CreateAndLogCriticalDependencyExceptionAsync(
             Xeption exception)
         {
             var listenerEventV1ArchiveDependencyException =
-                new ListenerEventV1ArchiveDependencyException(
+                new ListenerEventArchiveV1DependencyException(
                     message: "Listener event archive dependency error occurred, contact support.",
                     innerException: exception);
 
@@ -104,12 +104,12 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             return listenerEventV1ArchiveDependencyException;
         }
 
-        private async ValueTask<ListenerEventV1ArchiveDependencyValidationException>
+        private async ValueTask<ListenerEventArchiveV1DependencyValidationException>
             CreateAndLogDependencyValidationExceptionAsync(
                 Xeption exception)
         {
             var listenerEventV1ArchiveDependencyValidationException =
-                new ListenerEventV1ArchiveDependencyValidationException(
+                new ListenerEventArchiveV1DependencyValidationException(
                     message: "Listener event archive validation error occurred, fix the errors and try again.",
                     innerException: exception);
 
@@ -118,11 +118,11 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             return listenerEventV1ArchiveDependencyValidationException;
         }
 
-        private async ValueTask<ListenerEventV1ArchiveDependencyException> CreateAndLogDependencyExceptionAsync(
+        private async ValueTask<ListenerEventArchiveV1DependencyException> CreateAndLogDependencyExceptionAsync(
             Xeption exception)
         {
             var listenerEventV1ArchiveDependencyException =
-                new ListenerEventV1ArchiveDependencyException(
+                new ListenerEventArchiveV1DependencyException(
                     message: "Listener event archive dependency error occurred, contact support.",
                     innerException: exception);
 
@@ -131,10 +131,10 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             return listenerEventV1ArchiveDependencyException;
         }
 
-        private async ValueTask<ListenerEventV1ArchiveServiceException> CreateAndLogServiceExceptionAsync(Xeption exception)
+        private async ValueTask<ListenerEventArchiveV1ServiceException> CreateAndLogServiceExceptionAsync(Xeption exception)
         {
             var listenerEventV1ArchiveServiceException =
-                new ListenerEventV1ArchiveServiceException(
+                new ListenerEventArchiveV1ServiceException(
                     message: "Listener event archive service error occurred, contact support.",
                     innerException: exception);
 

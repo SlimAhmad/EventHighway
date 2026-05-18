@@ -17,23 +17,23 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
         public async Task ShouldThrowValidationExceptionOnAddIfEventV1ArchiveIsNullAndLogItAsync()
         {
             // given
-            EventV1Archive nullEventV1Archive = null;
+            EventArchiveV1 nullEventV1Archive = null;
 
             var nullEventV1ArchiveException =
-                new NullEventV1ArchiveException(
+                new NullEventArchiveV1Exception(
                     message: "Event archive is null.");
 
             var expectedEventV1ArchiveValidationException =
-                new EventV1ArchiveValidationException(
+                new EventArchiveV1ValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
                     innerException: nullEventV1ArchiveException);
 
             // when
-            ValueTask<EventV1Archive> addEventV1ArchiveTask =
-                this.eventV1ArchiveService.AddEventV1ArchiveAsync(nullEventV1Archive);
+            ValueTask<EventArchiveV1> addEventV1ArchiveTask =
+                this.eventV1ArchiveService.AddEventArchiveV1Async(nullEventV1Archive);
 
-            EventV1ArchiveValidationException actualEventV1ArchiveValidationException =
-                await Assert.ThrowsAsync<EventV1ArchiveValidationException>(
+            EventArchiveV1ValidationException actualEventV1ArchiveValidationException =
+                await Assert.ThrowsAsync<EventArchiveV1ValidationException>(
                     addEventV1ArchiveTask.AsTask);
 
             // then
@@ -51,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
 
             this.storageBrokerMock.Verify(broker =>
                 broker.InsertEventV1ArchiveAsync(
-                    It.IsAny<EventV1Archive>()),
+                    It.IsAny<EventArchiveV1>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -66,9 +66,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
         private async Task ShouldThrowValidationExceptionOnAddIfEventV1ArchiveIsInvalidAndLogItAsync(
             string invalidText)
         {
-            EventV1ArchiveType invalidType = GetInvalidEnum<EventV1ArchiveType>();
+            EventArchiveV1Type invalidType = GetInvalidEnum<EventArchiveV1Type>();
 
-            var invalidEventV1Archive = new EventV1Archive
+            var invalidEventV1Archive = new EventArchiveV1
             {
                 Id = Guid.Empty,
                 Type = invalidType,
@@ -76,48 +76,48 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             };
 
             var invalidEventV1ArchiveException =
-                new InvalidEventV1ArchiveException(
+                new InvalidEventArchiveV1Exception(
                     message: "Event archive is invalid, fix the errors and try again.");
 
             invalidEventV1ArchiveException.AddData(
-                key: nameof(EventV1Archive.Id),
+                key: nameof(EventArchiveV1.Id),
                 values: "Required");
 
             invalidEventV1ArchiveException.AddData(
-                key: nameof(EventV1Archive.Content),
+                key: nameof(EventArchiveV1.Content),
                 values: "Required");
 
             invalidEventV1ArchiveException.AddData(
-                key: nameof(EventV1Archive.Type),
+                key: nameof(EventArchiveV1.Type),
                 values: "Value is not recognized");
 
             invalidEventV1ArchiveException.AddData(
-                key: nameof(EventV1Archive.CreatedDate),
+                key: nameof(EventArchiveV1.CreatedDate),
                 values: "Required");
 
             invalidEventV1ArchiveException.AddData(
-                key: nameof(EventV1Archive.UpdatedDate),
+                key: nameof(EventArchiveV1.UpdatedDate),
                 values: "Required");
 
             invalidEventV1ArchiveException.AddData(
-                key: nameof(EventV1Archive.ArchivedDate),
+                key: nameof(EventArchiveV1.ArchivedDate),
                 values: "Required");
 
             invalidEventV1ArchiveException.AddData(
-                key: nameof(EventV1Archive.EventAddressId),
+                key: nameof(EventArchiveV1.EventAddressId),
                 values: "Required");
 
             var expectedEventV1ArchiveValidationException =
-                new EventV1ArchiveValidationException(
+                new EventArchiveV1ValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
                     innerException: invalidEventV1ArchiveException);
 
             // when
-            ValueTask<EventV1Archive> addEventV1ArchiveTask =
-                this.eventV1ArchiveService.AddEventV1ArchiveAsync(invalidEventV1Archive);
+            ValueTask<EventArchiveV1> addEventV1ArchiveTask =
+                this.eventV1ArchiveService.AddEventArchiveV1Async(invalidEventV1Archive);
 
-            EventV1ArchiveValidationException actualEventV1ArchiveValidationException =
-                await Assert.ThrowsAsync<EventV1ArchiveValidationException>(
+            EventArchiveV1ValidationException actualEventV1ArchiveValidationException =
+                await Assert.ThrowsAsync<EventArchiveV1ValidationException>(
                     addEventV1ArchiveTask.AsTask);
 
             // then
@@ -135,7 +135,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
 
             this.storageBrokerMock.Verify(broker =>
                 broker.InsertEventV1ArchiveAsync(
-                    It.IsAny<EventV1Archive>()),
+                    It.IsAny<EventArchiveV1>()),
                         Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -151,22 +151,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             // given
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
-            EventV1Archive randomEventV1Archive =
+            EventArchiveV1 randomEventV1Archive =
                 CreateRandomEventV1Archive(
                     date: randomDateTimeOffset.AddMinutes(minutesBeforeAndAfterNow));
 
-            EventV1Archive invalidEventV1Archive = randomEventV1Archive;
+            EventArchiveV1 invalidEventV1Archive = randomEventV1Archive;
 
             var invalidEventV1ArchiveException =
-                new InvalidEventV1ArchiveException(
+                new InvalidEventArchiveV1Exception(
                     message: "Event archive is invalid, fix the errors and try again.");
 
             invalidEventV1ArchiveException.AddData(
-                key: nameof(EventV1Archive.ArchivedDate),
+                key: nameof(EventArchiveV1.ArchivedDate),
                 values: "Date is not recent");
 
             var expectedEventV1ArchiveValidationException =
-                new EventV1ArchiveValidationException(
+                new EventArchiveV1ValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
                     innerException: invalidEventV1ArchiveException);
 
@@ -175,11 +175,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
                     .ReturnsAsync(randomDateTimeOffset);
 
             // when
-            ValueTask<EventV1Archive> addEventV1ArchiveTask =
-                this.eventV1ArchiveService.AddEventV1ArchiveAsync(invalidEventV1Archive);
+            ValueTask<EventArchiveV1> addEventV1ArchiveTask =
+                this.eventV1ArchiveService.AddEventArchiveV1Async(invalidEventV1Archive);
 
-            EventV1ArchiveValidationException actualEventV1ArchiveValidationException =
-                await Assert.ThrowsAsync<EventV1ArchiveValidationException>(
+            EventArchiveV1ValidationException actualEventV1ArchiveValidationException =
+                await Assert.ThrowsAsync<EventArchiveV1ValidationException>(
                     addEventV1ArchiveTask.AsTask);
 
             // then
@@ -196,7 +196,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertEventV1ArchiveAsync(It.IsAny<EventV1Archive>()),
+                broker.InsertEventV1ArchiveAsync(It.IsAny<EventArchiveV1>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();

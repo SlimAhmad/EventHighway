@@ -20,17 +20,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             DateTimeOffset randomDateTimeOffset =
                 GetRandomDateTimeOffset();
 
-            EventV1Archive randomEventV1Archive =
+            EventArchiveV1 randomEventV1Archive =
                 CreateRandomEventV1Archive(
                     date: randomDateTimeOffset);
 
-            EventV1Archive inputEventV1Archive =
+            EventArchiveV1 inputEventV1Archive =
                 randomEventV1Archive;
 
-            EventV1Archive insertedEventV1Archive =
+            EventArchiveV1 insertedEventV1Archive =
                 inputEventV1Archive;
 
-            EventV1Archive expectedEventV1Archive =
+            EventArchiveV1 expectedEventV1Archive =
                 insertedEventV1Archive.DeepClone();
 
             this.dateTimeBrokerMock.Setup(broker =>
@@ -43,9 +43,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
                         .ReturnsAsync(insertedEventV1Archive);
 
             // when
-            EventV1Archive actualEventV1Archive =
+            EventArchiveV1 actualEventV1Archive =
                 await this.eventV1ArchiveService
-                    .AddEventV1ArchiveAsync(
+                    .AddEventArchiveV1Async(
                         inputEventV1Archive);
 
             // then

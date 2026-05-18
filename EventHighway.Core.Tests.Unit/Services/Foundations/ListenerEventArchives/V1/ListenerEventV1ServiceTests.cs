@@ -99,18 +99,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
-        private static ListenerEventV1Archive CreateRandomListenerEventV1Archive() =>
+        private static ListenerEventArchiveV1 CreateRandomListenerEventV1Archive() =>
             CreateListenerEventV1ArchiveFiller(dates: GetRandomDateTimeOffset()).Create();
 
-        private static ListenerEventV1Archive CreateRandomListenerEventV1Archive(DateTimeOffset dates) =>
+        private static ListenerEventArchiveV1 CreateRandomListenerEventV1Archive(DateTimeOffset dates) =>
             CreateListenerEventV1ArchiveFiller(dates).Create();
 
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
 
-        private static Filler<ListenerEventV1Archive> CreateListenerEventV1ArchiveFiller(DateTimeOffset dates)
+        private static Filler<ListenerEventArchiveV1> CreateListenerEventV1ArchiveFiller(DateTimeOffset dates)
         {
-            var filler = new Filler<ListenerEventV1Archive>();
+            var filler = new Filler<ListenerEventArchiveV1>();
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(dates);

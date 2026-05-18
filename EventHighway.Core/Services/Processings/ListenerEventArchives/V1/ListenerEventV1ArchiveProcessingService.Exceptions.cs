@@ -13,9 +13,9 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V1
 {
     internal partial class ListenerEventV1ArchiveProcessingService
     {
-        private delegate ValueTask<ListenerEventV1Archive> ReturningListenerEventV1ArchiveFunction();
+        private delegate ValueTask<ListenerEventArchiveV1> ReturningListenerEventV1ArchiveFunction();
 
-        private async ValueTask<ListenerEventV1Archive> TryCatch(
+        private async ValueTask<ListenerEventArchiveV1> TryCatch(
             ReturningListenerEventV1ArchiveFunction returningListenerEventV1ArchiveFunction)
         {
             try
@@ -26,19 +26,19 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V1
             {
                 throw await CreateAndLogValidationExceptionAsync(nullListenerEventV1ArchiveProcessingException);
             }
-            catch (ListenerEventV1ArchiveValidationException ListenerEventV1ArchiveValidationException)
+            catch (ListenerEventArchiveV1ValidationException ListenerEventV1ArchiveValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(ListenerEventV1ArchiveValidationException);
             }
-            catch (ListenerEventV1ArchiveDependencyValidationException ListenerEventV1ArchiveDependencyValidationException)
+            catch (ListenerEventArchiveV1DependencyValidationException ListenerEventV1ArchiveDependencyValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(ListenerEventV1ArchiveDependencyValidationException);
             }
-            catch (ListenerEventV1ArchiveDependencyException listenerEventV1ArchiveDependencyException)
+            catch (ListenerEventArchiveV1DependencyException listenerEventV1ArchiveDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(listenerEventV1ArchiveDependencyException);
             }
-            catch (ListenerEventV1ArchiveServiceException listenerEventV1ArchiveServiceException)
+            catch (ListenerEventArchiveV1ServiceException listenerEventV1ArchiveServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(listenerEventV1ArchiveServiceException);
             }

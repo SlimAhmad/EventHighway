@@ -16,22 +16,22 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
 {
     internal partial class EventV1ArchiveService
     {
-        private delegate ValueTask<EventV1Archive> ReturningEventV1ArchiveFunction();
-        private delegate ValueTask<IQueryable<EventV1Archive>> ReturningEventV1ArchivesFunction();
+        private delegate ValueTask<EventArchiveV1> ReturningEventV1ArchiveFunction();
+        private delegate ValueTask<IQueryable<EventArchiveV1>> ReturningEventV1ArchivesFunction();
 
-        private async ValueTask<EventV1Archive> TryCatch(
+        private async ValueTask<EventArchiveV1> TryCatch(
             ReturningEventV1ArchiveFunction returningEventV1ArchiveFunction)
         {
             try
             {
                 return await returningEventV1ArchiveFunction();
             }
-            catch (NullEventV1ArchiveException nullEventV1ArchiveException)
+            catch (NullEventArchiveV1Exception nullEventV1ArchiveException)
             {
                 throw await CreateAndLogValidationExceptionAsync(
                     nullEventV1ArchiveException);
             }
-            catch (InvalidEventV1ArchiveException invalidEventV1ArchiveException)
+            catch (InvalidEventArchiveV1Exception invalidEventV1ArchiveException)
             {
                 throw await CreateAndLogValidationExceptionAsync(
                     invalidEventV1ArchiveException);
@@ -39,7 +39,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             catch (SqlException sqlException)
             {
                 var failedEventV1ArchiveStorageException =
-                    new FailedEventV1ArchiveStorageException(
+                    new FailedEventArchiveV1StorageException(
                         message: "Failed event archive storage error occurred, contact support.",
                         innerException: sqlException);
 
@@ -60,7 +60,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
                 foreignKeyConstraintConflictException)
             {
                 var invalidEventV1ArchiveReferenceException =
-                    new InvalidEventV1ArchiveReferenceException(
+                    new InvalidEventArchiveV1ReferenceException(
                         message: "Invalid event archive reference error occurred.",
                         innerException: foreignKeyConstraintConflictException);
 
@@ -70,7 +70,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             catch (DbUpdateException dbUpdateException)
             {
                 var failedEventV1ArchiveStorageException =
-                    new FailedEventV1ArchiveStorageException(
+                    new FailedEventArchiveV1StorageException(
                         message: "Failed event archive storage error occurred, contact support.",
                         innerException: dbUpdateException);
 
@@ -79,7 +79,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             catch (Exception serviceException)
             {
                 var failedEventV1ArchiveServiceException =
-                    new FailedEventV1ArchiveServiceException(
+                    new FailedEventArchiveV1ServiceException(
                         message: "Failed event archive service error occurred, contact support.",
                         innerException: serviceException);
 
@@ -88,7 +88,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             }
         }
 
-        private async ValueTask<IQueryable<EventV1Archive>> TryCatch(
+        private async ValueTask<IQueryable<EventArchiveV1>> TryCatch(
             ReturningEventV1ArchivesFunction returningEventV1ArchivesFunction)
         {
             try
@@ -98,7 +98,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             catch (SqlException sqlException)
             {
                 var failedEventV1ArchiveStorageException =
-                    new FailedEventV1ArchiveStorageException(
+                    new FailedEventArchiveV1StorageException(
                         message: "Failed event archive storage error occurred, contact support.",
                         innerException: sqlException);
 
@@ -108,7 +108,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             catch (Exception serviceException)
             {
                 var failedEventV1ArchiveServiceException =
-                    new FailedEventV1ArchiveServiceException(
+                    new FailedEventArchiveV1ServiceException(
                         message: "Failed event archive service error occurred, contact support.",
                         innerException: serviceException);
 
@@ -117,11 +117,11 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             }
         }
 
-        private async ValueTask<EventV1ArchiveValidationException> CreateAndLogValidationExceptionAsync(
+        private async ValueTask<EventArchiveV1ValidationException> CreateAndLogValidationExceptionAsync(
             Xeption exception)
         {
             var eventV1ArchiveValidationException =
-                new EventV1ArchiveValidationException(
+                new EventArchiveV1ValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
                     innerException: exception);
 
@@ -130,12 +130,12 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             return eventV1ArchiveValidationException;
         }
 
-        private async ValueTask<EventV1ArchiveDependencyValidationException>
+        private async ValueTask<EventArchiveV1DependencyValidationException>
             CreateAndLogDependencyValidationExceptionAsync(
                 Xeption exception)
         {
             var eventV1ArchiveDependencyValidationException =
-                new EventV1ArchiveDependencyValidationException(
+                new EventArchiveV1DependencyValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
                     innerException: exception);
 
@@ -144,11 +144,11 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             return eventV1ArchiveDependencyValidationException;
         }
 
-        private async ValueTask<EventV1ArchiveDependencyException> CreateAndLogDependencyExceptionAsync(
+        private async ValueTask<EventArchiveV1DependencyException> CreateAndLogDependencyExceptionAsync(
             Xeption exception)
         {
             var eventV1ArchiveDependencyException =
-                new EventV1ArchiveDependencyException(
+                new EventArchiveV1DependencyException(
                     message: "Event archive dependency error occurred, contact support.",
                     innerException: exception);
 
@@ -157,11 +157,11 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             return eventV1ArchiveDependencyException;
         }
 
-        private async ValueTask<EventV1ArchiveDependencyException> CreateAndLogCriticalDependencyExceptionAsync(
+        private async ValueTask<EventArchiveV1DependencyException> CreateAndLogCriticalDependencyExceptionAsync(
             Xeption exception)
         {
             var eventV1ArchiveDependencyException =
-                new EventV1ArchiveDependencyException(
+                new EventArchiveV1DependencyException(
                     message: "Event archive dependency error occurred, contact support.",
                     innerException: exception);
 
@@ -170,11 +170,11 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             return eventV1ArchiveDependencyException;
         }
 
-        private async ValueTask<EventV1ArchiveServiceException> CreateAndLogServiceExceptionAsync(
+        private async ValueTask<EventArchiveV1ServiceException> CreateAndLogServiceExceptionAsync(
             Xeption exception)
         {
             var eventV1ArchiveServiceException =
-                new EventV1ArchiveServiceException(
+                new EventArchiveV1ServiceException(
                     message: "Event archive service error occurred, contact support.",
                     innerException: exception);
 

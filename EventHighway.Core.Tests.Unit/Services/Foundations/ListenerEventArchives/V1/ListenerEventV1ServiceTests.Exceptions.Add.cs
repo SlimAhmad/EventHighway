@@ -20,16 +20,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowCriticalDependencyExceptionOnAddIfSqlExceptionOccursAndLogItAsync()
         {
             // given
-            ListenerEventV1Archive someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
+            ListenerEventArchiveV1 someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
             SqlException sqlException = GetSqlException();
 
             var failedListenerEventV1ArchiveStorageException =
-                new FailedListenerEventV1ArchiveStorageException(
+                new FailedListenerEventArchiveV1StorageException(
                     message: "Failed listener event archive storage error occurred, contact support.",
                     innerException: sqlException);
 
             var expectedListenerEventV1ArchiveDependencyException =
-                new ListenerEventV1ArchiveDependencyException(
+                new ListenerEventArchiveV1DependencyException(
                     message: "Listener event archive dependency error occurred, contact support.",
                     innerException: failedListenerEventV1ArchiveStorageException);
 
@@ -38,11 +38,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     .ThrowsAsync(sqlException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveService.AddListenerEventV1ArchiveAsync(someListenerEventV1Archive);
 
-            ListenerEventV1ArchiveDependencyException actualListenerEventV1ArchiveDependencyException =
-                await Assert.ThrowsAsync<ListenerEventV1ArchiveDependencyException>(
+            ListenerEventArchiveV1DependencyException actualListenerEventV1ArchiveDependencyException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV1DependencyException>(
                     addListenerEventV1ArchiveTask.AsTask);
 
             // then
@@ -59,7 +59,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -72,16 +72,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         {
             // given
             string randomMessage = GetRandomString();
-            ListenerEventV1Archive someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
+            ListenerEventArchiveV1 someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
             var duplicateKeyException = new DuplicateKeyException(randomMessage);
 
             var alreadyExistsListenerEventV1ArchiveException =
-                new AlreadyExistsListenerEventV1ArchiveException(
+                new AlreadyExistsListenerEventArchiveV1Exception(
                     message: "Listener event archive with the same id already exists.",
                     innerException: duplicateKeyException);
 
             var expectedListenerEventV1ArchiveDependencyValidationException =
-                new ListenerEventV1ArchiveDependencyValidationException(
+                new ListenerEventArchiveV1DependencyValidationException(
                     message: "Listener event archive validation error occurred, fix the errors and try again.",
                     innerException: alreadyExistsListenerEventV1ArchiveException);
 
@@ -90,11 +90,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     .ThrowsAsync(duplicateKeyException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveService.AddListenerEventV1ArchiveAsync(someListenerEventV1Archive);
 
-            ListenerEventV1ArchiveDependencyValidationException actualListenerEventV1ArchiveDependencyValidationException =
-                await Assert.ThrowsAsync<ListenerEventV1ArchiveDependencyValidationException>(
+            ListenerEventArchiveV1DependencyValidationException actualListenerEventV1ArchiveDependencyValidationException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV1DependencyValidationException>(
                     addListenerEventV1ArchiveTask.AsTask);
 
             // then
@@ -111,7 +111,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -123,16 +123,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowDependencyExceptionOnAddIfDbUpdateExceptionOccursAndLogItAsync()
         {
             // given
-            ListenerEventV1Archive someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
+            ListenerEventArchiveV1 someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
             var dbUpdateException = new DbUpdateException();
 
             var failedListenerEventV1ArchiveStorageException =
-                new FailedListenerEventV1ArchiveStorageException(
+                new FailedListenerEventArchiveV1StorageException(
                     message: "Failed listener event archive storage error occurred, contact support.",
                     innerException: dbUpdateException);
 
             var expectedListenerEventV1ArchiveDependencyException =
-                new ListenerEventV1ArchiveDependencyException(
+                new ListenerEventArchiveV1DependencyException(
                     message: "Listener event archive dependency error occurred, contact support.",
                     innerException: failedListenerEventV1ArchiveStorageException);
 
@@ -141,11 +141,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     .ThrowsAsync(dbUpdateException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveService.AddListenerEventV1ArchiveAsync(someListenerEventV1Archive);
 
-            ListenerEventV1ArchiveDependencyException actualListenerEventV1ArchiveDependencyException =
-                await Assert.ThrowsAsync<ListenerEventV1ArchiveDependencyException>(
+            ListenerEventArchiveV1DependencyException actualListenerEventV1ArchiveDependencyException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV1DependencyException>(
                     addListenerEventV1ArchiveTask.AsTask);
 
             // then
@@ -162,7 +162,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -174,16 +174,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
-            ListenerEventV1Archive someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
+            ListenerEventArchiveV1 someListenerEventV1Archive = CreateRandomListenerEventV1Archive();
             var serviceException = new Exception();
 
             var failedListenerEventV1ArchiveServiceException =
-                new FailedListenerEventV1ArchiveServiceException(
+                new FailedListenerEventArchiveV1ServiceException(
                     message: "Failed listener event archive service error occurred, contact support.",
                     innerException: serviceException);
 
             var expectedListenerEventV1ArchiveServiceException =
-                new ListenerEventV1ArchiveServiceException(
+                new ListenerEventArchiveV1ServiceException(
                     message: "Listener event archive service error occurred, contact support.",
                     innerException: failedListenerEventV1ArchiveServiceException);
 
@@ -192,11 +192,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     .ThrowsAsync(serviceException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveService.AddListenerEventV1ArchiveAsync(someListenerEventV1Archive);
 
-            ListenerEventV1ArchiveServiceException actualListenerEventV1ArchiveServiceException =
-                await Assert.ThrowsAsync<ListenerEventV1ArchiveServiceException>(
+            ListenerEventArchiveV1ServiceException actualListenerEventV1ArchiveServiceException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV1ServiceException>(
                     addListenerEventV1ArchiveTask.AsTask);
 
             // then
@@ -213,7 +213,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                broker.InsertListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();

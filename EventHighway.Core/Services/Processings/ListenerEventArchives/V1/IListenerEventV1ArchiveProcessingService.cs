@@ -9,7 +9,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V1
 {
     internal interface IListenerEventV1ArchiveProcessingService
     {
-        ValueTask<ListenerEventV1Archive> AddListenerEventV1ArchiveAsync(
-            ListenerEventV1Archive listenerEventV1Archive);
+        ValueTask<ListenerEventArchiveV1> AddListenerEventV1ArchiveAsync(
+            ListenerEventArchiveV1 listenerEventV1Archive);
     }
 }

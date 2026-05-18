@@ -163,8 +163,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                         .AreEqual;
         }
 
-        private Expression<Func<EventV1Archive, bool>> SameEventV1ArchiveAs(
-           EventV1Archive expectedEventV1Archive)
+        private Expression<Func<EventArchiveV1, bool>> SameEventV1ArchiveAs(
+           EventArchiveV1 expectedEventV1Archive)
         {
             return actualEventV1Archive =>
                 this.compareLogic.Compare(

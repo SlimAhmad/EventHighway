@@ -12,45 +12,45 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
     internal partial class ListenerEventV1ArchiveService
     {
         private async ValueTask ValidateListenerEventV1ArchiveOnAddAsync(
-            ListenerEventV1Archive listenerEventV1Archive)
+            ListenerEventArchiveV1 listenerEventV1Archive)
         {
             ValidateListenerEventV1ArchiveIsNotNull(listenerEventV1Archive);
 
             Validate(
                 (Rule: IsInvalid(listenerEventV1Archive.Id),
-                Parameter: nameof(ListenerEventV1Archive.Id)),
+                Parameter: nameof(ListenerEventArchiveV1.Id)),
 
                 (Rule: IsInvalid(listenerEventV1Archive.EventId),
-                Parameter: nameof(ListenerEventV1Archive.EventId)),
+                Parameter: nameof(ListenerEventArchiveV1.EventId)),
 
                 (Rule: IsInvalid(listenerEventV1Archive.EventAddressId),
-                Parameter: nameof(ListenerEventV1Archive.EventAddressId)),
+                Parameter: nameof(ListenerEventArchiveV1.EventAddressId)),
 
                 (Rule: IsInvalid(listenerEventV1Archive.EventListenerId),
-                Parameter: nameof(ListenerEventV1Archive.EventListenerId)),
+                Parameter: nameof(ListenerEventArchiveV1.EventListenerId)),
 
                 (Rule: IsInvalid(listenerEventV1Archive.Status),
-                Parameter: nameof(ListenerEventV1Archive.Status)),
+                Parameter: nameof(ListenerEventArchiveV1.Status)),
 
                 (Rule: IsInvalid(listenerEventV1Archive.CreatedDate),
-                Parameter: nameof(ListenerEventV1Archive.CreatedDate)),
+                Parameter: nameof(ListenerEventArchiveV1.CreatedDate)),
 
                 (Rule: IsInvalid(listenerEventV1Archive.UpdatedDate),
-                Parameter: nameof(ListenerEventV1Archive.UpdatedDate)),
+                Parameter: nameof(ListenerEventArchiveV1.UpdatedDate)),
 
                 (Rule: IsInvalid(listenerEventV1Archive.ArchivedDate),
-                Parameter: nameof(ListenerEventV1Archive.ArchivedDate)),
+                Parameter: nameof(ListenerEventArchiveV1.ArchivedDate)),
 
                 (Rule: await IsNotRecentAsync(listenerEventV1Archive.ArchivedDate),
-                Parameter: nameof(ListenerEventV1Archive.ArchivedDate)));
+                Parameter: nameof(ListenerEventArchiveV1.ArchivedDate)));
         }
 
         private static void ValidateListenerEventV1ArchiveIsNotNull(
-            ListenerEventV1Archive listenerEventV1Archive)
+            ListenerEventArchiveV1 listenerEventV1Archive)
         {
             if (listenerEventV1Archive is null)
             {
-                throw new NullListenerEventV1ArchiveException(
+                throw new NullListenerEventArchiveV1Exception(
                     message: "Listener event archive is null.");
             }
         }
@@ -107,7 +107,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
         private static void Validate(params (dynamic Rule, string Parameter)[] validations)
         {
             var invalidListenerEventV1ArchiveException =
-                new InvalidListenerEventV1ArchiveException(
+                new InvalidListenerEventArchiveV1Exception(
                     message: "Listener event archive is invalid, fix the errors and try again.");
 
             foreach ((dynamic rule, string parameter) in validations)

@@ -12,7 +12,7 @@ using EventHighway.Core.Models.Services.Foundations.EventsArchives.V1;
 
 namespace EventHighway.Core.Services.Foundations.EventArchives.V1
 {
-    internal partial class EventV1ArchiveService : IEventV1ArchiveService
+    internal partial class EventV1ArchiveService : IEventArchiveV1Service
     {
         private readonly IStorageBroker storageBroker;
         private readonly IDateTimeBroker dateTimeBroker;
@@ -28,26 +28,26 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<EventV1Archive> AddEventV1ArchiveAsync(EventV1Archive eventV1Archive) => 
+        public ValueTask<EventArchiveV1> AddEventArchiveV1Async(EventArchiveV1 eventArchiveV1) => 
         TryCatch(async () =>
         {
-            await ValidateEventV1ArchiveOnAddAsync(eventV1Archive);
+            await ValidateEventV1ArchiveOnAddAsync(eventArchiveV1);
 
-            return await this.storageBroker.InsertEventV1ArchiveAsync(eventV1Archive);
+            return await this.storageBroker.InsertEventV1ArchiveAsync(eventArchiveV1);
         });
 
-        public ValueTask<IQueryable<EventV1Archive>> RetrieveAllEventV1ArchivesAsync() =>
+        public ValueTask<IQueryable<EventArchiveV1>> RetrieveAllEventArchiveV1sAsync() =>
         TryCatch(async () =>
         {
-            return await this.storageBroker.SelectAllEventV1ArchivesAsync();
+            return await this.storageBroker.SelectAllEventArchiveV1sAsync();
         });
 
-        public ValueTask<EventV1Archive> RetrieveEventV1ArchiveByIdAsync(Guid eventArchiveV1Id) =>
+        public ValueTask<EventArchiveV1> RetrieveEventArchiveV1ByIdAsync(Guid eventArchiveV1Id) =>
         TryCatch(async () =>
         {
-            ValidateEventV1ArchiveId(eventArchiveV1Id);
+            ValidateEventArchiveV1Id(eventArchiveV1Id);
 
-            return await this.storageBroker.SelectEventV1ArchiveByIdAsync(eventArchiveV1Id);
+            return await this.storageBroker.SelectEventArchiveV1ByIdAsync(eventArchiveV1Id);
         });
     }
 }

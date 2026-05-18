@@ -20,17 +20,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             DateTimeOffset randomDateTimeOffset =
                 GetRandomDateTimeOffset();
 
-            ListenerEventV1Archive randomListenerEventV1Archive =
+            ListenerEventArchiveV1 randomListenerEventV1Archive =
                 CreateRandomListenerEventV1Archive(
                     randomDateTimeOffset);
 
-            ListenerEventV1Archive inputListenerEventV1Archive =
+            ListenerEventArchiveV1 inputListenerEventV1Archive =
                 randomListenerEventV1Archive;
 
-            ListenerEventV1Archive storageListenerEventV1Archive =
+            ListenerEventArchiveV1 storageListenerEventV1Archive =
                 inputListenerEventV1Archive;
 
-            ListenerEventV1Archive expectedListenerEventV1Archive =
+            ListenerEventArchiveV1 expectedListenerEventV1Archive =
                 storageListenerEventV1Archive.DeepClone();
 
             this.dateTimeBrokerMock.Setup(broker =>
@@ -43,7 +43,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                         .ReturnsAsync(storageListenerEventV1Archive);
 
             // when
-            ListenerEventV1Archive actualListenerEventV1Archive =
+            ListenerEventArchiveV1 actualListenerEventV1Archive =
                 await this.listenerEventV1ArchiveService
                     .AddListenerEventV1ArchiveAsync(
                         inputListenerEventV1Archive);

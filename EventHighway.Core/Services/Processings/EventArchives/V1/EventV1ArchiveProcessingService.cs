@@ -9,25 +9,25 @@ using EventHighway.Core.Services.Foundations.EventArchives.V1;
 
 namespace EventHighway.Core.Services.Processings.EventArchives.V1
 {
-    internal partial class EventV1ArchiveProcessingService : IEventV1ArchiveProcessingService
+    internal partial class EventArchiveV1ProcessingService : IEventArchiveV1ProcessingService
     {
-        private readonly IEventV1ArchiveService eventV1ArchiveService;
+        private readonly IEventArchiveV1Service eventArchiveV1Service;
         private readonly ILoggingBroker loggingBroker;
 
-        public EventV1ArchiveProcessingService(
-            IEventV1ArchiveService eventV1ArchiveService,
+        public EventArchiveV1ProcessingService(
+            IEventArchiveV1Service eventArchiveV1Service,
             ILoggingBroker loggingBroker)
         {
-            this.eventV1ArchiveService = eventV1ArchiveService;
+            this.eventArchiveV1Service = eventArchiveV1Service;
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<EventV1Archive> AddEventV1ArchiveAsync(EventV1Archive eventV1Archive) =>
+        public ValueTask<EventArchiveV1> AddEventArchiveV1Async(EventArchiveV1 eventArchiveV1) =>
         TryCatch(async () =>
         {
-            ValidateEventV1ArchiveIsNotNull(eventV1Archive);
+            ValidateEventV1ArchiveIsNotNull(eventArchiveV1);
 
-            return await this.eventV1ArchiveService.AddEventV1ArchiveAsync(eventV1Archive);
+            return await this.eventArchiveV1Service.AddEventArchiveV1Async(eventArchiveV1);
         });
     }
 }

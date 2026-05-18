@@ -41,11 +41,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
 
             return new TheoryData<Xeption>
             {
-                new ListenerEventV1ArchiveValidationException(
+                new ListenerEventArchiveV1ValidationException(
                     someMessage,
                     someInnerException),
 
-                new ListenerEventV1ArchiveDependencyValidationException(
+                new ListenerEventArchiveV1DependencyValidationException(
                     someMessage,
                     someInnerException),
             };
@@ -58,11 +58,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
 
             return new TheoryData<Xeption>
             {
-                new ListenerEventV1ArchiveDependencyException(
+                new ListenerEventArchiveV1DependencyException(
                     someMessage,
                     someInnerException),
 
-                new ListenerEventV1ArchiveServiceException(
+                new ListenerEventArchiveV1ServiceException(
                     someMessage,
                     someInnerException)
             };
@@ -77,15 +77,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
-        private static ListenerEventV1Archive CreateRandomListenerEventV1Archive() =>
+        private static ListenerEventArchiveV1 CreateRandomListenerEventV1Archive() =>
             CreateListenerEventV1ArchiveFiller().Create();
 
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
 
-        private static Filler<ListenerEventV1Archive> CreateListenerEventV1ArchiveFiller()
+        private static Filler<ListenerEventArchiveV1> CreateListenerEventV1ArchiveFiller()
         {
-            var filler = new Filler<ListenerEventV1Archive>();
+            var filler = new Filler<ListenerEventArchiveV1>();
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset);

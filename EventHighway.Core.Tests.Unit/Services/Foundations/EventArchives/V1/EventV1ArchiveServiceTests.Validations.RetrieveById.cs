@@ -20,25 +20,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             Guid invalidEventV1ArchiveId = Guid.Empty;
 
             var invalidEventV1ArchiveException =
-                new InvalidEventV1ArchiveException(
+                new InvalidEventArchiveV1Exception(
                     message: "Event archive is invalid, fix the errors and try again.");
 
             invalidEventV1ArchiveException.AddData(
-                key: nameof(EventV1Archive.Id),
+                key: nameof(EventArchiveV1.Id),
                 values: "Required");
 
             var expectedEventV1ArchiveValidationException =
-                new EventV1ArchiveValidationException(
+                new EventArchiveV1ValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
                     innerException: invalidEventV1ArchiveException);
 
             // when
-            ValueTask<EventV1Archive> retrieveEventV1ArchiveByIdTask =
-                this.eventV1ArchiveService.RetrieveEventV1ArchiveByIdAsync(
+            ValueTask<EventArchiveV1> retrieveEventV1ArchiveByIdTask =
+                this.eventV1ArchiveService.RetrieveEventArchiveV1ByIdAsync(
                     invalidEventV1ArchiveId);
 
-            EventV1ArchiveValidationException actualEventV1ArchiveValidationException =
-                await Assert.ThrowsAsync<EventV1ArchiveValidationException>(
+            EventArchiveV1ValidationException actualEventV1ArchiveValidationException =
+                await Assert.ThrowsAsync<EventArchiveV1ValidationException>(
                     retrieveEventV1ArchiveByIdTask.AsTask);
 
             // then
@@ -51,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectEventV1ArchiveByIdAsync(
+                broker.SelectEventArchiveV1ByIdAsync(
                     It.IsAny<Guid>()),
                         Times.Never);
 

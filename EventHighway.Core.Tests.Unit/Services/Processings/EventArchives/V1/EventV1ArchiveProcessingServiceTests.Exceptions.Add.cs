@@ -12,7 +12,7 @@ using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
 {
-    public partial class EventV1ArchiveProcessingServiceTests
+    public partial class EventArchiveV1ProcessingServiceTests
     {
         [Theory]
         [MemberData(nameof(ValidationExceptions))]
@@ -20,32 +20,32 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
             Xeption validationException)
         {
             // given
-            EventV1Archive someEventV1Archive = CreateRandomEventV1Archive();
+            EventArchiveV1 someEventArchiveV1 = CreateRandomEventArchiveV1();
 
             var expectedEventV1ArchiveProcessingDependencyValidationException =
-                new EventV1ArchiveProcessingDependencyValidationException(
+                new EventArchiveV1ProcessingDependencyValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
                     innerException: validationException.InnerException as Xeption);
 
-            this.eventV1ArchiveServiceMock.Setup(service =>
-                service.AddEventV1ArchiveAsync(It.IsAny<EventV1Archive>()))
+            this.eventArchiveV1ServiceMock.Setup(service =>
+                service.AddEventArchiveV1Async(It.IsAny<EventArchiveV1>()))
                     .ThrowsAsync(validationException);
 
             // when
-            ValueTask<EventV1Archive> addEventV1ArchiveTask =
-                this.eventV1ArchiveProcessingService.AddEventV1ArchiveAsync(someEventV1Archive);
+            ValueTask<EventArchiveV1> addEventArchiveV1Task =
+                this.eventArchiveV1ProcessingService.AddEventArchiveV1Async(someEventArchiveV1);
 
-            EventV1ArchiveProcessingDependencyValidationException
+            EventArchiveV1ProcessingDependencyValidationException
                 actualEventV1ArchiveProcessingDependencyValidationException =
-                    await Assert.ThrowsAsync<EventV1ArchiveProcessingDependencyValidationException>(
-                        addEventV1ArchiveTask.AsTask);
+                    await Assert.ThrowsAsync<EventArchiveV1ProcessingDependencyValidationException>(
+                        addEventArchiveV1Task.AsTask);
 
             // then
             actualEventV1ArchiveProcessingDependencyValidationException.Should().BeEquivalentTo(
                 expectedEventV1ArchiveProcessingDependencyValidationException);
 
-            this.eventV1ArchiveServiceMock.Verify(service =>
-                service.AddEventV1ArchiveAsync(It.IsAny<EventV1Archive>()),
+            this.eventArchiveV1ServiceMock.Verify(service =>
+                service.AddEventArchiveV1Async(It.IsAny<EventArchiveV1>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -53,7 +53,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
                     expectedEventV1ArchiveProcessingDependencyValidationException))),
                         Times.Once);
 
-            this.eventV1ArchiveServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV1ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -63,32 +63,32 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
             Xeption dependencyException)
         {
             // given
-            EventV1Archive someEventV1Archive = CreateRandomEventV1Archive();
+            EventArchiveV1 someEventArchiveV1 = CreateRandomEventArchiveV1();
 
             var expectedEventV1ArchiveProcessingDependencyException =
-                new EventV1ArchiveProcessingDependencyException(
+                new EventArchiveV1ProcessingDependencyException(
                     message: "Event archive dependency error occurred, contact support.",
                     innerException: dependencyException.InnerException as Xeption);
 
-            this.eventV1ArchiveServiceMock.Setup(service =>
-                service.AddEventV1ArchiveAsync(It.IsAny<EventV1Archive>()))
+            this.eventArchiveV1ServiceMock.Setup(service =>
+                service.AddEventArchiveV1Async(It.IsAny<EventArchiveV1>()))
                     .ThrowsAsync(dependencyException);
 
             // when
-            ValueTask<EventV1Archive> addEventV1ArchiveTask =
-                this.eventV1ArchiveProcessingService.AddEventV1ArchiveAsync(someEventV1Archive);
+            ValueTask<EventArchiveV1> addEventArchiveV1Task =
+                this.eventArchiveV1ProcessingService.AddEventArchiveV1Async(someEventArchiveV1);
 
-            EventV1ArchiveProcessingDependencyException
+            EventArchiveV1ProcessingDependencyException
                 actualEventV1ArchiveProcessingDependencyException =
-                    await Assert.ThrowsAsync<EventV1ArchiveProcessingDependencyException>(
-                        addEventV1ArchiveTask.AsTask);
+                    await Assert.ThrowsAsync<EventArchiveV1ProcessingDependencyException>(
+                        addEventArchiveV1Task.AsTask);
 
             // then
             actualEventV1ArchiveProcessingDependencyException.Should().BeEquivalentTo(
                 expectedEventV1ArchiveProcessingDependencyException);
 
-            this.eventV1ArchiveServiceMock.Verify(service =>
-                service.AddEventV1ArchiveAsync(It.IsAny<EventV1Archive>()),
+            this.eventArchiveV1ServiceMock.Verify(service =>
+                service.AddEventArchiveV1Async(It.IsAny<EventArchiveV1>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -96,7 +96,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
                     expectedEventV1ArchiveProcessingDependencyException))),
                         Times.Once);
 
-            this.eventV1ArchiveServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV1ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -104,39 +104,39 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
-            EventV1Archive someEventV1Archive = CreateRandomEventV1Archive();
+            EventArchiveV1 someEventArchiveV1 = CreateRandomEventArchiveV1();
             var serviceException = new Exception();
 
             var failedEventV1ArchiveProcessingServiceException =
-                new FailedEventV1ArchiveProcessingServiceException(
+                new FailedEventArchiveV1ProcessingServiceException(
                     message: "Failed event archive service error occurred, contact support.",
                     innerException: serviceException);
 
             var expectedEventV1ArchiveProcessingExceptionException =
-                new EventV1ArchiveProcessingServiceException(
+                new EventArchiveV1ProcessingServiceException(
                     message: "Event archive service error occurred, contact support.",
                     innerException: failedEventV1ArchiveProcessingServiceException);
 
-            this.eventV1ArchiveServiceMock.Setup(service =>
-                service.AddEventV1ArchiveAsync(It.IsAny<EventV1Archive>()))
+            this.eventArchiveV1ServiceMock.Setup(service =>
+                service.AddEventArchiveV1Async(It.IsAny<EventArchiveV1>()))
                     .ThrowsAsync(serviceException);
 
             // when
-            ValueTask<EventV1Archive> addEventV1ArchiveTask =
-                this.eventV1ArchiveProcessingService.AddEventV1ArchiveAsync(
-                    someEventV1Archive);
+            ValueTask<EventArchiveV1> addEventArchiveV1Task =
+                this.eventArchiveV1ProcessingService.AddEventArchiveV1Async(
+                    someEventArchiveV1);
 
-            EventV1ArchiveProcessingServiceException
+            EventArchiveV1ProcessingServiceException
                 actualEventV1ArchiveProcessingServiceException =
-                    await Assert.ThrowsAsync<EventV1ArchiveProcessingServiceException>(
-                        addEventV1ArchiveTask.AsTask);
+                    await Assert.ThrowsAsync<EventArchiveV1ProcessingServiceException>(
+                        addEventArchiveV1Task.AsTask);
 
             // then
             actualEventV1ArchiveProcessingServiceException.Should().BeEquivalentTo(
                 expectedEventV1ArchiveProcessingExceptionException);
 
-            this.eventV1ArchiveServiceMock.Verify(service =>
-                service.AddEventV1ArchiveAsync(It.IsAny<EventV1Archive>()),
+            this.eventArchiveV1ServiceMock.Verify(service =>
+                service.AddEventArchiveV1Async(It.IsAny<EventArchiveV1>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -144,7 +144,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
                     expectedEventV1ArchiveProcessingExceptionException))),
                         Times.Once);
 
-            this.eventV1ArchiveServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV1ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
         public async Task ShouldThrowValidationExceptionOnAddIfEventV1ArchiveIsNullAndLogItAsync()
         {
             // given
-            EventV1Archive nullEventV1Archive = null;
+            EventArchiveV1 nullEventV1Archive = null;
 
             var nullEventV1ArchiveOrchestrationException =
                 new NullEventV1ArchiveOrchestrationException(
@@ -48,12 +48,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                         Times.Once);
 
             this.listenerEventV1ArchiveServiceMock.Verify(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Never);
 
             this.eventV1ArchiveServiceMock.Verify(broker =>
-                broker.AddEventV1ArchiveAsync(
-                    It.IsAny<EventV1Archive>()),
+                broker.AddEventArchiveV1Async(
+                    It.IsAny<EventArchiveV1>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -65,8 +65,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
         public async Task ShouldThrowValidationExceptionOnAddIfListenerEventV1ArchivesAreNullAndLogItAsync()
         {
             // given
-            var invalidEventV1Archive = new EventV1Archive();
-            invalidEventV1Archive.ListenerEventV1Archives = null;
+            var invalidEventV1Archive = new EventArchiveV1();
+            invalidEventV1Archive.ListenerEventArchiveV1s = null;
 
             var nullEventV1ArchiveOrchestrationException =
                 new NullListenerEventV1ArchivesOrchestrationException(
@@ -97,12 +97,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
                         Times.Once);
 
             this.listenerEventV1ArchiveServiceMock.Verify(service =>
-                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventV1Archive>()),
+                service.AddListenerEventV1ArchiveAsync(It.IsAny<ListenerEventArchiveV1>()),
                     Times.Never);
 
             this.eventV1ArchiveServiceMock.Verify(broker =>
-                broker.AddEventV1ArchiveAsync(
-                    It.IsAny<EventV1Archive>()),
+                broker.AddEventArchiveV1Async(
+                    It.IsAny<EventArchiveV1>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();

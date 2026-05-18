@@ -17,30 +17,30 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
         public async Task ShouldRetrieveAllEventV1ArchivesAsync()
         {
             // given
-            IQueryable<EventV1Archive> randomEventV1Archives =
+            IQueryable<EventArchiveV1> randomEventV1Archives =
                 CreateRandomEventV1Archives();
 
-            IQueryable<EventV1Archive> retrievedEventV1Archives =
+            IQueryable<EventArchiveV1> retrievedEventV1Archives =
                 randomEventV1Archives;
 
-            IQueryable<EventV1Archive> expectedEventV1Archives =
+            IQueryable<EventArchiveV1> expectedEventV1Archives =
                 randomEventV1Archives.DeepClone();
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllEventV1ArchivesAsync())
+                broker.SelectAllEventArchiveV1sAsync())
                     .ReturnsAsync(retrievedEventV1Archives);
 
             // when
-            IQueryable<EventV1Archive> actualEventV1Archives =
+            IQueryable<EventArchiveV1> actualEventV1Archives =
                 await this.eventV1ArchiveService
-                    .RetrieveAllEventV1ArchivesAsync();
+                    .RetrieveAllEventArchiveV1sAsync();
 
             // then
             actualEventV1Archives.Should().BeEquivalentTo(
                 expectedEventV1Archives);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllEventV1ArchivesAsync(),
+                broker.SelectAllEventArchiveV1sAsync(),
                     Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();

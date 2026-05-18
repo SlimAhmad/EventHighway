@@ -20,24 +20,24 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             Guid randomEventV1ArchiveId = GetRandomId();
             Guid inputEventV1ArchiveId = randomEventV1ArchiveId;
 
-            EventV1Archive randomEventV1Archive =
+            EventArchiveV1 randomEventV1Archive =
                 CreateRandomEventV1Archive();
 
-            EventV1Archive selectedEventV1Archive =
+            EventArchiveV1 selectedEventV1Archive =
                 randomEventV1Archive;
 
-            EventV1Archive expectedEventV1Archive =
+            EventArchiveV1 expectedEventV1Archive =
                 selectedEventV1Archive.DeepClone();
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectEventV1ArchiveByIdAsync(
+                broker.SelectEventArchiveV1ByIdAsync(
                     inputEventV1ArchiveId))
                         .ReturnsAsync(selectedEventV1Archive);
 
             // when
-            EventV1Archive actualEventV1Archive =
+            EventArchiveV1 actualEventV1Archive =
                 await this.eventV1ArchiveService
-                    .RetrieveEventV1ArchiveByIdAsync(
+                    .RetrieveEventArchiveV1ByIdAsync(
                         inputEventV1ArchiveId);
 
             // then
@@ -45,7 +45,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
                 .BeEquivalentTo(expectedEventV1Archive);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectEventV1ArchiveByIdAsync(
+                broker.SelectEventArchiveV1ByIdAsync(
                     inputEventV1ArchiveId),
                         Times.Once());
 

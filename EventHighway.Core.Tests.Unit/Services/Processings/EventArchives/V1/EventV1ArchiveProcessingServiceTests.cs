@@ -16,20 +16,20 @@ using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
 {
-    public partial class EventV1ArchiveProcessingServiceTests
+    public partial class EventArchiveV1ProcessingServiceTests
     {
-        private readonly Mock<IEventV1ArchiveService> eventV1ArchiveServiceMock;
+        private readonly Mock<IEventArchiveV1Service> eventArchiveV1ServiceMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
-        private readonly IEventV1ArchiveProcessingService eventV1ArchiveProcessingService;
+        private readonly IEventArchiveV1ProcessingService eventArchiveV1ProcessingService;
 
-        public EventV1ArchiveProcessingServiceTests()
+        public EventArchiveV1ProcessingServiceTests()
         {
-            this.eventV1ArchiveServiceMock = new Mock<IEventV1ArchiveService>();
+            this.eventArchiveV1ServiceMock = new Mock<IEventArchiveV1Service>();
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
-            this.eventV1ArchiveProcessingService =
-                new EventV1ArchiveProcessingService(
-                    eventV1ArchiveService: this.eventV1ArchiveServiceMock.Object,
+            this.eventArchiveV1ProcessingService =
+                new EventArchiveV1ProcessingService(
+                    eventArchiveV1Service: this.eventArchiveV1ServiceMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }
 
@@ -40,11 +40,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
 
             return new TheoryData<Xeption>
             {
-                new EventV1ArchiveValidationException(
+                new EventArchiveV1ValidationException(
                     someMessage,
                     someInnerException),
 
-                new EventV1ArchiveDependencyValidationException(
+                new EventArchiveV1DependencyValidationException(
                     someMessage,
                     someInnerException)
             };
@@ -57,11 +57,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
 
             return new TheoryData<Xeption>
             {
-                new EventV1ArchiveDependencyException(
+                new EventArchiveV1DependencyException(
                     someMessage,
                     someInnerException),
 
-                new EventV1ArchiveServiceException(
+                new EventArchiveV1ServiceException(
                     someMessage,
                     someInnerException)
             };
@@ -73,11 +73,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 
-        private static IQueryable<EventV1Archive> CreateRandomEventV1Archives() =>
-            CreateEventV1ArchiveFiller().Create(count: GetRandomNumber()).AsQueryable();
+        private static IQueryable<EventArchiveV1> CreateRandomEventArchiveV1s() =>
+            CreateEventArchiveV1Filler().Create(count: GetRandomNumber()).AsQueryable();
 
-        private static EventV1Archive CreateRandomEventV1Archive() =>
-            CreateEventV1ArchiveFiller().Create();
+        private static EventArchiveV1 CreateRandomEventArchiveV1() =>
+            CreateEventArchiveV1Filler().Create();
 
         private static Guid GetRandomId() =>
             Guid.NewGuid();
@@ -88,9 +88,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V1
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
 
-        private static Filler<EventV1Archive> CreateEventV1ArchiveFiller()
+        private static Filler<EventArchiveV1> CreateEventArchiveV1Filler()
         {
-            var filler = new Filler<EventV1Archive>();
+            var filler = new Filler<EventArchiveV1>();
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)

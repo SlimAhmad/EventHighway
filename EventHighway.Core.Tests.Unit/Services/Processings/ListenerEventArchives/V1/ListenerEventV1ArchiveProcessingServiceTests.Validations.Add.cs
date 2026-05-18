@@ -16,7 +16,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         public async Task ShouldThrowValidationExceptionOnAddIfListenerEventV1ArchiveIsNullAndLogItAsync()
         {
             // given
-            ListenerEventV1Archive nullListenerEventV1Archive = null;
+            ListenerEventArchiveV1 nullListenerEventV1Archive = null;
 
             var nullListenerEventV1ArchiveProcessingException =
                 new NullListenerEventV1ArchiveProcessingException(
@@ -28,7 +28,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     innerException: nullListenerEventV1ArchiveProcessingException);
 
             // when
-            ValueTask<ListenerEventV1Archive> addListenerEventV1ArchiveTask =
+            ValueTask<ListenerEventArchiveV1> addListenerEventV1ArchiveTask =
                 this.listenerEventV1ArchiveProcessingService.AddListenerEventV1ArchiveAsync(
                     nullListenerEventV1Archive);
 
@@ -47,7 +47,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
 
             this.listenerEventV1ArchiveServiceMock.Verify(service =>
                 service.AddListenerEventV1ArchiveAsync(
-                    It.IsAny<ListenerEventV1Archive>()),
+                    It.IsAny<ListenerEventArchiveV1>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();

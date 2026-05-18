@@ -9,13 +9,13 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V1
 {
     internal partial class EventV1ArchiveOrchestrationService
     {
-        private static void ValidateEventV1Arhive(EventV1Archive eventV1Archive)
+        private static void ValidateEventV1Arhive(EventArchiveV1 eventV1Archive)
         {
             ValidateEventV1ArhiveIsNotNull(eventV1Archive);
             ValidateListenerEventV1ArhivesAreNotNull(eventV1Archive);
         }
 
-        private static void ValidateEventV1ArhiveIsNotNull(EventV1Archive eventV1Archive)
+        private static void ValidateEventV1ArhiveIsNotNull(EventArchiveV1 eventV1Archive)
         {
             if (eventV1Archive is null)
             {
@@ -24,9 +24,9 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V1
             }
         }
 
-        private static void ValidateListenerEventV1ArhivesAreNotNull(EventV1Archive eventV1Archive)
+        private static void ValidateListenerEventV1ArhivesAreNotNull(EventArchiveV1 eventV1Archive)
         {
-            if (eventV1Archive.ListenerEventV1Archives is null)
+            if (eventV1Archive.ListenerEventArchiveV1s is null)
             {
                 throw new NullListenerEventV1ArchivesOrchestrationException(
                     message: "Listener event archives are null.");
