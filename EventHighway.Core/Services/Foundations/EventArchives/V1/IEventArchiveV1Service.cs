@@ -11,8 +11,8 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
 {
     public partial interface IEventArchiveV1Service
     {
-        ValueTask<EventArchiveV1> AddEventArchiveV1Async(EventArchiveV1 eventV1Archive);
+        ValueTask<EventArchiveV1> AddEventArchiveV1Async(EventArchiveV1 eventArchiveV1);
         ValueTask<IQueryable<EventArchiveV1>> RetrieveAllEventArchiveV1sAsync();
-        ValueTask<EventArchiveV1> RetrieveEventArchiveV1ByIdAsync(Guid eventV1ArchiveId);
+        ValueTask<EventArchiveV1> RetrieveEventArchiveV1ByIdAsync(Guid eventArchiveV1Id);
     }
 }

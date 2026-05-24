@@ -312,7 +312,7 @@ namespace EventHighway.Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EventV1Archives");
+                    b.ToTable("EventArchiveV1s");
                 });
 
             modelBuilder.Entity("EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.EventArchiveV2", b =>
@@ -420,7 +420,7 @@ namespace EventHighway.Core.Migrations
 
                     b.HasIndex("EventArchiveV1Id");
 
-                    b.ToTable("ListenerEventV1Archives");
+                    b.ToTable("ListenerEventArchiveV1s");
                 });
 
             modelBuilder.Entity("EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.ListenerEventArchiveV2", b =>

@@ -12,7 +12,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventsArchives.V1
     {
         public Guid Id { get; set; }
         public string Content { get; set; }
-        public EventArchiveV1Type Type { get; set; }
+        public EventArchiveTypeV1 Type { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset UpdatedDate { get; set; }
         public DateTimeOffset? ScheduledDate { get; set; }

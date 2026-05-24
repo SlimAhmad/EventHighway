@@ -19,18 +19,18 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
     internal partial class EventV1CoordinationServiceV1 : IEventV1CoordinationServiceV1
     {
         private readonly IEventV1OrchestrationServiceV1 eventV1OrchestrationServiceV1;
-        private readonly IEventV1ArchiveOrchestrationService eventV1ArchiveOrchestrationService;
+        private readonly IEventArchiveV1OrchestrationService eventArchiveV1OrchestrationService;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventV1CoordinationServiceV1(
             IEventV1OrchestrationServiceV1 eventV1OrchestrationServiceV1,
-            IEventV1ArchiveOrchestrationService eventV1ArchiveOrchestrationService,
+            IEventArchiveV1OrchestrationService eventArchiveV1OrchestrationService,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV1OrchestrationServiceV1 = eventV1OrchestrationServiceV1;
-            this.eventV1ArchiveOrchestrationService = eventV1ArchiveOrchestrationService;
+            this.eventArchiveV1OrchestrationService = eventArchiveV1OrchestrationService;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
         }
@@ -44,12 +44,12 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
 
             foreach (EventV1 eventV1 in eventV1s)
             {
-                EventArchiveV1 eventV1Archive =
-                    await MapToEventV1ArchiveAsync(eventV1);
+                EventArchiveV1 eventArchiveV1 =
+                    await MapToEventArchiveV1Async(eventV1);
 
-                await this.eventV1ArchiveOrchestrationService
-                    .AddEventV1ArchiveWithListenerEventV1ArchivesAsync(
-                        eventV1Archive);
+                await this.eventArchiveV1OrchestrationService
+                    .AddEventArchiveV1WithListenerEventArchiveV1sAsync(
+                        eventArchiveV1);
 
                 await this.eventV1OrchestrationServiceV1
                     .RemoveEventV1AndListenerEventV1sAsync(
@@ -57,7 +57,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
             }
         });
 
-        private async ValueTask<EventArchiveV1> MapToEventV1ArchiveAsync(
+        private async ValueTask<EventArchiveV1> MapToEventArchiveV1Async(
             EventV1 eventV1)
         {
             DateTimeOffset currentDateTime =
@@ -67,7 +67,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
             {
                 Id = eventV1.Id,
                 Content = eventV1.Content,
-                Type = (EventArchiveV1Type)eventV1.Type,
+                Type = (EventArchiveTypeV1)eventV1.Type,
                 CreatedDate = eventV1.CreatedDate,
                 UpdatedDate = eventV1.UpdatedDate,
                 ScheduledDate = eventV1.ScheduledDate,
@@ -76,14 +76,14 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
 
                 ListenerEventArchiveV1s = eventV1.ListenerEvents
                     ?.Select(listenerEvent =>
-                        MapToListenerEventV1Archive(
+                        MapToListenerEventArchiveV1(
                             listenerEvent,
                             currentDateTime))
                                 .ToList()
             };
         }
 
-        private ListenerEventArchiveV1 MapToListenerEventV1Archive(
+        private ListenerEventArchiveV1 MapToListenerEventArchiveV1(
             ListenerEventV1 listenerEventV1,
             DateTimeOffset currentDateTime)
         {

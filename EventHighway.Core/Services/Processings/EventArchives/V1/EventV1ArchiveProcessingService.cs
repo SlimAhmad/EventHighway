@@ -25,7 +25,7 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V1
         public ValueTask<EventArchiveV1> AddEventArchiveV1Async(EventArchiveV1 eventArchiveV1) =>
         TryCatch(async () =>
         {
-            ValidateEventV1ArchiveIsNotNull(eventArchiveV1);
+            ValidateEventArchiveV1IsNotNull(eventArchiveV1);
 
             return await this.eventArchiveV1Service.AddEventArchiveV1Async(eventArchiveV1);
         });

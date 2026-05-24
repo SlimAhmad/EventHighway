@@ -9,9 +9,9 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V1
 {
     internal partial class EventArchiveV1ProcessingService
     {
-        private static void ValidateEventV1ArchiveIsNotNull(EventArchiveV1 eventV1Archive)
+        private static void ValidateEventArchiveV1IsNotNull(EventArchiveV1 eventArchiveV1)
         {
-            if (eventV1Archive is null)
+            if (eventArchiveV1 is null)
             {
                 throw new NullEventArchiveV1ProcessingException(
                     message: "Event archive is null.");

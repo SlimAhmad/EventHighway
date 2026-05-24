@@ -9,6 +9,6 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V1
 {
     public interface IEventArchiveV1ProcessingService
     {
-        ValueTask<EventArchiveV1> AddEventArchiveV1Async(EventArchiveV1 eventV1Archive);
+        ValueTask<EventArchiveV1> AddEventArchiveV1Async(EventArchiveV1 eventArchiveV1);
     }
 }

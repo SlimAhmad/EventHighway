@@ -62,7 +62,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                         ListenerEvents = retrievedListenerEventV1s
                     }).AsQueryable();
 
-            List<ListenerEventArchiveV1> mappedListenerEventV1Archives =
+            List<ListenerEventArchiveV1> mappedListenerEventArchiveV1s =
                 randomListenerEventV1sProperties.Select(item =>
                     new ListenerEventArchiveV1
                     {
@@ -77,19 +77,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                         EventListenerId = item.EventListenerId
                     }).ToList();
 
-            List<EventArchiveV1> mappedEventV1Archives =
+            List<EventArchiveV1> mappedEventArchiveV1s =
                 randomEventV1sProperties.Select(item =>
                     new EventArchiveV1
                     {
                         Id = item.Id,
                         Content = item.Content,
-                        Type = (EventArchiveV1Type)item.Type,
+                        Type = (EventArchiveTypeV1)item.Type,
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.UpdatedDate,
                         ScheduledDate = item.ScheduledDate,
                         EventAddressId = item.EventAddressId,
                         ArchivedDate = retrievedDateTimeOffset,
-                        ListenerEventArchiveV1s = mappedListenerEventV1Archives
+                        ListenerEventArchiveV1s = mappedListenerEventArchiveV1s
                     }).ToList();
 
             this.eventV1OrchestrationServiceV1Mock
@@ -97,8 +97,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                     service.RetrieveAllDeadEventV1sWithListenersAsync())
                         .ReturnsAsync(retrievedEventV1s);
 
-            foreach ((EventArchiveV1 mappedEventV1Archive, EventV1 retrievedEventV1)
-                in mappedEventV1Archives.Zip(retrievedEventV1s))
+            foreach ((EventArchiveV1 mappedEventArchiveV1, EventV1 retrievedEventV1)
+                in mappedEventArchiveV1s.Zip(retrievedEventV1s))
             {
                 this.dateTimeBrokerMock
                     .InSequence(mockSequence).Setup(broker =>
@@ -106,10 +106,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                             .ReturnsAsync(
                                 retrievedDateTimeOffset);
 
-                this.eventV1ArchiveOrchestrationServiceMock
+                this.eventArchiveV1OrchestrationServiceMock
                     .InSequence(mockSequence).Setup(service =>
-                        service.AddEventV1ArchiveWithListenerEventV1ArchivesAsync(
-                            It.Is(SameEventV1ArchiveAs(mappedEventV1Archive))))
+                        service.AddEventArchiveV1WithListenerEventArchiveV1sAsync(
+                            It.Is(SameEventArchiveV1As(mappedEventArchiveV1))))
                                 .Returns(ValueTask.CompletedTask);
 
                 this.eventV1OrchestrationServiceV1Mock
@@ -129,14 +129,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
-                    Times.Exactly(mappedEventV1Archives.Count));
+                    Times.Exactly(mappedEventArchiveV1s.Count));
 
-            foreach ((EventArchiveV1 mappedEventV1Archive, EventV1 retrievedEventV1)
-                in mappedEventV1Archives.Zip(retrievedEventV1s))
+            foreach ((EventArchiveV1 mappedEventArchiveV1, EventV1 retrievedEventV1)
+                in mappedEventArchiveV1s.Zip(retrievedEventV1s))
             {
-                this.eventV1ArchiveOrchestrationServiceMock.Verify(service =>
-                    service.AddEventV1ArchiveWithListenerEventV1ArchivesAsync(
-                        It.Is(SameEventV1ArchiveAs(mappedEventV1Archive))),
+                this.eventArchiveV1OrchestrationServiceMock.Verify(service =>
+                    service.AddEventArchiveV1WithListenerEventArchiveV1sAsync(
+                        It.Is(SameEventArchiveV1As(mappedEventArchiveV1))),
                             Times.Once);
 
                 this.eventV1OrchestrationServiceV1Mock.Verify(service =>
@@ -147,7 +147,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
 
             this.eventV1OrchestrationServiceV1Mock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventV1ArchiveOrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV1OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
