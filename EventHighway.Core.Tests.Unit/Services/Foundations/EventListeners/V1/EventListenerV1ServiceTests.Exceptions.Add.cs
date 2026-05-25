@@ -24,9 +24,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
             SqlException sqlException = GetSqlException();
 
             var failedEventListenerV1StorageException =
-                new FailedEventListenerV1StorageException(
+                new FailedStorageEventListenerV1Exception(
                     message: "Failed event listener storage error occurred, contact support.",
-                    innerException: sqlException);
+                    innerException: sqlException,
+                    data: sqlException.Data);
 
             var expectedEventListenerV1DependencyException =
                 new EventListenerV1DependencyException(
@@ -78,7 +79,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
             var alreadyExistsEventListenerV1Exception =
                 new AlreadyExistsEventListenerV1Exception(
                     message: "Event listener with the same id already exists.",
-                    innerException: duplicateKeyException);
+                    innerException: duplicateKeyException,
+                    data: duplicateKeyException.Data);
 
             var expectedEventListenerV1DependencyValidationException =
                 new EventListenerV1DependencyValidationException(
@@ -132,7 +134,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
             var invalidEventListenerV1ReferenceException =
                 new InvalidEventListenerV1ReferenceException(
                     message: "Invalid event listener reference error occurred.",
-                    innerException: foreignKeyConstraintConflictException);
+                    innerException: foreignKeyConstraintConflictException,
+                    data: foreignKeyConstraintConflictException.Data);
 
             var expectedEventListenerV1DependencyValidationException =
                 new EventListenerV1DependencyValidationException(
@@ -181,9 +184,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
             var dbUpdateException = new DbUpdateException();
 
             var failedEventListenerV1StorageException =
-                new FailedEventListenerV1StorageException(
+                new FailedStorageEventListenerV1Exception(
                     message: "Failed event listener storage error occurred, contact support.",
-                    innerException: dbUpdateException);
+                    innerException: dbUpdateException,
+                    data: dbUpdateException.Data);
 
             var expectedEventListenerV1DependencyException =
                 new EventListenerV1DependencyException(
@@ -234,7 +238,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
             var failedEventListenerV1ServiceException =
                 new FailedEventListenerV1ServiceException(
                     message: "Failed event listener service error occurred, contact support.",
-                    innerException: serviceException);
+                    innerException: serviceException,
+                    data: serviceException.Data);
 
             var expectedEventListenerV1ServiceException =
                 new EventListenerV1ServiceException(
