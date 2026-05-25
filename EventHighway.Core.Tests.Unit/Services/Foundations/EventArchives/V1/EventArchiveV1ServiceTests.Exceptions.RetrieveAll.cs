@@ -22,9 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             SqlException sqlException = CreateSqlException();
 
             var failedEventArchiveV1StorageException =
-                new FailedEventArchiveV1StorageException(
+                new FailedStorageEventArchiveV1Exception(
                     message: "Failed event archive storage error occurred, contact support.",
-                    innerException: sqlException);
+                    innerException: sqlException, data: sqlException.Data);
 
             var expectedEventArchiveV1DependencyException =
                 new EventArchiveV1DependencyException(
@@ -70,7 +70,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             var failedEventArchiveV1ServiceException =
                 new FailedEventArchiveV1ServiceException(
                     message: "Failed event archive service error occurred, contact support.",
-                    innerException: serviceException);
+                    innerException: serviceException, 
+                    data: serviceException.Data);
 
             var expectedEventArchiveV1ServiceException =
                 new EventArchiveV1ServiceException(

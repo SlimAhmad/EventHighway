@@ -3,14 +3,15 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using Xeptions;
 
 namespace EventHighway.Core.Models.Services.Foundations.ListenerEvents.V1.Exceptions
 {
-    public class FailedListenerEventV1StorageException : Xeption
+    public class FailedStorageListenerEventV1Exception : Xeption
     {
-        public FailedListenerEventV1StorageException(string message, Exception innerException)
-            : base(message, innerException)
+        public FailedStorageListenerEventV1Exception(string message, Exception innerException, IDictionary data)
+            : base(message, innerException, data)
         { }
     }
 }
