@@ -64,7 +64,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
 
                 new ListenerEventArchiveV1ServiceException(
                     someMessage,
-                    someInnerException)
+                    someInnerException,
+                    data: someInnerException.Data)
             };
         }
 

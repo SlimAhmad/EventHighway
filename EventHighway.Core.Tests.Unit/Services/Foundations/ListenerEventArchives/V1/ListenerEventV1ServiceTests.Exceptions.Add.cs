@@ -24,9 +24,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             SqlException sqlException = GetSqlException();
 
             var failedListenerEventArchiveV1StorageException =
-                new FailedListenerEventArchiveV1StorageException(
+                new FailedStorageListenerEventArchiveV1Exception(
                     message: "Failed listener event archive storage error occurred, contact support.",
-                    innerException: sqlException);
+                    innerException: sqlException,
+                    data: sqlException.Data);
 
             var expectedListenerEventArchiveV1DependencyException =
                 new ListenerEventArchiveV1DependencyException(
@@ -78,7 +79,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             var alreadyExistsListenerEventArchiveV1Exception =
                 new AlreadyExistsListenerEventArchiveV1Exception(
                     message: "Listener event archive with the same id already exists.",
-                    innerException: duplicateKeyException);
+                    innerException: duplicateKeyException,
+                    data: duplicateKeyException.Data);
 
             var expectedListenerEventArchiveV1DependencyValidationException =
                 new ListenerEventArchiveV1DependencyValidationException(
@@ -127,9 +129,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             var dbUpdateException = new DbUpdateException();
 
             var failedListenerEventArchiveV1StorageException =
-                new FailedListenerEventArchiveV1StorageException(
+                new FailedStorageListenerEventArchiveV1Exception(
                     message: "Failed listener event archive storage error occurred, contact support.",
-                    innerException: dbUpdateException);
+                    innerException: dbUpdateException,
+                    data: dbUpdateException.Data);
 
             var expectedListenerEventArchiveV1DependencyException =
                 new ListenerEventArchiveV1DependencyException(
@@ -180,12 +183,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             var failedListenerEventArchiveV1ServiceException =
                 new FailedListenerEventArchiveV1ServiceException(
                     message: "Failed listener event archive service error occurred, contact support.",
-                    innerException: serviceException);
+                    innerException: serviceException,
+                    data: serviceException.Data);
 
             var expectedListenerEventArchiveV1ServiceException =
                 new ListenerEventArchiveV1ServiceException(
                     message: "Listener event archive service error occurred, contact support.",
-                    innerException: failedListenerEventArchiveV1ServiceException);
+                    innerException: failedListenerEventArchiveV1ServiceException,
+                    data: failedListenerEventArchiveV1ServiceException.Data);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())

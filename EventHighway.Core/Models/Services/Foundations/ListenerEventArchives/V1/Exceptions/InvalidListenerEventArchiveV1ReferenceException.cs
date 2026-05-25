@@ -3,14 +3,15 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using Xeptions;
 
 namespace EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1.Exceptions
 {
     public class InvalidListenerEventArchiveV1ReferenceException : Xeption
     {
-        public InvalidListenerEventArchiveV1ReferenceException(string message, Exception innerException)
-            : base(message, innerException)
+        public InvalidListenerEventArchiveV1ReferenceException(string message, Exception innerException, IDictionary data)
+            : base(message, innerException, data)
         { }
     }
 }
