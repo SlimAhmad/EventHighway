@@ -4,7 +4,6 @@
 
 using System;
 using System.Threading.Tasks;
-using EventHighway.Core.Models.Services.Foundations.EventsArchives.V1.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1.Exceptions;
 
