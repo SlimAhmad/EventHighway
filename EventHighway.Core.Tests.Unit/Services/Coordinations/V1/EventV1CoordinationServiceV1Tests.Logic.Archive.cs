@@ -39,7 +39,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                     new ListenerEventV1
                     {
                         Id = item.Id,
-                        Status = (ListenerEventV1Status)item.Status,
+                        Status = (ListenerEventStatusV1)item.Status,
                         Response = item.Response,
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.UpdatedDate,
@@ -54,12 +54,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                     {
                         Id = item.Id,
                         Content = item.Content,
-                        Type = (EventV1Type)item.Type,
+                        Type = (EventTypeV1)item.Type,
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.UpdatedDate,
                         ScheduledDate = item.ScheduledDate,
                         EventAddressId = item.EventAddressId,
-                        ListenerEvents = retrievedListenerEventV1s
+                        ListenerEventV1s = retrievedListenerEventV1s
                     }).AsQueryable();
 
             List<ListenerEventArchiveV1> mappedListenerEventArchiveV1s =
@@ -67,7 +67,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                     new ListenerEventArchiveV1
                     {
                         Id = item.Id,
-                        Status = (ListenerEventArchiveV1Status)item.Status,
+                        Status = (ListenerEventArchiveStatusV1)item.Status,
                         Response = item.Response,
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.UpdatedDate,

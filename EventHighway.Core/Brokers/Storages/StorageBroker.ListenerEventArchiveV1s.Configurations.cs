@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EventHighway.Core.Brokers.Storages
@@ -11,8 +12,8 @@ namespace EventHighway.Core.Brokers.Storages
     {
         private static void ConfigureListenerEventArchiveV1s(EntityTypeBuilder<ListenerEventArchiveV1> model)
         {
-            model.HasKey(listenerEventArchiveV1 =>
-                listenerEventArchiveV1.Id);
+            model.ToTable("ListenerEventArchiveV1s");
+            model.HasKey(listenerEventArchiveV1 => listenerEventArchiveV1.Id);
         }
     }
 }

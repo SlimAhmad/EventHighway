@@ -1,8 +1,9 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V1;
 using EventHighway.Core.Models.Services.Processings.EventAddresses.V1.Exceptions;
@@ -108,11 +109,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V1
             // given
             Guid someEventAddressV1Id = GetRandomId();
             var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedEventAddressV1ProcessingServiceException =
                 new FailedEventAddressV1ProcessingServiceException(
                     message: "Failed event address service error occurred, contact support.",
-                    innerException: serviceException);
+                    innerException: serviceException,
+                    data: serviceException.Data);
 
             var expectedEventAddressV1ProcessingExceptionException =
                 new EventAddressV1ProcessingServiceException(

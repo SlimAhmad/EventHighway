@@ -70,7 +70,7 @@ namespace EventHighway.Core.Services.Foundations.ListernEvents.V1
                 foreignKeyConstraintConflictException)
             {
                 var invalidListenerEventV1ReferenceException =
-                    new InvalidListenerEventV1ReferenceException(
+                    new InvalidReferenceListenerEventV1Exception(
                         message: "Invalid listener event reference error occurred.",
                         innerException: foreignKeyConstraintConflictException,
                         data: foreignKeyConstraintConflictException.Data);

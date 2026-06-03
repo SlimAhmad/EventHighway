@@ -1,5 +1,5 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
@@ -42,6 +42,8 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V1
         private static void ValidateEventV1Id(Guid eventV1Id)
         {
             Validate(
+                message: "Event is invalid, fix the errors and try again.",
+
                 (Rule: IsInvalid(eventV1Id),
                 Parameter: nameof(EventV1.Id)));
         }
@@ -52,11 +54,9 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V1
             Message = "Required"
         };
 
-        private static void Validate(params (dynamic Rule, string Parameter)[] validations)
+        private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
         {
-            var invalidEventV1OrchestrationException =
-                new InvalidEventV1OrchestrationException(
-                    message: "Event is invalid, fix the errors and try again.");
+            var invalidEventV1OrchestrationException = new InvalidEventV1OrchestrationException(message);
 
             foreach ((dynamic rule, string parameter) in validations)
             {

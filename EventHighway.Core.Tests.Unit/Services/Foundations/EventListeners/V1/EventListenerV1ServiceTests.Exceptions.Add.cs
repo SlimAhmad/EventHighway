@@ -132,7 +132,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
                 new ForeignKeyConstraintConflictException(someMessage);
 
             var invalidEventListenerV1ReferenceException =
-                new InvalidEventListenerV1ReferenceException(
+                new InvalidReferenceEventListenerV1Exception(
                     message: "Invalid event listener reference error occurred.",
                     innerException: foreignKeyConstraintConflictException,
                     data: foreignKeyConstraintConflictException.Data);

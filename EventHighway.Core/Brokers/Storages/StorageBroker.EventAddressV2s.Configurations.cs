@@ -2,20 +2,18 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using System.Threading.Tasks;
-using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EventHighway.Core.Brokers.Storages
 {
     internal partial class StorageBroker
     {
-        public DbSet<ListenerEventArchiveV2> ListenerEventArchiveV2s { get; set; }
-
-        public async ValueTask<ListenerEventArchiveV2> InsertListenerEventV2ArchiveAsync(
-            ListenerEventArchiveV2 listenerEventV2Archive)
+        private static void ConfigureEventAddressV2s(EntityTypeBuilder<EventAddressV2> model)
         {
-            return await InsertAsync(listenerEventV2Archive);
+            model.ToTable("EventAddressV2s");
+            model.HasKey(eventAddressV2 => eventAddressV2.Id);
         }
     }
 }

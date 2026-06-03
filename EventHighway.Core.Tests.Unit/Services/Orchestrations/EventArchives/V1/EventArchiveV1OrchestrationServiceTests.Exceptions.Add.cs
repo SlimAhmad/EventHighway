@@ -1,8 +1,9 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V1;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1;
@@ -121,11 +122,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V1
             // given
             EventArchiveV1 someEventArchiveV1 = CreateRandomEventArchiveV1();
             var exception = new Exception();
+            exception.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedEventArchiveV1OrchestrationServiceException =
                 new FailedEventArchiveV1OrchestrationServiceException(
                     message: "Failed event archive service error occurred, contact support.",
-                    innerException: exception);
+                    innerException: exception,
+                    data: exception.Data);
 
             var expectedEventArchiveV1OrchestrationServiceException =
                 new EventArchiveV1OrchestrationServiceException(

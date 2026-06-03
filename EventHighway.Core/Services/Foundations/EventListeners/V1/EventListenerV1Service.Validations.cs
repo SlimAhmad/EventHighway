@@ -1,5 +1,5 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
@@ -16,6 +16,8 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V1
             ValidateEventListenerV1IsNotNull(eventListenerV1);
 
             Validate(
+                message: "Event listener is invalid, fix the errors and try again.",
+
                 (Rule: IsInvalid(eventListenerV1.Id),
                 Parameter: nameof(EventListenerV1.Id)),
 
@@ -54,6 +56,8 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V1
         private static void ValidateEventListenerV1Id(Guid eventListenerV1Id)
         {
             Validate(
+                message: "Event listener is invalid, fix the errors and try again.",
+
                 (Rule: IsInvalid(eventListenerV1Id),
                 Parameter: nameof(EventListenerV1.Id)));
         }
@@ -123,11 +127,9 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V1
             return timeDifference.TotalSeconds is > 60 or < 0;
         }
 
-        private static void Validate(params (dynamic Rule, string Parameter)[] validations)
+        private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
         {
-            var invalidEventListenerV1Exception =
-                new InvalidEventListenerV1Exception(
-                    message: "Event listener is invalid, fix the errors and try again.");
+            var invalidEventListenerV1Exception = new InvalidEventListenerV1Exception(message);
 
             foreach ((dynamic rule, string parameter) in validations)
             {

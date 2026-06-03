@@ -1,8 +1,9 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V1;
@@ -22,11 +23,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V1
             // given
             EventAddressV1 someEventAddressV1 = CreateRandomEventAddressV1();
             SqlException sqlException = CreateSqlException();
+            sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
             var failedEventAddressV1StorageException =
-                new FailedEventAddressV1StorageException(
+                new FailedStorageEventAddressV1Exception(
                     message: "Failed event address storage error occurred, contact support.",
-                    innerException: sqlException);
+                    innerException: sqlException,
+                    data: sqlException.Data);
 
             var expectedEventAddressV1DependencyException =
                 new EventAddressV1DependencyException(
@@ -74,11 +77,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V1
             string someMessage = GetRandomString();
             EventAddressV1 someEventAddressV1 = CreateRandomEventAddressV1();
             var duplicateKeyException = new DuplicateKeyException(someMessage);
+            duplicateKeyException.Data.Add("ErrorCode", new List<string> { "DuplicateKeyError" });
 
             var alreadyExistsEventAddressV1Exception =
                 new AlreadyExistsEventAddressV1Exception(
                     message: "Event address with the same id already exists.",
-                    innerException: duplicateKeyException);
+                    innerException: duplicateKeyException,
+                    data: duplicateKeyException.Data);
 
             var expectedEventAddressV1DependencyValidationException =
                 new EventAddressV1DependencyValidationException(
@@ -125,11 +130,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V1
             // given
             EventAddressV1 someEventAddressV1 = CreateRandomEventAddressV1();
             var dbUpdateException = new DbUpdateException();
+            dbUpdateException.Data.Add("ErrorCode", new List<string> { "DbUpdateError" });
 
             var failedEventAddressV1StorageException =
-                new FailedEventAddressV1StorageException(
+                new FailedStorageEventAddressV1Exception(
                     message: "Failed event address storage error occurred, contact support.",
-                    innerException: dbUpdateException);
+                    innerException: dbUpdateException,
+                    data: dbUpdateException.Data);
 
             var expectedEventAddressV1DependencyException =
                 new EventAddressV1DependencyException(
@@ -176,11 +183,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V1
             // given
             EventAddressV1 someEventAddressV1 = CreateRandomEventAddressV1();
             var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedEventAddressV1ServiceException =
                 new FailedEventAddressV1ServiceException(
                     message: "Failed event address service error occurred, contact support.",
-                    innerException: serviceException);
+                    innerException: serviceException,
+                    data: serviceException.Data);
 
             var expectedEventAddressV1ServiceException =
                 new EventAddressV1ServiceException(

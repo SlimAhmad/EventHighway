@@ -1,8 +1,9 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V1;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EventHighway.Core.Brokers.Storages
@@ -11,8 +12,8 @@ namespace EventHighway.Core.Brokers.Storages
     {
         private static void ConfigureEventArchiveV1s(EntityTypeBuilder<EventArchiveV1> model)
         {
-            model.HasKey(eventArchiveV1 =>
-                eventArchiveV1.Id);
+            model.ToTable("EventArchiveV1s");
+            model.HasKey(eventArchiveV1 => eventArchiveV1.Id);
         }
     }
 }

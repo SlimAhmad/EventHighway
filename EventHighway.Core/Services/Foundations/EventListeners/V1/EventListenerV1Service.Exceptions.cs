@@ -1,5 +1,5 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
@@ -31,7 +31,8 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V1
                 var failedStorageEventListenerV1Exception =
                     new FailedStorageEventListenerV1Exception(
                         message: "Failed event listener storage error occurred, contact support.",
-                        innerException: sqlException, data: sqlException.Data);
+                        innerException: sqlException,
+                        data: sqlException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
                     failedStorageEventListenerV1Exception);
@@ -41,7 +42,8 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V1
                 var failedEventListenerV1ServiceException =
                     new FailedEventListenerV1ServiceException(
                         message: "Failed event listener service error occurred, contact support.",
-                        innerException: serviceException, data: serviceException.Data);
+                        innerException: serviceException,
+                        data: serviceException.Data);
 
                 throw await CreateAndLogServiceExceptionAsync(
                     failedEventListenerV1ServiceException);
@@ -96,7 +98,7 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V1
                 foreignKeyConstraintConflictException)
             {
                 var invalidEventListenerV1ReferenceException =
-                    new InvalidEventListenerV1ReferenceException(
+                    new InvalidReferenceEventListenerV1Exception(
                         message: "Invalid event listener reference error occurred.",
                         innerException: foreignKeyConstraintConflictException,
                         data: foreignKeyConstraintConflictException.Data);

@@ -1,5 +1,5 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System.Threading.Tasks;
@@ -13,9 +13,7 @@ namespace EventHighway.Core.Brokers.Storages
         public DbSet<ListenerEventArchiveV1> ListenerEventArchiveV1s { get; set; }
 
         public async ValueTask<ListenerEventArchiveV1> InsertListenerEventArchiveV1Async(
-            ListenerEventArchiveV1 listenerEventArchiveV1)
-        {
-            return await InsertAsync(listenerEventArchiveV1);
-        }
+            ListenerEventArchiveV1 listenerEventArchiveV1) =>
+            await InsertAsync(listenerEventArchiveV1);
     }
 }

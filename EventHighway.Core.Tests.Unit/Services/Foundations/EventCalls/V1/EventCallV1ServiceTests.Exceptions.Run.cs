@@ -1,8 +1,9 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V1;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V1.Exceptions;
@@ -24,9 +25,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             EventCallV1 someEventCallV1 = CreateRandomEventCallV1();
 
             var failedEventCallV1ConfigurationException =
-                new FailedEventCallV1ConfigurationException(
+                new FailedConfigurationEventCallV1Exception(
                     message: "Failed event call configuration error occurred, contact support.",
-                    innerException: criticalDependencyException);
+                    innerException: criticalDependencyException,
+                    data: criticalDependencyException.Data);
 
             var expectedEventCallV1DependencyException =
                 new EventCallV1DependencyException(
@@ -74,11 +76,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             // given
             EventCallV1 someEventCallV1 = CreateRandomEventCallV1();
             var httpUnprocessableEntityException = new HttpResponseUnprocessableEntityException();
+            httpUnprocessableEntityException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedEventCallV1RequestException =
-                new FailedEventCallV1RequestException(
+                new FailedRequestEventCallV1Exception(
                     message: "Failed event call request error occurred, fix the errors and try again.",
-                    innerException: httpUnprocessableEntityException);
+                    innerException: httpUnprocessableEntityException,
+                    data: httpUnprocessableEntityException.Data);
 
             var expectedEventCallV1DependencyValidationException =
                 new EventCallV1DependencyValidationException(
@@ -181,11 +185,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             // given
             EventCallV1 someEventCallV1 = CreateRandomEventCallV1();
             var httpConflictException = new HttpResponseConflictException();
+            httpConflictException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var alreadyExistsEventCallV1Exception =
                 new AlreadyExistsEventCallV1Exception(
                     message: "Event call with same id already exists, try again.",
-                    innerException: httpConflictException);
+                    innerException: httpConflictException,
+                    data: httpConflictException.Data);
 
             var expectedEventCallV1DependencyValidationException =
                 new EventCallV1DependencyValidationException(
@@ -237,9 +243,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
                 new HttpResponseFailedDependencyException();
 
             var invalidEventCallV1ReferenceException =
-                new InvalidEventCallV1ReferenceException(
+                new InvalidReferenceEventCallV1Exception(
                     message: "Invalid event call reference error occurred, fix the errors and try again.",
-                    innerException: httpResponseFailedDependencyException);
+                    innerException: httpResponseFailedDependencyException,
+                    data: httpResponseFailedDependencyException.Data);
 
             var expectedEventCallV1DependencyValidationException =
                 new EventCallV1DependencyValidationException(
@@ -287,11 +294,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             // given
             EventCallV1 someEventCallV1 = CreateRandomEventCallV1();
             var httpException = new HttpResponseException();
+            httpException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedEventCallV1DependencyException =
                 new FailedEventCallV1DependencyException(
                     message: "Failed event call dependency error occurred, contact support.",
-                    innerException: httpException);
+                    innerException: httpException,
+                    data: httpException.Data);
 
             var expectedEventCallV1DependencyException =
                 new EventCallV1DependencyException(
@@ -339,11 +348,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             // given
             EventCallV1 someEventCallV1 = CreateRandomEventCallV1();
             var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedEventCallV1ServiceException =
                 new FailedEventCallV1ServiceException(
                     message: "Failed event call service error occurred, contact support.",
-                    innerException: serviceException);
+                    innerException: serviceException,
+                    data: serviceException.Data);
 
             var expectedEventCallV1ServiceException =
                 new EventCallV1ServiceException(

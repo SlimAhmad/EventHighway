@@ -1,5 +1,5 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
@@ -16,7 +16,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             ValidateEventArchiveV1IsNotNull(eventArchiveV1);
 
             Validate(
-                message: "Event archive is invalid, fix the errors and try again.", 
+                message: "Event archive is invalid, fix the errors and try again.",
 
                 (Rule: IsInvalid(eventArchiveV1.Id),
                 Parameter: nameof(EventArchiveV1.Id)),
@@ -121,8 +121,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
 
         private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
         {
-            var invalidEventArchiveV1Exception =
-                new InvalidEventArchiveV1Exception(message);
+            var invalidEventArchiveV1Exception = new InvalidEventArchiveV1Exception(message);
 
             foreach ((dynamic rule, string parameter) in validations)
             {

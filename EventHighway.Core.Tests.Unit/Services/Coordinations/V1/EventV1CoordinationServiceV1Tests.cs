@@ -196,8 +196,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
             Guid randomId = GetRandomId();
             string randomContent = GetRandomString();
 
-            EventV1Type randomType =
-                GetRandomEnum<EventV1Type>();
+            EventTypeV1 randomType =
+                GetRandomEnum<EventTypeV1>();
 
             DateTimeOffset randomCreatedDate =
                 GetRandomDateTimeOffset();
@@ -226,8 +226,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
         {
             Guid randomId = GetRandomId();
 
-            ListenerEventV1Status randomStatus =
-                GetRandomEnum<ListenerEventV1Status>();
+            ListenerEventStatusV1 randomStatus =
+                GetRandomEnum<ListenerEventStatusV1>();
 
             string randomResponse = GetRandomString();
 
@@ -276,10 +276,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                     .Use(GetRandomDateTimeOffset())
 
                 .OnProperty(eventV1 =>
-                    eventV1.EventAddress).IgnoreIt()
+                    eventV1.EventAddressV1).IgnoreIt()
 
                 .OnProperty(eventV1 =>
-                    eventV1.ListenerEvents).IgnoreIt();
+                    eventV1.ListenerEventV1s).IgnoreIt();
 
             return filler;
         }

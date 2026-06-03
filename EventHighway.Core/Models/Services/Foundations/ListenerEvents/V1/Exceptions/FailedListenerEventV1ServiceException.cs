@@ -1,5 +1,5 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
@@ -11,7 +11,7 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEvents.V1.Except
     public class FailedListenerEventV1ServiceException : Xeption
     {
         public FailedListenerEventV1ServiceException(string message, Exception innerException, IDictionary data)
-            : base(message, innerException, data    )
+            : base(message, innerException, data)
         { }
     }
 }

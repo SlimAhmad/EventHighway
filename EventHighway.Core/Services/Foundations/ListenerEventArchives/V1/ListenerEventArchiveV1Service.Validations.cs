@@ -1,5 +1,5 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
@@ -108,8 +108,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
 
         private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
         {
-            var invalidListenerEventArchiveV1Exception =
-                new InvalidListenerEventArchiveV1Exception(message);
+            var invalidListenerEventArchiveV1Exception = new InvalidListenerEventArchiveV1Exception(message);
 
             foreach ((dynamic rule, string parameter) in validations)
             {

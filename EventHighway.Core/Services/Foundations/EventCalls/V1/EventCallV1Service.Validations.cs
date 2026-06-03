@@ -1,5 +1,5 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System.Net.Http;
@@ -15,6 +15,8 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V1
             ValidateEventCallV1IsNotNull(eventCallV1);
 
             Validate(
+                message: "Event call is invalid, fix the errors and try again.",
+
                 (Rule: IsInvalid(eventCallV1.Endpoint),
                 Parameter: nameof(EventCallV1.Endpoint)),
 
@@ -46,11 +48,9 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V1
             Message = "Required"
         };
 
-        private static void Validate(params (dynamic Rule, string Parameter)[] validations)
+        private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
         {
-            var invalidEventCallV1Exception =
-                new InvalidEventCallV1Exception(
-                    message: "Event call is invalid, fix the errors and try again.");
+            var invalidEventCallV1Exception = new InvalidEventCallV1Exception(message);
 
             foreach ((dynamic rule, string parameter) in validations)
             {
