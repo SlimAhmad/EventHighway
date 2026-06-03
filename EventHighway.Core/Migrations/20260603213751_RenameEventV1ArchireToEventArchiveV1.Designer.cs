@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventHighway.Core.Migrations
 {
     [DbContext(typeof(StorageBroker))]
-    [Migration("20260524180551_RenameEventV1ArchireToEventArchiveV1")]
+    [Migration("20260603213751_RenameEventV1ArchireToEventArchiveV1")]
     partial class RenameEventV1ArchireToEventArchiveV1
     {
         /// <inheritdoc />
