@@ -9,13 +9,13 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V1
 {
     internal partial class EventArchiveV1OrchestrationService
     {
-        private static void ValidateEventV1Arhive(EventArchiveV1 eventArchiveV1)
+        private static void ValidateEventArchiveV1(EventArchiveV1 eventArchiveV1)
         {
-            ValidateEventV1ArhiveIsNotNull(eventArchiveV1);
-            ValidateListenerEventV1ArhivesAreNotNull(eventArchiveV1);
+            ValidateEventArchiveV1IsNotNull(eventArchiveV1);
+            ValidateListenerEventArchiveV1sAreNotNull(eventArchiveV1);
         }
 
-        private static void ValidateEventV1ArhiveIsNotNull(EventArchiveV1 eventArchiveV1)
+        private static void ValidateEventArchiveV1IsNotNull(EventArchiveV1 eventArchiveV1)
         {
             if (eventArchiveV1 is null)
             {
@@ -24,7 +24,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V1
             }
         }
 
-        private static void ValidateListenerEventV1ArhivesAreNotNull(EventArchiveV1 eventArchiveV1)
+        private static void ValidateListenerEventArchiveV1sAreNotNull(EventArchiveV1 eventArchiveV1)
         {
             if (eventArchiveV1.ListenerEventArchiveV1s is null)
             {

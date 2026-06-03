@@ -17,6 +17,8 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             ValidateListenerEventArchiveV1IsNotNull(listenerEventArchiveV1);
 
             Validate(
+                message: "Listener event archive is invalid, fix the errors and try again.",
+
                 (Rule: IsInvalid(listenerEventArchiveV1.Id),
                 Parameter: nameof(ListenerEventArchiveV1.Id)),
 
@@ -104,11 +106,10 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             return isDefined is false;
         }
 
-        private static void Validate(params (dynamic Rule, string Parameter)[] validations)
+        private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
         {
             var invalidListenerEventArchiveV1Exception =
-                new InvalidListenerEventArchiveV1Exception(
-                    message: "Listener event archive is invalid, fix the errors and try again.");
+                new InvalidListenerEventArchiveV1Exception(message);
 
             foreach ((dynamic rule, string parameter) in validations)
             {
