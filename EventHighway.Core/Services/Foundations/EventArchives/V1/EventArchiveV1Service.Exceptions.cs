@@ -38,14 +38,14 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             }
             catch (SqlException sqlException)
             {
-                var failedEventArchiveV1StorageException =
+                var failedStorageEventArchiveV1Exception =
                     new FailedStorageEventArchiveV1Exception(
                         message: "Failed event archive storage error occurred, contact support.",
                         innerException: sqlException,
                         data: sqlException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedEventArchiveV1StorageException);
+                    failedStorageEventArchiveV1Exception);
             }
             catch (DuplicateKeyException duplicateKeyException)
             {
@@ -61,24 +61,24 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             catch (ForeignKeyConstraintConflictException
                 foreignKeyConstraintConflictException)
             {
-                var invalidEventArchiveV1ReferenceException =
+                var invalidReferenceEventArchiveV1Exception =
                     new InvalidReferenceEventArchiveV1Exception(
                         message: "Invalid event archive reference error occurred.",
                         innerException: foreignKeyConstraintConflictException,
                         data: foreignKeyConstraintConflictException.Data);
 
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    invalidEventArchiveV1ReferenceException);
+                    invalidReferenceEventArchiveV1Exception);
             }
             catch (DbUpdateException dbUpdateException)
             {
-                var failedEventArchiveV1StorageException =
+                var failedStorageEventArchiveV1Exception =
                     new FailedStorageEventArchiveV1Exception(
                         message: "Failed event archive storage error occurred, contact support.",
                         innerException: dbUpdateException,
                         data: dbUpdateException.Data);
 
-                throw await CreateAndLogDependencyExceptionAsync(failedEventArchiveV1StorageException);
+                throw await CreateAndLogDependencyExceptionAsync(failedStorageEventArchiveV1Exception);
             }
             catch (Exception serviceException)
             {
@@ -102,14 +102,14 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V1
             }
             catch (SqlException sqlException)
             {
-                var failedEventArchiveV1StorageException =
+                var failedStorageEventArchiveV1Exception =
                     new FailedStorageEventArchiveV1Exception(
                         message: "Failed event archive storage error occurred, contact support.",
                         innerException: sqlException,
                         data: sqlException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedEventArchiveV1StorageException);
+                    failedStorageEventArchiveV1Exception);
             }
             catch (Exception serviceException)
             {

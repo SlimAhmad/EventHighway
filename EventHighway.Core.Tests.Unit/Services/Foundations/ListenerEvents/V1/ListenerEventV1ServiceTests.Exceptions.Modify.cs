@@ -23,7 +23,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             ListenerEventV1 someListenerEventV1 = CreateRandomListenerEventV1();
             SqlException sqlException = GetSqlException();
 
-            var failedListenerEventV1StorageException =
+            var failedStorageListenerEventV1Exception =
                 new FailedStorageListenerEventV1Exception(
                     message: "Failed listener event storage error occurred, contact support.",
                     innerException: sqlException,
@@ -32,7 +32,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             var expectedListenerEventV1DependencyException =
                 new ListenerEventV1DependencyException(
                     message: "Listener event dependency error occurred, contact support.",
-                    innerException: failedListenerEventV1StorageException);
+                    innerException: failedStorageListenerEventV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
@@ -80,7 +80,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             var foreignKeyConstraintConflictException =
                 new ForeignKeyConstraintConflictException(someMessage);
 
-            var invalidListenerEventV1ReferenceException =
+            var invalidReferenceListenerEventV1Exception =
                 new InvalidReferenceListenerEventV1Exception(
                     message: "Invalid listener event reference error occurred.",
                     innerException: foreignKeyConstraintConflictException,
@@ -89,7 +89,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             var expectedListenerEventV1DependencyValidationException =
                 new ListenerEventV1DependencyValidationException(
                     message: "Listener event validation error occurred, fix the errors and try again.",
-                    innerException: invalidListenerEventV1ReferenceException);
+                    innerException: invalidReferenceListenerEventV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
@@ -185,7 +185,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             ListenerEventV1 someListenerEventV1 = CreateRandomListenerEventV1();
             var dbUpdateException = new DbUpdateException();
 
-            var failedListenerEventV1StorageException =
+            var failedStorageListenerEventV1Exception =
                 new FailedStorageListenerEventV1Exception(
                     message: "Failed listener event storage error occurred, contact support.",
                     innerException: dbUpdateException,
@@ -194,7 +194,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             var expectedListenerEventV1DependencyException =
                 new ListenerEventV1DependencyException(
                     message: "Listener event dependency error occurred, contact support.",
-                    innerException: failedListenerEventV1StorageException);
+                    innerException: failedStorageListenerEventV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())

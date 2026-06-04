@@ -28,7 +28,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
                 key: nameof(SqlException.Number),
                 value: new List<string> { "Some SQL error code" });
 
-            var failedEventArchiveV1StorageException =
+            var failedStorageEventArchiveV1Exception =
                 new FailedStorageEventArchiveV1Exception(
                     message: "Failed event archive storage error occurred, contact support.",
                     innerException: sqlException,
@@ -37,7 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             var expectedEventArchiveV1DependencyException =
                 new EventArchiveV1DependencyException(
                     message: "Event archive dependency error occurred, contact support.",
-                    innerException: failedEventArchiveV1StorageException);
+                    innerException: failedStorageEventArchiveV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
@@ -137,7 +137,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             var foreignKeyConstraintConflictException =
                 new ForeignKeyConstraintConflictException(someMessage);
 
-            var invalidEventArchiveV1ReferenceException =
+            var invalidReferenceEventArchiveV1Exception =
                 new InvalidReferenceEventArchiveV1Exception(
                     message: "Invalid event archive reference error occurred.",
                     innerException: foreignKeyConstraintConflictException,
@@ -146,7 +146,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             var expectedEventArchiveV1DependencyValidationException =
                 new EventArchiveV1DependencyValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
-                    innerException: invalidEventArchiveV1ReferenceException);
+                    innerException: invalidReferenceEventArchiveV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
@@ -190,7 +190,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             EventArchiveV1 someEventArchiveV1 = CreateRandomEventArchiveV1();
             var dbUpdateException = new DbUpdateException();
 
-            var failedEventArchiveV1StorageException =
+            var failedStorageEventArchiveV1Exception =
                 new FailedStorageEventArchiveV1Exception(
                     message: "Failed event archive storage error occurred, contact support.",
                     innerException: dbUpdateException,
@@ -199,7 +199,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             var expectedEventArchiveV1DependencyException =
                 new EventArchiveV1DependencyException(
                     message: "Event archive dependency error occurred, contact support.",
-                    innerException: failedEventArchiveV1StorageException);
+                    innerException: failedStorageEventArchiveV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())

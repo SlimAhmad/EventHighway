@@ -23,7 +23,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V1
             SqlException sqlException = CreateSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
-            var failedEventAddressV1StorageException =
+            var failedStorageEventAddressV1Exception =
                 new FailedStorageEventAddressV1Exception(
                     message: "Failed event address storage error occurred, contact support.",
                     innerException: sqlException,
@@ -32,7 +32,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V1
             var expectedEventAddressV1DependencyException =
                 new EventAddressV1DependencyException(
                     message: "Event address dependency error occurred, contact support.",
-                    innerException: failedEventAddressV1StorageException);
+                    innerException: failedStorageEventAddressV1Exception);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectAllEventAddressV1sAsync())

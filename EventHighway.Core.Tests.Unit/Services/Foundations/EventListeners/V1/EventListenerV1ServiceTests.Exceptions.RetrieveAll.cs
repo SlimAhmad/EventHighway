@@ -21,7 +21,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
             // given
             SqlException sqlException = GetSqlException();
 
-            var failedEventListenerV1StorageException =
+            var failedStorageEventListenerV1Exception =
                 new FailedStorageEventListenerV1Exception(
                     message: "Failed event listener storage error occurred, contact support.",
                     innerException: sqlException,
@@ -30,7 +30,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
             var expectedEventListenerV1DependencyException =
                 new EventListenerV1DependencyException(
                     message: "Event listener dependency error occurred, contact support.",
-                    innerException: failedEventListenerV1StorageException);
+                    innerException: failedStorageEventListenerV1Exception);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectAllEventListenerV1sAsync())

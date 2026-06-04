@@ -35,58 +35,58 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V1
             }
             catch (HttpResponseUrlNotFoundException httpResponseUrlNotFoundException)
             {
-                var failedEventCallV1ConfigurationException =
+                var failedConfigurationEventCallV1Exception =
                     new FailedConfigurationEventCallV1Exception(
                         message: "Failed event call configuration error occurred, contact support.",
                         innerException: httpResponseUrlNotFoundException,
                         data: httpResponseUrlNotFoundException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedEventCallV1ConfigurationException);
+                    failedConfigurationEventCallV1Exception);
             }
             catch (HttpResponseUnauthorizedException httpResponseUnauthorizedException)
             {
-                var failedEventCallV1ConfigurationException =
+                var failedConfigurationEventCallV1Exception =
                     new FailedConfigurationEventCallV1Exception(
                         message: "Failed event call configuration error occurred, contact support.",
                         innerException: httpResponseUnauthorizedException,
                         data: httpResponseUnauthorizedException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedEventCallV1ConfigurationException);
+                    failedConfigurationEventCallV1Exception);
             }
             catch (HttpResponseForbiddenException httpResponseForbiddenException)
             {
-                var failedEventCallV1ConfigurationException =
+                var failedConfigurationEventCallV1Exception =
                     new FailedConfigurationEventCallV1Exception(
                         message: "Failed event call configuration error occurred, contact support.",
                         innerException: httpResponseForbiddenException,
                         data: httpResponseForbiddenException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedEventCallV1ConfigurationException);
+                    failedConfigurationEventCallV1Exception);
             }
             catch (HttpResponseMethodNotAllowedException httpResponseMethodNotAllowedException)
             {
-                var failedEventCallV1ConfigurationException =
+                var failedConfigurationEventCallV1Exception =
                     new FailedConfigurationEventCallV1Exception(
                         message: "Failed event call configuration error occurred, contact support.",
                         innerException: httpResponseMethodNotAllowedException,
                         data: httpResponseMethodNotAllowedException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedEventCallV1ConfigurationException);
+                    failedConfigurationEventCallV1Exception);
             }
             catch (HttpResponseUnprocessableEntityException httpResponseUnprocessableEntityException)
             {
-                var failedEventCallV1RequestException =
+                var failedRequestEventCallV1Exception =
                     new FailedRequestEventCallV1Exception(
                         message: "Failed event call request error occurred, fix the errors and try again.",
                         innerException: httpResponseUnprocessableEntityException,
                         data: httpResponseUnprocessableEntityException.Data);
 
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    failedEventCallV1RequestException);
+                    failedRequestEventCallV1Exception);
             }
             catch (HttpResponseBadRequestException httpResponseBadRequestException)
             {
@@ -112,14 +112,14 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V1
             }
             catch (HttpResponseFailedDependencyException httpResponseFailedDependencyException)
             {
-                var invalidEventCallV1ReferenceException =
+                var invalidReferenceEventCallV1Exception =
                     new InvalidReferenceEventCallV1Exception(
                         message: "Invalid event call reference error occurred, fix the errors and try again.",
                         innerException: httpResponseFailedDependencyException,
                         data: httpResponseFailedDependencyException.Data);
 
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    invalidEventCallV1ReferenceException);
+                    invalidReferenceEventCallV1Exception);
             }
             catch (HttpResponseException httpResponseException)
             {

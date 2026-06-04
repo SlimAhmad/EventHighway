@@ -24,7 +24,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             SqlException sqlException = GetSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
-            var failedEventV1StorageException =
+            var failedStorageEventV1Exception =
                 new FailedStorageEventV1Exception(
                     message: "Failed event storage error occurred, contact support.",
                     innerException: sqlException,
@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             var expectedEventV1DependencyException =
                 new EventV1DependencyException(
                     message: "Event dependency error occurred, contact support.",
-                    innerException: failedEventV1StorageException);
+                    innerException: failedStorageEventV1Exception);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectEventV1ByIdAsync(It.IsAny<Guid>()))
@@ -125,7 +125,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             var dbUpdateException = new DbUpdateException();
             dbUpdateException.Data.Add("ErrorCode", new List<string> { "DatabaseUpdateError" });
 
-            var failedEventV1StorageException =
+            var failedStorageEventV1Exception =
                 new FailedStorageEventV1Exception(
                     message: "Failed event storage error occurred, contact support.",
                     innerException: dbUpdateException,
@@ -134,7 +134,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             var expectedEventV1DependencyException =
                 new EventV1DependencyException(
                     message: "Event dependency error occurred, contact support.",
-                    innerException: failedEventV1StorageException);
+                    innerException: failedStorageEventV1Exception);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectEventV1ByIdAsync(It.IsAny<Guid>()))

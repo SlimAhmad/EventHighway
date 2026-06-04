@@ -23,7 +23,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ListenerEventArchiveV1 someListenerEventArchiveV1 = CreateRandomListenerEventArchiveV1();
             SqlException sqlException = GetSqlException();
 
-            var failedListenerEventArchiveV1StorageException =
+            var failedStorageListenerEventArchiveV1Exception =
                 new FailedStorageListenerEventArchiveV1Exception(
                     message: "Failed listener event archive storage error occurred, contact support.",
                     innerException: sqlException,
@@ -32,7 +32,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             var expectedListenerEventArchiveV1DependencyException =
                 new ListenerEventArchiveV1DependencyException(
                     message: "Listener event archive dependency error occurred, contact support.",
-                    innerException: failedListenerEventArchiveV1StorageException);
+                    innerException: failedStorageListenerEventArchiveV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
@@ -128,7 +128,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ListenerEventArchiveV1 someListenerEventArchiveV1 = CreateRandomListenerEventArchiveV1();
             var dbUpdateException = new DbUpdateException();
 
-            var failedListenerEventArchiveV1StorageException =
+            var failedStorageListenerEventArchiveV1Exception =
                 new FailedStorageListenerEventArchiveV1Exception(
                     message: "Failed listener event archive storage error occurred, contact support.",
                     innerException: dbUpdateException,
@@ -137,7 +137,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             var expectedListenerEventArchiveV1DependencyException =
                 new ListenerEventArchiveV1DependencyException(
                     message: "Listener event archive dependency error occurred, contact support.",
-                    innerException: failedListenerEventArchiveV1StorageException);
+                    innerException: failedStorageListenerEventArchiveV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())

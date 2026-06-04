@@ -46,14 +46,14 @@ namespace EventHighway.Core.Services.Foundations.ListernEvents.V1
             }
             catch (SqlException sqlException)
             {
-                var failedListenerEventV1StorageException =
+                var failedStorageListenerEventV1Exception =
                     new FailedStorageListenerEventV1Exception(
                         message: "Failed listener event storage error occurred, contact support.",
                         innerException: sqlException,
                         data: sqlException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedListenerEventV1StorageException);
+                    failedStorageListenerEventV1Exception);
             }
             catch (DuplicateKeyException duplicateKeyException)
             {
@@ -69,14 +69,14 @@ namespace EventHighway.Core.Services.Foundations.ListernEvents.V1
             catch (ForeignKeyConstraintConflictException
                 foreignKeyConstraintConflictException)
             {
-                var invalidListenerEventV1ReferenceException =
+                var invalidReferenceListenerEventV1Exception =
                     new InvalidReferenceListenerEventV1Exception(
                         message: "Invalid listener event reference error occurred.",
                         innerException: foreignKeyConstraintConflictException,
                         data: foreignKeyConstraintConflictException.Data);
 
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    invalidListenerEventV1ReferenceException);
+                    invalidReferenceListenerEventV1Exception);
             }
             catch (DbUpdateConcurrencyException dbUpdateConcurrencyException)
             {
@@ -91,14 +91,14 @@ namespace EventHighway.Core.Services.Foundations.ListernEvents.V1
             }
             catch (DbUpdateException dbUpdateException)
             {
-                var failedListenerEventV1StorageException =
+                var failedStorageListenerEventV1Exception =
                     new FailedStorageListenerEventV1Exception(
                         message: "Failed listener event storage error occurred, contact support.",
                         innerException: dbUpdateException,
                         data: dbUpdateException.Data);
 
                 throw await CreateAndLogDependencyExceptionAsync(
-                    failedListenerEventV1StorageException);
+                    failedStorageListenerEventV1Exception);
             }
             catch (Exception serviceException)
             {
@@ -122,14 +122,14 @@ namespace EventHighway.Core.Services.Foundations.ListernEvents.V1
             }
             catch (SqlException sqlException)
             {
-                var failedListenerEventV1StorageException =
+                var failedStorageListenerEventV1Exception =
                     new FailedStorageListenerEventV1Exception(
                         message: "Failed listener event storage error occurred, contact support.",
                         innerException: sqlException,
                         data: sqlException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedListenerEventV1StorageException);
+                    failedStorageListenerEventV1Exception);
             }
             catch (Exception serviceException)
             {

@@ -21,7 +21,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             // given
             SqlException sqlException = CreateSqlException();
 
-            var failedEventArchiveV1StorageException =
+            var failedStorageEventArchiveV1Exception =
                 new FailedStorageEventArchiveV1Exception(
                     message: "Failed event archive storage error occurred, contact support.",
                     innerException: sqlException, data: sqlException.Data);
@@ -29,7 +29,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             var expectedEventArchiveV1DependencyException =
                 new EventArchiveV1DependencyException(
                     message: "Event archive dependency error occurred, contact support.",
-                    innerException: failedEventArchiveV1StorageException);
+                    innerException: failedStorageEventArchiveV1Exception);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectAllEventArchiveV1sAsync())
@@ -70,7 +70,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
             var failedEventArchiveV1ServiceException =
                 new FailedEventArchiveV1ServiceException(
                     message: "Failed event archive service error occurred, contact support.",
-                    innerException: serviceException, 
+                    innerException: serviceException,
                     data: serviceException.Data);
 
             var expectedEventArchiveV1ServiceException =

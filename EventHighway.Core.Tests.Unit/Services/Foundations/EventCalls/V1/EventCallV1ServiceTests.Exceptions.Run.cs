@@ -24,7 +24,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             // given
             EventCallV1 someEventCallV1 = CreateRandomEventCallV1();
 
-            var failedEventCallV1ConfigurationException =
+            var failedConfigurationEventCallV1Exception =
                 new FailedConfigurationEventCallV1Exception(
                     message: "Failed event call configuration error occurred, contact support.",
                     innerException: criticalDependencyException,
@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             var expectedEventCallV1DependencyException =
                 new EventCallV1DependencyException(
                     message: "Event call dependency error occurred, contact support.",
-                    innerException: failedEventCallV1ConfigurationException);
+                    innerException: failedConfigurationEventCallV1Exception);
 
             this.apiBrokerMock.Setup(broker =>
                 broker.PostAsync(
@@ -78,7 +78,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             var httpUnprocessableEntityException = new HttpResponseUnprocessableEntityException();
             httpUnprocessableEntityException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
-            var failedEventCallV1RequestException =
+            var failedRequestEventCallV1Exception =
                 new FailedRequestEventCallV1Exception(
                     message: "Failed event call request error occurred, fix the errors and try again.",
                     innerException: httpUnprocessableEntityException,
@@ -87,7 +87,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             var expectedEventCallV1DependencyValidationException =
                 new EventCallV1DependencyValidationException(
                     message: "Event call validation error occurred, fix the errors and try again.",
-                    innerException: failedEventCallV1RequestException);
+                    innerException: failedRequestEventCallV1Exception);
 
             this.apiBrokerMock.Setup(broker =>
                 broker.PostAsync(
@@ -242,7 +242,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             var httpResponseFailedDependencyException =
                 new HttpResponseFailedDependencyException();
 
-            var invalidEventCallV1ReferenceException =
+            var invalidReferenceEventCallV1Exception =
                 new InvalidReferenceEventCallV1Exception(
                     message: "Invalid event call reference error occurred, fix the errors and try again.",
                     innerException: httpResponseFailedDependencyException,
@@ -251,7 +251,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V1
             var expectedEventCallV1DependencyValidationException =
                 new EventCallV1DependencyValidationException(
                     message: "Event call validation error occurred, fix the errors and try again.",
-                    innerException: invalidEventCallV1ReferenceException);
+                    innerException: invalidReferenceEventCallV1Exception);
 
             this.apiBrokerMock.Setup(broker =>
                 broker.PostAsync(

@@ -22,7 +22,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             Guid someListenerEventV1Id = GetRandomId();
             SqlException sqlException = GetSqlException();
 
-            var failedListenerEventV1StorageException =
+            var failedStorageListenerEventV1Exception =
                 new FailedStorageListenerEventV1Exception(
                     message: "Failed listener event storage error occurred, contact support.",
                     innerException: sqlException,
@@ -31,7 +31,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             var expectedListenerEventV1DependencyException =
                 new ListenerEventV1DependencyException(
                     message: "Listener event dependency error occurred, contact support.",
-                    innerException: failedListenerEventV1StorageException);
+                    innerException: failedStorageListenerEventV1Exception);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectListenerEventV1ByIdAsync(It.IsAny<Guid>()))
@@ -121,7 +121,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             Guid someListenerEventV1Id = GetRandomId();
             var dbUpdateException = new DbUpdateException();
 
-            var failedListenerEventV1StorageException =
+            var failedStorageListenerEventV1Exception =
                 new FailedStorageListenerEventV1Exception(
                     message: "Failed listener event storage error occurred, contact support.",
                     innerException: dbUpdateException,
@@ -130,7 +130,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V1
             var expectedListenerEventV1DependencyException =
                 new ListenerEventV1DependencyException(
                     message: "Listener event dependency error occurred, contact support.",
-                    innerException: failedListenerEventV1StorageException);
+                    innerException: failedStorageListenerEventV1Exception);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectListenerEventV1ByIdAsync(It.IsAny<Guid>()))

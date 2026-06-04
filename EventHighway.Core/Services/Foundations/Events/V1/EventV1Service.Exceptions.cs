@@ -81,13 +81,13 @@ namespace EventHighway.Core.Services.Foundations.Events.V1
             }
             catch (DbUpdateException dbUpdateException)
             {
-                var failedEventV1StorageException =
+                var failedStorageEventV1Exception =
                     new FailedStorageEventV1Exception(
                         message: "Failed event storage error occurred, contact support.",
                         innerException: dbUpdateException,
                         data: dbUpdateException.Data);
 
-                throw await CreateAndLogDependencyExceptionAsync(failedEventV1StorageException);
+                throw await CreateAndLogDependencyExceptionAsync(failedStorageEventV1Exception);
             }
             catch (Exception serviceException)
             {
@@ -109,13 +109,13 @@ namespace EventHighway.Core.Services.Foundations.Events.V1
             }
             catch (SqlException sqlException)
             {
-                var failedEventV1StorageException =
+                var failedStorageEventV1Exception =
                     new FailedStorageEventV1Exception(
                         message: "Failed event storage error occurred, contact support.",
                         innerException: sqlException,
                         data: sqlException.Data);
 
-                throw await CreateAndLogCriticalDependencyExceptionAsync(failedEventV1StorageException);
+                throw await CreateAndLogCriticalDependencyExceptionAsync(failedStorageEventV1Exception);
             }
             catch (Exception serviceException)
             {

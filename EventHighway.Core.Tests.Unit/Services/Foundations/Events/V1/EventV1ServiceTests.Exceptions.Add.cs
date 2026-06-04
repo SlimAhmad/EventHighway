@@ -25,7 +25,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             SqlException sqlException = GetSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
-            var failedEventV1StorageException =
+            var failedStorageEventV1Exception =
                 new FailedStorageEventV1Exception(
                     message: "Failed event storage error occurred, contact support.",
                     innerException: sqlException,
@@ -34,7 +34,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             var expectedEventV1DependencyException =
                 new EventV1DependencyException(
                     message: "Event dependency error occurred, contact support.",
-                    innerException: failedEventV1StorageException);
+                    innerException: failedStorageEventV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
@@ -134,7 +134,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             var foreignKeyConstraintConflictException =
                 new ForeignKeyConstraintConflictException(someMessage);
 
-            var invalidEventV1ReferenceException =
+            var invalidReferenceEventV1Exception =
                 new InvalidReferenceEventV1Exception(
                     message: "Invalid event reference error occurred.",
                     innerException: foreignKeyConstraintConflictException,
@@ -143,7 +143,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             var expectedEventV1DependencyValidationException =
                 new EventV1DependencyValidationException(
                     message: "Event validation error occurred, fix the errors and try again.",
-                    innerException: invalidEventV1ReferenceException);
+                    innerException: invalidReferenceEventV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
@@ -187,7 +187,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             var dbUpdateException = new DbUpdateException();
             dbUpdateException.Data.Add("ErrorCode", new List<string> { "DbUpdateError" });
 
-            var failedEventV1StorageException =
+            var failedStorageEventV1Exception =
                 new FailedStorageEventV1Exception(
                     message: "Failed event storage error occurred, contact support.",
                     innerException: dbUpdateException,
@@ -196,7 +196,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
             var expectedEventV1DependencyException =
                 new EventV1DependencyException(
                     message: "Event dependency error occurred, contact support.",
-                    innerException: failedEventV1StorageException);
+                    innerException: failedStorageEventV1Exception);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())

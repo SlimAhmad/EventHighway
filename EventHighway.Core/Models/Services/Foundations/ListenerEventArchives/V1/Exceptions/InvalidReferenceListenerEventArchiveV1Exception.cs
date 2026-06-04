@@ -10,7 +10,10 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1
 {
     public class InvalidReferenceListenerEventArchiveV1Exception : Xeption
     {
-        public InvalidReferenceListenerEventArchiveV1Exception(string message, Exception innerException, IDictionary data)
+        public InvalidReferenceListenerEventArchiveV1Exception(
+            string message,
+            Exception innerException,
+            IDictionary data)
             : base(message, innerException, data)
         { }
     }

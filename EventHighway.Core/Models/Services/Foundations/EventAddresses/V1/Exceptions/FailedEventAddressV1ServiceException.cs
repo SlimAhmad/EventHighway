@@ -11,7 +11,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventAddresses.V1.Except
     public class FailedEventAddressV1ServiceException : Xeption
     {
         public FailedEventAddressV1ServiceException(string message, Exception innerException, IDictionary data)
-            : base(message, innerException)
+            : base(message, innerException, data)
         { }
     }
 }

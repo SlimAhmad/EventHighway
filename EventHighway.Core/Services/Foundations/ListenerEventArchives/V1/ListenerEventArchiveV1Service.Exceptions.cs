@@ -38,14 +38,14 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             }
             catch (SqlException sqlException)
             {
-                var failedListenerEventArchiveV1StorageException =
+                var failedStorageListenerEventArchiveV1Exception =
                     new FailedStorageListenerEventArchiveV1Exception(
                         message: "Failed listener event archive storage error occurred, contact support.",
                         innerException: sqlException,
                         data: sqlException.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
-                    failedListenerEventArchiveV1StorageException);
+                    failedStorageListenerEventArchiveV1Exception);
             }
             catch (DuplicateKeyException duplicateKeyException)
             {
@@ -60,14 +60,14 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V1
             }
             catch (DbUpdateException dbUpdateException)
             {
-                var failedListenerEventArchiveV1StorageException =
+                var failedStorageListenerEventArchiveV1Exception =
                     new FailedStorageListenerEventArchiveV1Exception(
                         message: "Failed listener event archive storage error occurred, contact support.",
                         innerException: dbUpdateException,
                         data: dbUpdateException.Data);
 
                 throw await CreateAndLogDependencyExceptionAsync(
-                    failedListenerEventArchiveV1StorageException);
+                    failedStorageListenerEventArchiveV1Exception);
             }
             catch (Exception serviceException)
             {
