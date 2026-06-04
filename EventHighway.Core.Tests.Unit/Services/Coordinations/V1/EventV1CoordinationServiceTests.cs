@@ -224,13 +224,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                     .Use(GetRandomDateTimeOffset())
 
                 .OnProperty(eventV1 =>
-                    eventV1.EventAddressV1).IgnoreIt()
+                    eventV1.EventAddress).IgnoreIt()
 
                 .OnProperty(eventV1 =>
                     eventV1.RetryAttempts).Use(retryAttempts)
 
                 .OnProperty(eventV1 =>
-                    eventV1.ListenerEventV1s).IgnoreIt();
+                    eventV1.ListenerEvents).IgnoreIt();
 
             return filler;
         }
@@ -243,10 +243,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
 
                 .OnProperty(eventListenerV1 =>
-                    eventListenerV1.EventAddressV1s).IgnoreIt()
+                    eventListenerV1.EventAddress).IgnoreIt()
 
                 .OnProperty(eventListenerV1 =>
-                    eventListenerV1.ListenerEventV1s).IgnoreIt();
+                    eventListenerV1.ListenerEvents).IgnoreIt();
 
             return filler;
         }

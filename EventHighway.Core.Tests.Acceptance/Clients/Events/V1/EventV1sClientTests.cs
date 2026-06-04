@@ -150,10 +150,10 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V1
                     eventListenerV1.Endpoint).Use(inputMockEndpoint)
 
                 .OnProperty(eventListenerV1 =>
-                    eventListenerV1.EventAddressV1s).IgnoreIt()
+                    eventListenerV1.EventAddress).IgnoreIt()
 
                 .OnProperty(eventListenerV1 =>
-                    eventListenerV1.ListenerEventV1s).IgnoreIt();
+                    eventListenerV1.ListenerEvents).IgnoreIt();
 
             return filler;
         }
@@ -167,10 +167,10 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V1
 
             filler.Setup()
                 .OnProperty(eventV1 =>
-                    eventV1.EventAddressV1).IgnoreIt()
+                    eventV1.EventAddress).IgnoreIt()
 
                 .OnProperty(eventV1 =>
-                    eventV1.ListenerEventV1s).IgnoreIt()
+                    eventV1.ListenerEvents).IgnoreIt()
 
                 .OnProperty(eventV1 =>
                     eventV1.EventAddressId).Use(eventAddressV1Id)
@@ -194,10 +194,10 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V1
                 .OnProperty(eventAddressV1 => eventAddressV1.Events)
                     .IgnoreIt()
 
-                .OnProperty(eventAddressV1 => eventAddressV1.EventListenerV1s)
+                .OnProperty(eventAddressV1 => eventAddressV1.EventListeners)
                     .IgnoreIt()
 
-                .OnProperty(eventAddressV1 => eventAddressV1.ListenerEventV1s)
+                .OnProperty(eventAddressV1 => eventAddressV1.ListenerEvents)
                     .IgnoreIt();
 
             return filler;

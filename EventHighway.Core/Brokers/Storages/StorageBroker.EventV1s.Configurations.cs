@@ -15,7 +15,7 @@ namespace EventHighway.Core.Brokers.Storages
             model.ToTable("EventV1s");
             model.HasKey(eventV1 => eventV1.Id);
 
-            model.HasOne(eventV1 => eventV1.EventAddressV1)
+            model.HasOne(eventV1 => eventV1.EventAddress)
                 .WithMany(eventAddressV1 => eventAddressV1.Events)
                 .HasForeignKey(eventV1 => eventV1.EventAddressId)
                 .OnDelete(DeleteBehavior.NoAction);

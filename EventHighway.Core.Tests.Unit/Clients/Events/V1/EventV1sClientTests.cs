@@ -70,10 +70,10 @@ namespace EventHighway.Core.Tests.Unit.Clients.Events.V1
                     .Use(GetRandomDateTimeOffset())
 
                 .OnProperty(eventV1 =>
-                    eventV1.EventAddressV1).IgnoreIt()
+                    eventV1.EventAddress).IgnoreIt()
 
                 .OnProperty(eventV1 =>
-                    eventV1.ListenerEventV1s).IgnoreIt();
+                    eventV1.ListenerEvents).IgnoreIt();
 
             return filler;
         }

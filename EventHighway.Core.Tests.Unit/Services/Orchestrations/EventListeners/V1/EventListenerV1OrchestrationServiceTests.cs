@@ -164,10 +164,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V1
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
 
-                .OnProperty(eventListenerV1 => eventListenerV1.EventAddressV1s)
+                .OnProperty(eventListenerV1 => eventListenerV1.EventAddress)
                     .IgnoreIt()
 
-                .OnProperty(eventListenerV1 => eventListenerV1.ListenerEventV1s)
+                .OnProperty(eventListenerV1 => eventListenerV1.ListenerEvents)
                     .IgnoreIt();
 
             return filler;

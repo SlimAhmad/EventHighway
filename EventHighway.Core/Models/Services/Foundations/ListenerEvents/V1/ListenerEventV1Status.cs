@@ -4,7 +4,7 @@
 
 namespace EventHighway.Core.Models.Services.Foundations.ListenerEvents.V1
 {
-    public enum ListenerEventStatusV1
+    public enum ListenerEventV1Status
     {
         Pending,
         Success,

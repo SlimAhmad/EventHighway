@@ -202,10 +202,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V1
                 .OnProperty(eventAddressV1 => eventAddressV1.Events)
                     .IgnoreIt()
 
-                .OnProperty(eventAddressV1 => eventAddressV1.EventListenerV1s)
+                .OnProperty(eventAddressV1 => eventAddressV1.EventListeners)
                     .IgnoreIt()
 
-                .OnProperty(eventAddressV1 => eventAddressV1.ListenerEventV1s)
+                .OnProperty(eventAddressV1 => eventAddressV1.ListenerEvents)
                     .IgnoreIt();
 
             return filler;

@@ -74,7 +74,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
                 ArchivedDate = currentDateTime,
                 EventAddressId = eventV1.EventAddressId,
 
-                ListenerEventArchiveV1s = eventV1.ListenerEventV1s
+                ListenerEventArchiveV1s = eventV1.ListenerEvents
                     ?.Select(listenerEvent =>
                         MapToListenerEventArchiveV1(
                             listenerEvent,

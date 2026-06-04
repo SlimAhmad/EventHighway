@@ -20,8 +20,8 @@ namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V1
         public DateTimeOffset UpdatedDate { get; set; }
 
         public Guid EventAddressId { get; set; }
-        public EventAddressV1 EventAddressV1s { get; set; }
+        public EventAddressV1 EventAddress { get; set; }
 
-        public IEnumerable<ListenerEventV1> ListenerEventV1s { get; set; }
+        public IEnumerable<ListenerEventV1> ListenerEvents { get; set; }
     }
 }

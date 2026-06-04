@@ -16,17 +16,17 @@ namespace EventHighway.Core.Brokers.Storages
             model.HasKey(listenerEventV1 => listenerEventV1.Id);
 
             model.HasOne(listenerEventV1 => listenerEventV1.Event)
-                .WithMany(eventV1 => eventV1.ListenerEventV1s)
+                .WithMany(eventV1 => eventV1.ListenerEvents)
                 .HasForeignKey(listenerEventV1 => listenerEventV1.EventId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             model.HasOne(listenerEventV1 => listenerEventV1.EventAddress)
-                .WithMany(eventAddressV1 => eventAddressV1.ListenerEventV1s)
+                .WithMany(eventAddressV1 => eventAddressV1.ListenerEvents)
                 .HasForeignKey(listenerEventV1 => listenerEventV1.EventAddressId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             model.HasOne(listenerEventV1 => listenerEventV1.EventListener)
-                .WithMany(eventListenerV1 => eventListenerV1.ListenerEventV1s)
+                .WithMany(eventListenerV1 => eventListenerV1.ListenerEvents)
                 .HasForeignKey(listenerEventV1 => listenerEventV1.EventListenerId)
                 .OnDelete(DeleteBehavior.NoAction);
         }

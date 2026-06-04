@@ -64,7 +64,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V1
         private async Task ShouldThrowValidationExceptionOnAddIfEventV1IsInvalidAndLogItAsync(
             string invalidText)
         {
-            EventTypeV1 invalidEventV1Type = GetInvalidEnum<EventTypeV1>();
+            EventV1Type invalidEventV1Type = GetInvalidEnum<EventV1Type>();
 
             var invalidEventV1 = new EventV1
             {

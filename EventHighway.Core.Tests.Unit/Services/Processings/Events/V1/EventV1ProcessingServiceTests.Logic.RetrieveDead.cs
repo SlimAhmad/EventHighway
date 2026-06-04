@@ -20,13 +20,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V1
             List<EventV1> randomScheduledEventV1s =
                 CreateRandomEventV1s(
                     dates: GetRandomDateTimeOffset(),
-                    eventV1Type: EventTypeV1.Scheduled)
+                    eventV1Type: EventV1Type.Scheduled)
                         .ToList();
 
             List<EventV1> randomImmediateEventV1s =
                 CreateRandomEventV1s(
                     dates: GetRandomDateTimeOffset(),
-                    eventV1Type: EventTypeV1.Immediate)
+                    eventV1Type: EventV1Type.Immediate)
                         .ToList();
 
             IQueryable<EventV1> retrievedEventV1s =

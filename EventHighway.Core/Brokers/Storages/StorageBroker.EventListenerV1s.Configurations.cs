@@ -15,8 +15,8 @@ namespace EventHighway.Core.Brokers.Storages
             model.ToTable("EventListenerV1s");
             model.HasKey(eventListenerV1 => eventListenerV1.Id);
 
-            model.HasOne(eventListenerV1 => eventListenerV1.EventAddressV1s)
-                .WithMany(eventAddressV1 => eventAddressV1.EventListenerV1s)
+            model.HasOne(eventListenerV1 => eventListenerV1.EventAddress)
+                .WithMany(eventAddressV1 => eventAddressV1.EventListeners)
                 .HasForeignKey(eventListenerV1 => eventListenerV1.EventAddressId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
