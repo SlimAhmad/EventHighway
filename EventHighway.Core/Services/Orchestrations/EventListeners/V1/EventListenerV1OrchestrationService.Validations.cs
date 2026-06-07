@@ -1,5 +1,5 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
@@ -14,6 +14,8 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V1
         private static void ValidateEventListenerV1Id(Guid eventListenerV1Id)
         {
             Validate(
+                message: "Event listener is invalid, fix the errors and try again.",
+
                 (Rule: IsInvalid(eventListenerV1Id),
                 Parameter: nameof(EventListenerV1.Id)));
         }
@@ -21,6 +23,8 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V1
         private static void ValidateEventAddressId(Guid eventAddressId)
         {
             Validate(
+                message: "Event listener is invalid, fix the errors and try again.",
+
                 (Rule: IsInvalid(eventAddressId),
                 Parameter: nameof(EventListenerV1.EventAddressId)));
         }
@@ -28,6 +32,8 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V1
         private static void ValidateListenerEventV1Id(Guid listenerEventV1Id)
         {
             Validate(
+                message: "Event listener is invalid, fix the errors and try again.",
+
                 (Rule: IsInvalid(listenerEventV1Id),
                 Parameter: nameof(ListenerEventV1.Id)));
         }
@@ -56,11 +62,10 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V1
             Message = "Required"
         };
 
-        private static void Validate(params (dynamic Rule, string Parameter)[] validations)
+        private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
         {
             var invalidEventListenerV1OrchestrationException =
-                new InvalidEventListenerV1OrchestrationException(
-                    message: "Event listener is invalid, fix the errors and try again.");
+                new InvalidEventListenerV1OrchestrationException(message);
 
             foreach ((dynamic rule, string parameter) in validations)
             {

@@ -1,8 +1,9 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Copyright (c) The Standard Organization, a coalition of the Good-Hearted Engineers 
+﻿// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V1;
@@ -20,16 +21,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V1
         {
             // given
             SqlException sqlException = CreateSqlException();
+            sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
-            var failedEventAddressV1StorageException =
-                new FailedEventAddressV1StorageException(
+            var failedStorageEventAddressV1Exception =
+                new FailedStorageEventAddressV1Exception(
                     message: "Failed event address storage error occurred, contact support.",
-                    innerException: sqlException);
+                    innerException: sqlException,
+                    data: sqlException.Data);
 
             var expectedEventAddressV1DependencyException =
                 new EventAddressV1DependencyException(
                     message: "Event address dependency error occurred, contact support.",
-                    innerException: failedEventAddressV1StorageException);
+                    innerException: failedStorageEventAddressV1Exception);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectAllEventAddressV1sAsync())
@@ -66,11 +69,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V1
         {
             // given
             var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedEventAddressV1ServiceException =
                 new FailedEventAddressV1ServiceException(
                     message: "Failed event address service error occurred, contact support.",
-                    innerException: serviceException);
+                    innerException: serviceException,
+                    data: serviceException.Data);
 
             var expectedEventAddressV1ServiceException =
                 new EventAddressV1ServiceException(
