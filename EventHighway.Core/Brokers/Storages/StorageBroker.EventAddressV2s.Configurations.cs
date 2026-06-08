@@ -14,6 +14,9 @@ namespace EventHighway.Core.Brokers.Storages
         {
             model.ToTable("EventAddressV2s");
             model.HasKey(eventAddressV2 => eventAddressV2.Id);
+
+            model.HasIndex(eventAddressV2 => eventAddressV2.Name)
+                .IsUnique();
         }
     }
 }
