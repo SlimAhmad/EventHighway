@@ -218,7 +218,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
             invalidEventListenerV2Exception.AddData(
                 key: nameof(EventListenerV2.Name),
-                values: $"Text exceed max length of 450 characters");
+                values: $"Text exceed max length of {invalidEventListenerV2.Name.Length - 1} characters");
 
             var expectedEventListenerV2ValidationException =
                 new EventListenerV2ValidationException(
@@ -425,7 +425,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
             invalidEventListenerV2Exception.AddData(
                 key: "HandlerConfiguration[0].Name",
-                values: "Text exceed max length of 450 characters");
+                values: $"Text exceed max length of {randomHandlerConfiguration.Name.Length - 1} characters");
 
             var expectedEventListenerV2ValidationException =
                 new EventListenerV2ValidationException(
