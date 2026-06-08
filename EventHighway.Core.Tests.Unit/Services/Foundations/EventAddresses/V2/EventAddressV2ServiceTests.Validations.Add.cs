@@ -187,6 +187,61 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             this.storageBrokerMock.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnAddIfEventAddressV2HasInvalidLengthPropertyAndLogItAsync()
+        {
+            // given
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            EventAddressV2 invalidEventAddressV2 = CreateRandomEventAddressV2(dates: randomDateTimeOffset);
+            invalidEventAddressV2.Name = GetRandomStringWithLengthOf(451);
+
+            var invalidEventAddressV2Exception =
+                new InvalidEventAddressV2Exception(
+                    message: "Event address is invalid, fix the errors and try again.");
+
+            invalidEventAddressV2Exception.AddData(
+                key: nameof(EventAddressV2.Name),
+                values: $"Text exceed max length of {invalidEventAddressV2.Name.Length - 1} characters");
+
+            var expectedEventAddressV2ValidationException =
+                new EventAddressV2ValidationException(
+                    message: "Event address validation error occurred, fix the errors and try again.",
+                    innerException: invalidEventAddressV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTimeOffset);
+
+            // when
+            ValueTask<EventAddressV2> addEventAddressV2Task =
+                this.eventAddressV2Service.AddEventAddressV2Async(invalidEventAddressV2);
+
+            EventAddressV2ValidationException actualEventAddressV2ValidationException =
+                await Assert.ThrowsAsync<EventAddressV2ValidationException>(
+                    addEventAddressV2Task.AsTask);
+
+            // then
+            actualEventAddressV2ValidationException.Should().BeEquivalentTo(
+                expectedEventAddressV2ValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventAddressV2ValidationException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventAddressV2Async(It.IsAny<EventAddressV2>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(MinutesBeforeAndAfterNow))]
         public async Task ShouldThrowValidationExceptionOnAddIfCreatedDateIsNotRecentAndLogItAsync(

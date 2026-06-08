@@ -64,6 +64,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
+        private static string GetRandomStringWithLengthOf(int length) =>
+            new MnemonicString(wordCount: 1, wordMinLength: length, wordMaxLength: length).GetValue();
+
         private static int GetRandomNegativeNumber() =>
             -1 * GetRandomNumber();
 

@@ -24,6 +24,9 @@ namespace EventHighway.Core.Services.Foundations.EventAddresses.V2
                 (Rule: IsInvalid(eventAddressV2.Name),
                 Parameter: nameof(EventAddressV2.Name)),
 
+                (Rule: IsExceedingLengthOf(eventAddressV2.Name, 450),
+                Parameter: nameof(EventAddressV2.Name)),
+
                 (Rule: IsInvalid(eventAddressV2.Description),
                 Parameter: nameof(EventAddressV2.Description)),
 
@@ -90,6 +93,15 @@ namespace EventHighway.Core.Services.Foundations.EventAddresses.V2
             Condition = date == default,
             Message = "Required"
         };
+
+        private static dynamic IsExceedingLengthOf(string text, int maxLength) => new
+        {
+            Condition = IsExceedingLength(text, maxLength),
+            Message = $"Text exceed max length of {maxLength} characters"
+        };
+
+        private static bool IsExceedingLength(string text, int maxLength) =>
+            (text ?? string.Empty).Length > maxLength;
 
         private static dynamic IsNotSameAs(
             DateTimeOffset firstDate,
