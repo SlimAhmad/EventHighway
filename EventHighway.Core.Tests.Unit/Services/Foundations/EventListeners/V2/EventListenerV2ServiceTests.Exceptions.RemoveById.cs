@@ -21,6 +21,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             // given
             Guid someEventListenerV2Id = GetRandomId();
             SqlException sqlException = GetSqlException();
+            sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
             var failedStorageEventListenerV2Exception =
                 new FailedStorageEventListenerV2Exception(
