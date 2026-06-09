@@ -42,7 +42,13 @@ namespace EventHighway.Core.Tests.Unit.Services.EventListeners
             var filler = new Filler<EventListener>();
 
             filler.Setup()
-                .OnType<DateTimeOffset>().Use(CreateRandomDateTime);
+                .OnType<DateTimeOffset>().Use(CreateRandomDateTime)
+
+                .OnProperty(eventListener => eventListener.EventAddress)
+                    .IgnoreIt()
+
+                .OnProperty(eventListener => eventListener.ListenerEvents)
+                    .IgnoreIt();
 
             return filler;
         }
