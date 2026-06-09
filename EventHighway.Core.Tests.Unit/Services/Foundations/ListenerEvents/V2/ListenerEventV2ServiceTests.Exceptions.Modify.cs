@@ -80,6 +80,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             var foreignKeyConstraintConflictException =
                 new ForeignKeyConstraintConflictException(someMessage);
+            
+            foreignKeyConstraintConflictException.Data.Add(
+                "ErrorCode",
+                new List<string> { "ForeignKeyConstraintConflictExceptionError" });
 
             var invalidReferenceListenerEventV2Exception =
                 new InvalidReferenceListenerEventV2Exception(
