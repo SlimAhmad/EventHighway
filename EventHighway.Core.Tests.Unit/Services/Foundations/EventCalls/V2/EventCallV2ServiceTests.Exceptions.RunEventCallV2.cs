@@ -51,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
 
             EventCallV2DependencyException actualEventCallV2DependencyException =
                 await Assert.ThrowsAsync<EventCallV2DependencyException>(
@@ -109,7 +109,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             var failedEventCallV2DependencyValidationException =
                 new FailedEventCallV2DependencyValidationException(
-                    message: "Failed event call dependency validation error occurred, fix the errors and try again.",
+                    message: "Failed event call dependency validation error occurred, " +
+                        "fix the errors and try again.",
+
                     innerException: dependencyValidationException,
                     data: dependencyValidationException.Data);
 
@@ -120,7 +122,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
 
             EventCallV2DependencyValidationException actualEventCallV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventCallV2DependencyValidationException>(
@@ -188,7 +190,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
 
             EventCallV2DependencyException actualEventCallV2DependencyException =
                 await Assert.ThrowsAsync<EventCallV2DependencyException>(
@@ -254,7 +256,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
 
             EventCallV2ServiceException actualEventCallV2ServiceException =
                 await Assert.ThrowsAsync<EventCallV2ServiceException>(

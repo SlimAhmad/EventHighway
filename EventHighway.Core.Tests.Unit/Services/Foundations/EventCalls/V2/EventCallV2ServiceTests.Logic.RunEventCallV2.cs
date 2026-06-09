@@ -49,16 +49,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
                 inputEventCallV2.DeepClone();
 
             expectedEventCallV2.IsSuccess =
-                returnedEventHandlerResult.Succeeded;
+                returnedEventHandlerResult.IsSuccess;
 
             expectedEventCallV2.Response =
                 returnedEventHandlerResult.Response;
 
             expectedEventCallV2.ResponseCode =
-                returnedEventHandlerResult.ErrorCode;
+                returnedEventHandlerResult.ResponseCode;
 
-            expectedEventCallV2.ResponseReasonPhrase =
-                returnedEventHandlerResult.ErrorMessage;
+            expectedEventCallV2.ResponseMessage =
+                returnedEventHandlerResult.ResponseMessage;
 
             this.eventHandlerBrokerMock.Setup(broker => broker.Name)
                 .Returns(randomHandlerName);
@@ -78,7 +78,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             // when
             EventCallV2 actualEventCallV2 =
                 await this.eventCallV2Service
-                    .RunEventCallV2Async(inputEventCallV2);
+                    .RunEventCallV2Async(inputEventCallV2, TestContext.Current.CancellationToken);
 
             // then
             actualEventCallV2.Should().BeEquivalentTo(expectedEventCallV2);

@@ -6,9 +6,9 @@ namespace EventHighway.Abstractions.EventHandlers
 {
     public class EventHandlerResult
     {
-        public bool Succeeded { get; set; }
         public string Response { get; set; }
-        public string ErrorCode { get; set; }
-        public string ErrorMessage { get; set; }
+        public string ResponseCode { get; set; }
+        public string ResponseMessage { get; set; }
+        public bool IsSuccess { get; set; }
     }
 }
