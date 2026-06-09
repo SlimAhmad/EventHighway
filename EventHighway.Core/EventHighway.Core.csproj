@@ -10,6 +10,8 @@
 		<Company>The Standard Organization</Company>
 		<Product>EventHighway</Product>
 		<Version>2.1.0</Version>
+		<AssemblyVersion>2.1.0.0</AssemblyVersion>
+		<FileVersion>2.1.0.0</FileVersion>
 		<PackageId>EventHighway</PackageId>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Copyright>Hassan Habib 2026 (c)</Copyright>
