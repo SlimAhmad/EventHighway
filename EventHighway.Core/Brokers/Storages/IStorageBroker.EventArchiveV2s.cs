@@ -10,6 +10,8 @@ namespace EventHighway.Core.Brokers.Storages
 {
     internal partial interface IStorageBroker
     {
-        ValueTask<EventArchiveV2> InsertEventArchiveV2Async(EventArchiveV2 eventArchiveV2, CancellationToken cancellationToken = default);
+        ValueTask<EventArchiveV2> InsertEventArchiveV2Async(
+            EventArchiveV2 eventArchiveV2,
+            CancellationToken cancellationToken = default);
     }
 }

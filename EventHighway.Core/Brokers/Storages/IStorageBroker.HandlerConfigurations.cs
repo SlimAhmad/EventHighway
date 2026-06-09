@@ -12,10 +12,22 @@ namespace EventHighway.Core.Brokers.Storages
 {
     internal partial interface IStorageBroker
     {
-        ValueTask<HandlerConfiguration> InsertHandlerConfigurationAsync(HandlerConfiguration handlerConfiguration, CancellationToken cancellationToken = default);
+        ValueTask<HandlerConfiguration> InsertHandlerConfigurationAsync(
+            HandlerConfiguration handlerConfiguration,
+            CancellationToken cancellationToken = default);
+
         ValueTask<IQueryable<HandlerConfiguration>> SelectAllHandlerConfigurationsAsync();
-        ValueTask<HandlerConfiguration> SelectHandlerConfigurationByIdAsync(Guid handlerConfigurationId, CancellationToken cancellationToken = default);
-        ValueTask<HandlerConfiguration> UpdateHandlerConfigurationAsync(HandlerConfiguration handlerConfiguration, CancellationToken cancellationToken = default);
-        ValueTask<HandlerConfiguration> DeleteHandlerConfigurationAsync(HandlerConfiguration handlerConfiguration, CancellationToken cancellationToken = default);
+
+        ValueTask<HandlerConfiguration> SelectHandlerConfigurationByIdAsync(
+            Guid handlerConfigurationId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<HandlerConfiguration> UpdateHandlerConfigurationAsync(
+            HandlerConfiguration handlerConfiguration,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<HandlerConfiguration> DeleteHandlerConfigurationAsync(
+            HandlerConfiguration handlerConfiguration,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -12,9 +12,18 @@ namespace EventHighway.Core.Brokers.Storages
 {
     internal partial interface IStorageBroker
     {
-        ValueTask<EventAddressV2> InsertEventAddressV2Async(EventAddressV2 eventAddressV2, CancellationToken cancellationToken = default);
+        ValueTask<EventAddressV2> InsertEventAddressV2Async(
+            EventAddressV2 eventAddressV2,
+            CancellationToken cancellationToken = default);
+
         ValueTask<IQueryable<EventAddressV2>> SelectAllEventAddressV2sAsync();
-        ValueTask<EventAddressV2> SelectEventAddressV2ByIdAsync(Guid eventAddressV2Id, CancellationToken cancellationToken = default);
-        ValueTask<EventAddressV2> DeleteEventAddressV2Async(EventAddressV2 eventAddressV2, CancellationToken cancellationToken = default);
+
+        ValueTask<EventAddressV2> SelectEventAddressV2ByIdAsync(
+            Guid eventAddressV2Id,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<EventAddressV2> DeleteEventAddressV2Async(
+            EventAddressV2 eventAddressV2,
+            CancellationToken cancellationToken = default);
     }
 }

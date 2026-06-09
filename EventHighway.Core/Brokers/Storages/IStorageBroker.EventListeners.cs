@@ -11,7 +11,10 @@ namespace EventHighway.Core.Brokers.Storages
 {
     internal partial interface IStorageBroker
     {
-        ValueTask<EventListener> InsertEventListenerAsync(EventListener eventListener, CancellationToken cancellationToken = default);
+        ValueTask<EventListener> InsertEventListenerAsync(
+            EventListener eventListener,
+            CancellationToken cancellationToken = default);
+
         ValueTask<IQueryable<EventListener>> SelectAllEventListenersAsync();
     }
 }
