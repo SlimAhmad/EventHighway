@@ -77,6 +77,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
             var duplicateKeyException = new DuplicateKeyException(randomMessage);
 
+            duplicateKeyException.Data.Add(
+                "ErrorCode",
+                new List<string> { "DuplicateKeyError" });
+
             var alreadyExistsListenerEventV2Exception =
                 new AlreadyExistsListenerEventV2Exception(
                     message: "Listener event with the same id already exists.",
