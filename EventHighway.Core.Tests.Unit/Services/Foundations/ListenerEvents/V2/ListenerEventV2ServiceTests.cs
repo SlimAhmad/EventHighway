@@ -9,6 +9,9 @@ using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.ListenerEvents.V2;
 using Microsoft.Data.SqlClient;
@@ -73,20 +76,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             }
         }
 
-        public static TheoryData<int> MinutesBeforeAndAfterNow()
-        {
-            int randomMoreThanOneMinuteAhead =
-                GetRandomNumber();
-
-            int randomMoreThanOneMinuteAgo =
-                GetRandomNegativeNumber();
-
-            return new TheoryData<int>
-            {
-                randomMoreThanOneMinuteAhead,
-                randomMoreThanOneMinuteAgo
-            };
-        }
 
         private static Guid GetRandomId() =>
             Guid.NewGuid();
@@ -131,7 +120,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                     .IgnoreIt()
 
                 .OnProperty(listenerEventV2 => listenerEventV2.EventListener)
-                    .IgnoreIt();
+                    .IgnoreIt()
+
+                .OnType<EventV2>().IgnoreIt()
+                .OnType<EventAddressV2>().IgnoreIt()
+                .OnType<EventListenerV2>().IgnoreIt();
 
             return filler;
         }

@@ -72,20 +72,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             }
         }
 
-        public static TheoryData<int> MinutesBeforeAndAfterNow()
-        {
-            int randomMoreThanOneMinuteAhead =
-                GetRandomNumber();
-
-            int randomMoreThanOneMinuteAgo =
-                GetRandomNegativeNumber();
-
-            return new TheoryData<int>
-            {
-                randomMoreThanOneMinuteAhead,
-                randomMoreThanOneMinuteAgo
-            };
-        }
 
         private static Guid GetRandomId() =>
             Guid.NewGuid();

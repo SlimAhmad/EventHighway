@@ -276,7 +276,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
         }
 
         [Theory]
-        [MemberData(nameof(MinutesBeforeAndAfterNow))]
+        [InlineData(61)]
+        [InlineData(-61)]
         public async Task ShouldThrowValidationExceptionOnModifyIfUpdatedDateIsNotRecentAndLogItAsync(
             int minutesBeforeAndAfter)
         {
@@ -290,7 +291,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             invalidHandlerConfiguration.CreatedDate = randomDateTimeOffset.AddDays(GetRandomNegativeNumber());
 
             invalidHandlerConfiguration.UpdatedDate =
-                randomDateTimeOffset.AddMinutes(minutesBeforeAndAfter);
+                randomDateTimeOffset.AddSeconds(minutesBeforeAndAfter);
 
             var invalidHandlerConfigurationException =
                 new InvalidHandlerConfigurationException(
