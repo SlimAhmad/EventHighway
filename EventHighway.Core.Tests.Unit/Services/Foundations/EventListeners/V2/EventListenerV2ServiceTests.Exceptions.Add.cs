@@ -250,6 +250,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             EventListenerV2 someEventListenerV2 = CreateRandomEventListenerV2();
             var serviceException = new Exception();
 
+            serviceException.Data.Add(
+                "ErrorCode",
+                new List<string> { "ServiceError" });
+                
             var failedEventListenerV2ServiceException =
                 new FailedEventListenerV2ServiceException(
                     message: "Failed event listener service error occurred, contact support.",
