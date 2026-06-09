@@ -12,6 +12,7 @@ namespace EventHighway.Core.Brokers.EventHandlers
     internal interface IEventHandlerBroker
     {
         string Name { get; }
+        IEnumerable<string> RequiredParams { get; }
 
         ValueTask<EventHandlerResult> HandleAsync(
             string content,

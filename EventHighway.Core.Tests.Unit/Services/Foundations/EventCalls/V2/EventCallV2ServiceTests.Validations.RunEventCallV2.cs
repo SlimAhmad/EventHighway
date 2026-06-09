@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EventHighway.Core.Brokers.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
+using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Services.Foundations.EventCalls.V2;
 using FluentAssertions;
 using Moq;
@@ -231,6 +232,82 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             // then
             actualEventCallV2ValidationException.Should().BeEquivalentTo(
                 expectedEventCallV2ValidationException);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventCallV2ValidationException))),
+                        Times.Once);
+
+            this.eventHandlerBrokerMock.Verify(broker =>
+                broker.HandleAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<IReadOnlyDictionary<string, string>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public async Task ShouldThrowValidationExceptionOnRunIfRequiredHandlerConfigurationIsInvalidAndLogItAsync(
+            string invalidValue)
+        {
+            // given
+            string randomHandlerName = GetRandomString();
+            string requiredParam = GetRandomString();
+
+            EventCallV2 inputEventCallV2 = CreateRandomEventCallV2();
+            inputEventCallV2.HandlerName = randomHandlerName;
+
+            inputEventCallV2.HandlerConfigurations = invalidValue is null
+                ? new List<HandlerConfiguration>()
+                : new List<HandlerConfiguration>
+                {
+                    new HandlerConfiguration { Name = requiredParam, Value = invalidValue }
+                };
+
+            this.eventHandlerBrokerMock.Setup(broker => broker.Name)
+                .Returns(randomHandlerName);
+
+            this.eventHandlerBrokerMock.Setup(broker => broker.RequiredParams)
+                .Returns(new[] { requiredParam });
+
+            var invalidEventCallV2Exception =
+                new InvalidEventCallV2Exception(
+                    message: "Event call handler configuration is invalid, fix the errors and try again.");
+
+            invalidEventCallV2Exception.AddData(
+                key: $"HandlerConfiguration['{requiredParam}']",
+                values: invalidValue is null ? "Config item required" : "Value required");
+
+            var expectedEventCallV2ValidationException =
+                new EventCallV2ValidationException(
+                    message: "Event call validation error occurred, fix the errors and try again.",
+                    innerException: invalidEventCallV2Exception);
+
+            // when
+            ValueTask<EventCallV2> runEventCallV2Task =
+                this.eventCallV2Service.RunEventCallV2Async(inputEventCallV2);
+
+            EventCallV2ValidationException actualEventCallV2ValidationException =
+                await Assert.ThrowsAsync<EventCallV2ValidationException>(
+                    runEventCallV2Task.AsTask);
+
+            // then
+            actualEventCallV2ValidationException.Should().BeEquivalentTo(
+                expectedEventCallV2ValidationException);
+
+            this.eventHandlerBrokerMock.VerifyGet(
+                broker => broker.Name,
+                Times.AtLeastOnce);
+
+            this.eventHandlerBrokerMock.VerifyGet(
+                broker => broker.RequiredParams,
+                Times.AtLeastOnce);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(

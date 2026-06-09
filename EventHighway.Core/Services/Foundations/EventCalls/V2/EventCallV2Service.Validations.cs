@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using EventHighway.Core.Brokers.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
