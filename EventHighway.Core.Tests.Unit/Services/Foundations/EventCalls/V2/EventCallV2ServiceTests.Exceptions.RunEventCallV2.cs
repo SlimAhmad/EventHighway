@@ -85,5 +85,76 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(DependencyValidationExceptions))]
+        public async Task ShouldThrowDependencyValidationExceptionOnRunIfDependencyValidationErrorOccursAndLogItAsync(
+            Exception dependencyValidationException)
+        {
+            // given
+            EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
+
+            this.eventHandlerBrokerMock
+                .Setup(broker => broker.Name)
+                .Returns(someEventCallV2.HandlerName);
+
+            this.eventHandlerBrokerMock
+                .Setup(broker => broker.RequiredParams)
+                .Returns(System.Array.Empty<string>());
+
+            this.eventHandlerBrokerMock
+                .Setup(broker =>
+                    broker.HandleAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<IReadOnlyDictionary<string, string>>(),
+                        It.IsAny<CancellationToken>()))
+                .ThrowsAsync(dependencyValidationException);
+
+            var failedEventCallV2DependencyValidationException =
+                new FailedEventCallV2DependencyValidationException(
+                    message: "Failed event call dependency validation error occurred, fix the errors and try again.",
+                    innerException: dependencyValidationException,
+                    data: dependencyValidationException.Data);
+
+            var expectedEventCallV2DependencyValidationException =
+                new EventCallV2DependencyValidationException(
+                    message: "Event call validation error occurred, fix the errors and try again.",
+                    innerException: failedEventCallV2DependencyValidationException);
+
+            // when
+            ValueTask<EventCallV2> runEventCallV2Task =
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2);
+
+            EventCallV2DependencyValidationException actualEventCallV2DependencyValidationException =
+                await Assert.ThrowsAsync<EventCallV2DependencyValidationException>(
+                    runEventCallV2Task.AsTask);
+
+            // then
+            actualEventCallV2DependencyValidationException.Should()
+                .BeEquivalentTo(expectedEventCallV2DependencyValidationException);
+
+            this.eventHandlerBrokerMock.VerifyGet(
+                broker => broker.Name,
+                Times.AtLeastOnce);
+
+            this.eventHandlerBrokerMock.VerifyGet(
+                broker => broker.RequiredParams,
+                Times.AtLeastOnce);
+
+            this.eventHandlerBrokerMock.Verify(broker =>
+                broker.HandleAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<IReadOnlyDictionary<string, string>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventCallV2DependencyValidationException))),
+                        Times.Once);
+
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }

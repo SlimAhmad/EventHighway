@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -50,8 +50,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
                 new SomeCriticalEventHandlerDependencyException()
             };
 
+        public static TheoryData<Exception> DependencyValidationExceptions() =>
+            new TheoryData<Exception>
+            {
+                new SomeDependencyValidationEventHandlerException()
+            };
+
         private class SomeCriticalEventHandlerDependencyException
             : Exception, IEventHandlerDependencyException
+        { }
+
+        private class SomeDependencyValidationEventHandlerException
+            : Exception, IEventHandlerDependencyValidationException
         { }
 
         private static Filler<EventCallV2> CreateEventCallV2Filler()
