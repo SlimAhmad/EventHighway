@@ -24,8 +24,11 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public async ValueTask<EventCallV2> RunEventCallV2Async(EventCallV2 eventCallV2)
+        public ValueTask<EventCallV2> RunEventCallV2Async(EventCallV2 eventCallV2) =>
+        TryCatch(async () =>
         {
+            ValidateEventCallV2OnRun(eventCallV2);
+
             IEventHandlerBroker handler =
                 this.eventHandlerBrokers.SingleOrDefault(
                     broker => broker.Name == eventCallV2.HandlerName);
@@ -45,6 +48,6 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             eventCallV2.ResponseReasonPhrase = result.ErrorMessage;
 
             return eventCallV2;
-        }
+        });
     }
 }
