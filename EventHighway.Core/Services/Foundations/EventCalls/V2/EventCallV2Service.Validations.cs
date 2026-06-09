@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Linq;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
@@ -30,6 +31,8 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 (Rule: IsInvalid(eventCallV2.Content),
                 Parameter: nameof(EventCallV2.Content),
                 Message: "Payload required"));
+
+            ValidateHandlerCount(eventCallV2.HandlerName);
         }
 
         private static void ValidateEventCallV2IsNotNull(EventCallV2 eventCallV2)
@@ -48,6 +51,26 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 throw new HandlerNotFoundEventCallV2Exception(
                     message: "No event call handler was found, fix the errors and try again.");
             }
+        }
+
+        private void ValidateHandlerCount(string handlerName)
+        {
+            int count =
+                this.eventHandlerBrokers.Count(
+                    broker => broker.Name == handlerName);
+
+            Validate(
+                message: "EventHandlerBrokers on event call is invalid, fix the errors and try again.",
+
+                (Rule: count == 0,
+                Parameter: nameof(EventCallV2.HandlerName),
+                Message: $"No handler found that matches '{handlerName}', " +
+                    $"fix registrations and try again."),
+
+                (Rule: count > 1,
+                Parameter: nameof(EventCallV2.HandlerName),
+                Message: $"Multiple providers found that matches '{handlerName}', " +
+                    $"fix registrations and try again."));
         }
 
         private static bool IsInvalid(string text) =>

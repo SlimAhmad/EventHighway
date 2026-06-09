@@ -172,7 +172,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         [Theory]
         [InlineData(0)]
         [InlineData(2)]
-        public async Task ShouldThrowValidationExceptionOnRunIfHandlerRegistrationCountIsNotOneAndLogItAsync(
+        public async Task ShouldThrowValidationExceptionOnRunIfHandlerRegistrationCountIsInvalidAndLogItAsync(
             int matchingHandlerCount)
         {
             // given

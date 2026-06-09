@@ -30,7 +30,7 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             ValidateEventCallV2OnRun(eventCallV2);
 
             IEventHandlerBroker handler =
-                this.eventHandlerBrokers.SingleOrDefault(
+                this.eventHandlerBrokers.Single(
                     broker => broker.Name == eventCallV2.HandlerName);
 
             IReadOnlyDictionary<string, string> handlerParams =
