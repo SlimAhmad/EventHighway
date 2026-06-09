@@ -12,7 +12,7 @@
 		<PackageId>EventHighway.Abstractions</PackageId>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Copyright>Hassan Habib 2026 (c)</Copyright>
-		<Description>Abstractions for EventHighway — interfaces and contracts required to implement custom event handlers.</Description>
+		<Description>EventHighway abstractions: interfaces and contracts for custom event handlers.</Description>
 		<PackageProjectUrl>https://github.com/hassanhabib/EventHighway</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/hassanhabib/EventHighway</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>

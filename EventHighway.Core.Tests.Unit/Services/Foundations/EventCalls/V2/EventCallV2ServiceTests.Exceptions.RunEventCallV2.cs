@@ -109,7 +109,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             var failedEventCallV2DependencyValidationException =
                 new FailedEventCallV2DependencyValidationException(
-                    message: "Failed event call dependency validation error occurred, fix the errors and try again.",
+                    message: "Failed event call dependency validation error occurred, " +
+                        "fix the errors and try again.",
+
                     innerException: dependencyValidationException,
                     data: dependencyValidationException.Data);
 

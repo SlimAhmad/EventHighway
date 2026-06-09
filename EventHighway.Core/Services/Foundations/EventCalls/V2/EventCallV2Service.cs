@@ -53,7 +53,7 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             eventCallV2.IsSuccess = result.Succeeded;
             eventCallV2.Response = result.Response;
             eventCallV2.ResponseCode = result.ErrorCode;
-            eventCallV2.ResponseReasonPhrase = result.ErrorMessage;
+            eventCallV2.ResponseMessage = result.ErrorMessage;
 
             return eventCallV2;
         });

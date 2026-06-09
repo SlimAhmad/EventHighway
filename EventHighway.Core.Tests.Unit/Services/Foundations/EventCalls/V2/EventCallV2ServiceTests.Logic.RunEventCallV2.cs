@@ -57,7 +57,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             expectedEventCallV2.ResponseCode =
                 returnedEventHandlerResult.ErrorCode;
 
-            expectedEventCallV2.ResponseReasonPhrase =
+            expectedEventCallV2.ResponseMessage =
                 returnedEventHandlerResult.ErrorMessage;
 
             this.eventHandlerBrokerMock.Setup(broker => broker.Name)
