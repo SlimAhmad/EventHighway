@@ -69,16 +69,6 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 throw await CreateAndLogDependencyExceptionAsync(
                     failedEventCallV2DependencyException);
             }
-            catch (Exception serviceException)
-            {
-                var failedEventCallV2ServiceException =
-                    new FailedEventCallV2ServiceException(
-                        message: "Failed event call service error occurred, contact support.",
-                        innerException: serviceException,
-                        data: serviceException.Data);
-
-                throw await CreateAndLogServiceExceptionAsync(failedEventCallV2ServiceException);
-            }
         }
 
         private async ValueTask<EventCallV2ValidationException> CreateAndLogValidationExceptionAsync(
