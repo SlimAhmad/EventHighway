@@ -1,7 +1,8 @@
-﻿// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,9 @@ namespace EventHighway.Core.Brokers.Storages
     {
         public DbSet<Event> Events { get; set; }
 
-        public async ValueTask<Event> InsertEventAsync(Event @event) =>
-            await InsertAsync(@event);
+        public async ValueTask<Event> InsertEventAsync(
+            Event @event,
+            CancellationToken cancellationToken = default) =>
+            await InsertAsync(@event, cancellationToken);
     }
 }

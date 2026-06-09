@@ -14,7 +14,8 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2
         public Guid Id { get; set; }
         public ListenerEventStatusV2 Status { get; set; }
         public string Response { get; set; }
-        public string ResponseReasonPhrase { get; set; }
+        public string ResponseCode { get; set; }
+        public string ResponseMessage { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset UpdatedDate { get; set; }
 

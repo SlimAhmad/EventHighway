@@ -81,12 +81,16 @@ namespace EventHighway.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTimeOffset>("UpdatedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
 
                     b.ToTable("EventAddressV2s", (string)null);
                 });
@@ -178,7 +182,7 @@ namespace EventHighway.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTimeOffset>("UpdatedDate")
                         .HasColumnType("datetimeoffset");
@@ -186,6 +190,10 @@ namespace EventHighway.Core.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EventAddressId");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
 
                     b.ToTable("EventListenerV2s", (string)null);
                 });
@@ -265,7 +273,7 @@ namespace EventHighway.Core.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("EventName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTimeOffset?>("ScheduledDate")
                         .HasColumnType("datetimeoffset");
@@ -279,6 +287,10 @@ namespace EventHighway.Core.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EventAddressId");
+
+                    b.HasIndex("EventName")
+                        .IsUnique()
+                        .HasFilter("[EventName] IS NOT NULL");
 
                     b.ToTable("EventV2s", (string)null);
                 });
@@ -566,7 +578,10 @@ namespace EventHighway.Core.Migrations
                     b.Property<string>("Response")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ResponseReasonPhrase")
+                    b.Property<string>("ResponseCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponseMessage")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -657,7 +672,7 @@ namespace EventHighway.Core.Migrations
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventListeners.V2.EventListenerV2", "EventListener")
                         .WithMany("HandlerConfigurations")
                         .HasForeignKey("EventListenerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("EventListener");
