@@ -70,6 +70,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             Guid someEventListenerV2Id = GetRandomId();
             var dbUpdateConcurrencyException = new DbUpdateConcurrencyException();
 
+            dbUpdateConcurrencyException.Data.Add(
+                "ErrorCode",
+                new List<string> { "DbUpdateConcurrencyError" });
+
             var lockedEventListenerV2Exception =
                 new LockedEventListenerV2Exception(
                     message: "Event listener is locked, try again.",
