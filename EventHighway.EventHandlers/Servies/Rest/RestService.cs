@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
@@ -20,11 +21,25 @@ namespace EventHighway.EventHandlers.Servies.Rest
             this.apiBroker = apiBroker;
         }
 
-        public ValueTask<EventHandlerResult> PostWithSecretAsync(
+        public async ValueTask<EventHandlerResult> PostWithSecretAsync(
             string content,
             IReadOnlyDictionary<string, string> handlerParams,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            HttpResponseMessage response =
+                await this.apiBroker.PostWithSecretAsync(
+                    content,
+                    url: handlerParams["url"],
+                    secret: handlerParams["secret"]);
+
+            return new EventHandlerResult
+            {
+                Response = await response.Content.ReadAsStringAsync(cancellationToken),
+                ResponseCode = ((int)response.StatusCode).ToString(),
+                ResponseMessage = response.ReasonPhrase,
+                IsSuccess = response.IsSuccessStatusCode
+            };
+        }
 
         public ValueTask<EventHandlerResult> PostWithBearerTokenAsync(
             string content,

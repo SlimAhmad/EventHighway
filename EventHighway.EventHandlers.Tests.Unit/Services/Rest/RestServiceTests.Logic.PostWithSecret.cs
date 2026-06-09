@@ -20,6 +20,7 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
             string randomContent = GetRandomString();
             string randomUrl = GetRandomString();
             string randomSecret = GetRandomString();
+            string randomResponseBody = GetRandomString();
 
             string inputContent = randomContent;
 
@@ -31,11 +32,17 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
             var returnedHttpResponseMessage =
                 new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent(GetRandomString())
+                    Content = new StringContent(randomResponseBody)
                 };
 
             EventHandlerResult expectedResult =
-                CreateRandomEventHandlerResult();
+                new EventHandlerResult
+                {
+                    Response = randomResponseBody,
+                    ResponseCode = "200",
+                    ResponseMessage = "OK",
+                    IsSuccess = true
+                };
 
             this.apiBrokerMock.Setup(broker =>
                 broker.PostWithSecretAsync(
