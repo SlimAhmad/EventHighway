@@ -137,6 +137,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
             var dbUpdateConcurrencyException = new DbUpdateConcurrencyException();
 
+            dbUpdateException.Data.Add(
+                "ErrorCode",
+                new List<string> { "DatabaseUpdateError" });
+
             var lockedListenerEventV2Exception =
                 new LockedListenerEventV2Exception(
                     message: "Listener event is locked, try again.",
