@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.EventHandlers;
@@ -25,7 +26,9 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<EventCallV2> RunEventCallV2Async(EventCallV2 eventCallV2) =>
+        public ValueTask<EventCallV2> RunEventCallV2Async(
+            EventCallV2 eventCallV2,
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             ValidateEventCallV2OnRun(eventCallV2);
@@ -44,7 +47,8 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             EventHandlerResult result =
                 await handler.HandleAsync(
                     content: eventCallV2.Content,
-                    handlerParams: handlerParams);
+                    handlerParams: handlerParams,
+                    cancellationToken: cancellationToken);
 
             eventCallV2.IsSuccess = result.Succeeded;
             eventCallV2.Response = result.Response;

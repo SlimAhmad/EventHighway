@@ -51,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
 
             EventCallV2DependencyException actualEventCallV2DependencyException =
                 await Assert.ThrowsAsync<EventCallV2DependencyException>(
@@ -120,7 +120,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
 
             EventCallV2DependencyValidationException actualEventCallV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventCallV2DependencyValidationException>(
@@ -188,7 +188,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
 
             EventCallV2DependencyException actualEventCallV2DependencyException =
                 await Assert.ThrowsAsync<EventCallV2DependencyException>(
@@ -254,7 +254,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
 
             EventCallV2ServiceException actualEventCallV2ServiceException =
                 await Assert.ThrowsAsync<EventCallV2ServiceException>(
