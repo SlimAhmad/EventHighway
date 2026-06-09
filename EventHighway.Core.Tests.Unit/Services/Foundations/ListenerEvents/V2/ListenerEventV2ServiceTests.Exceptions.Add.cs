@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -135,7 +136,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             var foreignKeyConstraintConflictException =
                 new ForeignKeyConstraintConflictException(someMessage);
-            
+
             foreignKeyConstraintConflictException.Data.Add(
                 "ErrorCode",
                 new List<string> { "ForeignKeyConstraintConflictExceptionError" });
@@ -247,10 +248,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             // given
             ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
             var serviceException = new Exception();
-
-            serviceException.Data.Add(
-                "ErrorCode",
-                new List<string> { "ServiceError" });
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedListenerEventV2ServiceException =
                 new FailedListenerEventV2ServiceException(
