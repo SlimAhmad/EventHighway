@@ -49,16 +49,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
                 inputEventCallV2.DeepClone();
 
             expectedEventCallV2.IsSuccess =
-                returnedEventHandlerResult.Succeeded;
+                returnedEventHandlerResult.IsSuccess;
 
             expectedEventCallV2.Response =
                 returnedEventHandlerResult.Response;
 
             expectedEventCallV2.ResponseCode =
-                returnedEventHandlerResult.ErrorCode;
+                returnedEventHandlerResult.ResponseCode;
 
             expectedEventCallV2.ResponseMessage =
-                returnedEventHandlerResult.ErrorMessage;
+                returnedEventHandlerResult.ResponseMessage;
 
             this.eventHandlerBrokerMock.Setup(broker => broker.Name)
                 .Returns(randomHandlerName);

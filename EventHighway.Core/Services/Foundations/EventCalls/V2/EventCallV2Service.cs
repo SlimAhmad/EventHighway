@@ -50,10 +50,10 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                     handlerParams: handlerParams,
                     cancellationToken: cancellationToken);
 
-            eventCallV2.IsSuccess = result.Succeeded;
+            eventCallV2.IsSuccess = result.IsSuccess;
             eventCallV2.Response = result.Response;
-            eventCallV2.ResponseCode = result.ErrorCode;
-            eventCallV2.ResponseMessage = result.ErrorMessage;
+            eventCallV2.ResponseCode = result.ResponseCode;
+            eventCallV2.ResponseMessage = result.ResponseMessage;
 
             return eventCallV2;
         });
