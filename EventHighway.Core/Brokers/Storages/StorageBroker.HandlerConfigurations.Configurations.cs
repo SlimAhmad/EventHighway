@@ -18,7 +18,7 @@ namespace EventHighway.Core.Brokers.Storages
             model.HasOne(handlerConfiguration => handlerConfiguration.EventListener)
                 .WithMany(eventListenerV2 => eventListenerV2.HandlerConfigurations)
                 .HasForeignKey(handlerConfiguration => handlerConfiguration.EventListenerId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             model.HasIndex(handlerConfiguration => new
             {

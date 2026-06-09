@@ -1,0 +1,133 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
+using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Brokers.Storages;
+using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
+using EventHighway.Core.Services.Foundations.EventListeners.V2;
+using Microsoft.Data.SqlClient;
+using Moq;
+using Tynamix.ObjectFiller;
+using Xeptions;
+
+namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
+{
+    public partial class EventListenerV2ServiceTests
+    {
+        private readonly Mock<IStorageBroker> storageBrokerMock;
+        private readonly Mock<ILoggingBroker> loggingBrokerMock;
+        private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
+        private readonly IEventListenerV2Service eventListenerV2Service;
+
+        public EventListenerV2ServiceTests()
+        {
+            this.storageBrokerMock = new Mock<IStorageBroker>();
+            this.loggingBrokerMock = new Mock<ILoggingBroker>();
+            this.dateTimeBrokerMock = new Mock<IDateTimeBroker>();
+
+            this.eventListenerV2Service = new EventListenerV2Service(
+                storageBroker: this.storageBrokerMock.Object,
+                dateTimeBroker: this.dateTimeBrokerMock.Object,
+                loggingBroker: this.loggingBrokerMock.Object);
+        }
+
+        private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
+            actualException => actualException.SameExceptionAs(expectedException);
+
+        public static TheoryData<int> MinutesBeforeAndAfterNow()
+        {
+            int randomMoreThanOneMinuteAhead =
+                GetRandomNumber();
+
+            int randomMoreThanOneMinuteAgo =
+                GetRandomNegativeNumber();
+
+            return new TheoryData<int>
+            {
+                randomMoreThanOneMinuteAhead,
+                randomMoreThanOneMinuteAgo
+            };
+        }
+
+        private static SqlException GetSqlException()
+        {
+            return (SqlException)RuntimeHelpers
+                .GetUninitializedObject(type: typeof(SqlException));
+        }
+
+        private static Guid GetRandomId() =>
+            Guid.NewGuid();
+
+        private static IQueryable<EventListenerV2> CreateRandomEventListenerV2s()
+        {
+            return CreateEventListenerV2Filler(
+                dates: GetRandomDateTimeOffset())
+                    .Create(count: GetRandomNumber())
+                        .AsQueryable();
+        }
+
+        private static EventListenerV2 CreateRandomEventListenerV2() =>
+            CreateEventListenerV2Filler(dates: GetRandomDateTimeOffset()).Create();
+
+        private static EventListenerV2 CreateRandomEventListenerV2(DateTimeOffset dates) =>
+            CreateEventListenerV2Filler(dates).Create();
+
+        private static HandlerConfiguration CreateRandomHandlerConfiguration(DateTimeOffset dates) =>
+            CreateHandlerConfigurationFiller(dates).Create();
+
+        private static string GetRandomString() =>
+            new MnemonicString().GetValue();
+
+        private static string GetRandomStringWithLengthOf(int length) =>
+            new MnemonicString(wordCount: 1, wordMinLength: length, wordMaxLength: length).GetValue();
+
+        private static int GetRandomNumber() =>
+            new IntRange(min: 2, max: 9).GetValue();
+
+        private static int GetRandomNegativeNumber() =>
+            -1 * GetRandomNumber();
+
+        private static DateTimeOffset GetRandomDateTimeOffset() =>
+            new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
+
+        private static Filler<EventListenerV2> CreateEventListenerV2Filler(DateTimeOffset dates)
+        {
+            var filler = new Filler<EventListenerV2>();
+
+            filler.Setup()
+                .OnType<DateTimeOffset>().Use(dates)
+
+                .OnProperty(eventListenerV2 =>
+                    eventListenerV2.EventAddressV2).IgnoreIt()
+
+                .OnProperty(eventListenerV2 =>
+                    eventListenerV2.ListenerEventV2s).IgnoreIt()
+
+                .OnProperty(eventListenerV2 =>
+                    eventListenerV2.HandlerConfigurations)
+                        .Use(Array.Empty<HandlerConfiguration>());
+
+            return filler;
+        }
+
+        private static Filler<HandlerConfiguration> CreateHandlerConfigurationFiller(DateTimeOffset dates)
+        {
+            var filler = new Filler<HandlerConfiguration>();
+
+            filler.Setup()
+                .OnType<DateTimeOffset>().Use(dates)
+
+                .OnProperty(handlerConfiguration =>
+                    handlerConfiguration.EventListener).IgnoreIt();
+
+            return filler;
+        }
+    }
+}
