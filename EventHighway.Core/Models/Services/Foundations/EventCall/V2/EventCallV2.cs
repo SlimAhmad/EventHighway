@@ -13,7 +13,8 @@ namespace EventHighway.Core.Models.Services.Foundations.EventCall.V2
         public List<HandlerConfiguration> HandlerConfigurations { get; set; } = new();
         public string Content { get; set; }
         public string Response { get; set; }
-        public string ResponseReasonPhrase { get; set; }
+        public string ResponseCode { get; set; }
+        public string ResponseMessage { get; set; }
         public bool IsSuccess { get; set; }
     }
 }
