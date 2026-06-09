@@ -175,6 +175,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             // given
             Guid someEventListenerV2Id = GetRandomId();
             var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedEventListenerV2ServiceException =
                 new FailedEventListenerV2ServiceException(
