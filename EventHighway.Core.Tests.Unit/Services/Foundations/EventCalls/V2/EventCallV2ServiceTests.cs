@@ -66,7 +66,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             };
 
         private class SomeDependencyValidationEventHandlerException
-            : Exception, IEventHandlerDependencyValidationException
+            : Exception, IEventHandlerValidationException
         { }
         private class SomeServiceEventHandlerException
             : Exception, IEventHandlerServiceException

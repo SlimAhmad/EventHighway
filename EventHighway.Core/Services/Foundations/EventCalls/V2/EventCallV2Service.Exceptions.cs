@@ -34,7 +34,7 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 throw await CreateAndLogValidationExceptionAsync(handlerNotFoundEventCallV2Exception);
             }
             catch (Exception exception)
-                when (exception is IEventHandlerDependencyValidationException)
+                when (exception is IEventHandlerValidationException)
             {
                 var failedEventCallV2DependencyValidationException =
                     new FailedEventCallV2DependencyValidationException(
@@ -55,6 +55,18 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                         data: exception.Data);
 
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
+                    failedEventCallV2DependencyException);
+            }
+            catch (Exception exception)
+                when (exception is IEventHandlerServiceException)
+            {
+                var failedEventCallV2DependencyException =
+                    new FailedEventCallV2DependencyException(
+                        message: "Failed event call dependency error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(
                     failedEventCallV2DependencyException);
             }
             catch (Exception serviceException)
@@ -80,6 +92,19 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             await this.loggingBroker.LogErrorAsync(eventCallV2ValidationException);
 
             return eventCallV2ValidationException;
+        }
+
+        private async ValueTask<EventCallV2DependencyException> CreateAndLogDependencyExceptionAsync(
+            Xeption exception)
+        {
+            var eventCallV2DependencyException =
+                new EventCallV2DependencyException(
+                    message: "Event call dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(eventCallV2DependencyException);
+
+            return eventCallV2DependencyException;
         }
 
         private async ValueTask<EventCallV2DependencyValidationException>

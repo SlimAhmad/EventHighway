@@ -4,6 +4,6 @@
 
 namespace EventHighway.Abstractions.EventHandlers.Exceptions
 {
-    public interface IEventHandlerDependencyValidationException
+    public interface IEventHandlerServiceException
     { }
 }
