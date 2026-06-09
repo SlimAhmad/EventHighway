@@ -4,6 +4,8 @@
 
 using System;
 using System.Linq.Expressions;
+using EventHighway.Abstractions.Models.EventHandlers;
+using EventHighway.Abstractions.Models.EventHandlers.Exceptions;
 using EventHighway.Core.Brokers.EventHandlers;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -41,6 +43,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
         private static EventCallV2 CreateRandomEventCallV2() =>
             CreateEventCallV2Filler().Create();
+
+        public static TheoryData<Exception> CriticalEventHandlerDependencyExceptions() =>
+            new TheoryData<Exception>
+            {
+                new SomeCriticalEventHandlerDependencyException()
+            };
+
+        private class SomeCriticalEventHandlerDependencyException
+            : Exception, IEventHandlerDependencyException
+        { }
 
         private static Filler<EventCallV2> CreateEventCallV2Filler()
         {

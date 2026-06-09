@@ -2,10 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using EventHighway.Abstractions.Models.EventHandlers;
-
-namespace EventHighway.Core.Brokers.EventHandlers
+namespace EventHighway.Abstractions.Models.EventHandlers.Exceptions
 {
-    internal interface IEventHandlerBroker : IEventHandler
+    public interface IEventHandlerDependencyException
     { }
 }

@@ -71,4 +71,8 @@
 	  <Folder Include="Services\Foundations\EventAddresses\V2\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\EventHighway.Abstractions\EventHighway.Abstractions.csproj" />
+	</ItemGroup>
+
 </Project>
