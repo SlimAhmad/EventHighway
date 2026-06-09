@@ -54,6 +54,34 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             }
         }
 
+        private static void ValidateHandlerConfigurations(
+            IEventHandlerBroker handler,
+            List<HandlerConfiguration> handlerConfigurations)
+        {
+            var validations = new List<(bool Rule, string Parameter, string Message)>();
+
+            foreach (string requiredParam in handler.RequiredParams)
+            {
+                HandlerConfiguration matchingConfig =
+                    handlerConfigurations.FirstOrDefault(
+                        config => config.Name == requiredParam);
+
+                validations.Add(
+                    (Rule: matchingConfig is null,
+                    Parameter: $"HandlerConfiguration['{requiredParam}']",
+                    Message: "Config item required"));
+
+                validations.Add(
+                    (Rule: matchingConfig is not null && IsInvalid(matchingConfig.Value),
+                    Parameter: $"HandlerConfiguration['{requiredParam}']",
+                    Message: "Value required"));
+            }
+
+            Validate(
+                message: "Event call handler configuration is invalid, fix the errors and try again.",
+                validations: validations.ToArray());
+        }
+
         private void ValidateHandlerCount(string handlerName)
         {
             int count =

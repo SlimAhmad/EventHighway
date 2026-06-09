@@ -62,6 +62,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerBrokerMock.Setup(broker => broker.Name)
                 .Returns(randomHandlerName);
 
+            this.eventHandlerBrokerMock.Setup(broker => broker.RequiredParams)
+                .Returns(new[] { randomConfigName });
+
             this.eventHandlerBrokerMock
                 .Setup(broker =>
                     broker.HandleAsync(
@@ -80,6 +83,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             actualEventCallV2.Should().BeEquivalentTo(expectedEventCallV2);
 
             this.eventHandlerBrokerMock.VerifyGet(broker => broker.Name,
+                Times.AtLeastOnce);
+
+            this.eventHandlerBrokerMock.VerifyGet(broker => broker.RequiredParams,
                 Times.AtLeastOnce);
 
             this.eventHandlerBrokerMock.Verify(broker =>

@@ -33,6 +33,8 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 this.eventHandlerBrokers.Single(
                     broker => broker.Name == eventCallV2.HandlerName);
 
+            ValidateHandlerConfigurations(handler, eventCallV2.HandlerConfigurations);
+
             IReadOnlyDictionary<string, string> handlerParams =
                 eventCallV2.HandlerConfigurations.ToDictionary(
                     handlerConfiguration => handlerConfiguration.Name,
