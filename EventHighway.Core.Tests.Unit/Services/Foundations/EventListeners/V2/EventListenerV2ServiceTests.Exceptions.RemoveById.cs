@@ -124,6 +124,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             Guid someEventListenerV2Id = GetRandomId();
             var dbUpdateException = new DbUpdateException();
 
+            dbUpdateException.Data.Add(
+                "ErrorCode",
+                new List<string> { "DatabaseUpdateError" });
+
             var failedStorageEventListenerV2Exception =
                 new FailedStorageEventListenerV2Exception(
                     message: "Failed event listener storage error occurred, contact support.",
