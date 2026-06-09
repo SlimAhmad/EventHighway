@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<Title>EventHighway Abstractions</Title>
+		<Authors>Hassan Habib;Christo du Toit</Authors>
+		<Company>The Standard Organization</Company>
+		<Product>EventHighway.Abstractions</Product>
+		<Version>2.1.0</Version>
+		<AssemblyVersion>2.1.0.0</AssemblyVersion>
+		<FileVersion>2.1.0.0</FileVersion>
+		<PackageId>EventHighway.Abstractions</PackageId>
+		<PackageIcon>EventHighwayLogo.png</PackageIcon>
+		<PackageLicenseFile>license.txt</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Copyright>Hassan Habib 2026 (c)</Copyright>
+		<Description>EventHighway abstractions: interfaces and contracts for custom event handlers.</Description>
+		<PackageProjectUrl>https://github.com/hassanhabib/EventHighway</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/hassanhabib/EventHighway</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>Event-Driven</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\EventHighwayLogo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+			<Link>EventHighwayLogo.png</Link>
+		</None>
+		<None Include="..\license.txt">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+			<Link>license.txt</Link>
+		</None>
+	</ItemGroup>
+
+</Project>
