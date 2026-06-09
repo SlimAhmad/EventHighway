@@ -12,7 +12,7 @@ using EventHighway.EventHandlers.Brokers.Apis;
 
 namespace EventHighway.EventHandlers.Servies.Rest
 {
-    internal class RestService : IRestService
+    internal partial class RestService : IRestService
     {
         private readonly IApiBroker apiBroker;
 
@@ -21,11 +21,14 @@ namespace EventHighway.EventHandlers.Servies.Rest
             this.apiBroker = apiBroker;
         }
 
-        public async ValueTask<EventHandlerResult> PostWithSecretAsync(
+        public ValueTask<EventHandlerResult> PostWithSecretAsync(
             string content,
             IReadOnlyDictionary<string, string> handlerParams,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidatePostWithSecretParams(content, handlerParams);
+
             HttpResponseMessage response =
                 await this.apiBroker.PostWithSecretAsync(
                     content,
@@ -39,7 +42,7 @@ namespace EventHighway.EventHandlers.Servies.Rest
                 ResponseMessage = response.ReasonPhrase,
                 IsSuccess = response.IsSuccessStatusCode
             };
-        }
+        });
 
         public ValueTask<EventHandlerResult> PostWithBearerTokenAsync(
             string content,
