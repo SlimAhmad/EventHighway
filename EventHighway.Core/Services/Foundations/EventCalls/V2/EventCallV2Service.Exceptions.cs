@@ -28,6 +28,10 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(invalidEventCallV2Exception);
             }
+            catch (HandlerNotFoundEventCallV2Exception handlerNotFoundEventCallV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(handlerNotFoundEventCallV2Exception);
+            }
             catch (Exception serviceException)
             {
                 var failedEventCallV2ServiceException =

@@ -11,9 +11,10 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
 {
     internal partial class EventCallV2Service
     {
-        private static void ValidateEventCallV2OnRun(EventCallV2 eventCallV2)
+        private void ValidateEventCallV2OnRun(EventCallV2 eventCallV2)
         {
             ValidateEventCallV2IsNotNull(eventCallV2);
+            ValidateEventHandlerBrokersIsNotNull();
 
             Validate(
                 message: "Event call is invalid, fix the errors and try again.",
@@ -37,6 +38,15 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             {
                 throw new NullEventCallV2Exception(
                     message: "Event call is null.");
+            }
+        }
+
+        private void ValidateEventHandlerBrokersIsNotNull()
+        {
+            if (this.eventHandlerBrokers is null)
+            {
+                throw new HandlerNotFoundEventCallV2Exception(
+                    message: "No event call handler was found, fix the errors and try again.");
             }
         }
 
