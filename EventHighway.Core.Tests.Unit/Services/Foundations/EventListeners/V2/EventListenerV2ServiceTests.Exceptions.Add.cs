@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
@@ -135,11 +136,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
             var foreignKeyConstraintConflictException =
                 new ForeignKeyConstraintConflictException(someMessage);
-            
+
             foreignKeyConstraintConflictException.Data.Add(
                 "ErrorCode",
                 new List<string> { "ForeignKeyConstraintConflictExceptionError" });
-                
+
 
             var invalidReferenceEventListenerV2Exception =
                 new InvalidReferenceEventListenerV2Exception(
@@ -196,7 +197,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             dbUpdateException.Data.Add(
                 "ErrorCode",
                 new List<string> { "DbUpdateError" });
-            
+
 
             var failedStorageEventListenerV2Exception =
                 new FailedStorageEventListenerV2Exception(
@@ -253,7 +254,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             serviceException.Data.Add(
                 "ErrorCode",
                 new List<string> { "ServiceError" });
-                
+
             var failedEventListenerV2ServiceException =
                 new FailedEventListenerV2ServiceException(
                     message: "Failed event listener service error occurred, contact support.",
