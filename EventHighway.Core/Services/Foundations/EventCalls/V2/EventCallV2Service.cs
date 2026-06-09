@@ -34,8 +34,9 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                     broker => broker.Name == eventCallV2.HandlerName);
 
             IReadOnlyDictionary<string, string> handlerParams =
-                eventCallV2.HandlerConfigurations
-                    .ToDictionary(HandlerConfiguration => HandlerConfiguration.Name, hc => hc.Value);
+                eventCallV2.HandlerConfigurations.ToDictionary(
+                    handlerConfiguration => handlerConfiguration.Name,
+                    handlerConfiguration => handlerConfiguration.Value);
 
             EventHandlerResult result =
                 await handler.HandleAsync(

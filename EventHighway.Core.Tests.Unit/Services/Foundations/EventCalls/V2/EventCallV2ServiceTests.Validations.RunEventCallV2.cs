@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
+using EventHighway.Core.Services.Foundations.EventCalls.V2;
 using FluentAssertions;
 using Moq;
 
@@ -95,6 +96,53 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
                 this.eventCallV2Service.RunEventCallV2Async(invalidEventCallV2);
+
+            EventCallV2ValidationException actualEventCallV2ValidationException =
+                await Assert.ThrowsAsync<EventCallV2ValidationException>(
+                    runEventCallV2Task.AsTask);
+
+            // then
+            actualEventCallV2ValidationException.Should().BeEquivalentTo(
+                expectedEventCallV2ValidationException);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventCallV2ValidationException))),
+                        Times.Once);
+
+            this.eventHandlerBrokerMock.Verify(broker =>
+                broker.HandleAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<IReadOnlyDictionary<string, string>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnRunIfHandlersIsNullAndLogItAsync()
+        {
+            // given
+            EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
+
+            IEventCallV2Service serviceWithNullBrokers = new EventCallV2Service(
+                eventHandlerBrokers: null,
+                loggingBroker: this.loggingBrokerMock.Object);
+
+            var handlerNotFoundEventCallV2Exception =
+                new HandlerNotFoundEventCallV2Exception(
+                    message: "No event call handler was found, fix the errors and try again.");
+
+            var expectedEventCallV2ValidationException =
+                new EventCallV2ValidationException(
+                    message: "Event call validation error occurred, fix the errors and try again.",
+                    innerException: handlerNotFoundEventCallV2Exception);
+
+            // when
+            ValueTask<EventCallV2> runEventCallV2Task =
+                serviceWithNullBrokers.RunEventCallV2Async(someEventCallV2);
 
             EventCallV2ValidationException actualEventCallV2ValidationException =
                 await Assert.ThrowsAsync<EventCallV2ValidationException>(
