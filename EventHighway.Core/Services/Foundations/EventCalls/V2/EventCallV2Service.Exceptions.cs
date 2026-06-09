@@ -34,6 +34,18 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 throw await CreateAndLogValidationExceptionAsync(handlerNotFoundEventCallV2Exception);
             }
             catch (Exception exception)
+                when (exception is IEventHandlerDependencyValidationException)
+            {
+                var failedEventCallV2DependencyValidationException =
+                    new FailedEventCallV2DependencyValidationException(
+                        message: "Failed event call dependency validation error occurred, fix the errors and try again.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    failedEventCallV2DependencyValidationException);
+            }
+            catch (Exception exception)
                 when (exception is IEventHandlerDependencyException)
             {
                 var failedEventCallV2DependencyException =
@@ -68,6 +80,19 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             await this.loggingBroker.LogErrorAsync(eventCallV2ValidationException);
 
             return eventCallV2ValidationException;
+        }
+
+        private async ValueTask<EventCallV2DependencyValidationException>
+            CreateAndLogDependencyValidationExceptionAsync(Xeption exception)
+        {
+            var eventCallV2DependencyValidationException =
+                new EventCallV2DependencyValidationException(
+                    message: "Event call validation error occurred, fix the errors and try again.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(eventCallV2DependencyValidationException);
+
+            return eventCallV2DependencyValidationException;
         }
 
         private async ValueTask<EventCallV2DependencyException> CreateAndLogCriticalDependencyExceptionAsync(
