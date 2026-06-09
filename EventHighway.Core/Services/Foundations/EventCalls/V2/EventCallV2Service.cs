@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EventHighway.Abstractions.Models.EventHandlers;
+using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.EventHandlers;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;

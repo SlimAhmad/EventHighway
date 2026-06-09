@@ -4,8 +4,8 @@
 
 using System;
 using System.Linq.Expressions;
-using EventHighway.Abstractions.Models.EventHandlers;
-using EventHighway.Abstractions.Models.EventHandlers.Exceptions;
+using EventHighway.Abstractions.EventHandlers;
+using EventHighway.Abstractions.EventHandlers.Exceptions;
 using EventHighway.Core.Brokers.EventHandlers;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;

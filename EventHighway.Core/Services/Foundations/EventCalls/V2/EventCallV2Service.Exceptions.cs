@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
+using EventHighway.Abstractions.EventHandlers.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
 using Xeptions;
@@ -32,6 +33,18 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(handlerNotFoundEventCallV2Exception);
             }
+            catch (Exception exception)
+                when (exception is IEventHandlerDependencyException)
+            {
+                var failedEventCallV2DependencyException =
+                    new FailedEventCallV2DependencyException(
+                        message: "Failed event call dependency error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(
+                    failedEventCallV2DependencyException);
+            }
             catch (Exception serviceException)
             {
                 var failedEventCallV2ServiceException =
@@ -55,6 +68,19 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             await this.loggingBroker.LogErrorAsync(eventCallV2ValidationException);
 
             return eventCallV2ValidationException;
+        }
+
+        private async ValueTask<EventCallV2DependencyException> CreateAndLogCriticalDependencyExceptionAsync(
+            Xeption exception)
+        {
+            var eventCallV2DependencyException =
+                new EventCallV2DependencyException(
+                    message: "Event call dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogCriticalAsync(eventCallV2DependencyException);
+
+            return eventCallV2DependencyException;
         }
 
         private async ValueTask<EventCallV2ServiceException> CreateAndLogServiceExceptionAsync(

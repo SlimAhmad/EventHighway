@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EventHighway.Abstractions.Models.EventHandlers
+namespace EventHighway.Abstractions.EventHandlers
 {
     public interface IEventHandler
     {
