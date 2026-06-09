@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using FluentAssertions;
@@ -58,20 +59,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectEventV2ByIdAsync(
-                    eventV2Id))
+                    eventV2Id, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(
                             storageEventV2);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.UpdateEventV2Async(
-                    inputEventV2))
+                    inputEventV2, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(persistedEventV2);
 
             // when
             EventV2 actualEventV2 =
                 await this.eventV2Service
                     .ModifyEventV2Async(
-                        inputEventV2);
+                        inputEventV2, TestContext.Current.CancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(
@@ -83,12 +84,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectEventV2ByIdAsync(
-                    eventV2Id),
+                    eventV2Id, It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.UpdateEventV2Async(
-                    inputEventV2),
+                    inputEventV2, It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();

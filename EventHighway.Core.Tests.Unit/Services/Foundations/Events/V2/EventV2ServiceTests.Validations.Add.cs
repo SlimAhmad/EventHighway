@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2.Exceptions;
@@ -29,7 +30,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> addEventV2Task =
-                this.eventV2Service.AddEventV2Async(nullEventV2);
+                this.eventV2Service.AddEventV2Async(nullEventV2, TestContext.Current.CancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -49,7 +50,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     Times.Never);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertEventV2Async(It.IsAny<EventV2>()),
+                broker.InsertEventV2Async(It.IsAny<EventV2>(), It.IsAny<CancellationToken>()),
                     Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -114,7 +115,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> addEventV2Task =
-                this.eventV2Service.AddEventV2Async(invalidEventV2);
+                this.eventV2Service.AddEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -134,7 +135,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertEventV2Async(It.IsAny<EventV2>()),
+                broker.InsertEventV2Async(It.IsAny<EventV2>(), It.IsAny<CancellationToken>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -171,7 +172,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> addEventV2Task =
-                this.eventV2Service.AddEventV2Async(invalidEventV2);
+                this.eventV2Service.AddEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -191,7 +192,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertEventV2Async(It.IsAny<EventV2>()),
+                broker.InsertEventV2Async(It.IsAny<EventV2>(), It.IsAny<CancellationToken>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -226,7 +227,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> addEventV2Task =
-                this.eventV2Service.AddEventV2Async(invalidEventV2);
+                this.eventV2Service.AddEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -246,7 +247,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertEventV2Async(It.IsAny<EventV2>()),
+                broker.InsertEventV2Async(It.IsAny<EventV2>(), It.IsAny<CancellationToken>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -286,7 +287,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> addEventV2Task =
-                this.eventV2Service.AddEventV2Async(invalidEventV2);
+                this.eventV2Service.AddEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -306,7 +307,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertEventV2Async(It.IsAny<EventV2>()),
+                broker.InsertEventV2Async(It.IsAny<EventV2>(), It.IsAny<CancellationToken>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();

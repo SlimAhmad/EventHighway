@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2.Exceptions;
@@ -36,13 +37,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     innerException: failedStorageEventV2Exception);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>()))
+                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                     .ThrowsAsync(sqlException);
 
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2Service.RemoveEventV2ByIdAsync(
-                    someEventV2Id);
+                    someEventV2Id, TestContext.Current.CancellationToken);
 
             EventV2DependencyException actualEventV2DependencyException =
                 await Assert.ThrowsAsync<EventV2DependencyException>(
@@ -53,7 +54,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                 .BeEquivalentTo(expectedEventV2DependencyException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>()),
+                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -86,13 +87,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     innerException: lockedEventV2Exception);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>()))
+                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dbUpdateConcurrencyException);
 
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2Service.RemoveEventV2ByIdAsync(
-                    someEventV2Id);
+                    someEventV2Id, TestContext.Current.CancellationToken);
 
             EventV2DependencyValidationException actualEventV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventV2DependencyValidationException>(
@@ -104,7 +105,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectEventV2ByIdAsync(
-                    It.IsAny<Guid>()),
+                    It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -137,12 +138,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     innerException: failedStorageEventV2Exception);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>()))
+                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dbUpdateException);
 
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
-                this.eventV2Service.RemoveEventV2ByIdAsync(someEventV2Id);
+                this.eventV2Service.RemoveEventV2ByIdAsync(someEventV2Id, TestContext.Current.CancellationToken);
 
             EventV2DependencyException actualEventV2DependencyException =
                 await Assert.ThrowsAsync<EventV2DependencyException>(
@@ -154,7 +155,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectEventV2ByIdAsync(
-                    It.IsAny<Guid>()),
+                    It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -187,13 +188,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     innerException: failedEventV2ServiceException);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>()))
+                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                     .ThrowsAsync(serviceException);
 
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2Service.RemoveEventV2ByIdAsync(
-                    someEventV2Id);
+                    someEventV2Id, TestContext.Current.CancellationToken);
 
             EventV2ServiceException actualEventV2ServiceException =
                 await Assert.ThrowsAsync<EventV2ServiceException>(
@@ -204,7 +205,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                 .BeEquivalentTo(expectedEventV2ServiceException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>()),
+                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using Microsoft.EntityFrameworkCore;
@@ -15,22 +16,26 @@ namespace EventHighway.Core.Brokers.Storages
         public DbSet<HandlerConfiguration> HandlerConfigurations { get; set; }
 
         public async ValueTask<HandlerConfiguration> InsertHandlerConfigurationAsync(
-            HandlerConfiguration handlerConfiguration) =>
-            await InsertAsync(handlerConfiguration);
+            HandlerConfiguration handlerConfiguration,
+            CancellationToken cancellationToken = default) =>
+            await InsertAsync(handlerConfiguration, cancellationToken);
 
         public async ValueTask<IQueryable<HandlerConfiguration>> SelectAllHandlerConfigurationsAsync() =>
             SelectAll<HandlerConfiguration>();
 
         public async ValueTask<HandlerConfiguration> SelectHandlerConfigurationByIdAsync(
-            Guid handlerConfigurationId) =>
-            await SelectAsync<HandlerConfiguration>(handlerConfigurationId);
+            Guid handlerConfigurationId,
+            CancellationToken cancellationToken = default) =>
+            await SelectAsync<HandlerConfiguration>(new object[] { handlerConfigurationId }, cancellationToken);
 
         public async ValueTask<HandlerConfiguration> UpdateHandlerConfigurationAsync(
-            HandlerConfiguration handlerConfiguration) =>
-            await UpdateAsync(handlerConfiguration);
+            HandlerConfiguration handlerConfiguration,
+            CancellationToken cancellationToken = default) =>
+            await UpdateAsync(handlerConfiguration, cancellationToken);
 
         public async ValueTask<HandlerConfiguration> DeleteHandlerConfigurationAsync(
-            HandlerConfiguration handlerConfiguration) =>
-            await DeleteAsync(handlerConfiguration);
+            HandlerConfiguration handlerConfiguration,
+            CancellationToken cancellationToken = default) =>
+            await DeleteAsync(handlerConfiguration, cancellationToken);
     }
 }

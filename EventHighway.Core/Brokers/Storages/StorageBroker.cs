@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EFxceptions;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses;
@@ -60,20 +61,23 @@ namespace EventHighway.Core.Brokers.Storages
             ConfigureListenerEvents(modelBuilder.Entity<ListenerEvent>());
         }
 
-        private async ValueTask<T> InsertAsync<T>(T @object)
+        private async ValueTask<T> InsertAsync<T>(T @object, CancellationToken cancellationToken = default)
         {
             var broker = new StorageBroker(this.connectionString);
             broker.Entry(@object).State = EntityState.Added;
-            await broker.SaveChangesAsync();
+            await broker.SaveChangesAsync(cancellationToken);
 
             return @object;
         }
 
-        private async ValueTask<T> SelectAsync<T>(params object[] objectIds) where T : class
+        private async ValueTask<T> SelectAsync<T>(
+            object[] objectIds,
+            CancellationToken cancellationToken = default)
+            where T : class
         {
             var broker = new StorageBroker(this.connectionString);
 
-            return await broker.FindAsync<T>(objectIds);
+            return await broker.FindAsync<T>(objectIds, cancellationToken);
         }
 
         private IQueryable<T> SelectAll<T>() where T : class
@@ -83,20 +87,20 @@ namespace EventHighway.Core.Brokers.Storages
             return broker.Set<T>();
         }
 
-        private async ValueTask<T> UpdateAsync<T>(T @object)
+        private async ValueTask<T> UpdateAsync<T>(T @object, CancellationToken cancellationToken = default)
         {
             var broker = new StorageBroker(this.connectionString);
             broker.Entry(@object).State = EntityState.Modified;
-            await broker.SaveChangesAsync();
+            await broker.SaveChangesAsync(cancellationToken);
 
             return @object;
         }
 
-        private async ValueTask<T> DeleteAsync<T>(T @object)
+        private async ValueTask<T> DeleteAsync<T>(T @object, CancellationToken cancellationToken = default)
         {
             var broker = new StorageBroker(this.connectionString);
             broker.Entry(@object).State = EntityState.Deleted;
-            await broker.SaveChangesAsync();
+            await broker.SaveChangesAsync(cancellationToken);
 
             return @object;
         }

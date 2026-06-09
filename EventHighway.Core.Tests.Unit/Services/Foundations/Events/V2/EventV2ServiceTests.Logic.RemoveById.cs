@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using FluentAssertions;
@@ -28,19 +29,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectEventV2ByIdAsync(
-                    inputEventV2Id))
+                    inputEventV2Id, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(retrievedEventV2);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.DeleteEventV2Async(
-                    retrievedEventV2))
+                    retrievedEventV2, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(deletedEventV2);
 
             // when
             EventV2 actualEventV2 =
                 await this.eventV2Service
                     .RemoveEventV2ByIdAsync(
-                        inputEventV2Id);
+                        inputEventV2Id, TestContext.Current.CancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(
@@ -48,12 +49,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectEventV2ByIdAsync(
-                    inputEventV2Id),
+                    inputEventV2Id, It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.DeleteEventV2Async(
-                    retrievedEventV2),
+                    retrievedEventV2, It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();
