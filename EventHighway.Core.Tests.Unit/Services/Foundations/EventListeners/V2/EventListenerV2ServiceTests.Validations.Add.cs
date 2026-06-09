@@ -277,7 +277,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         }
 
         [Theory]
-        [MemberData(nameof(MinutesBeforeAndAfterNow))]
+        [InlineData(1)]
+        [InlineData(-61)]
         public async Task ShouldThrowValidationExceptionOnAddIfCreatedDateIsNotRecentAndLogItAsync(
             int minutesBeforeAndAfter)
         {
@@ -286,7 +287,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
             EventListenerV2 randomEventListenerV2 =
                 CreateRandomEventListenerV2(randomDateTimeOffset
-                    .AddMinutes(minutesBeforeAndAfter));
+                    .AddSeconds(minutesBeforeAndAfter));
 
             EventListenerV2 invalidEventListenerV2 = randomEventListenerV2;
 
@@ -561,7 +562,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         }
 
         [Theory]
-        [MemberData(nameof(MinutesBeforeAndAfterNow))]
+        [InlineData(1)]
+        [InlineData(-61)]
         public async Task
             ShouldThrowValidationExceptionOnAddIfHandlerConfigurationCreatedDateIsNotRecentAndLogItAsync(
                 int minutesBeforeAndAfter)
@@ -573,7 +575,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
             HandlerConfiguration randomHandlerConfiguration =
                 CreateRandomHandlerConfiguration(
-                    randomDateTimeOffset.AddMinutes(minutesBeforeAndAfter));
+                    randomDateTimeOffset.AddSeconds(minutesBeforeAndAfter));
 
             invalidEventListenerV2.HandlerConfigurations = new[] { randomHandlerConfiguration };
 
