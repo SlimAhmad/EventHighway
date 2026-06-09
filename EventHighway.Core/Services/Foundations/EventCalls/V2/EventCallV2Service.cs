@@ -2,8 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.EventHandlers;
 using EventHighway.Core.Brokers.Loggings;
@@ -24,7 +24,27 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<EventCallV2> RunEventCallV2Async(EventCallV2 eventCallV2) =>
-            throw new NotImplementedException();
+        public async ValueTask<EventCallV2> RunEventCallV2Async(EventCallV2 eventCallV2)
+        {
+            IEventHandlerBroker handler =
+                this.eventHandlerBrokers.SingleOrDefault(
+                    broker => broker.Name == eventCallV2.HandlerName);
+
+            IReadOnlyDictionary<string, string> handlerParams =
+                eventCallV2.HandlerConfigurations
+                    .ToDictionary(HandlerConfiguration => HandlerConfiguration.Name, hc => hc.Value);
+
+            EventHandlerResult result =
+                await handler.HandleAsync(
+                    content: eventCallV2.Content,
+                    handlerParams: handlerParams);
+
+            eventCallV2.IsSuccess = result.Succeeded;
+            eventCallV2.Response = result.Response;
+            eventCallV2.ResponseCode = result.ErrorCode;
+            eventCallV2.ResponseReasonPhrase = result.ErrorMessage;
+
+            return eventCallV2;
+        }
     }
 }
