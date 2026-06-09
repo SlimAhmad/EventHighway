@@ -59,9 +59,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         private class SomeCriticalEventHandlerDependencyException
             : Exception, IEventHandlerDependencyException
         { }
+        public static TheoryData<Exception> ServiceExceptions() =>
+            new TheoryData<Exception>
+            {
+                new SomeServiceEventHandlerException()
+            };
 
         private class SomeDependencyValidationEventHandlerException
             : Exception, IEventHandlerDependencyValidationException
+        { }
+        private class SomeServiceEventHandlerException
+            : Exception, IEventHandlerServiceException
         { }
 
         private static Filler<EventCallV2> CreateEventCallV2Filler()
@@ -76,3 +84,4 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         }
     }
 }
+
