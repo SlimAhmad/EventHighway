@@ -57,7 +57,9 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             return await storageBroker.UpdateEventV2Async(eventV2, cancellationToken);
         });
 
-        public ValueTask<EventV2> RemoveEventV2ByIdAsync(Guid eventV2Id, CancellationToken cancellationToken = default) =>
+        public ValueTask<EventV2> RemoveEventV2ByIdAsync(
+            Guid eventV2Id,
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             ValidateEventV2Id(eventV2Id);
