@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2.Exceptions;
@@ -35,7 +36,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             // when
             ValueTask<ListenerEventV2> removeListenerEventV2ByIdTask =
                 this.listenerEventV2Service.RemoveListenerEventV2ByIdAsync(
-                    invalidListenerEventV2Id);
+                    invalidListenerEventV2Id,
+                    TestContext.Current.CancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -52,7 +54,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>()),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -77,12 +80,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                     innerException: notFoundListenerEventV2Exception);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectListenerEventV2ByIdAsync(It.IsAny<Guid>()))
-                    .ReturnsAsync(nullListenerEventV2);
+                broker.SelectListenerEventV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(nullListenerEventV2);
 
             // when
             ValueTask<ListenerEventV2> removeListenerEventV2ByIdTask =
-                this.listenerEventV2Service.RemoveListenerEventV2ByIdAsync(nonExistingListenerEventV2Id);
+                this.listenerEventV2Service.RemoveListenerEventV2ByIdAsync(
+                    nonExistingListenerEventV2Id,
+                    TestContext.Current.CancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -94,7 +101,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>()),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -104,7 +112,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.DeleteListenerEventV2Async(
-                    It.IsAny<ListenerEventV2>()),
+                    It.IsAny<ListenerEventV2>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.storageBrokerMock.VerifyNoOtherCalls();

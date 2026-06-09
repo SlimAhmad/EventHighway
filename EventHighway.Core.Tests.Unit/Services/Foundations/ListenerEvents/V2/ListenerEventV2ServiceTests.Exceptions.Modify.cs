@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -43,7 +44,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             // when
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
                 this.listenerEventV2Service.ModifyListenerEventV2Async(
-                    someListenerEventV2);
+                    someListenerEventV2,
+                    TestContext.Current.CancellationToken);
 
             ListenerEventV2DependencyException actualListenerEventV2DependencyException =
                 await Assert.ThrowsAsync<ListenerEventV2DependencyException>(
@@ -64,7 +66,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>()),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -123,8 +126,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.UpdateListenerEventV2Async(It.IsAny<ListenerEventV2>()),
-                    Times.Never);
+                broker.UpdateListenerEventV2Async(
+                    It.IsAny<ListenerEventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -177,7 +182,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>()),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -230,7 +236,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>()),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -284,7 +291,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>()),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
