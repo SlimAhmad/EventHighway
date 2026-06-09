@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using FluentAssertions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         private async Task ShouldRemoveEventListenerV2ByIdAsync()
         {
             // given
+            CancellationToken cancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid randomEventListenerV2Id = GetRandomId();
             Guid inputEventListenerV2Id = randomEventListenerV2Id;
 
@@ -34,19 +38,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectEventListenerV2ByIdAsync(
-                    inputEventListenerV2Id))
+                    inputEventListenerV2Id,
+                    cancellationToken))
                         .ReturnsAsync(retrievedEventListenerV2);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.DeleteEventListenerV2Async(
-                    retrievedEventListenerV2))
+                    retrievedEventListenerV2,
+                    cancellationToken))
                         .ReturnsAsync(deletedEventListenerV2);
 
             // when
             EventListenerV2 actualEventListenerV2 =
                 await this.eventListenerV2Service
                     .RemoveEventListenerV2ByIdAsync(
-                        inputEventListenerV2Id);
+                        inputEventListenerV2Id,
+                        cancellationToken);
 
             // then
             actualEventListenerV2.Should().BeEquivalentTo(
@@ -54,12 +61,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectEventListenerV2ByIdAsync(
-                    inputEventListenerV2Id),
+                    inputEventListenerV2Id,
+                    cancellationToken),
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.DeleteEventListenerV2Async(
-                    retrievedEventListenerV2),
+                    retrievedEventListenerV2,
+                    cancellationToken),
                         Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();

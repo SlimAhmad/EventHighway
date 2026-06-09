@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using FluentAssertions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldAddEventListenerV2Async()
         {
             // given
+            CancellationToken cancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset =
                 GetRandomDateTimeOffset();
 
@@ -39,14 +43,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
             this.storageBrokerMock.Setup(broker =>
                 broker.InsertEventListenerV2Async(
-                    inputEventListenerV2))
+                    inputEventListenerV2,
+                    cancellationToken))
                         .ReturnsAsync(storageEventListenerV2);
 
             // when
             EventListenerV2 actualEventListenerV2 =
                 await this.eventListenerV2Service
                     .AddEventListenerV2Async(
-                        inputEventListenerV2);
+                        inputEventListenerV2,
+                        cancellationToken);
 
             // then
             actualEventListenerV2.Should().BeEquivalentTo(
@@ -58,7 +64,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.InsertEventListenerV2Async(
-                    inputEventListenerV2),
+                    inputEventListenerV2,
+                    cancellationToken),
                         Times.Once);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();

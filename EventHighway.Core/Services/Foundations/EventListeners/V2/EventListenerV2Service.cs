@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
@@ -28,28 +29,32 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<EventListenerV2> AddEventListenerV2Async(EventListenerV2 eventListenerV2) =>
+        public ValueTask<EventListenerV2> AddEventListenerV2Async(
+            EventListenerV2 eventListenerV2,
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             await ValidateEventListenerV2OnAddAsync(eventListenerV2);
 
-            return await this.storageBroker.InsertEventListenerV2Async(eventListenerV2);
+            return await this.storageBroker.InsertEventListenerV2Async(eventListenerV2, cancellationToken);
         });
 
         public ValueTask<IQueryable<EventListenerV2>> RetrieveAllEventListenerV2sAsync() =>
         TryCatch(async () => await storageBroker.SelectAllEventListenerV2sAsync());
 
-        public ValueTask<EventListenerV2> RemoveEventListenerV2ByIdAsync(Guid eventListenerV2Id) =>
+        public ValueTask<EventListenerV2> RemoveEventListenerV2ByIdAsync(
+            Guid eventListenerV2Id,
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             ValidateEventListenerV2Id(eventListenerV2Id);
 
             EventListenerV2 maybeEventListenerV2 =
-                await this.storageBroker.SelectEventListenerV2ByIdAsync(eventListenerV2Id);
+                await this.storageBroker.SelectEventListenerV2ByIdAsync(eventListenerV2Id, cancellationToken);
 
             ValidateEventListenerV2Exists(maybeEventListenerV2, eventListenerV2Id);
 
-            return await this.storageBroker.DeleteEventListenerV2Async(maybeEventListenerV2);
+            return await this.storageBroker.DeleteEventListenerV2Async(maybeEventListenerV2, cancellationToken);
         });
     }
 }
