@@ -141,7 +141,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V1
                 .OnType<DateTimeOffset?>()
                     .Use(dates)
 
-                .OnType<EventV1Type>().Use(eventV1Type);
+                .OnType<EventV1Type>().Use(eventV1Type)
+
+                .OnProperty(eventV1 => eventV1.EventAddress)
+                    .IgnoreIt()
+
+                .OnProperty(eventV1 => eventV1.ListenerEvents)
+                    .IgnoreIt();
 
             return filler;
         }

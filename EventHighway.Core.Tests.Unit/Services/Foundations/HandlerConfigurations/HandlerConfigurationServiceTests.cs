@@ -88,7 +88,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             filler.Setup()
                 .OnType<Guid>().Use(Guid.NewGuid)
                 .OnType<DateTimeOffset>().Use(dates)
-                .OnType<DateTimeOffset?>().Use((DateTimeOffset?)GetRandomDateTimeOffset());
+                .OnType<DateTimeOffset?>().Use((DateTimeOffset?)GetRandomDateTimeOffset())
+
+                .OnProperty(handlerConfiguration => handlerConfiguration.EventListener)
+                    .IgnoreIt();
 
             return filler;
         }

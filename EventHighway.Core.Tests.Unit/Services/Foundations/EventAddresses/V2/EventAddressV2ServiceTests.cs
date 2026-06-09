@@ -9,48 +9,39 @@ using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
-using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Services.Foundations.EventAddresses.V2;
 using Microsoft.Data.SqlClient;
 using Moq;
 using Tynamix.ObjectFiller;
 using Xeptions;
 
-namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
+namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
 {
-    public partial class EventV2ServiceTests
+    public partial class EventAddressV2ServiceTests
     {
         private readonly Mock<IStorageBroker> storageBrokerMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
-        private readonly IEventV2Service eventV2Service;
+        private readonly IEventAddressV2Service eventAddressV2Service;
 
-        public EventV2ServiceTests()
+        public EventAddressV2ServiceTests()
         {
-            this.storageBrokerMock =
-                new Mock<IStorageBroker>();
+            this.storageBrokerMock = new Mock<IStorageBroker>();
+            this.dateTimeBrokerMock = new Mock<IDateTimeBroker>();
+            this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
-            this.loggingBrokerMock =
-                new Mock<ILoggingBroker>();
-
-            this.dateTimeBrokerMock =
-                new Mock<IDateTimeBroker>();
-
-            this.eventV2Service = new EventV2Service(
+            this.eventAddressV2Service = new EventAddressV2Service(
                 storageBroker: this.storageBrokerMock.Object,
                 dateTimeBroker: this.dateTimeBrokerMock.Object,
                 loggingBroker: this.loggingBrokerMock.Object);
         }
 
-        private static SqlException GetSqlException()
-        {
-            return (SqlException)RuntimeHelpers
-                .GetUninitializedObject(
-                    type: typeof(SqlException));
-        }
-
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
+
+        private static SqlException CreateSqlException() =>
+            (SqlException)RuntimeHelpers.GetUninitializedObject(type: typeof(SqlException));
 
         public static TheoryData<int> MinutesBeforeAndAfterNow()
         {
@@ -82,65 +73,36 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 9).GetValue();
 
-        private static T GetInvalidEnum<T>()
+        private static EventAddressV2 CreateRandomEventAddressV2(DateTimeOffset dates) =>
+            CreateEventAddressV2Filler(dates).Create();
+
+        private static EventAddressV2 CreateRandomEventAddressV2() =>
+            CreateEventAddressV2Filler(dates: GetRandomDateTimeOffset()).Create();
+
+        private static IQueryable<EventAddressV2> CreateRandomEventAddressV2s()
         {
-            int randomNumber =
-                GetLocalRandomNumber();
-
-            while (Enum.IsDefined(typeof(T), randomNumber) is true)
-            {
-                randomNumber = GetLocalRandomNumber();
-            }
-
-            return (T)(object)randomNumber;
-
-            static int GetLocalRandomNumber()
-            {
-                return new IntRange(
-                    min: int.MinValue,
-                    max: int.MaxValue)
-                        .GetValue();
-            }
-        }
-
-        private static IQueryable<EventV2> CreateRandomEventV2s()
-        {
-            return CreateEventV2Filler(dates: GetRandomDateTimeOffset())
+            return CreateEventAddressV2Filler(dates: GetRandomDateTimeOffset())
                 .Create(count: GetRandomNumber())
                     .AsQueryable();
         }
 
-        private static EventV2 CreateRandomEventV2()
-        {
-            return CreateEventV2Filler(
-                dates: GetRandomDateTimeOffset())
-                    .Create();
-        }
+        private static DateTimeOffset GetRandomDateTimeOffset() =>
+            new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
 
-        private static EventV2 CreateRandomEventV2(DateTimeOffset dates) =>
-            CreateEventV2Filler(dates).Create();
-
-        private static DateTimeOffset GetRandomDateTimeOffset()
+        private static Filler<EventAddressV2> CreateEventAddressV2Filler(DateTimeOffset dates)
         {
-            return new DateTimeRange(
-                earliestDate: DateTime.UnixEpoch)
-                    .GetValue();
-        }
-
-        private static Filler<EventV2> CreateEventV2Filler(DateTimeOffset dates)
-        {
-            var filler = new Filler<EventV2>();
+            var filler = new Filler<EventAddressV2>();
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(dates)
 
-                .OnType<DateTimeOffset?>()
-                    .Use(GetRandomDateTimeOffset())
-
-                .OnProperty(eventV2 => eventV2.EventAddressV2)
+                .OnProperty(eventAddressV2 => eventAddressV2.Events)
                     .IgnoreIt()
 
-                .OnProperty(eventV2 => eventV2.ListenerEventV2s)
+                .OnProperty(eventAddressV2 => eventAddressV2.EventListenerV2s)
+                    .IgnoreIt()
+
+                .OnProperty(eventAddressV2 => eventAddressV2.ListenerEventV2s)
                     .IgnoreIt();
 
             return filler;

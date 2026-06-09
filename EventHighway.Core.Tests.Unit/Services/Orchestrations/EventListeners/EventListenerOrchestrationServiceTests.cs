@@ -96,7 +96,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners
             var filler = new Filler<Event>();
 
             filler.Setup()
-                .OnType<DateTimeOffset>().Use(GetRandomDateTime());
+                .OnType<DateTimeOffset>().Use(GetRandomDateTime())
+
+                .OnProperty(@event => @event.EventAddress)
+                    .IgnoreIt()
+
+                .OnProperty(@event => @event.ListenerEvents)
+                    .IgnoreIt();
 
             return filler;
         }
@@ -106,7 +112,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners
             var filler = new Filler<EventListener>();
 
             filler.Setup()
-                .OnType<DateTimeOffset>().Use(GetRandomDateTime);
+                .OnType<DateTimeOffset>().Use(GetRandomDateTime)
+
+                .OnProperty(eventListener => eventListener.EventAddress)
+                    .IgnoreIt()
+
+                .OnProperty(eventListener => eventListener.ListenerEvents)
+                    .IgnoreIt();
 
             return filler;
         }
