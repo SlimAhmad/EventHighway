@@ -2,12 +2,15 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.EventHandlers.Brokers.Apis;
 using EventHighway.EventHandlers.Servies.Rest;
 using Moq;
 using Tynamix.ObjectFiller;
+using Xeptions;
 
 namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
 {
@@ -45,5 +48,8 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
                 { "url", url },
                 { "secret", secret }
             };
+
+        private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
+            actualException => actualException.SameExceptionAs(expectedException);
     }
 }
