@@ -12,8 +12,14 @@ namespace EventHighway.Core.Brokers.Storages
 {
     internal partial interface IStorageBroker
     {
-        ValueTask<EventAddress> InsertEventAddressAsync(EventAddress eventAddress, CancellationToken cancellationToken = default);
+        ValueTask<EventAddress> InsertEventAddressAsync(
+            EventAddress eventAddress,
+            CancellationToken cancellationToken = default);
+
         ValueTask<IQueryable<EventAddress>> SelectAllEventAddressesAsync();
-        ValueTask<EventAddress> SelectEventAddressByIdAsync(Guid eventAddressId, CancellationToken cancellationToken = default);
+
+        ValueTask<EventAddress> SelectEventAddressByIdAsync(
+            Guid eventAddressId,
+            CancellationToken cancellationToken = default);
     }
 }
