@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using EventHighway.Abstractions.EventHandlers;
+using EventHighway.EventHandlers.Models.Foundations.Rest.Exceptions;
 using EventHighway.EventHandlers.Services.Rest;
 using Moq;
 using Tynamix.ObjectFiller;
@@ -45,6 +46,30 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.RestSecretEventHandlers
                 { "Url", GetRandomString() },
                 { "Secret", GetRandomString() }
             };
+
+        public static TheoryData<Xeption> RestSecretValidationExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+
+            return new TheoryData<Xeption>
+            {
+                new RestServiceValidationException(someMessage, someInnerException),
+                new RestServiceDependencyValidationException(someMessage, someInnerException),
+            };
+        }
+
+        public static TheoryData<Xeption> RestSecretDependencyExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+
+            return new TheoryData<Xeption>
+            {
+                new RestServiceDependencyException(someMessage, someInnerException),
+                new RestServiceException(someMessage, someInnerException),
+            };
+        }
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
