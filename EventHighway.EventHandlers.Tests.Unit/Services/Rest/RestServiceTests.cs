@@ -4,7 +4,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.EventHandlers.Brokers.Apis;
 using EventHighway.EventHandlers.Services.Rest;
@@ -59,6 +61,27 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
                 new HttpResponseForbiddenException(),
                 new HttpResponseMethodNotAllowedException()
             };
+
+        private static HttpResponseBadRequestException CreateHttpBadRequestException()
+        {
+            var httpResponseMessage = new HttpResponseMessage();
+            var randomDictionary = new Dictionary<string, List<string>>();
+
+            Enumerable.Range(start: 0, count: new IntRange(min: 2, max: 9).GetValue())
+                .ToList().ForEach(_ => randomDictionary.TryAdd(
+                    key: GetRandomString(),
+                    value: Enumerable.Range(start: 0, count: new IntRange(min: 2, max: 9).GetValue())
+                        .Select(_ => GetRandomString()).ToList()));
+
+            var httpResponseBadRequestException =
+                new HttpResponseBadRequestException(
+                    httpResponseMessage,
+                    GetRandomString());
+
+            httpResponseBadRequestException.AddData(randomDictionary);
+
+            return httpResponseBadRequestException;
+        }
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
