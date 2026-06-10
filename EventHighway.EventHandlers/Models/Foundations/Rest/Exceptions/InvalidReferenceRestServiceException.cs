@@ -8,7 +8,7 @@ using Xeptions;
 
 namespace EventHighway.EventHandlers.Models.Foundations.Rest.Exceptions
 {
-    internal class InvalidReferenceRestServiceException : Xeption
+    public class InvalidReferenceRestServiceException : Xeption
     {
         public InvalidReferenceRestServiceException(string message, Exception innerException, IDictionary data)
             : base(message, innerException, data)

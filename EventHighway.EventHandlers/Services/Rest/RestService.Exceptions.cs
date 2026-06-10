@@ -112,15 +112,15 @@ namespace EventHighway.EventHandlers.Servies.Rest
 
         private static RestServiceException CreateServiceException(Exception exception)
         {
-            var failedRestServiceServiceException =
-                new FailedRestServiceServiceException(
-                    message: "Failed rest service service error occurred, contact support.",
+            var failedRestServiceException =
+                new FailedRestServiceException(
+                    message: "Failed rest service error occurred, contact support.",
                     innerException: exception,
                     data: exception.Data);
 
             return new RestServiceException(
                 message: "Rest service error occurred, contact support.",
-                innerException: failedRestServiceServiceException);
+                innerException: failedRestServiceException);
         }
 
         private static RestServiceDependencyException CreateFailedDependencyException(Xeption exception)

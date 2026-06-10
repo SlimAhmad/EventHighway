@@ -320,8 +320,8 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedRestServiceServiceException =
-                new FailedRestServiceServiceException(
-                    message: "Failed rest service service error occurred, contact support.",
+                new FailedRestServiceException(
+                    message: "Failed rest service error occurred, contact support.",
                     innerException: serviceException,
                     data: serviceException.Data);
 
