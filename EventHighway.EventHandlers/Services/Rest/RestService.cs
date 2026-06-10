@@ -49,6 +49,25 @@ namespace EventHighway.EventHandlers.Servies.Rest
             string content,
             IReadOnlyDictionary<string, string> handlerParams,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            HttpResponseMessage response =
+                await this.apiBroker.PostWithBearerTokenAsync(
+                    content,
+                    url: handlerParams["url"],
+                    clientId: handlerParams["clientId"],
+                    clientSecret: handlerParams["clientSecret"],
+                    scope: handlerParams["scope"],
+                    grantType: handlerParams["grantType"],
+                    tokenUrl: handlerParams["tokenUrl"]);
+
+            return new EventHandlerResult
+            {
+                Response = await response.Content.ReadAsStringAsync(cancellationToken),
+                ResponseCode = ((int)response.StatusCode).ToString(),
+                ResponseMessage = response.ReasonPhrase,
+                IsSuccess = response.IsSuccessStatusCode
+            };
+        });
     }
 }
