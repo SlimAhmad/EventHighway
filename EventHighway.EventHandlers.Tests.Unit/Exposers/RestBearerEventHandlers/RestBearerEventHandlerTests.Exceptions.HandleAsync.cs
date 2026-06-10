@@ -60,5 +60,53 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.RestBearerEventHandlers
 
             this.restServiceMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(RestBearerDependencyExceptions))]
+        public async Task ShouldThrowDependencyExceptionOnHandleIfDependencyErrorOccursAsync(
+            Xeption dependencyException)
+        {
+            // given
+            string randomContent = GetRandomString();
+            var randomHandlerParams = CreateRandomHandlerParams();
+
+            var expectedRestBearerEventHandlerDependencyException =
+                new RestBearerEventHandlerDependencyException(
+                    message: "Rest bearer event handler dependency error occurred, contact support.",
+                    innerException: dependencyException.InnerException as Xeption,
+                    data: (dependencyException.InnerException as Xeption).Data);
+
+            this.restServiceMock.Setup(service =>
+                service.PostWithBearerTokenAsync(
+                    randomContent,
+                    randomHandlerParams,
+                    TestContext.Current.CancellationToken))
+                        .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask<EventHandlerResult> handleTask =
+                this.restBearerEventHandler.HandleAsync(
+                    content: randomContent,
+                    handlerParams: randomHandlerParams,
+                    cancellationToken: TestContext.Current.CancellationToken);
+
+            RestBearerEventHandlerDependencyException
+                actualRestBearerEventHandlerDependencyException =
+                    await Assert.ThrowsAsync<RestBearerEventHandlerDependencyException>(
+                        handleTask.AsTask);
+
+            // then
+            actualRestBearerEventHandlerDependencyException.Should()
+                .BeEquivalentTo(expectedRestBearerEventHandlerDependencyException);
+
+            this.restServiceMock.Verify(service =>
+                service.PostWithBearerTokenAsync(
+                    randomContent,
+                    randomHandlerParams,
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.restServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
