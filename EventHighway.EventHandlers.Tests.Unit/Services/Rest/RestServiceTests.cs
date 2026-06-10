@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.EventHandlers.Brokers.Apis;
+using EventHighway.EventHandlers.Services.Rest;
 using EventHighway.EventHandlers.Servies.Rest;
 using Moq;
+using RESTFulSense.Exceptions;
 using Tynamix.ObjectFiller;
 using Xeptions;
 
@@ -47,6 +49,15 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
             {
                 { "url", url },
                 { "secret", secret }
+            };
+
+        public static TheoryData<Xeption> CriticalDependencyExceptions() =>
+            new TheoryData<Xeption>
+            {
+                new HttpResponseUrlNotFoundException(),
+                new HttpResponseUnauthorizedException(),
+                new HttpResponseForbiddenException(),
+                new HttpResponseMethodNotAllowedException()
             };
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>

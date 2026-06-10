@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 
-namespace EventHighway.EventHandlers.Servies.Rest
+namespace EventHighway.EventHandlers.Services.Rest
 {
     internal interface IRestService
     {

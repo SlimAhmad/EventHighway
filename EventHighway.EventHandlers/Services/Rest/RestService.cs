@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.EventHandlers.Brokers.Apis;
+using EventHighway.EventHandlers.Services.Rest;
 
 namespace EventHighway.EventHandlers.Servies.Rest
 {
