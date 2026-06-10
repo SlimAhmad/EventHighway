@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.EventHandlers.Models.Foundations.Rest.Exceptions;
@@ -57,6 +58,10 @@ namespace EventHighway.EventHandlers.Servies.Rest
             {
                 throw CreateFailedDependencyException(httpResponseException);
             }
+            catch (Exception serviceException)
+            {
+                throw CreateServiceException(serviceException);
+            }
         }
 
         private static RestServiceValidationException CreateValidationException(Xeption exception) =>
@@ -103,6 +108,19 @@ namespace EventHighway.EventHandlers.Servies.Rest
             return new RestServiceDependencyValidationException(
                 message: "Rest service dependency validation error occurred, fix the errors and try again.",
                 innerException: invalidRestServiceException);
+        }
+
+        private static RestServiceException CreateServiceException(Exception exception)
+        {
+            var failedRestServiceServiceException =
+                new FailedRestServiceServiceException(
+                    message: "Failed rest service service error occurred, contact support.",
+                    innerException: exception,
+                    data: exception.Data);
+
+            return new RestServiceException(
+                message: "Rest service error occurred, contact support.",
+                innerException: failedRestServiceServiceException);
         }
 
         private static RestServiceDependencyException CreateFailedDependencyException(Xeption exception)

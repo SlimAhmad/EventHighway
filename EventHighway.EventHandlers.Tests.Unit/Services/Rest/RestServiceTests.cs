@@ -53,14 +53,28 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
                 { "secret", secret }
             };
 
-        public static TheoryData<Xeption> CriticalDependencyExceptions() =>
-            new TheoryData<Xeption>
+        public static TheoryData<Xeption> CriticalDependencyExceptions()
+        {
+            var urlNotFoundException = new HttpResponseUrlNotFoundException();
+            urlNotFoundException.Data.Add("ErrorCode", new List<string> { "UrlNotFound" });
+
+            var unauthorizedException = new HttpResponseUnauthorizedException();
+            unauthorizedException.Data.Add("ErrorCode", new List<string> { "Unauthorized" });
+
+            var forbiddenException = new HttpResponseForbiddenException();
+            forbiddenException.Data.Add("ErrorCode", new List<string> { "Forbidden" });
+
+            var methodNotAllowedException = new HttpResponseMethodNotAllowedException();
+            methodNotAllowedException.Data.Add("ErrorCode", new List<string> { "MethodNotAllowed" });
+
+            return new TheoryData<Xeption>
             {
-                new HttpResponseUrlNotFoundException(),
-                new HttpResponseUnauthorizedException(),
-                new HttpResponseForbiddenException(),
-                new HttpResponseMethodNotAllowedException()
+                urlNotFoundException,
+                unauthorizedException,
+                forbiddenException,
+                methodNotAllowedException
             };
+        }
 
         private static HttpResponseBadRequestException CreateHttpBadRequestException()
         {

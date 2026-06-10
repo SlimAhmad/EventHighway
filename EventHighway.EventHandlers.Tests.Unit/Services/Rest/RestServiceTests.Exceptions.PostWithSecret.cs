@@ -203,6 +203,10 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
             var httpResponseFailedDependencyException =
                 new HttpResponseFailedDependencyException();
 
+            httpResponseFailedDependencyException.Data.Add(
+                "ErrorCode",
+                new List<string> { "FailedDependency" });
+
             var invalidReferenceRestServiceException =
                 new InvalidReferenceRestServiceException(
                     message: "Invalid rest service reference error occurred, fix the errors and try again.",
