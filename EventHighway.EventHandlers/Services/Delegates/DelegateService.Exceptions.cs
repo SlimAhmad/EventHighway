@@ -25,10 +25,6 @@ namespace EventHighway.EventHandlers.Services.Delegates
             {
                 throw CreateValidationException(invalidDelegateServiceException);
             }
-            catch (Exception exception)
-            {
-                throw CreateServiceException(exception);
-            }
         }
 
         private static DelegateServiceValidationException CreateValidationException(
