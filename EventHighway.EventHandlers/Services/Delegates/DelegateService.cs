@@ -24,12 +24,15 @@ namespace EventHighway.EventHandlers.Services.Delegates
             this.handler = handler;
         }
 
-        public virtual async ValueTask<EventHandlerResult> InvokeAsync(
+        public virtual ValueTask<EventHandlerResult> InvokeAsync(
             string content,
             IReadOnlyDictionary<string, string> handlerParams,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateInvokeParams(content, this.handler);
+
             return await this.handler(content, handlerParams, cancellationToken);
-        }
+        });
     }
 }
