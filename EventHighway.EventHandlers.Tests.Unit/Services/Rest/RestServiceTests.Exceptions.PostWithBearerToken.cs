@@ -1,0 +1,84 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System.Threading.Tasks;
+using EventHighway.Abstractions.EventHandlers;
+using EventHighway.EventHandlers.Models.Foundations.Rest.Exceptions;
+using FluentAssertions;
+using Moq;
+using Xeptions;
+
+namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
+{
+    public partial class RestServiceTests
+    {
+        [Theory]
+        [MemberData(nameof(CriticalDependencyExceptions))]
+        public async Task
+            ShouldThrowCriticalDependencyExceptionOnPostWithBearerTokenIfCriticalDependencyErrorOccursAndLogItAsync(
+                Xeption criticalDependencyException)
+        {
+            // given
+            string randomContent = GetRandomString();
+
+            var someHandlerParams = CreateBearerTokenHandlerParams(
+                url: GetRandomString(),
+                clientId: GetRandomString(),
+                clientSecret: GetRandomString(),
+                scope: GetRandomString(),
+                grantType: GetRandomString(),
+                tokenUrl: GetRandomString());
+
+            var failedRestServiceException =
+                new FailedRestServiceException(
+                    message: "Failed rest service error occurred, contact support.",
+                    innerException: criticalDependencyException,
+                    data: criticalDependencyException.Data);
+
+            var expectedRestServiceDependencyException =
+                new RestServiceDependencyException(
+                    message: "Rest service dependency error occurred, contact support.",
+                    innerException: failedRestServiceException);
+
+            this.apiBrokerMock.Setup(broker =>
+                broker.PostWithBearerTokenAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                        .ThrowsAsync(criticalDependencyException);
+
+            // when
+            ValueTask<EventHandlerResult> postWithBearerTokenTask =
+                this.restService.PostWithBearerTokenAsync(
+                    content: randomContent,
+                    handlerParams: someHandlerParams,
+                    cancellationToken: TestContext.Current.CancellationToken);
+
+            RestServiceDependencyException actualRestServiceDependencyException =
+                await Assert.ThrowsAsync<RestServiceDependencyException>(
+                    postWithBearerTokenTask.AsTask);
+
+            // then
+            actualRestServiceDependencyException.Should()
+                .BeEquivalentTo(expectedRestServiceDependencyException);
+
+            this.apiBrokerMock.Verify(broker =>
+                broker.PostWithBearerTokenAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()),
+                        Times.Once);
+
+            this.apiBrokerMock.VerifyNoOtherCalls();
+        }
+    }
+}
