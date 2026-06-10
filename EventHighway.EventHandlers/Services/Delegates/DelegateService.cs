@@ -29,7 +29,7 @@ namespace EventHighway.EventHandlers.Services.Delegates
             IReadOnlyDictionary<string, string> handlerParams,
             CancellationToken cancellationToken = default)
         {
-            return null;
+            return await this.handler(content, handlerParams, cancellationToken);
         }
     }
 }
