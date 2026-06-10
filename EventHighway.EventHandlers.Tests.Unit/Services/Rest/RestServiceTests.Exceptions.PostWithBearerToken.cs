@@ -222,5 +222,77 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
 
             this.apiBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyValidationExceptionOnPostWithBearerTokenIfFailedDependencyErrorOccursAndLogItAsync()
+        {
+            // given
+            string randomContent = GetRandomString();
+
+            var someHandlerParams = CreateBearerTokenHandlerParams(
+                url: GetRandomString(),
+                clientId: GetRandomString(),
+                clientSecret: GetRandomString(),
+                scope: GetRandomString(),
+                grantType: GetRandomString(),
+                tokenUrl: GetRandomString());
+
+            var httpResponseFailedDependencyException =
+                new HttpResponseFailedDependencyException();
+
+            httpResponseFailedDependencyException.Data.Add(
+                "ErrorCode",
+                new List<string> { "FailedDependency" });
+
+            var invalidReferenceRestServiceException =
+                new InvalidReferenceRestServiceException(
+                    message: "Invalid rest service reference error occurred, fix the errors and try again.",
+                    innerException: httpResponseFailedDependencyException,
+                    data: httpResponseFailedDependencyException.Data);
+
+            var expectedRestServiceDependencyValidationException =
+                new RestServiceDependencyValidationException(
+                    message: "Rest service dependency validation error occurred, fix the errors and try again.",
+                    innerException: invalidReferenceRestServiceException);
+
+            this.apiBrokerMock.Setup(broker =>
+                broker.PostWithBearerTokenAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                        .ThrowsAsync(httpResponseFailedDependencyException);
+
+            // when
+            ValueTask<EventHandlerResult> postWithBearerTokenTask =
+                this.restService.PostWithBearerTokenAsync(
+                    content: randomContent,
+                    handlerParams: someHandlerParams,
+                    cancellationToken: TestContext.Current.CancellationToken);
+
+            RestServiceDependencyValidationException actualRestServiceDependencyValidationException =
+                await Assert.ThrowsAsync<RestServiceDependencyValidationException>(
+                    postWithBearerTokenTask.AsTask);
+
+            // then
+            actualRestServiceDependencyValidationException.Should()
+                .BeEquivalentTo(expectedRestServiceDependencyValidationException);
+
+            this.apiBrokerMock.Verify(broker =>
+                broker.PostWithBearerTokenAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()),
+                        Times.Once);
+
+            this.apiBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
