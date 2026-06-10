@@ -60,5 +60,53 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.RestSecretEventHandlers
 
             this.restServiceMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(RestSecretDependencyExceptions))]
+        public async Task ShouldThrowDependencyExceptionOnHandleIfDependencyErrorOccursAsync(
+            Xeption dependencyException)
+        {
+            // given
+            string randomContent = GetRandomString();
+            var randomHandlerParams = CreateRandomHandlerParams();
+
+            var expectedRestSecretEventHandlerDependencyException =
+                new RestSecretEventHandlerDependencyException(
+                    message: "Rest secret event handler dependency error occurred, contact support.",
+                    innerException: dependencyException.InnerException as Xeption,
+                    data: (dependencyException.InnerException as Xeption).Data);
+
+            this.restServiceMock.Setup(service =>
+                service.PostWithSecretAsync(
+                    randomContent,
+                    randomHandlerParams,
+                    TestContext.Current.CancellationToken))
+                        .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask<EventHandlerResult> handleTask =
+                this.restSecretEventHandler.HandleAsync(
+                    content: randomContent,
+                    handlerParams: randomHandlerParams,
+                    cancellationToken: TestContext.Current.CancellationToken);
+
+            RestSecretEventHandlerDependencyException
+                actualRestSecretEventHandlerDependencyException =
+                    await Assert.ThrowsAsync<RestSecretEventHandlerDependencyException>(
+                        handleTask.AsTask);
+
+            // then
+            actualRestSecretEventHandlerDependencyException.Should()
+                .BeEquivalentTo(expectedRestSecretEventHandlerDependencyException);
+
+            this.restServiceMock.Verify(service =>
+                service.PostWithSecretAsync(
+                    randomContent,
+                    randomHandlerParams,
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.restServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
