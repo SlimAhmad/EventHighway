@@ -51,6 +51,8 @@ namespace EventHighway.EventHandlers.Servies.Rest
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            ValidatePostWithBearerTokenParams(content, handlerParams);
+
             HttpResponseMessage response =
                 await this.apiBroker.PostWithBearerTokenAsync(
                     content,
