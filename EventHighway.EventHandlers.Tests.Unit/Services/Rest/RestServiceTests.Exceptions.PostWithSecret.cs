@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
@@ -290,6 +291,62 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
             // then
             actualRestServiceDependencyException.Should()
                 .BeEquivalentTo(expectedRestServiceDependencyException);
+
+            this.apiBrokerMock.Verify(broker =>
+                broker.PostWithSecretAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()),
+                        Times.Once);
+
+            this.apiBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnPostWithSecretIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            string randomContent = GetRandomString();
+
+            var someHandlerParams = CreateSecretHandlerParams(
+                url: GetRandomString(),
+                secret: GetRandomString());
+
+            var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedRestServiceServiceException =
+                new FailedRestServiceServiceException(
+                    message: "Failed rest service service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedRestServiceException =
+                new RestServiceException(
+                    message: "Rest service error occurred, contact support.",
+                    innerException: failedRestServiceServiceException);
+
+            this.apiBrokerMock.Setup(broker =>
+                broker.PostWithSecretAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<EventHandlerResult> postWithSecretTask =
+                this.restService.PostWithSecretAsync(
+                    content: randomContent,
+                    handlerParams: someHandlerParams,
+                    cancellationToken: TestContext.Current.CancellationToken);
+
+            RestServiceException actualRestServiceException =
+                await Assert.ThrowsAsync<RestServiceException>(
+                    postWithSecretTask.AsTask);
+
+            // then
+            actualRestServiceException.Should()
+                .BeEquivalentTo(expectedRestServiceException);
 
             this.apiBrokerMock.Verify(broker =>
                 broker.PostWithSecretAsync(
