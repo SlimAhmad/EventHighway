@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
@@ -348,6 +349,74 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
             // then
             actualRestServiceDependencyException.Should()
                 .BeEquivalentTo(expectedRestServiceDependencyException);
+
+            this.apiBrokerMock.Verify(broker =>
+                broker.PostWithBearerTokenAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()),
+                        Times.Once);
+
+            this.apiBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnPostWithBearerTokenIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            string randomContent = GetRandomString();
+
+            var someHandlerParams = CreateBearerTokenHandlerParams(
+                url: GetRandomString(),
+                clientId: GetRandomString(),
+                clientSecret: GetRandomString(),
+                scope: GetRandomString(),
+                grantType: GetRandomString(),
+                tokenUrl: GetRandomString());
+
+            var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedRestServiceServiceException =
+                new FailedRestServiceServiceException(
+                    message: "Failed rest service service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedRestServiceException =
+                new RestServiceException(
+                    message: "Rest service error occurred, contact support.",
+                    innerException: failedRestServiceServiceException);
+
+            this.apiBrokerMock.Setup(broker =>
+                broker.PostWithBearerTokenAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<EventHandlerResult> postWithBearerTokenTask =
+                this.restService.PostWithBearerTokenAsync(
+                    content: randomContent,
+                    handlerParams: someHandlerParams,
+                    cancellationToken: TestContext.Current.CancellationToken);
+
+            RestServiceException actualRestServiceException =
+                await Assert.ThrowsAsync<RestServiceException>(
+                    postWithBearerTokenTask.AsTask);
+
+            // then
+            actualRestServiceException.Should()
+                .BeEquivalentTo(expectedRestServiceException);
 
             this.apiBrokerMock.Verify(broker =>
                 broker.PostWithBearerTokenAsync(
