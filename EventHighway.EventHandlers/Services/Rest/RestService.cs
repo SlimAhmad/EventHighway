@@ -28,13 +28,18 @@ namespace EventHighway.EventHandlers.Servies.Rest
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            ValidatePostWithSecretParams(content, handlerParams);
+            IReadOnlyDictionary<string, string> normalizedParams =
+                handlerParams is not null
+                    ? new Dictionary<string, string>(handlerParams, StringComparer.OrdinalIgnoreCase)
+                    : null;
+
+            ValidatePostWithSecretParams(content, normalizedParams);
 
             HttpResponseMessage response =
                 await this.apiBroker.PostWithSecretAsync(
                     content,
-                    url: handlerParams["url"],
-                    secret: handlerParams["secret"]);
+                    url: normalizedParams["Url"],
+                    secret: normalizedParams["Secret"]);
 
             return new EventHandlerResult
             {
@@ -51,17 +56,22 @@ namespace EventHighway.EventHandlers.Servies.Rest
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            ValidatePostWithBearerTokenParams(content, handlerParams);
+            IReadOnlyDictionary<string, string> normalizedParams =
+                handlerParams is not null
+                    ? new Dictionary<string, string>(handlerParams, StringComparer.OrdinalIgnoreCase)
+                    : null;
+
+            ValidatePostWithBearerTokenParams(content, normalizedParams);
 
             HttpResponseMessage response =
                 await this.apiBroker.PostWithBearerTokenAsync(
                     content,
-                    url: handlerParams["url"],
-                    clientId: handlerParams["clientId"],
-                    clientSecret: handlerParams["clientSecret"],
-                    scope: handlerParams["scope"],
-                    grantType: handlerParams["grantType"],
-                    tokenUrl: handlerParams["tokenUrl"]);
+                    url: normalizedParams["Url"],
+                    clientId: normalizedParams["ClientId"],
+                    clientSecret: normalizedParams["ClientSecret"],
+                    scope: normalizedParams["Scope"],
+                    grantType: normalizedParams["GrantType"],
+                    tokenUrl: normalizedParams["TokenUrl"]);
 
             return new EventHandlerResult
             {
