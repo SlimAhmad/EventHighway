@@ -53,6 +53,10 @@ namespace EventHighway.EventHandlers.Servies.Rest
             {
                 throw CreateInvalidReferenceDependencyValidationException(httpResponseFailedDependencyException);
             }
+            catch (HttpResponseException httpResponseException)
+            {
+                throw CreateFailedDependencyException(httpResponseException);
+            }
         }
 
         private static RestServiceValidationException CreateValidationException(Xeption exception) =>
@@ -99,6 +103,19 @@ namespace EventHighway.EventHandlers.Servies.Rest
             return new RestServiceDependencyValidationException(
                 message: "Rest service dependency validation error occurred, fix the errors and try again.",
                 innerException: invalidRestServiceException);
+        }
+
+        private static RestServiceDependencyException CreateFailedDependencyException(Xeption exception)
+        {
+            var failedRestServiceException =
+                new FailedRestServiceException(
+                    message: "Failed rest service error occurred, contact support.",
+                    innerException: exception,
+                    data: exception.Data);
+
+            return new RestServiceDependencyException(
+                message: "Rest service dependency error occurred, contact support.",
+                innerException: failedRestServiceException);
         }
 
         private static RestServiceDependencyValidationException CreateInvalidReferenceDependencyValidationException(
