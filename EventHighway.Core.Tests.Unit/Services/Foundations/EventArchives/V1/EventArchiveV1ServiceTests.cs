@@ -43,20 +43,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
         private static SqlException CreateSqlException() =>
             (SqlException)RuntimeHelpers.GetUninitializedObject(type: typeof(SqlException));
 
-        public static TheoryData<int> MinutesBeforeAndAfterNow()
-        {
-            int randomMoreThanOneMinuteAhead =
-                GetRandomNumber();
-
-            int randomMoreThanOneMinuteAgo =
-                GetRandomNegativeNumber();
-
-            return new TheoryData<int>
-            {
-                randomMoreThanOneMinuteAhead,
-                randomMoreThanOneMinuteAgo
-            };
-        }
 
         private static Guid GetRandomId() =>
             Guid.NewGuid();
@@ -116,7 +102,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
                 .OnType<DateTimeOffset>().Use(date)
 
                 .OnType<DateTimeOffset?>().Use(
-                    GetRandomDateTimeOffset());
+                    GetRandomDateTimeOffset())
+
+                .OnProperty(eventArchiveV1 => eventArchiveV1.ListenerEventArchiveV1s)
+                    .IgnoreIt();
 
             return filler;
         }
