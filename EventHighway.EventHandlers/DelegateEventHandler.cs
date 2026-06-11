@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
+using EventHighway.EventHandlers.Models.Exposers.DelegateEventHandlers.Exceptions;
+using EventHighway.EventHandlers.Models.Foundations.Delegates.Exceptions;
 using EventHighway.EventHandlers.Services.Delegates;
+using Xeptions;
 
 namespace EventHighway.EventHandlers
 {
@@ -30,7 +33,46 @@ namespace EventHighway.EventHandlers
             IReadOnlyDictionary<string, string> handlerParams,
             CancellationToken cancellationToken = default)
         {
-            return await this.delegateService.InvokeAsync(content, handlerParams, cancellationToken);
+            try
+            {
+                return await this.delegateService.InvokeAsync(content, handlerParams, cancellationToken);
+            }
+            catch (DelegateServiceValidationException delegateServiceValidationException)
+            {
+                throw CreateValidationException(
+                    delegateServiceValidationException.InnerException as Xeption);
+            }
+            catch (DelegateServiceException delegateServiceException)
+            {
+                throw CreateDependencyException(
+                    delegateServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateServiceException(
+                    exception.InnerException as Xeption);
+            }
         }
+
+        private static DelegateEventHandlerValidationException CreateValidationException(
+            Xeption innerException) =>
+            new DelegateEventHandlerValidationException(
+                message: "Delegate event handler validation error occurred, fix errors and try again.",
+                innerException,
+                data: innerException.Data);
+
+        private static DelegateEventHandlerDependencyException CreateDependencyException(
+            Xeption innerException) =>
+            new DelegateEventHandlerDependencyException(
+                message: "Delegate event handler dependency error occurred, contact support.",
+                innerException,
+                data: innerException.Data);
+
+        private static DelegateEventHandlerServiceException CreateServiceException(
+            Xeption innerException) =>
+            new DelegateEventHandlerServiceException(
+                message: "Delegate event handler service error occurred, contact support.",
+                innerException,
+                data: innerException.Data);
     }
 }
