@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -42,7 +43,8 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             IReadOnlyDictionary<string, string> handlerParams =
                 eventCallV2.HandlerConfigurations.ToDictionary(
                     handlerConfiguration => handlerConfiguration.Name,
-                    handlerConfiguration => handlerConfiguration.Value);
+                    handlerConfiguration => handlerConfiguration.Value,
+                    StringComparer.OrdinalIgnoreCase);
 
             EventHandlerResult result =
                 await handler.HandleAsync(
