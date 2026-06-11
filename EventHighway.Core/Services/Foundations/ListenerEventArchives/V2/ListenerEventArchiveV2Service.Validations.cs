@@ -1,0 +1,121 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
+
+namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
+{
+    internal partial class ListenerEventArchiveV2Service
+    {
+        private async ValueTask ValidateListenerEventArchiveV2OnAddAsync(
+            ListenerEventArchiveV2 listenerEventArchiveV2)
+        {
+            ValidateListenerEventArchiveV2IsNotNull(listenerEventArchiveV2);
+
+            Validate(
+                message: "Listener event archive is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(listenerEventArchiveV2.Id),
+                Parameter: nameof(ListenerEventArchiveV2.Id)),
+
+                (Rule: IsInvalid(listenerEventArchiveV2.EventId),
+                Parameter: nameof(ListenerEventArchiveV2.EventId)),
+
+                (Rule: IsInvalid(listenerEventArchiveV2.EventAddressId),
+                Parameter: nameof(ListenerEventArchiveV2.EventAddressId)),
+
+                (Rule: IsInvalid(listenerEventArchiveV2.EventListenerId),
+                Parameter: nameof(ListenerEventArchiveV2.EventListenerId)),
+
+                (Rule: IsInvalid(listenerEventArchiveV2.Status),
+                Parameter: nameof(ListenerEventArchiveV2.Status)),
+
+                (Rule: IsInvalid(listenerEventArchiveV2.CreatedDate),
+                Parameter: nameof(ListenerEventArchiveV2.CreatedDate)),
+
+                (Rule: IsInvalid(listenerEventArchiveV2.UpdatedDate),
+                Parameter: nameof(ListenerEventArchiveV2.UpdatedDate)),
+
+                (Rule: IsInvalid(listenerEventArchiveV2.ArchivedDate),
+                Parameter: nameof(ListenerEventArchiveV2.ArchivedDate)),
+
+                (Rule: await IsNotRecentAsync(listenerEventArchiveV2.ArchivedDate),
+                Parameter: nameof(ListenerEventArchiveV2.ArchivedDate)));
+        }
+
+        private static void ValidateListenerEventArchiveV2IsNotNull(
+            ListenerEventArchiveV2 listenerEventArchiveV2)
+        {
+            if (listenerEventArchiveV2 is null)
+            {
+                throw new NullListenerEventArchiveV2Exception(
+                    message: "Listener event archive is null.");
+            }
+        }
+
+        private static dynamic IsInvalid(Guid id) => new
+        {
+            Condition = id == Guid.Empty,
+            Message = "Required"
+        };
+
+        private static dynamic IsInvalid(DateTimeOffset date) => new
+        {
+            Condition = date == default,
+            Message = "Required"
+        };
+
+        private static dynamic IsInvalid<T>(T value) => new
+        {
+            Condition = IsInvalidEnum(value) is true,
+            Message = "Value is not recognized"
+        };
+
+        private static bool IsInvalidEnum<T>(T enumValue)
+        {
+            bool isDefined = Enum.IsDefined(
+                enumType: typeof(T),
+                value: enumValue);
+
+            return isDefined is false;
+        }
+
+        private async ValueTask<dynamic> IsNotRecentAsync(DateTimeOffset date) => new
+        {
+            Condition = await IsDateNotRecentAsync(date),
+            Message = "Date is not recent"
+        };
+
+        private async ValueTask<bool> IsDateNotRecentAsync(DateTimeOffset date)
+        {
+            DateTimeOffset currentDateTime =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            TimeSpan timeDifference = currentDateTime.Subtract(value: date);
+
+            return timeDifference.TotalSeconds is > 60 or < 0;
+        }
+
+        private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
+        {
+            var invalidListenerEventArchiveV2Exception =
+                new InvalidListenerEventArchiveV2Exception(message);
+
+            foreach ((dynamic rule, string parameter) in validations)
+            {
+                if (rule.Condition)
+                {
+                    invalidListenerEventArchiveV2Exception.UpsertDataList(
+                        key: parameter,
+                        value: rule.Message);
+                }
+            }
+
+            invalidListenerEventArchiveV2Exception.ThrowIfContainsErrors();
+        }
+    }
+}
