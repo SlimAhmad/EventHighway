@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V1;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V1;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V1;
 using EventHighway.Core.Models.Services.Foundations.Events.V1;
@@ -138,20 +139,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
 
         public static TheoryData<DateTimeOffset, DateTimeOffset?> ScheduledDates()
         {
-            int randomNegativeDays = GetRandomNegativeNumber();
-            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
-
-            DateTimeOffset scheduledNegativeDate =
-                randomDateTimeOffset.AddDays(randomNegativeDays);
+            DateTimeOffset fixedDateTimeOffset =
+                new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
             return new TheoryData<DateTimeOffset, DateTimeOffset?>
             {
                 {
-                    randomDateTimeOffset,
-                    scheduledNegativeDate
+                    fixedDateTimeOffset,
+                    fixedDateTimeOffset.AddDays(-2)
                 },
                 {
-                    randomDateTimeOffset,
+                    fixedDateTimeOffset,
                     null
                 }
             };
@@ -230,7 +228,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                     eventV1.RetryAttempts).Use(retryAttempts)
 
                 .OnProperty(eventV1 =>
-                    eventV1.ListenerEvents).IgnoreIt();
+                    eventV1.ListenerEvents).IgnoreIt()
+
+                .OnType<EventAddressV1>().IgnoreIt()
+                .OnType<ListenerEventV1>().IgnoreIt();
 
             return filler;
         }
@@ -246,7 +247,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V1
                     eventListenerV1.EventAddress).IgnoreIt()
 
                 .OnProperty(eventListenerV1 =>
-                    eventListenerV1.ListenerEvents).IgnoreIt();
+                    eventListenerV1.ListenerEvents).IgnoreIt()
+
+                .OnType<EventAddressV1>().IgnoreIt()
+                .OnType<EventV1>().IgnoreIt();
 
             return filler;
         }

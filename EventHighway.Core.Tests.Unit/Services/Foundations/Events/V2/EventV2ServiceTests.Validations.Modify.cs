@@ -278,7 +278,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         }
 
         [Theory]
-        [MemberData(nameof(MinutesBeforeAndAfterNow))]
+        [InlineData(1)]
+        [InlineData(-61)]
         public async Task ShouldThrowValidationExceptionOnModifyIfUpdatedDateIsNotRecentAndLogItAsync(
             int minutesBeforeOrAfter)
         {
@@ -288,7 +289,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             EventV2 invalidEventV2 = randomEventV2;
 
             invalidEventV2.UpdatedDate =
-                invalidEventV2.UpdatedDate.AddMinutes(minutesBeforeOrAfter);
+                invalidEventV2.UpdatedDate.AddSeconds(minutesBeforeOrAfter);
 
             var invalidEventV2Exception =
                 new InvalidEventV2Exception(

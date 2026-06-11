@@ -9,7 +9,9 @@ using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V1;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V1;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V1;
 using EventHighway.Core.Services.Foundations.EventListeners.V1;
 using Microsoft.Data.SqlClient;
 using Moq;
@@ -40,20 +42,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 
-        public static TheoryData<int> MinutesBeforeAndAfterNow()
-        {
-            int randomMoreThanOneMinuteAhead =
-                GetRandomNumber();
-
-            int randomMoreThanOneMinuteAgo =
-                GetRandomNegativeNumber();
-
-            return new TheoryData<int>
-            {
-                randomMoreThanOneMinuteAhead,
-                randomMoreThanOneMinuteAgo
-            };
-        }
 
         private static SqlException GetSqlException()
         {
@@ -101,7 +89,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
                     eventListenerV1.EventAddress).IgnoreIt()
 
                 .OnProperty(eventListenerV1 =>
-                    eventListenerV1.ListenerEvents).IgnoreIt();
+                    eventListenerV1.ListenerEvents).IgnoreIt()
+
+                .OnType<EventAddressV1>().IgnoreIt()
+                .OnType<ListenerEventV1>().IgnoreIt();
 
             return filler;
         }

@@ -43,20 +43,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V1
         private static SqlException CreateSqlException() =>
             (SqlException)RuntimeHelpers.GetUninitializedObject(type: typeof(SqlException));
 
-        public static TheoryData<int> MinutesBeforeAndAfterNow()
-        {
-            int randomMoreThanOneMinuteAhead =
-                GetRandomNumber();
-
-            int randomMoreThanOneMinuteAgo =
-                GetRandomNegativeNumber();
-
-            return new TheoryData<int>
-            {
-                randomMoreThanOneMinuteAhead,
-                randomMoreThanOneMinuteAgo
-            };
-        }
 
         private static Guid GetRandomId() =>
             Guid.NewGuid();
