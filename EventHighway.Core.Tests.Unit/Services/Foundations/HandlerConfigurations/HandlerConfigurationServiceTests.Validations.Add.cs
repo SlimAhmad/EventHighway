@@ -235,7 +235,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
         }
 
         [Theory]
-        [MemberData(nameof(MinutesBeforeAndAfterNow))]
+        [InlineData(61)]
+        [InlineData(-61)]
         public async Task ShouldThrowValidationExceptionOnAddIfCreatedDateIsNotRecentAndLogItAsync(
             int minutesBeforeAndAfter)
         {
@@ -243,7 +244,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
             HandlerConfiguration randomHandlerConfiguration =
-                CreateRandomHandlerConfiguration(randomDateTimeOffset.AddMinutes(minutesBeforeAndAfter));
+                CreateRandomHandlerConfiguration(randomDateTimeOffset.AddSeconds(minutesBeforeAndAfter));
 
             HandlerConfiguration invalidHandlerConfiguration = randomHandlerConfiguration;
 

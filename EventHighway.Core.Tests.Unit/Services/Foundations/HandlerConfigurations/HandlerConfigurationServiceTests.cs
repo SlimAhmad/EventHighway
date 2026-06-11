@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Services.Foundations.HandlerConfigurations;
 using Microsoft.Data.SqlClient;
@@ -57,17 +58,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 
-        public static TheoryData<int> MinutesBeforeAndAfterNow()
-        {
-            int randomMoreThanOneMinuteAhead = GetRandomNumber();
-            int randomMoreThanOneMinuteAgo = -1 * GetRandomNumber();
-
-            return new TheoryData<int>
-            {
-                randomMoreThanOneMinuteAhead,
-                randomMoreThanOneMinuteAgo
-            };
-        }
 
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 9).GetValue();
@@ -91,7 +81,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.HandlerConfiguration
                 .OnType<DateTimeOffset?>().Use((DateTimeOffset?)GetRandomDateTimeOffset())
 
                 .OnProperty(handlerConfiguration => handlerConfiguration.EventListener)
-                    .IgnoreIt();
+                    .IgnoreIt()
+
+                .OnType<EventListenerV2>().IgnoreIt();
 
             return filler;
         }
