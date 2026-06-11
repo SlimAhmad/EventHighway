@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/EventHighway.Core/">
+    <Project Path="EventHighway.Abstractions/EventHighway.Abstractions.csproj" />
     <Project Path="EventHighway.Core.Tests.Acceptance/EventHighway.Core.Tests.Acceptance.csproj" />
     <Project Path="EventHighway.Core.Tests.Unit/EventHighway.Core.Tests.Unit.csproj" />
     <Project Path="EventHighway.Core/EventHighway.Core.csproj" />
@@ -9,7 +10,8 @@
     <Project Path="EventHighway.EventHandlers.Tests.Unit/EventHighway.EventHandlers.Tests.Unit.csproj" />
     <Project Path="EventHighway.EventHandlers/EventHighway.EventHandlers.csproj" />
   </Folder>
-  <Project Path="EventHighway.Abstractions/EventHighway.Abstractions.csproj" />
-  <Project Path="EventHighway.App/EventHighway.App.csproj" />
+  <Folder Name="/Samples/">
+    <Project Path="EventHighway.App/EventHighway.App.csproj" />
+  </Folder>
   <Project Path="EventHighway.Infrastructure/EventHighway.Infrastructure.csproj" />
 </Solution>
