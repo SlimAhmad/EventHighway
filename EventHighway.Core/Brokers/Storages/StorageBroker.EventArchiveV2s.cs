@@ -2,6 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
@@ -17,5 +19,18 @@ namespace EventHighway.Core.Brokers.Storages
             EventArchiveV2 eventArchiveV2,
             CancellationToken cancellationToken = default) =>
             await InsertAsync(eventArchiveV2, cancellationToken);
+
+        public async ValueTask<IQueryable<EventArchiveV2>> SelectAllEventArchiveV2sAsync() =>
+            SelectAll<EventArchiveV2>();
+
+        public async ValueTask<EventArchiveV2> SelectEventArchiveV2ByIdAsync(
+            Guid eventArchiveV2Id,
+            CancellationToken cancellationToken = default) =>
+            await SelectAsync<EventArchiveV2>(new object[] { eventArchiveV2Id }, cancellationToken);
+
+        public async ValueTask<EventArchiveV2> DeleteEventArchiveV2Async(
+            EventArchiveV2 eventArchiveV2,
+            CancellationToken cancellationToken = default) =>
+            await DeleteAsync(eventArchiveV2, cancellationToken);
     }
 }

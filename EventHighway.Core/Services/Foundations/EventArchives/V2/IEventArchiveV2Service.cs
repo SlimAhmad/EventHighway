@@ -8,22 +8,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 
-namespace EventHighway.Core.Brokers.Storages
+namespace EventHighway.Core.Services.Foundations.EventArchives.V2
 {
-    internal partial interface IStorageBroker
+    internal interface IEventArchiveV2Service
     {
-        ValueTask<EventArchiveV2> InsertEventArchiveV2Async(
+        ValueTask<EventArchiveV2> AddEventArchiveV2Async(
             EventArchiveV2 eventArchiveV2,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IQueryable<EventArchiveV2>> SelectAllEventArchiveV2sAsync();
+        ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync();
 
-        ValueTask<EventArchiveV2> SelectEventArchiveV2ByIdAsync(
+        ValueTask<EventArchiveV2> RetrieveEventArchiveV2ByIdAsync(
             Guid eventArchiveV2Id,
             CancellationToken cancellationToken = default);
 
-        ValueTask<EventArchiveV2> DeleteEventArchiveV2Async(
-            EventArchiveV2 eventArchiveV2,
+        ValueTask<EventArchiveV2> RemoveEventArchiveV2ByIdAsync(
+            Guid eventArchiveV2Id,
             CancellationToken cancellationToken = default);
     }
 }
