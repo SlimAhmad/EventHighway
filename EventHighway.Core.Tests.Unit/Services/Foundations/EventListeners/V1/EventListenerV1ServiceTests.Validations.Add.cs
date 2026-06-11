@@ -203,7 +203,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
         }
 
         [Theory]
-        [MemberData(nameof(MinutesBeforeAndAfterNow))]
+        [InlineData(1)]
+        [InlineData(-61)]
         public async Task ShouldThrowValidationExceptionOnAddIfCreatedDateIsNotRecentAndLogItAsync(
             int minutesBeforeAndAfter)
         {
@@ -212,7 +213,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V1
 
             EventListenerV1 randomEventListenerV1 =
                 CreateRandomEventListenerV1(randomDateTimeOffset
-                    .AddMinutes(minutesBeforeAndAfter));
+                    .AddSeconds(minutesBeforeAndAfter));
 
             EventListenerV1 invalidEventListenerV1 = randomEventListenerV1;
 
