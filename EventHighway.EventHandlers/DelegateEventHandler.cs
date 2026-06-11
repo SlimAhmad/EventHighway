@@ -30,7 +30,7 @@ namespace EventHighway.EventHandlers
             IReadOnlyDictionary<string, string> handlerParams,
             CancellationToken cancellationToken = default)
         {
-            return null;
+            return await this.delegateService.InvokeAsync(content, handlerParams, cancellationToken);
         }
     }
 }
