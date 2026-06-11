@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EventHighway.Core.Brokers.EventHandlers;
@@ -64,7 +65,9 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             {
                 HandlerConfiguration matchingConfig =
                     handlerConfigurations.FirstOrDefault(
-                        config => config.Name == requiredParam);
+                        config => config.Name.Equals(
+                            requiredParam,
+                            StringComparison.OrdinalIgnoreCase));
 
                 validations.Add(
                     (Rule: matchingConfig is null,

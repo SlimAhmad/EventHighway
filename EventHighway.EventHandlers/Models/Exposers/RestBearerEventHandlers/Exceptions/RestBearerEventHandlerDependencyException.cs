@@ -2,15 +2,15 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using System;
 using System.Collections;
+using EventHighway.Abstractions.EventHandlers.Exceptions;
 using Xeptions;
 
-namespace EventHighway.EventHandlers.Models.Foundations.Rest.Exceptions
+namespace EventHighway.EventHandlers.Models.Exposers.RestBearerEventHandlers.Exceptions
 {
-    internal class FailedRestServiceServiceException : Xeption
+    public class RestBearerEventHandlerDependencyException : Xeption, IEventHandlerDependencyException
     {
-        public FailedRestServiceServiceException(string message, Exception innerException, IDictionary data)
+        public RestBearerEventHandlerDependencyException(string message, Xeption innerException, IDictionary data)
             : base(message, innerException, data)
         { }
     }

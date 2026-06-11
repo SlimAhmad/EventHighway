@@ -53,6 +53,23 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Rest
                 { "secret", secret }
             };
 
+        private static IReadOnlyDictionary<string, string> CreateBearerTokenHandlerParams(
+            string url,
+            string clientId,
+            string clientSecret,
+            string scope,
+            string grantType,
+            string tokenUrl) =>
+            new Dictionary<string, string>
+            {
+                { "url", url },
+                { "clientId", clientId },
+                { "clientSecret", clientSecret },
+                { "scope", scope },
+                { "grantType", grantType },
+                { "tokenUrl", tokenUrl }
+            };
+
         public static TheoryData<Xeption> CriticalDependencyExceptions()
         {
             var urlNotFoundException = new HttpResponseUrlNotFoundException();

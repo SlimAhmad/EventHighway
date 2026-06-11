@@ -44,6 +44,73 @@ namespace EventHighway.EventHandlers.Servies.Rest
                 Message: "Value required"));
         }
 
+        private static void ValidatePostWithBearerTokenParams(
+            string content,
+            IReadOnlyDictionary<string, string> handlerParams)
+        {
+            Validate(
+                message: "Rest service params are invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(content),
+                Parameter: "content",
+                Message: "Text required"),
+
+                (Rule: handlerParams is null,
+                Parameter: "handlerParams",
+                Message: "Params required"));
+
+            Validate(
+                message: "Rest service params are invalid, fix the errors and try again.",
+
+                (Rule: !handlerParams.ContainsKey("url"),
+                Parameter: "url",
+                Message: "Config item required"),
+
+                (Rule: handlerParams.ContainsKey("url") && IsInvalid(handlerParams["url"]),
+                Parameter: "url",
+                Message: "Value required"),
+
+                (Rule: !handlerParams.ContainsKey("clientId"),
+                Parameter: "clientId",
+                Message: "Config item required"),
+
+                (Rule: handlerParams.ContainsKey("clientId") && IsInvalid(handlerParams["clientId"]),
+                Parameter: "clientId",
+                Message: "Value required"),
+
+                (Rule: !handlerParams.ContainsKey("clientSecret"),
+                Parameter: "clientSecret",
+                Message: "Config item required"),
+
+                (Rule: handlerParams.ContainsKey("clientSecret") && IsInvalid(handlerParams["clientSecret"]),
+                Parameter: "clientSecret",
+                Message: "Value required"),
+
+                (Rule: !handlerParams.ContainsKey("scope"),
+                Parameter: "scope",
+                Message: "Config item required"),
+
+                (Rule: handlerParams.ContainsKey("scope") && IsInvalid(handlerParams["scope"]),
+                Parameter: "scope",
+                Message: "Value required"),
+
+                (Rule: !handlerParams.ContainsKey("grantType"),
+                Parameter: "grantType",
+                Message: "Config item required"),
+
+                (Rule: handlerParams.ContainsKey("grantType") && IsInvalid(handlerParams["grantType"]),
+                Parameter: "grantType",
+                Message: "Value required"),
+
+                (Rule: !handlerParams.ContainsKey("tokenUrl"),
+                Parameter: "tokenUrl",
+                Message: "Config item required"),
+
+                (Rule: handlerParams.ContainsKey("tokenUrl") && IsInvalid(handlerParams["tokenUrl"]),
+                Parameter: "tokenUrl",
+                Message: "Value required"));
+        }
+
         private static bool IsInvalid(string text) =>
             string.IsNullOrWhiteSpace(text);
 
