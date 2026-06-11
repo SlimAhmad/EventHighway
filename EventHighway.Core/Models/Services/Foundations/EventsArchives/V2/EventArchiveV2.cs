@@ -17,6 +17,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventsArchives.V2
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset UpdatedDate { get; set; }
         public DateTimeOffset? ScheduledDate { get; set; }
+        public int RemainingRetryAttempts { get; set; }
         public DateTimeOffset ArchivedDate { get; set; }
 
         public Guid EventAddressId { get; set; }

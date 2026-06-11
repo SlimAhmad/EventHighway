@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using FluentAssertions;
 using Moq;
 
@@ -23,19 +24,35 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                     eventV2Type: EventTypeV2.Scheduled)
                         .ToList();
 
-            List<EventV2> randomImmediateEventV2s =
+            List<EventV2> randomImmediateEventV2sWithRetries =
                 CreateRandomEventV2s(
                     dates: GetRandomDateTimeOffset(),
                     eventV2Type: EventTypeV2.Immediate)
                         .ToList();
 
+            randomImmediateEventV2sWithRetries.ForEach(eventV2 =>
+                eventV2.RemainingRetryAttempts = GetRandomNumber());
+
+            List<EventV2> randomDeadEventV2s =
+                CreateRandomEventV2s(
+                    dates: GetRandomDateTimeOffset(),
+                    eventV2Type: EventTypeV2.Immediate)
+                        .ToList();
+
+            randomDeadEventV2s.ForEach(eventV2 =>
+            {
+                eventV2.RemainingRetryAttempts = 0;
+                eventV2.ListenerEventV2s = new List<ListenerEventV2>();
+            });
+
             IQueryable<EventV2> retrievedEventV2s =
-                randomScheduledEventV2s.Union(
-                    randomImmediateEventV2s)
+                randomScheduledEventV2s
+                    .Union(randomImmediateEventV2sWithRetries)
+                    .Union(randomDeadEventV2s)
                         .AsQueryable();
 
             IQueryable<EventV2> expectedEventV2s =
-                randomImmediateEventV2s.AsQueryable();
+                randomDeadEventV2s.AsQueryable();
 
             this.eventV2ServiceMock.Setup(service =>
                 service.RetrieveAllEventV2sWithListenerEventV2sAsync())

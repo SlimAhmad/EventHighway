@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.Events.V2;
 
 namespace EventHighway.Core.Services.Processings.Events.V2
@@ -57,7 +58,11 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             IQueryable<EventV2> eventV2s =
                 await this.eventV2Service.RetrieveAllEventV2sWithListenerEventV2sAsync();
 
-            return eventV2s.Where(eventV2 => eventV2.Type == EventTypeV2.Immediate);
+            return eventV2s.Where(eventV2 =>
+                eventV2.Type == EventTypeV2.Immediate
+                && eventV2.RemainingRetryAttempts == 0
+                && eventV2.ListenerEventV2s.All(listenerEvent =>
+                    listenerEvent.Status != ListenerEventStatusV2.Pending));
         });
 
         public ValueTask<EventV2> MarkEventV2AsImmediateAsync(EventV2 eventV2, CancellationToken cancellationToken = default) =>
