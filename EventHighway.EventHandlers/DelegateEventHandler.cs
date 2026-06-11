@@ -35,7 +35,7 @@ namespace EventHighway.EventHandlers
         {
             try
             {
-                return await this.delegateService.InvokeAsync(content, handlerParams, cancellationToken);
+                return await this.delegateService.InvokeAsync(content, null, cancellationToken);
             }
             catch (DelegateServiceValidationException delegateServiceValidationException)
             {
