@@ -21,6 +21,7 @@ using EventHighway.Core.Services.Foundations.EventAddresses.V1;
 using EventHighway.Core.Services.Foundations.EventArchives.V1;
 using EventHighway.Core.Services.Foundations.EventCalls;
 using EventHighway.Core.Services.Foundations.EventCalls.V1;
+using EventHighway.Core.Services.Foundations.EventCalls.V2;
 using EventHighway.Core.Services.Foundations.EventListeners;
 using EventHighway.Core.Services.Foundations.EventListeners.V1;
 using EventHighway.Core.Services.Foundations.Events;
@@ -36,6 +37,7 @@ using EventHighway.Core.Services.Orchestrations.Events.V1;
 using EventHighway.Core.Services.Processings.EventAddresses.V1;
 using EventHighway.Core.Services.Processings.EventCalls;
 using EventHighway.Core.Services.Processings.EventCalls.V1;
+using EventHighway.Core.Services.Processings.EventCalls.V2;
 using EventHighway.Core.Services.Processings.EventListeners;
 using EventHighway.Core.Services.Processings.EventListeners.V1;
 using EventHighway.Core.Services.Processings.Events.V1;
@@ -133,6 +135,7 @@ namespace EventHighway.Core.Clients.EventHighways
             services.AddTransient<IEventListenerV1Service, EventListenerV1Service>();
             services.AddTransient<IListenerEventV1Service, ListenerEventV1Service>();
             services.AddTransient<IEventCallV1Service, EventCallV1Service>();
+            services.AddTransient<IEventCallV2Service, EventCallV2Service>();
             services.AddTransient<IEventAddressV1Service, EventAddressV1Service>();
             services.AddTransient<IEventArchiveV1Service, EventArchiveV1Service>();
             services.AddTransient<IListenerEventArchiveV1Service, ListenerEventArchiveV1Service>();
@@ -155,6 +158,10 @@ namespace EventHighway.Core.Clients.EventHighways
             services.AddTransient<
                 IEventCallV1ProcessingService,
                 EventCallV1ProcessingService>();
+
+            services.AddTransient<
+                IEventCallV2ProcessingService,
+                EventCallV2ProcessingService>();
 
             services.AddTransient<
                 IEventListenerV1ProcessingService,
