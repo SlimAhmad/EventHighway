@@ -144,7 +144,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
         }
 
         [Theory]
-        [MemberData(nameof(MinutesBeforeAndAfterNow))]
+        [InlineData(1)]
+        [InlineData(-61)]
         public async Task ShouldThrowValidationExceptionOnAddIfArchiveDateIsNotRecentAndLogItAsync(
             int minutesBeforeAndAfterNow)
         {
@@ -153,7 +154,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V1
 
             EventArchiveV1 randomEventArchiveV1 =
                 CreateRandomEventArchiveV1(
-                    date: randomDateTimeOffset.AddMinutes(minutesBeforeAndAfterNow));
+                    date: randomDateTimeOffset.AddSeconds(minutesBeforeAndAfterNow));
 
             EventArchiveV1 invalidEventArchiveV1 = randomEventArchiveV1;
 
