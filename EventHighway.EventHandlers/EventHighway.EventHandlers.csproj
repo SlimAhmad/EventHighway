@@ -53,4 +53,13 @@
 		<ProjectReference Include="..\EventHighway.Abstractions\EventHighway.Abstractions.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Models\Exposers\RestSecretEventHandlers\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="RESTFulSense" Version="3.2.0" />
+	  <PackageReference Include="Xeption" Version="2.9.0" />
+	</ItemGroup>
+
 </Project>
