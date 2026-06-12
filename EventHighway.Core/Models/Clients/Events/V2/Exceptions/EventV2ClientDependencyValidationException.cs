@@ -5,11 +5,11 @@
 using System.Collections;
 using Xeptions;
 
-namespace EventHighway.Core.Models.Clients.EventAddresses.V2.Exceptions
+namespace EventHighway.Core.Models.Clients.Events.V2.Exceptions
 {
-    public class EventAddressV2ClientServiceException : Xeption
+    public class EventV2ClientValidationException : Xeption
     {
-        public EventAddressV2ClientServiceException(string message, Xeption innerException, IDictionary data)
+        public EventV2ClientValidationException(string message, Xeption innerException, IDictionary data)
             : base(message, innerException, data)
         { }
     }

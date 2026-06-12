@@ -33,12 +33,12 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             }
             catch (EventAddressV2ValidationException eventAddressV2ValidationException)
             {
-                throw CreateEventAddressV2ClientDependencyValidationException(
+                throw CreateEventAddressV2ClientValidationException(
                     eventAddressV2ValidationException.InnerException as Xeption);
             }
             catch (EventAddressV2DependencyValidationException eventAddressV2DependencyValidationException)
             {
-                throw CreateEventAddressV2ClientDependencyValidationException(
+                throw CreateEventAddressV2ClientValidationException(
                     eventAddressV2DependencyValidationException.InnerException as Xeption);
             }
             catch (EventAddressV2DependencyException eventAddressV2DependencyException)
@@ -48,8 +48,12 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             }
             catch (EventAddressV2ServiceException eventAddressV2ServiceException)
             {
-                throw CreateEventAddressV2ClientServiceException(
+                throw CreateEventAddressV2ClientDependencyException(
                     eventAddressV2ServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventAddressV2ClientServiceException(exception as Xeption);
             }
         }
 
@@ -69,8 +73,12 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             catch (EventListenerV2OrchestrationServiceException
                 eventListenerV2OrchestrationServiceException)
             {
-                throw CreateEventAddressV2ClientServiceException(
+                throw CreateEventAddressV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventAddressV2ClientServiceException(exception as Xeption);
             }
         }
 
@@ -85,12 +93,12 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             }
             catch (EventAddressV2ValidationException eventAddressV2ValidationException)
             {
-                throw CreateEventAddressV2ClientDependencyValidationException(
+                throw CreateEventAddressV2ClientValidationException(
                     eventAddressV2ValidationException.InnerException as Xeption);
             }
             catch (EventAddressV2DependencyValidationException eventAddressV2DependencyValidationException)
             {
-                throw CreateEventAddressV2ClientDependencyValidationException(
+                throw CreateEventAddressV2ClientValidationException(
                     eventAddressV2DependencyValidationException.InnerException as Xeption);
             }
             catch (EventAddressV2DependencyException eventAddressV2DependencyException)
@@ -100,17 +108,22 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             }
             catch (EventAddressV2ServiceException eventAddressV2ServiceException)
             {
-                throw CreateEventAddressV2ClientServiceException(
+                throw CreateEventAddressV2ClientDependencyException(
                     eventAddressV2ServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventAddressV2ClientServiceException(exception as Xeption);
             }
         }
 
-        private static EventAddressV2ClientDependencyValidationException
-            CreateEventAddressV2ClientDependencyValidationException(Xeption innerException)
+        private static EventAddressV2ClientValidationException
+            CreateEventAddressV2ClientValidationException(Xeption innerException)
         {
-            return new EventAddressV2ClientDependencyValidationException(
+            return new EventAddressV2ClientValidationException(
                 message: "Event address client validation error occurred, fix the errors and try again.",
-                innerException: innerException);
+                innerException: innerException,
+                data: innerException.Data);
         }
 
         private static EventAddressV2ClientDependencyException
@@ -118,7 +131,8 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
         {
             return new EventAddressV2ClientDependencyException(
                 message: "Event address client dependency error occurred, contact support.",
-                innerException: innerException);
+                innerException: innerException,
+                data: innerException.Data);
         }
 
         private static EventAddressV2ClientServiceException
@@ -126,7 +140,8 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
         {
             return new EventAddressV2ClientServiceException(
                 message: "Event address client service error occurred, contact support.",
-                innerException: innerException);
+                innerException: innerException,
+                data: innerException.Data);
         }
     }
 }

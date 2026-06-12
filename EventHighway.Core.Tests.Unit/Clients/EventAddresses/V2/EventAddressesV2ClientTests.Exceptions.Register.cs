@@ -17,9 +17,8 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
     {
         [Theory]
         [MemberData(nameof(ValidationExceptions))]
-        public async Task
-            ShouldThrowDependencyValidationExceptionOnRegisterIfDependencyValidationErrorOccursAsync(
-                Xeption validationException)
+        public async Task ShouldThrowValidationExceptionOnRegisterIfValidationErrorOccursAsync(
+            Xeption validationException)
         {
             // given
             CancellationToken randomCancellationToken =
@@ -27,10 +26,11 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
 
             EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
 
-            var expectedEventAddressV2ClientDependencyValidationException =
-                new EventAddressV2ClientDependencyValidationException(
+            var expectedEventAddressV2ClientValidationException =
+                new EventAddressV2ClientValidationException(
                     message: "Event address client validation error occurred, fix the errors and try again.",
-                    innerException: validationException.InnerException as Xeption);
+                    innerException: validationException.InnerException as Xeption,
+                    data: (validationException.InnerException as Xeption).Data);
 
             this.eventAddressV2ServiceMock.Setup(service =>
                 service.AddEventAddressV2Async(
@@ -44,14 +44,13 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
                     someEventAddressV2,
                     randomCancellationToken);
 
-            EventAddressV2ClientDependencyValidationException
-                actualEventAddressV2ClientDependencyValidationException =
-                    await Assert.ThrowsAsync<EventAddressV2ClientDependencyValidationException>(
-                        registerEventAddressV2Task.AsTask);
+            EventAddressV2ClientValidationException actualEventAddressV2ClientValidationException =
+                await Assert.ThrowsAsync<EventAddressV2ClientValidationException>(
+                    registerEventAddressV2Task.AsTask);
 
             // then
-            actualEventAddressV2ClientDependencyValidationException.Should()
-                .BeEquivalentTo(expectedEventAddressV2ClientDependencyValidationException);
+            actualEventAddressV2ClientValidationException.Should()
+                .BeEquivalentTo(expectedEventAddressV2ClientValidationException);
 
             this.eventAddressV2ServiceMock.Verify(service =>
                 service.AddEventAddressV2Async(
@@ -82,7 +81,8 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
             var expectedEventAddressV2ClientDependencyException =
                 new EventAddressV2ClientDependencyException(
                     message: "Event address client dependency error occurred, contact support.",
-                    innerException: eventAddressV2DependencyException.InnerException as Xeption);
+                    innerException: eventAddressV2DependencyException.InnerException as Xeption,
+                    data: (eventAddressV2DependencyException.InnerException as Xeption).Data);
 
             this.eventAddressV2ServiceMock.Setup(service =>
                 service.AddEventAddressV2Async(
@@ -96,10 +96,9 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
                     someEventAddressV2,
                     randomCancellationToken);
 
-            EventAddressV2ClientDependencyException
-                actualEventAddressV2ClientDependencyException =
-                    await Assert.ThrowsAsync<EventAddressV2ClientDependencyException>(
-                        registerEventAddressV2Task.AsTask);
+            EventAddressV2ClientDependencyException actualEventAddressV2ClientDependencyException =
+                await Assert.ThrowsAsync<EventAddressV2ClientDependencyException>(
+                    registerEventAddressV2Task.AsTask);
 
             // then
             actualEventAddressV2ClientDependencyException.Should()
@@ -115,7 +114,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
         }
 
         [Fact]
-        public async Task ShouldThrowServiceExceptionOnRegisterIfServiceErrorOccursAsync()
+        public async Task ShouldThrowDependencyExceptionOnRegisterIfServiceErrorOccursAsync()
         {
             // given
             CancellationToken randomCancellationToken =
@@ -131,10 +130,11 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
                     someMessage,
                     someInnerException);
 
-            var expectedEventAddressV2ClientServiceException =
-                new EventAddressV2ClientServiceException(
-                    message: "Event address client service error occurred, contact support.",
-                    innerException: eventAddressV2ServiceException.InnerException as Xeption);
+            var expectedEventAddressV2ClientDependencyException =
+                new EventAddressV2ClientDependencyException(
+                    message: "Event address client dependency error occurred, contact support.",
+                    innerException: eventAddressV2ServiceException.InnerException as Xeption,
+                    data: (eventAddressV2ServiceException.InnerException as Xeption).Data);
 
             this.eventAddressV2ServiceMock.Setup(service =>
                 service.AddEventAddressV2Async(
@@ -148,13 +148,13 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
                     someEventAddressV2,
                     randomCancellationToken);
 
-            EventAddressV2ClientServiceException actualEventAddressV2ClientServiceException =
-                await Assert.ThrowsAsync<EventAddressV2ClientServiceException>(
+            EventAddressV2ClientDependencyException actualEventAddressV2ClientDependencyException =
+                await Assert.ThrowsAsync<EventAddressV2ClientDependencyException>(
                     registerEventAddressV2Task.AsTask);
 
             // then
-            actualEventAddressV2ClientServiceException.Should()
-                .BeEquivalentTo(expectedEventAddressV2ClientServiceException);
+            actualEventAddressV2ClientDependencyException.Should()
+                .BeEquivalentTo(expectedEventAddressV2ClientDependencyException);
 
             this.eventAddressV2ServiceMock.Verify(service =>
                 service.AddEventAddressV2Async(

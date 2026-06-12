@@ -7,9 +7,9 @@ using Xeptions;
 
 namespace EventHighway.Core.Models.Clients.EventAddresses.V2.Exceptions
 {
-    public class EventAddressV2ClientServiceException : Xeption
+    public class EventAddressV2ClientValidationException : Xeption
     {
-        public EventAddressV2ClientServiceException(string message, Xeption innerException, IDictionary data)
+        public EventAddressV2ClientValidationException(string message, Xeption innerException, IDictionary data)
             : base(message, innerException, data)
         { }
     }
