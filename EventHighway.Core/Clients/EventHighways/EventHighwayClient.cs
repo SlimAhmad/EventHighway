@@ -44,10 +44,13 @@ using EventHighway.Core.Services.Processings.EventCalls;
 using EventHighway.Core.Services.Processings.EventCalls.V1;
 using EventHighway.Core.Services.Processings.EventCalls.V2;
 using EventHighway.Core.Services.Processings.EventListeners;
+using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
 using EventHighway.Core.Services.Processings.EventListeners.V1;
+using EventHighway.Core.Services.Processings.EventListeners.V2;
 using EventHighway.Core.Services.Processings.Events.V1;
 using EventHighway.Core.Services.Processings.ListenerEvents;
 using EventHighway.Core.Services.Processings.ListenerEvents.V1;
+using EventHighway.Core.Services.Processings.ListenerEvents.V2;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EventHighway.Core.Clients.EventHighways
@@ -193,6 +196,14 @@ namespace EventHighway.Core.Clients.EventHighways
             services.AddTransient<
                 IEventAddressV2ProcessingService,
                 EventAddressV2ProcessingService>();
+
+            services.AddTransient<
+                IEventListenerV2ProcessingService,
+                EventListenerV2ProcessingService>();
+
+            services.AddTransient<
+                IListenerEventV2ProcessingService,
+                ListenerEventV2ProcessingService>();
         }
 
         private static void RegisterOrchestrationServices(IServiceCollection services)
@@ -224,6 +235,10 @@ namespace EventHighway.Core.Clients.EventHighways
             services.AddTransient<
                 IEventV2OrchestrationService,
                 EventV2OrchestrationService>();
+
+            services.AddTransient<
+                IEventListenerV2OrchestrationService,
+                EventListenerV2OrchestrationService>();
         }
 
         private static void RegisterCoordinationServices(IServiceCollection services)
