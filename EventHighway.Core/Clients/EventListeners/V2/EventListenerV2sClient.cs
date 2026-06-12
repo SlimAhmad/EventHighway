@@ -33,13 +33,13 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             catch (EventListenerV2OrchestrationValidationException
                 eventListenerV2OrchestrationValidationException)
             {
-                throw CreateEventListenerV2ClientDependencyValidationException(
+                throw CreateEventListenerV2ClientValidationException(
                     eventListenerV2OrchestrationValidationException.InnerException as Xeption);
             }
             catch (EventListenerV2OrchestrationDependencyValidationException
                 eventListenerV2OrchestrationDependencyValidationException)
             {
-                throw CreateEventListenerV2ClientDependencyValidationException(
+                throw CreateEventListenerV2ClientValidationException(
                     eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
             }
             catch (EventListenerV2OrchestrationDependencyException
@@ -51,8 +51,12 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             catch (EventListenerV2OrchestrationServiceException
                 eventListenerV2OrchestrationServiceException)
             {
-                throw CreateEventListenerV2ClientServiceException(
+                throw CreateEventListenerV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventListenerV2ClientServiceException(exception as Xeption);
             }
         }
 
@@ -68,13 +72,13 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             catch (EventListenerV2OrchestrationValidationException
                 eventListenerV2OrchestrationValidationException)
             {
-                throw CreateEventListenerV2ClientDependencyValidationException(
+                throw CreateEventListenerV2ClientValidationException(
                     eventListenerV2OrchestrationValidationException.InnerException as Xeption);
             }
             catch (EventListenerV2OrchestrationDependencyValidationException
                 eventListenerV2OrchestrationDependencyValidationException)
             {
-                throw CreateEventListenerV2ClientDependencyValidationException(
+                throw CreateEventListenerV2ClientValidationException(
                     eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
             }
             catch (EventListenerV2OrchestrationDependencyException
@@ -86,8 +90,12 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             catch (EventListenerV2OrchestrationServiceException
                 eventListenerV2OrchestrationServiceException)
             {
-                throw CreateEventListenerV2ClientServiceException(
+                throw CreateEventListenerV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventListenerV2ClientServiceException(exception as Xeption);
             }
         }
 
@@ -103,13 +111,13 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             catch (EventListenerV2OrchestrationValidationException
                 eventListenerV2OrchestrationValidationException)
             {
-                throw CreateEventListenerV2ClientDependencyValidationException(
+                throw CreateEventListenerV2ClientValidationException(
                     eventListenerV2OrchestrationValidationException.InnerException as Xeption);
             }
             catch (EventListenerV2OrchestrationDependencyValidationException
                 eventListenerV2OrchestrationDependencyValidationException)
             {
-                throw CreateEventListenerV2ClientDependencyValidationException(
+                throw CreateEventListenerV2ClientValidationException(
                     eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
             }
             catch (EventListenerV2OrchestrationDependencyException
@@ -121,17 +129,22 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             catch (EventListenerV2OrchestrationServiceException
                 eventListenerV2OrchestrationServiceException)
             {
-                throw CreateEventListenerV2ClientServiceException(
+                throw CreateEventListenerV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventListenerV2ClientServiceException(exception as Xeption);
             }
         }
 
-        private static EventListenerV2ClientDependencyValidationException
-            CreateEventListenerV2ClientDependencyValidationException(Xeption innerException)
+        private static EventListenerV2ClientValidationException
+            CreateEventListenerV2ClientValidationException(Xeption innerException)
         {
-            return new EventListenerV2ClientDependencyValidationException(
+            return new EventListenerV2ClientValidationException(
                 message: "Event listener client validation error occurred, fix the errors and try again.",
-                innerException: innerException);
+                innerException: innerException,
+                data: innerException.Data);
         }
 
         private static EventListenerV2ClientDependencyException
@@ -139,7 +152,8 @@ namespace EventHighway.Core.Clients.EventListeners.V2
         {
             return new EventListenerV2ClientDependencyException(
                 message: "Event listener client dependency error occurred, contact support.",
-                innerException: innerException);
+                innerException: innerException,
+                data: innerException.Data);
         }
 
         private static EventListenerV2ClientServiceException
@@ -147,7 +161,8 @@ namespace EventHighway.Core.Clients.EventListeners.V2
         {
             return new EventListenerV2ClientServiceException(
                 message: "Event listener client service error occurred, contact support.",
-                innerException: innerException);
+                innerException: innerException,
+                data: innerException.Data);
         }
     }
 }

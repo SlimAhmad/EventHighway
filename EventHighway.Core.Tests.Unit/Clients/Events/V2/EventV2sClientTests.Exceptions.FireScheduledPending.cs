@@ -1,0 +1,164 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Clients.Events.V2.Exceptions;
+using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
+using FluentAssertions;
+using Moq;
+using Xeptions;
+
+namespace EventHighway.Core.Tests.Unit.Clients.Events.V2
+{
+    public partial class EventV2sClientTests
+    {
+        [Fact]
+        public async Task
+            ShouldThrowValidationExceptionOnFireIfDependencyValidationErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
+
+            var eventV2CoordinationDependencyValidationException =
+                new EventV2CoordinationDependencyValidationException(
+                    someMessage,
+                    someInnerException);
+
+            var expectedEventV2ClientValidationException =
+                new EventV2ClientValidationException(
+                    message: "Event client validation error occurred, fix the errors and try again.",
+                    innerException: eventV2CoordinationDependencyValidationException
+                        .InnerException as Xeption,
+                    data: (eventV2CoordinationDependencyValidationException
+                        .InnerException as Xeption).Data);
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(eventV2CoordinationDependencyValidationException);
+
+            // when
+            ValueTask fireScheduledPendingEventV2sTask =
+                this.eventV2sClient.FireScheduledPendingEventV2sAsync(
+                    randomCancellationToken);
+
+            EventV2ClientValidationException actualEventV2ClientValidationException =
+                await Assert.ThrowsAsync<EventV2ClientValidationException>(
+                    fireScheduledPendingEventV2sTask.AsTask);
+
+            // then
+            actualEventV2ClientValidationException.Should()
+                .BeEquivalentTo(expectedEventV2ClientValidationException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnFireIfDependencyErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
+
+            var eventV2CoordinationDependencyException =
+                new EventV2CoordinationDependencyException(
+                    someMessage,
+                    someInnerException);
+
+            var expectedEventV2ClientDependencyException =
+                new EventV2ClientDependencyException(
+                    message: "Event client dependency error occurred, contact support.",
+                    innerException: eventV2CoordinationDependencyException.InnerException as Xeption,
+                    data: (eventV2CoordinationDependencyException.InnerException as Xeption).Data);
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(eventV2CoordinationDependencyException);
+
+            // when
+            ValueTask fireScheduledPendingEventV2sTask =
+                this.eventV2sClient.FireScheduledPendingEventV2sAsync(
+                    randomCancellationToken);
+
+            EventV2ClientDependencyException actualEventV2ClientDependencyException =
+                await Assert.ThrowsAsync<EventV2ClientDependencyException>(
+                    fireScheduledPendingEventV2sTask.AsTask);
+
+            // then
+            actualEventV2ClientDependencyException.Should()
+                .BeEquivalentTo(expectedEventV2ClientDependencyException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnFireIfServiceErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
+
+            var eventV2CoordinationServiceException =
+                new EventV2CoordinationServiceException(
+                    someMessage,
+                    someInnerException);
+
+            var expectedEventV2ClientDependencyException =
+                new EventV2ClientDependencyException(
+                    message: "Event client dependency error occurred, contact support.",
+                    innerException: eventV2CoordinationServiceException.InnerException as Xeption,
+                    data: (eventV2CoordinationServiceException.InnerException as Xeption).Data);
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(eventV2CoordinationServiceException);
+
+            // when
+            ValueTask fireScheduledPendingEventV2sTask =
+                this.eventV2sClient.FireScheduledPendingEventV2sAsync(
+                    randomCancellationToken);
+
+            EventV2ClientDependencyException actualEventV2ClientDependencyException =
+                await Assert.ThrowsAsync<EventV2ClientDependencyException>(
+                    fireScheduledPendingEventV2sTask.AsTask);
+
+            // then
+            actualEventV2ClientDependencyException.Should()
+                .BeEquivalentTo(expectedEventV2ClientDependencyException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+    }
+}
