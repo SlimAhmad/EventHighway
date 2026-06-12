@@ -65,7 +65,8 @@ namespace EventHighway.Core.Services.Processings.Events.V2
                     listenerEvent.Status != ListenerEventStatusV2.Pending));
         });
 
-        public ValueTask<EventV2> MarkEventV2AsImmediateAsync(EventV2 eventV2, CancellationToken cancellationToken = default) =>
+        public ValueTask<EventV2> MarkEventV2AsImmediateAsync(
+            EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             ValidateEventV2IsNotNull(eventV2);
@@ -73,7 +74,8 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             return await SetEventV2AsImmediateAsync(eventV2, cancellationToken);
         });
 
-        public ValueTask<EventV2> RemoveEventV2ByIdAsync(Guid eventV2Id, CancellationToken cancellationToken = default) =>
+        public ValueTask<EventV2> RemoveEventV2ByIdAsync(
+            Guid eventV2Id, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             ValidateEventV2Id(eventV2Id);
@@ -82,7 +84,8 @@ namespace EventHighway.Core.Services.Processings.Events.V2
                 eventV2Id, cancellationToken);
         });
 
-        private async ValueTask<EventV2> SetEventV2AsImmediateAsync(EventV2 eventV2, CancellationToken cancellationToken)
+        private async ValueTask<EventV2> SetEventV2AsImmediateAsync(
+            EventV2 eventV2, CancellationToken cancellationToken)
         {
             DateTimeOffset now =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();

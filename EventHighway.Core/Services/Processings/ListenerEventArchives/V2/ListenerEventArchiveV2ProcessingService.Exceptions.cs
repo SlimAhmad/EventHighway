@@ -30,9 +30,11 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(listenerEventArchiveV2ValidationException);
             }
-            catch (ListenerEventArchiveV2DependencyValidationException listenerEventArchiveV2DependencyValidationException)
+            catch (ListenerEventArchiveV2DependencyValidationException
+                listenerEventArchiveV2DependencyValidationException)
             {
-                throw await CreateAndLogDependencyValidationExceptionAsync(listenerEventArchiveV2DependencyValidationException);
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2DependencyValidationException);
             }
             catch (ListenerEventArchiveV2DependencyException listenerEventArchiveV2DependencyException)
             {

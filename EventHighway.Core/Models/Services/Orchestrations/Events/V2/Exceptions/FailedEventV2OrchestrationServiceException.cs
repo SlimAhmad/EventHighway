@@ -6,12 +6,14 @@ using System;
 using System.Collections;
 using Xeptions;
 
-namespace EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions
+namespace EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions
 {
-    public class InvalidReferenceListenerEventArchiveV2Exception : Xeption
+    public class FailedEventV2OrchestrationServiceException : Xeption
     {
-        public InvalidReferenceListenerEventArchiveV2Exception(
-            string message, Exception innerException, IDictionary data)
+        public FailedEventV2OrchestrationServiceException(
+            string message,
+            Exception innerException,
+            IDictionary data)
             : base(message, innerException, data)
         { }
     }

@@ -37,9 +37,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     nullListenerEventArchiveV2,
                     cancellationToken);
 
-            ListenerEventArchiveV2ProcessingValidationException actualListenerEventArchiveV2ProcessingValidationException =
-                await Assert.ThrowsAsync<ListenerEventArchiveV2ProcessingValidationException>(
-                    addListenerEventArchiveV2Task.AsTask);
+            ListenerEventArchiveV2ProcessingValidationException
+                actualListenerEventArchiveV2ProcessingValidationException =
+                    await Assert.ThrowsAsync<ListenerEventArchiveV2ProcessingValidationException>(
+                        addListenerEventArchiveV2Task.AsTask);
 
             // then
             actualListenerEventArchiveV2ProcessingValidationException.Should().BeEquivalentTo(
