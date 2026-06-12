@@ -3,24 +3,23 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
 
-namespace EventHighway.Core.Clients.EventAddresses.V2
+namespace EventHighway.Core.Clients.Events.V2
 {
-    public interface IEventAddressV2Client
+    public interface IEventV2Client
     {
-        ValueTask<EventAddressV2> RegisterEventAddressV2Async(
-            EventAddressV2 eventAddressV2,
+        ValueTask<EventV2> SubmitEventV2Async(
+            EventV2 eventV2,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync(
+        ValueTask FireScheduledPendingEventV2sAsync(
             CancellationToken cancellationToken = default);
 
-        ValueTask<EventAddressV2> RemoveEventAddressV2ByIdAsync(
-            Guid eventAddressV2Id,
+        ValueTask<EventV2> RemoveEventV2ByIdAsync(
+            Guid eventV2Id,
             CancellationToken cancellationToken = default);
     }
 }

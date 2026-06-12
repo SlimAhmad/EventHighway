@@ -15,11 +15,11 @@ using Xeptions;
 
 namespace EventHighway.Core.Clients.EventAddresses.V2
 {
-    internal class EventAddressesV2Client : IEventAddressesV2Client
+    internal class EventAddressV2Client : IEventAddressV2Client
     {
         private readonly IEventAddressV2Service eventAddressV2Service;
 
-        public EventAddressesV2Client(IEventAddressV2Service eventAddressV2Service) =>
+        public EventAddressV2Client(IEventAddressV2Service eventAddressV2Service) =>
             this.eventAddressV2Service = eventAddressV2Service;
 
         public async ValueTask<EventAddressV2> RegisterEventAddressV2Async(
