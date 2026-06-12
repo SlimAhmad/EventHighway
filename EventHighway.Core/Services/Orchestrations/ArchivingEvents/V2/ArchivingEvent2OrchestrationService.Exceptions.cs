@@ -3,10 +3,8 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
-using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.ListenerEvents.V2.Exceptions;
 using Xeptions;
@@ -15,34 +13,7 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 {
     internal partial class ArchivingEvent2OrchestrationService
     {
-        private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
         private delegate ValueTask ReturningNothingFunction();
-
-        private async ValueTask<IQueryable<EventV2>> TryCatch(ReturningEventV2sFunction returningEventV2sFunction)
-        {
-            try
-            {
-                return await returningEventV2sFunction();
-            }
-            catch (EventV2ProcessingDependencyException eventV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventV2ProcessingDependencyException);
-            }
-            catch (EventV2ProcessingServiceException eventV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventV2ProcessingServiceException);
-            }
-            catch (Exception exception)
-            {
-                var failedArchivingEvent2OrchestrationServiceException =
-                    new FailedArchivingEvent2OrchestrationServiceException(
-                        message: "Failed event service error occurred, contact support.",
-                        innerException: exception,
-                        data: exception.Data);
-
-                throw await CreateAndLogServiceExceptionAsync(failedArchivingEvent2OrchestrationServiceException);
-            }
-        }
 
         private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
         {

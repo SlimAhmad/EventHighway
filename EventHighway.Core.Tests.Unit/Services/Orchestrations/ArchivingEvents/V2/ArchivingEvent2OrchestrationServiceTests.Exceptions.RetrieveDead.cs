@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -32,14 +31,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     .ThrowsAsync(eventV2DependencyException);
 
             // when
-            ValueTask<IQueryable<EventV2>> retrieveAllDeadEventV2sWithListenersTask =
-                this.archivingEvent2OrchestrationService.RetrieveAllDeadEventV2sWithListenersAsync(
-                    TestContext.Current.CancellationToken);
-
             ArchivingEvent2OrchestrationDependencyException
                 actualArchivingEvent2OrchestrationDependencyException =
-                    await Assert.ThrowsAsync<ArchivingEvent2OrchestrationDependencyException>(
-                        retrieveAllDeadEventV2sWithListenersTask.AsTask);
+                    await Assert.ThrowsAsync<ArchivingEvent2OrchestrationDependencyException>(async () =>
+                    {
+                        await foreach (EventV2 _ in
+                            this.archivingEvent2OrchestrationService
+                                .RetrieveAllDeadEventV2sWithListenersAsync(
+                                    TestContext.Current.CancellationToken)) { }
+                    });
 
             // then
             actualArchivingEvent2OrchestrationDependencyException.Should().BeEquivalentTo(
@@ -82,14 +82,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     .ThrowsAsync(serviceException);
 
             // when
-            ValueTask<IQueryable<EventV2>> retrieveAllDeadEventV2sWithListenersTask =
-                this.archivingEvent2OrchestrationService.RetrieveAllDeadEventV2sWithListenersAsync(
-                    TestContext.Current.CancellationToken);
-
             ArchivingEvent2OrchestrationServiceException
                 actualArchivingEvent2OrchestrationServiceException =
-                    await Assert.ThrowsAsync<ArchivingEvent2OrchestrationServiceException>(
-                        retrieveAllDeadEventV2sWithListenersTask.AsTask);
+                    await Assert.ThrowsAsync<ArchivingEvent2OrchestrationServiceException>(async () =>
+                    {
+                        await foreach (EventV2 _ in
+                            this.archivingEvent2OrchestrationService
+                                .RetrieveAllDeadEventV2sWithListenersAsync(
+                                    TestContext.Current.CancellationToken)) { }
+                    });
 
             // then
             actualArchivingEvent2OrchestrationServiceException.Should().BeEquivalentTo(

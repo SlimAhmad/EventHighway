@@ -39,11 +39,9 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         public ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            IQueryable<EventV2> eventV2s =
-                await this.archivingEvent2OrchestrationService
-                    .RetrieveAllDeadEventV2sWithListenersAsync(cancellationToken);
-
-            foreach (EventV2 eventV2 in eventV2s)
+            await foreach (EventV2 eventV2 in
+                this.archivingEvent2OrchestrationService
+                    .RetrieveAllDeadEventV2sWithListenersAsync(cancellationToken))
             {
                 EventArchiveV1 eventArchiveV1 =
                     await MapToEventArchiveV1Async(eventV2);

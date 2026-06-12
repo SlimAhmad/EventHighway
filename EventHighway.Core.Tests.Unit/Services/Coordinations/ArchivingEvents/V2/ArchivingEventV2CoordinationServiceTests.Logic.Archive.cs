@@ -51,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         EventListenerId = item.EventListenerId
                     }).ToList();
 
-            IQueryable<EventV2> retrievedEventV2s =
+            List<EventV2> retrievedEventV2s =
                 randomEventV2sProperties.Select(item =>
                     new EventV2
                     {
@@ -64,7 +64,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         ScheduledDate = item.ScheduledDate,
                         EventAddressId = item.EventAddressId,
                         ListenerEventV2s = retrievedListenerEventV2s
-                    }).AsQueryable();
+                    }).ToList();
 
             List<ListenerEventArchiveV1> mappedListenerEventArchiveV1s =
                 randomListenerEventV2sProperties.Select(item =>
@@ -101,7 +101,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveAllDeadEventV2sWithListenersAsync(
                         It.IsAny<CancellationToken>()))
-                            .ReturnsAsync(retrievedEventV2s);
+                            .Returns(CreateAsyncEnumerable(retrievedEventV2s));
 
             foreach ((EventArchiveV1 mappedEventArchiveV1, EventV2 retrievedEventV2)
                 in mappedEventArchiveV1s.Zip(retrievedEventV2s))
