@@ -6,7 +6,7 @@ using Xeptions;
 
 namespace EventHighway.Core.Models.Services.Foundations.EventAddresses.V2.Exceptions
 {
-    public class EventAddressV2DependencyException : Xeption
+    internal class EventAddressV2DependencyException : Xeption
     {
         public EventAddressV2DependencyException(string message, Xeption innerException)
             : base(message, innerException)
