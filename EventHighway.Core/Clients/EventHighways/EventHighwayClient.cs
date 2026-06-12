@@ -16,6 +16,7 @@ using EventHighway.Core.Clients.Events.V1;
 using EventHighway.Core.Clients.ListenerEvents.V1;
 using EventHighway.Core.Services.Coordinations.Events;
 using EventHighway.Core.Services.Coordinations.Events.V1;
+using EventHighway.Core.Services.Coordinations.Events.V2;
 using EventHighway.Core.Services.Foundations.EventAddresses;
 using EventHighway.Core.Services.Foundations.EventAddresses.V1;
 using EventHighway.Core.Services.Foundations.EventArchives.V1;
@@ -254,6 +255,10 @@ namespace EventHighway.Core.Clients.EventHighways
             services.AddTransient<
                 IEventV1CoordinationServiceV1,
                 EventV1CoordinationServiceV1>();
+
+            services.AddTransient<
+                IEventV2CoordinationService,
+                EventV2CoordinationService>();
         }
 
         private static void RegisterClients(IServiceCollection services)
