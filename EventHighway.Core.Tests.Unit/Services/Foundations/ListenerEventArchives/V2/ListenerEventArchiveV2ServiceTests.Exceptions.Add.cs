@@ -79,7 +79,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         }
 
         [Fact]
-        public async Task ShouldThrowDependencyValidationExceptionOnAddIfListenerEventArchiveV2AlreadyExistsAndLogItAsync()
+        public async Task
+            ShouldThrowDependencyValidationExceptionOnAddIfListenerEventArchiveV2AlreadyExistsAndLogItAsync()
         {
             // given
             string randomMessage = GetRandomString();
