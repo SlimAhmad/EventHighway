@@ -9,6 +9,7 @@ using EventHighway.Core.Clients.EventListeners.V1;
 using EventHighway.Core.Clients.Events;
 using EventHighway.Core.Clients.Events.V1;
 using EventHighway.Core.Clients.ListenerEvents.V1;
+using EventHighway.Core.Clients.ListenerEvents.V2;
 
 namespace EventHighway.Core.Clients.EventHighways
 {
@@ -22,5 +23,6 @@ namespace EventHighway.Core.Clients.EventHighways
         public IEventAddressesV1Client EventAddressV1s { get; set; }
         public IEventListenerV1sClient EventListenerV1s { get; set; }
         public IListenerEventV1sClient ListenerEventV1s { get; set; }
+        public IListenerEventV2sClient ListenerEventV2s { get; set; }
     }
 }

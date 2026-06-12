@@ -106,7 +106,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             // when
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
-                this.listenerEventV2Service.ModifyListenerEventV2Async(someListenerEventV2);
+                this.listenerEventV2Service.ModifyListenerEventV2Async(
+                    someListenerEventV2,
+                    TestContext.Current.CancellationToken);
 
             ListenerEventV2DependencyValidationException actualListenerEventV2DependencyValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2DependencyValidationException>(
@@ -161,7 +163,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             // when
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
-                this.listenerEventV2Service.ModifyListenerEventV2Async(someListenerEventV2);
+                this.listenerEventV2Service.ModifyListenerEventV2Async(
+                    someListenerEventV2,
+                    TestContext.Current.CancellationToken);
 
             ListenerEventV2DependencyValidationException actualListenerEventV2DependencyValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2DependencyValidationException>(
@@ -215,7 +219,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             // when
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
-                this.listenerEventV2Service.ModifyListenerEventV2Async(someListenerEventV2);
+                this.listenerEventV2Service.ModifyListenerEventV2Async(
+                    someListenerEventV2,
+                    TestContext.Current.CancellationToken);
 
             ListenerEventV2DependencyException actualListenerEventV2DependencyException =
                 await Assert.ThrowsAsync<ListenerEventV2DependencyException>(
@@ -270,7 +276,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             // when
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
-                this.listenerEventV2Service.ModifyListenerEventV2Async(someListenerEventV2);
+                this.listenerEventV2Service.ModifyListenerEventV2Async(
+                    someListenerEventV2,
+                    TestContext.Current.CancellationToken);
 
             ListenerEventV2ServiceException actualListenerEventV2ServiceException =
                 await Assert.ThrowsAsync<ListenerEventV2ServiceException>(
