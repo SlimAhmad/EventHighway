@@ -30,6 +30,9 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             this.loggingBroker = loggingBroker;
         }
 
+        public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync() =>
+            throw new NotImplementedException();
+
         public ValueTask<EventV2> AddEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
