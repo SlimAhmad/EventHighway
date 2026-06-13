@@ -31,8 +31,13 @@ EventHighway is an event-dispatch library built on top of a SQL database. When y
    - [Step 3 – Use handlerParams to pass configuration](#64-step-3--use-handlerparams-to-pass-configuration)
    - [Step 4 – Register and use the handler](#65-step-4--register-and-use-the-handler)
    - [Why the exception interfaces matter](#66-why-the-exception-interfaces-matter)
-7. [Future Enhancements](#7-future-enhancements)
-   - [Listener filter criteria](#71-listener-filter-criteria)
+7. [Health Monitoring](#7-health-monitoring)
+   - [Retrieving a health summary](#71-retrieving-a-health-summary)
+   - [Metrics reference](#72-metrics-reference)
+   - [RAG status rules](#73-rag-status-rules)
+   - [Example output](#74-example-output)
+8. [Future Enhancements](#8-future-enhancements)
+   - [Listener filter criteria](#81-listener-filter-criteria)
 
 ---
 
@@ -771,9 +776,127 @@ If your exception does **not** implement one of the three interfaces, it falls t
 
 ---
 
-## 7. Future Enhancements
+## 7. Health Monitoring
 
-### 7.1 Listener filter criteria
+`IHealthV2Client` provides a single method that queries every layer of the EventHighway stack and returns a flat list of `HealthCheckItemV2` rows — one row per metric. Each row carries a RAG (Red / Amber / Green) status so you can see the overall health of the system at a glance.
+
+---
+
+### 7.1 Retrieving a health summary
+
+```csharp
+IEnumerable<HealthCheckItemV2> summary =
+    await client.V2.HealthV2Client.RetrieveHealthSummaryV2Async();
+
+foreach (HealthCheckItemV2 item in summary)
+{
+    Console.WriteLine($"[{item.Status,-6}] {item.Grouping} / {item.Item}: {item.Value}");
+}
+```
+
+The method accepts an optional `CancellationToken`:
+
+```csharp
+IEnumerable<HealthCheckItemV2> summary =
+    await client.V2.HealthV2Client.RetrieveHealthSummaryV2Async(cancellationToken);
+```
+
+---
+
+### 7.2 Metrics reference
+
+The returned collection always contains exactly 15 rows in the order shown below.
+
+| # | Grouping | Item | What it counts |
+|---|---|---|---|
+| 1 | Event Addresses | Total | All registered event addresses |
+| 2 | Event Listeners | Total | All registered event listeners |
+| 3 | Active Events | Total | All events currently in the database |
+| 4 | Active Events | Immediate | Events of type `Immediate` |
+| 5 | Active Events | Scheduled | Events of type `Scheduled` |
+| 6 | Active Events | Dead (0 retries) | Events with `RemainingRetryAttempts == 0` |
+| 7 | Listener Events | Total | All listener event records |
+| 8 | Listener Events | Pending | Listener events with status `Pending` |
+| 9 | Listener Events | Successful | Listener events with status `Success` |
+| 10 | Listener Events | Errors | Listener events with status `Error` |
+| 11 | Listener Events | Error Rate % | `Errors / Total × 100`, formatted as `F2` |
+| 12 | Event Archives | Total Archived Events | Archived events |
+| 13 | Event Archives | Total Archived Listener Events | Archived listener event records |
+| 14 | Event Archives | Archived Listener Errors | Archived listener events with status `Error` |
+| 15 | Event Handlers | Registered Handlers | In-process `IEventHandler` registrations |
+
+The `Value` property is always a string. Numeric metrics are formatted with `.ToString()`. The error rate is formatted as `F2` (two decimal places), e.g. `"12.50"`.
+
+---
+
+### 7.3 RAG status rules
+
+Three of the fifteen rows carry a meaningful RAG status. All other rows are `NA`.
+
+| Row | Green | Amber | Red |
+|---|---|---|---|
+| Active Events — Dead (0 retries) | Count = 0 | Count 1–5 | Count > 5 |
+| Listener Events — Error Rate % | Rate < 10 % | Rate 10–25 % | Rate > 25 % |
+| Event Handlers — Registered Handlers | Count ≥ 1 | Count = 0 | *(never Red)* |
+
+The `StatusCode` property carries the numeric value of the `HealthStatusV2` enum:
+
+| StatusCode | Status string | Meaning |
+|---|---|---|
+| 0 | `NA` | No RAG threshold applies to this metric |
+| 1 | `Red` | Needs immediate attention |
+| 2 | `Amber` | Worth monitoring |
+| 3 | `Green` | Healthy |
+
+---
+
+### 7.4 Example output
+
+The snippet below shows the kind of output you get when the system is healthy (no dead events, low error rate, at least one handler registered):
+
+```
+[NA    ] Event Addresses / Total: 3
+[NA    ] Event Listeners / Total: 7
+[NA    ] Active Events / Total: 42
+[NA    ] Active Events / Immediate: 38
+[NA    ] Active Events / Scheduled: 4
+[Green ] Active Events / Dead (0 retries): 0
+[NA    ] Listener Events / Total: 210
+[NA    ] Listener Events / Pending: 18
+[NA    ] Listener Events / Successful: 187
+[NA    ] Listener Events / Errors: 5
+[Green ] Listener Events / Error Rate %: 2.38
+[NA    ] Event Archives / Total Archived Events: 91
+[NA    ] Event Archives / Total Archived Listener Events: 364
+[NA    ] Event Archives / Archived Listener Errors: 12
+[Green ] Event Handlers / Registered Handlers: 2
+```
+
+And a system under stress (6 dead events, 30 % error rate, no handlers registered):
+
+```
+[NA    ] Event Addresses / Total: 1
+[NA    ] Event Listeners / Total: 2
+[NA    ] Active Events / Total: 9
+[NA    ] Active Events / Immediate: 3
+[NA    ] Active Events / Scheduled: 0
+[Red   ] Active Events / Dead (0 retries): 6
+[NA    ] Listener Events / Total: 10
+[NA    ] Listener Events / Pending: 0
+[NA    ] Listener Events / Successful: 7
+[NA    ] Listener Events / Errors: 3
+[Red   ] Listener Events / Error Rate %: 30.00
+[NA    ] Event Archives / Total Archived Events: 0
+[NA    ] Event Archives / Total Archived Listener Events: 0
+[NA    ] Event Archives / Archived Listener Errors: 0
+[Amber ] Event Handlers / Registered Handlers: 0
+```
+
+---
+
+## 8. Future Enhancements
+
+### 8.1 Listener filter criteria
 
 Today, every listener registered on an event address is invoked for every event published to that address. A planned enhancement would allow each listener to declare **filter criteria** — conditions that must be satisfied before the listener is invoked at all.
 
