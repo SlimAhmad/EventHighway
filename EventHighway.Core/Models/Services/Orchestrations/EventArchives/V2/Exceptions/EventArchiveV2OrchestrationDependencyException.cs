@@ -4,11 +4,11 @@
 
 using Xeptions;
 
-namespace EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2
+namespace EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions
 {
-    internal class EventArchiveV2OrchestrationDependencyValidationException : Xeption
+    internal class EventArchiveV2OrchestrationDependencyException : Xeption
     {
-        public EventArchiveV2OrchestrationDependencyValidationException(string message, Xeption innerException)
+        public EventArchiveV2OrchestrationDependencyException(string message, Xeption innerException)
             : base(message, innerException)
         { }
     }

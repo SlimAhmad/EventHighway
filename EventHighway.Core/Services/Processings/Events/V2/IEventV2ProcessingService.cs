@@ -13,6 +13,7 @@ namespace EventHighway.Core.Services.Processings.Events.V2
     internal interface IEventV2ProcessingService
     {
         ValueTask<EventV2> AddEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default);
+        ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync();
         ValueTask<IQueryable<EventV2>> RetrieveScheduledPendingEventV2sAsync();
         ValueTask<IQueryable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync();
         ValueTask<EventV2> MarkEventV2AsImmediateAsync(EventV2 eventV2, CancellationToken cancellationToken = default);

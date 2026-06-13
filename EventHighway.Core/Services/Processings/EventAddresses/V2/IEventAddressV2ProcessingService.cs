@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
@@ -11,6 +12,8 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
 {
     internal interface IEventAddressV2ProcessingService
     {
+        ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync();
+
         ValueTask<EventAddressV2> RetrieveEventAddressV2ByIdAsync(
             Guid eventAddressV2Id,
             CancellationToken cancellationToken = default);

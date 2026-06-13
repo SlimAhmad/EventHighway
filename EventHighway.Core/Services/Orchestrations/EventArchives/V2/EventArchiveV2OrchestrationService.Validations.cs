@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
-using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
 {

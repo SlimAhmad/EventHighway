@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
@@ -23,6 +24,12 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             this.eventAddressV2Service = eventAddressV2Service;
             this.loggingBroker = loggingBroker;
         }
+
+        public ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync() =>
+        TryCatch(async () =>
+        {
+            return await this.eventAddressV2Service.RetrieveAllEventAddressV2sAsync();
+        });
 
         public ValueTask<EventAddressV2> RetrieveEventAddressV2ByIdAsync(
             Guid eventAddressV2Id,

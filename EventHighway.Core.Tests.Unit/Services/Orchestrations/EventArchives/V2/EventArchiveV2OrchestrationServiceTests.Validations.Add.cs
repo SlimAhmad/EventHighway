@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
-using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 using FluentAssertions;
 using Moq;
 

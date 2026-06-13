@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
@@ -13,7 +14,36 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
 {
     internal partial class EventArchiveV2ProcessingService
     {
+        private delegate ValueTask<IQueryable<EventArchiveV2>> ReturningEventArchiveV2sFunction();
         private delegate ValueTask<EventArchiveV2> ReturningEventArchiveV2Function();
+
+        private async ValueTask<IQueryable<EventArchiveV2>> TryCatch(
+            ReturningEventArchiveV2sFunction returningEventArchiveV2sFunction)
+        {
+            try
+            {
+                return await returningEventArchiveV2sFunction();
+            }
+            catch (EventArchiveV2DependencyException eventArchiveV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2DependencyException);
+            }
+            catch (EventArchiveV2ServiceException eventArchiveV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventArchiveV2ProcessingServiceException =
+                    new FailedEventArchiveV2ProcessingServiceException(
+                        message: "Failed event archive service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventArchiveV2ProcessingServiceException);
+            }
+        }
 
         private async ValueTask<EventArchiveV2> TryCatch(
             ReturningEventArchiveV2Function returningEventArchiveV2Function)

@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
@@ -56,6 +57,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
 
             return new TheoryData<Xeption>
             {
@@ -73,6 +75,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
 
             return new TheoryData<Xeption>
             {
@@ -90,6 +93,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
 
             return new TheoryData<Xeption>
             {
@@ -107,6 +111,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
 
             return new TheoryData<Xeption>
             {
@@ -124,6 +129,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
 
             return new TheoryData<Xeption>
             {
@@ -141,6 +147,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
 
             return new TheoryData<Xeption>
             {
@@ -182,6 +189,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                 .Create(count: GetRandomNumber())
                     .AsQueryable();
         }
+
+        private static IQueryable<EventAddressV2> CreateRandomEventAddressV2s() =>
+            CreateEventAddressV2Filler().Create(count: GetRandomNumber()).AsQueryable();
 
         private static EventAddressV2 CreateRandomEventAddressV2() =>
             CreateEventAddressV2Filler().Create();

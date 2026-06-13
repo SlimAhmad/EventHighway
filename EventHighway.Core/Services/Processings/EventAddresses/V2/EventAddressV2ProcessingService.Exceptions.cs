@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2.Exceptions;
@@ -13,7 +14,36 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
 {
     internal partial class EventAddressV2ProcessingService
     {
+        private delegate ValueTask<IQueryable<EventAddressV2>> ReturningEventAddressV2sFunction();
         private delegate ValueTask<EventAddressV2> ReturningEventAddressV2Function();
+
+        private async ValueTask<IQueryable<EventAddressV2>> TryCatch(
+            ReturningEventAddressV2sFunction returningEventAddressV2sFunction)
+        {
+            try
+            {
+                return await returningEventAddressV2sFunction();
+            }
+            catch (EventAddressV2DependencyException eventAddressV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventAddressV2DependencyException);
+            }
+            catch (EventAddressV2ServiceException eventAddressV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventAddressV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventAddressV2ProcessingServiceException =
+                    new FailedEventAddressV2ProcessingServiceException(
+                        message: "Failed event address service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventAddressV2ProcessingServiceException);
+            }
+        }
 
         private async ValueTask<EventAddressV2> TryCatch(
             ReturningEventAddressV2Function returningEventAddressV2Function)
