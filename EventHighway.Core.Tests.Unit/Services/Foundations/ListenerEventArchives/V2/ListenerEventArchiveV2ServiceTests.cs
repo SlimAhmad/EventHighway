@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
@@ -82,6 +83,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
 
         private static ListenerEventArchiveV2 CreateRandomListenerEventArchiveV2() =>
             CreateListenerEventArchiveV2Filler(date: GetRandomDateTimeOffset()).Create();
+
+        private static IQueryable<ListenerEventArchiveV2> CreateRandomListenerEventArchiveV2s()
+        {
+            return CreateListenerEventArchiveV2Filler(date: GetRandomDateTimeOffset())
+                .Create(count: GetRandomNumber())
+                    .AsQueryable();
+        }
 
         private static Filler<ListenerEventArchiveV2> CreateListenerEventArchiveV2Filler(DateTimeOffset date)
         {
