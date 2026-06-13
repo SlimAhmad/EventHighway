@@ -26,7 +26,10 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
         }
 
         public ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync() =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            return await this.eventAddressV2Service.RetrieveAllEventAddressV2sAsync();
+        });
 
         public ValueTask<EventAddressV2> RetrieveEventAddressV2ByIdAsync(
             Guid eventAddressV2Id,
