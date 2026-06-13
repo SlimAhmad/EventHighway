@@ -12,7 +12,9 @@
   </Folder>
   <Folder Name="/Samples/">
     <Project Path="EventHighway.App/EventHighway.App.csproj" />
-    <Project Path="EventHighway.ClientV2.App/EventHighway.ClientV2.App.csproj" />
+    <Project Path="EventHighway.ClientV2.App/EventHighway.ClientV2.App.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
   </Folder>
   <Project Path="EventHighway.Infrastructure/EventHighway.Infrastructure.csproj" />
 </Solution>

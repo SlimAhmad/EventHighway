@@ -21,7 +21,7 @@ namespace EventHighway.Core.Brokers.Storages
             await InsertAsync(eventArchiveV2, cancellationToken);
 
         public async ValueTask<IQueryable<EventArchiveV2>> SelectAllEventArchiveV2sAsync() =>
-            SelectAll<EventArchiveV2>();
+            SelectAll<EventArchiveV2>().Include(eventArchiveV2 => eventArchiveV2.ListenerEventArchiveV2s);
 
         public async ValueTask<EventArchiveV2> SelectEventArchiveV2ByIdAsync(
             Guid eventArchiveV2Id,
