@@ -2,6 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
@@ -37,6 +39,12 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             return await this.storageBroker.InsertListenerEventArchiveV2Async(
                 listenerEventArchiveV2,
                 cancellationToken);
+        });
+
+        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync() =>
+        TryCatch(async () =>
+        {
+            return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
         });
     }
 }
