@@ -20,6 +20,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         {
             // given
             SqlException sqlException = CreateSqlException();
+            criticalDependencyException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedStorageListenerEventArchiveV2Exception =
                 new FailedStorageListenerEventArchiveV2Exception(
@@ -67,6 +68,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         {
             // given
             var serviceException = new Exception();
+            dependencyValidationException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedListenerEventArchiveV2ServiceException =
                 new FailedListenerEventArchiveV2ServiceException(
