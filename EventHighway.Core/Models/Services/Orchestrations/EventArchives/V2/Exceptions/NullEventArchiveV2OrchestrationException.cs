@@ -4,7 +4,7 @@
 
 using Xeptions;
 
-namespace EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2
+namespace EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions
 {
     public class NullEventArchiveV2OrchestrationException : Xeption
     {
