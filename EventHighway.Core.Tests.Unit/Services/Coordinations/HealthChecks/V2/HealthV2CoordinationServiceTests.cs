@@ -233,7 +233,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             var listenerEvents = new List<ListenerEventV2>();
 
             int sucCount = successCount > 0 ? successCount : GetRandomPositiveNumber();
-            int penCount = pendingCount > 0 ? pendingCount : GetRandomPositiveNumber();
+            int penCount = pendingCount;
 
             for (int i = 0; i < sucCount; i++)
             {
@@ -280,9 +280,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             return listenerEvents.AsQueryable();
         }
 
-        private static IEnumerable<IEventHandler> CreateRandomEventHandlers(int count = 0)
+        private static IEnumerable<IEventHandler> CreateRandomEventHandlers(int count = -1)
         {
-            int actualCount = count > 0 ? count : GetRandomPositiveNumber();
+            int actualCount = count >= 0 ? count : GetRandomPositiveNumber();
 
             return Enumerable.Range(0, actualCount)
                 .Select(_ => new Mock<IEventHandler>().Object)
