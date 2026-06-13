@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.EventHandlers;
@@ -39,6 +40,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventHandlers.V2
             mock.SetupGet(h => h.Name).Returns(new MnemonicString(1).GetValue());
             mock.SetupGet(h => h.RequiredParams).Returns(Array.Empty<string>());
             return mock.Object;
+        }
+
+        private static IEnumerable<IEventHandler> CreateRandomEventHandlers()
+        {
+            int count = new IntRange(min: 2, max: 9).GetValue();
+            var handlers = new List<IEventHandler>();
+
+            for (int i = 0; i < count; i++)
+                handlers.Add(CreateRandomEventHandler());
+
+            return handlers;
         }
     }
 }

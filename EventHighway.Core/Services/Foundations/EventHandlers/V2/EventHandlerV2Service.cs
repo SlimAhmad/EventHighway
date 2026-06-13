@@ -2,6 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.EventHandlers;
 
@@ -22,5 +24,8 @@ namespace EventHighway.Core.Services.Foundations.EventHandlers.V2
                 ValidateEventHandlerV2OnRegister(eventHandler);
                 this.eventHandlerBroker.Register(eventHandler);
             });
+
+        public IEnumerable<IEventHandler> RetrieveAllEventHandlerV2s() =>
+            throw new NotImplementedException();
     }
 }
