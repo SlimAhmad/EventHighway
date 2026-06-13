@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +11,6 @@ using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
 using EventHighway.Core.Services.Orchestrations.Events.V2;
@@ -137,9 +135,9 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             var eventCallV2 = new EventCallV2
             {
                 Content = eventV2.Content,
+                HandlerId = eventListenerV2.HandlerId,
                 HandlerName = eventListenerV2.HandlerName,
-                HandlerConfigurations =
-                    eventListenerV2.HandlerConfigurations?.ToList() ?? new List<HandlerConfiguration>(),
+                HandlerConfigurations = eventListenerV2.HandlerConfigurations?.ToList() ?? [],
                 Response = null
             };
 

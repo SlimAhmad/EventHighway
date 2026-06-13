@@ -20,12 +20,19 @@ namespace EventHighway.EventHandlers
     {
         private readonly IRestService restService;
 
-        public RestSecretEventHandler() =>
+        public RestSecretEventHandler(Guid id)
+        {
+            this.Id = id;
             this.restService = new RestService(new ApiBroker());
+        }
 
-        internal RestSecretEventHandler(IRestService restService) =>
+        internal RestSecretEventHandler(Guid id, IRestService restService)
+        {
+            this.Id = id;
             this.restService = restService;
+        }
 
+        public Guid Id { get; }
         public string Name => nameof(RestSecretEventHandler);
         public IEnumerable<string> RequiredParams => new[] { "Url", "Secret" };
 

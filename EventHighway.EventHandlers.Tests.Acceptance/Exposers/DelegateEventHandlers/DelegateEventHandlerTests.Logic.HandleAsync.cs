@@ -2,8 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using FluentAssertions;
@@ -24,8 +24,10 @@ namespace EventHighway.EventHandlers.Tests.Acceptance.Exposers.DelegateEventHand
 
             string actualInvokedContent = null;
             IReadOnlyDictionary<string, string> actualInvokedHandlerParams = null;
+            Guid identifier = Guid.NewGuid();
 
             var delegateEventHandler = new DelegateEventHandler(
+                Id: identifier,
                 handler: (content, handlerParams, cancellationToken) =>
                 {
                     actualInvokedContent = content;

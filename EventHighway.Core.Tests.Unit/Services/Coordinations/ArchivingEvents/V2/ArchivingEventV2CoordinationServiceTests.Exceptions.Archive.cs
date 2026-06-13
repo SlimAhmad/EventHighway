@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.EventsArchives.V1;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using FluentAssertions;
 using Moq;
 using Xeptions;
@@ -18,8 +18,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
     public partial class ArchivingEventV2CoordinationServiceTests
     {
         [Theory]
-        [MemberData(nameof(ArchivingEvent2ValidationExceptions))]
-        [MemberData(nameof(EventArchiveV1ValidationExceptions))]
+        [MemberData(nameof(ArchivingEventV2ValidationExceptions))]
+        [MemberData(nameof(EventArchiveV2ValidationExceptions))]
         public async Task
             ShouldThrowDependencyValidationOnArchiveDeadEventV2sIfDependencyValidationErrorOccursAndLogItAsync(
                 Xeption validationException)
@@ -30,14 +30,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     message: "Archiving event validation error occurred, fix the errors and try again.",
                     innerException: validationException.InnerException as Xeption);
 
-            this.archivingEvent2OrchestrationServiceMock.Setup(service =>
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()))
                         .Returns(CreateThrowingAsyncEnumerable(validationException));
 
             // when
             ValueTask archiveDeadEventV2sTask =
-                this.archivingEventV1CoordinationService
+                this.archivingEventV2CoordinationService
                     .ArchiveDeadEventV2sAsync(TestContext.Current.CancellationToken);
 
             ArchivingEventV2CoordinationDependencyValidationException
@@ -49,7 +49,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             actualArchivingEventV2CoordinationDependencyValidationException.Should()
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyValidationException);
 
-            this.archivingEvent2OrchestrationServiceMock.Verify(service =>
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()),
                         Times.Once);
@@ -63,26 +63,27 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 broker.GetDateTimeOffsetAsync(),
                     Times.Never);
 
-            this.eventArchiveV1OrchestrationServiceMock.Verify(service =>
-                service.AddEventArchiveV1WithListenerEventArchiveV1sAsync(
-                    It.IsAny<EventArchiveV1>()),
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.AddEventArchiveV2WithListenerEventArchiveV2sAsync(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.archivingEvent2OrchestrationServiceMock.Verify(service =>
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RemoveEventV2AndListenerEventV2sAsync(
                     It.IsAny<EventV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.archivingEvent2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventArchiveV1OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
         [Theory]
-        [MemberData(nameof(ArchivingEvent2DependencyExceptions))]
-        [MemberData(nameof(EventArchiveV1DependencyExceptions))]
+        [MemberData(nameof(ArchivingEventV2DependencyExceptions))]
+        [MemberData(nameof(EventArchiveV2DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnArchiveDeadEventV2sIfDependencyErrorOccursAndLogItAsync(
             Xeption dependencyException)
         {
@@ -92,14 +93,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     message: "Archiving event dependency error occurred, contact support.",
                     innerException: dependencyException.InnerException as Xeption);
 
-            this.archivingEvent2OrchestrationServiceMock.Setup(service =>
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()))
                         .Returns(CreateThrowingAsyncEnumerable(dependencyException));
 
             // when
             ValueTask archiveDeadEventV2sTask =
-                this.archivingEventV1CoordinationService
+                this.archivingEventV2CoordinationService
                     .ArchiveDeadEventV2sAsync(TestContext.Current.CancellationToken);
 
             ArchivingEventV2CoordinationDependencyException
@@ -111,7 +112,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             actualArchivingEventV2CoordinationDependencyException.Should()
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyException);
 
-            this.archivingEvent2OrchestrationServiceMock.Verify(service =>
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()),
                         Times.Once);
@@ -125,21 +126,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 broker.GetDateTimeOffsetAsync(),
                     Times.Never);
 
-            this.eventArchiveV1OrchestrationServiceMock.Verify(service =>
-                service.AddEventArchiveV1WithListenerEventArchiveV1sAsync(
-                    It.IsAny<EventArchiveV1>()),
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.AddEventArchiveV2WithListenerEventArchiveV2sAsync(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.archivingEvent2OrchestrationServiceMock.Verify(service =>
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RemoveEventV2AndListenerEventV2sAsync(
                     It.IsAny<EventV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.archivingEvent2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventArchiveV1OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -160,14 +162,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     message: "Archiving event service error occurred, contact support.",
                     innerException: failedArchivingEventV2CoordinationServiceException);
 
-            this.archivingEvent2OrchestrationServiceMock.Setup(service =>
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()))
                         .Returns(CreateThrowingAsyncEnumerable(serviceException));
 
             // when
             ValueTask archiveDeadEventV2sTask =
-                this.archivingEventV1CoordinationService
+                this.archivingEventV2CoordinationService
                     .ArchiveDeadEventV2sAsync(TestContext.Current.CancellationToken);
 
             ArchivingEventV2CoordinationServiceException
@@ -179,7 +181,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             actualArchivingEventV2CoordinationServiceException.Should()
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationServiceException);
 
-            this.archivingEvent2OrchestrationServiceMock.Verify(service =>
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()),
                         Times.Once);
@@ -193,21 +195,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 broker.GetDateTimeOffsetAsync(),
                     Times.Never);
 
-            this.eventArchiveV1OrchestrationServiceMock.Verify(service =>
-                service.AddEventArchiveV1WithListenerEventArchiveV1sAsync(
-                    It.IsAny<EventArchiveV1>()),
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.AddEventArchiveV2WithListenerEventArchiveV2sAsync(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.archivingEvent2OrchestrationServiceMock.Verify(service =>
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RemoveEventV2AndListenerEventV2sAsync(
                     It.IsAny<EventV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.archivingEvent2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventArchiveV1OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
     }
 }

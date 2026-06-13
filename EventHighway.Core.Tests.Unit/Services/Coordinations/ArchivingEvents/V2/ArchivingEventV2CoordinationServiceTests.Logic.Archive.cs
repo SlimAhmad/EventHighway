@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -8,8 +8,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.EventsArchives.V1;
-using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using Moq;
 
@@ -62,18 +62,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.UpdatedDate,
                         ScheduledDate = item.ScheduledDate,
+                        RemainingRetryAttempts = item.RemainingRetryAttempts,
                         EventAddressId = item.EventAddressId,
                         ListenerEventV2s = retrievedListenerEventV2s
                     }).ToList();
 
-            List<ListenerEventArchiveV1> mappedListenerEventArchiveV1s =
+            List<ListenerEventArchiveV2> mappedListenerEventArchiveV2s =
                 randomListenerEventV2sProperties.Select(item =>
-                    new ListenerEventArchiveV1
+                    new ListenerEventArchiveV2
                     {
                         Id = item.Id,
-                        Status = (ListenerEventArchiveStatusV1)item.Status,
+                        Status = (ListenerEventArchiveStatusV2)item.Status,
                         Response = item.Response,
-                        ResponseReasonPhrase = item.ResponseMessage,
+                        ResponseCode = item.ResponseCode,
+                        ResponseMessage = item.ResponseMessage,
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.UpdatedDate,
                         ArchivedDate = retrievedDateTimeOffset,
@@ -82,42 +84,45 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         EventListenerId = item.EventListenerId
                     }).ToList();
 
-            List<EventArchiveV1> mappedEventArchiveV1s =
+            List<EventArchiveV2> mappedEventArchiveV2s =
                 randomEventV2sProperties.Select(item =>
-                    new EventArchiveV1
+                    new EventArchiveV2
                     {
                         Id = item.Id,
                         Content = item.Content,
-                        Type = (EventArchiveTypeV1)item.Type,
+                        EventName = item.EventName,
+                        Type = (EventArchiveTypeV2)item.Type,
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.UpdatedDate,
                         ScheduledDate = item.ScheduledDate,
+                        RemainingRetryAttempts = item.RemainingRetryAttempts,
                         EventAddressId = item.EventAddressId,
                         ArchivedDate = retrievedDateTimeOffset,
-                        ListenerEventArchiveV1s = mappedListenerEventArchiveV1s
+                        ListenerEventArchiveV2s = mappedListenerEventArchiveV2s
                     }).ToList();
 
-            this.archivingEvent2OrchestrationServiceMock
+            this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveAllDeadEventV2sWithListenersAsync(
                         It.IsAny<CancellationToken>()))
                             .Returns(CreateAsyncEnumerable(retrievedEventV2s));
 
-            foreach ((EventArchiveV1 mappedEventArchiveV1, EventV2 retrievedEventV2)
-                in mappedEventArchiveV1s.Zip(retrievedEventV2s))
+            foreach ((EventArchiveV2 mappedEventArchiveV2, EventV2 retrievedEventV2)
+                in mappedEventArchiveV2s.Zip(retrievedEventV2s))
             {
                 this.dateTimeBrokerMock
                     .InSequence(mockSequence).Setup(broker =>
                         broker.GetDateTimeOffsetAsync())
                             .ReturnsAsync(retrievedDateTimeOffset);
 
-                this.eventArchiveV1OrchestrationServiceMock
+                this.eventArchiveV2OrchestrationServiceMock
                     .InSequence(mockSequence).Setup(service =>
-                        service.AddEventArchiveV1WithListenerEventArchiveV1sAsync(
-                            It.Is(SameEventArchiveV1As(mappedEventArchiveV1))))
+                        service.AddEventArchiveV2WithListenerEventArchiveV2sAsync(
+                            It.Is(SameEventArchiveV2As(mappedEventArchiveV2)),
+                            It.IsAny<CancellationToken>()))
                                 .Returns(ValueTask.CompletedTask);
 
-                this.archivingEvent2OrchestrationServiceMock
+                this.archivingEventV2OrchestrationServiceMock
                     .InSequence(mockSequence).Setup(service =>
                         service.RemoveEventV2AndListenerEventV2sAsync(
                             It.Is(SameEventV2As(retrievedEventV2)),
@@ -126,37 +131,38 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             }
 
             // when
-            await this.archivingEventV1CoordinationService
+            await this.archivingEventV2CoordinationService
                 .ArchiveDeadEventV2sAsync(TestContext.Current.CancellationToken);
 
             // then
-            this.archivingEvent2OrchestrationServiceMock.Verify(service =>
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
-                    Times.Exactly(mappedEventArchiveV1s.Count));
+                    Times.Exactly(mappedEventArchiveV2s.Count));
 
-            foreach ((EventArchiveV1 mappedEventArchiveV1, EventV2 retrievedEventV2)
-                in mappedEventArchiveV1s.Zip(retrievedEventV2s))
+            foreach ((EventArchiveV2 mappedEventArchiveV2, EventV2 retrievedEventV2)
+                in mappedEventArchiveV2s.Zip(retrievedEventV2s))
             {
-                this.eventArchiveV1OrchestrationServiceMock.Verify(service =>
-                    service.AddEventArchiveV1WithListenerEventArchiveV1sAsync(
-                        It.Is(SameEventArchiveV1As(mappedEventArchiveV1))),
+                this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                    service.AddEventArchiveV2WithListenerEventArchiveV2sAsync(
+                        It.Is(SameEventArchiveV2As(mappedEventArchiveV2)),
+                        It.IsAny<CancellationToken>()),
                             Times.Once);
 
-                this.archivingEvent2OrchestrationServiceMock.Verify(service =>
+                this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                     service.RemoveEventV2AndListenerEventV2sAsync(
                         It.Is(SameEventV2As(retrievedEventV2)),
                         It.IsAny<CancellationToken>()),
                             Times.Once);
             }
 
-            this.archivingEvent2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventArchiveV1OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

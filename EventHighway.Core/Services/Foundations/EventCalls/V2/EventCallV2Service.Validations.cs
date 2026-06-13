@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using EventHighway.Core.Brokers.EventHandlers;
+using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
@@ -17,7 +17,7 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
         private void ValidateEventCallV2OnRun(EventCallV2 eventCallV2)
         {
             ValidateEventCallV2IsNotNull(eventCallV2);
-            ValidateEventHandlerBrokersIsNotNull();
+            ValidateEventHandlerBrokerIsNotNull();
 
             Validate(
                 message: "Event call is invalid, fix the errors and try again.",
@@ -46,9 +46,9 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             }
         }
 
-        private void ValidateEventHandlerBrokersIsNotNull()
+        private void ValidateEventHandlerBrokerIsNotNull()
         {
-            if (this.eventHandlerBrokers is null)
+            if (this.eventHandlerBroker is null)
             {
                 throw new HandlerNotFoundEventCallV2Exception(
                     message: "No event call handler was found, fix the errors and try again.");
@@ -56,7 +56,7 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
         }
 
         private static void ValidateHandlerConfigurations(
-            IEventHandlerBroker handler,
+            IEventHandler handler,
             List<HandlerConfiguration> handlerConfigurations)
         {
             var validations = new List<(bool Rule, string Parameter, string Message)>();
@@ -88,8 +88,8 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
         private void ValidateHandlerCount(string handlerName)
         {
             int count =
-                this.eventHandlerBrokers.Count(
-                    broker => broker.Name == handlerName);
+                this.eventHandlerBroker.GetAll()
+                    .Count(h => h.Name == handlerName);
 
             Validate(
                 message: "EventHandlerBrokers on event call is invalid, fix the errors and try again.",

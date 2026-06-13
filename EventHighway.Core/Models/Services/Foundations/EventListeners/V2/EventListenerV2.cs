@@ -15,6 +15,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public Guid HandlerId { get; set; }
         public string HandlerName { get; set; }
         public IEnumerable<HandlerConfiguration> HandlerConfigurations { get; set; }
         public DateTimeOffset CreatedDate { get; set; }

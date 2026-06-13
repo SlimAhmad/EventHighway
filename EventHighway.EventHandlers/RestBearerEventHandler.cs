@@ -20,15 +20,23 @@ namespace EventHighway.EventHandlers
     {
         private readonly IRestService restService;
 
-        public RestBearerEventHandler() =>
+        public RestBearerEventHandler(Guid id)
+        {
+            this.Id = id;
             this.restService = new RestService(new ApiBroker());
+        }
 
-        internal RestBearerEventHandler(IRestService restService) =>
+        internal RestBearerEventHandler(Guid id, IRestService restService)
+        {
+            this.Id = id;
             this.restService = restService;
+        }
 
+        public Guid Id { get; }
         public string Name => nameof(RestBearerEventHandler);
         public IEnumerable<string> RequiredParams =>
             new[] { "Url", "ClientId", "ClientSecret", "Scope", "GrantType", "TokenUrl" };
+
 
         public async ValueTask<EventHandlerResult> HandleAsync(
             string content,

@@ -4,6 +4,7 @@
 
 using EventHighway.Core.Clients.EventHighways;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners;
 using EventHighway.Core.Models.Services.Foundations.Events;
 
@@ -18,6 +19,17 @@ namespace EventHighway.App
                 "Trusted_Connection=True;MultipleActiveResultSets=true");
 
             var eventHighwayClient = new EventHighwayClient(inputConnectionString);
+
+            await eventHighwayClient.V2.EventAddressV2Client.RegisterEventAddressV2Async(
+                eventAddressV2: new EventAddressV2
+                {
+                    Id = Guid.Parse(input: "d3b3b3b3-0b3b-4b3b-8b3b-0b3b3b3b3b32"),
+                    CreatedDate = DateTimeOffset.UtcNow,
+                    UpdatedDate = DateTimeOffset.UtcNow,
+                    Name = "Test",
+                    Description = "Some Desc."
+                });
+
 
             await eventHighwayClient.EventAddresses.RegisterEventAddressAsync(
                 eventAddress: new EventAddress

@@ -3,28 +3,18 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 
 namespace EventHighway.Core.Brokers.EventHandlers
 {
     internal class EventHandlerBroker : IEventHandlerBroker
     {
-        private readonly IEventHandler eventHandler;
+        private readonly List<IEventHandler> eventHandlers = new List<IEventHandler>();
 
-        public EventHandlerBroker(IEventHandler eventHandler)
-        {
-            this.eventHandler = eventHandler;
-        }
+        public void Register(IEventHandler eventHandler) =>
+            this.eventHandlers.Add(eventHandler);
 
-        public string Name => eventHandler.Name;
-        public IEnumerable<string> RequiredParams => eventHandler.RequiredParams;
-
-        public ValueTask<EventHandlerResult> HandleAsync(
-            string content,
-            IReadOnlyDictionary<string, string> handlerParams,
-            CancellationToken cancellationToken = default) =>
-            eventHandler.HandleAsync(content, handlerParams, cancellationToken);
+        public IEnumerable<IEventHandler> GetAll() =>
+            this.eventHandlers;
     }
 }

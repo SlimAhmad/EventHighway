@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Clients.EventHighways;
 
 namespace EventHighway.Core.Tests.Acceptance.Brokers
@@ -17,8 +18,13 @@ namespace EventHighway.Core.Tests.Acceptance.Brokers
                 "Server=(localdb)\\MSSQLLocalDB;Database=EventHighwayDb;",
                 "Trusted_Connection=True;MultipleActiveResultSets=true");
 
-            this.eventHighwayClient =
-                new EventHighwayClient(connectionString);
+            this.eventHighwayClient = new EventHighwayClient(connectionString);
+        }
+
+        public ClientBroker RegisterEventHandler(IEventHandler eventHandler)
+        {
+            this.eventHighwayClient.V2.RegisterEventHandler(eventHandler);
+            return this;
         }
     }
 }

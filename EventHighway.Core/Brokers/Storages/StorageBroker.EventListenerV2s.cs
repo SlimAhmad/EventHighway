@@ -17,16 +17,28 @@ namespace EventHighway.Core.Brokers.Storages
 
         public async ValueTask<EventListenerV2> InsertEventListenerV2Async(
             EventListenerV2 eventListenerV2,
-            CancellationToken cancellationToken = default) =>
-            await InsertAsync(eventListenerV2, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            var broker = new StorageBroker(this.connectionString);
+            broker.Add(eventListenerV2);
+            await broker.SaveChangesAsync(cancellationToken);
+
+            return eventListenerV2;
+        }
 
         public async ValueTask<IQueryable<EventListenerV2>> SelectAllEventListenerV2sAsync() =>
-            SelectAll<EventListenerV2>();
+            SelectAll<EventListenerV2>().Include(e => e.HandlerConfigurations);
 
         public async ValueTask<EventListenerV2> SelectEventListenerV2ByIdAsync(
             Guid eventListenerV2Id,
-            CancellationToken cancellationToken = default) =>
-            await SelectAsync<EventListenerV2>(new object[] { eventListenerV2Id }, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            var broker = new StorageBroker(this.connectionString);
+
+            return await broker.EventListenerV2s
+                .Include(e => e.HandlerConfigurations)
+                .FirstOrDefaultAsync(e => e.Id == eventListenerV2Id, cancellationToken);
+        }
 
         public async ValueTask<EventListenerV2> DeleteEventListenerV2Async(
             EventListenerV2 eventListenerV2,

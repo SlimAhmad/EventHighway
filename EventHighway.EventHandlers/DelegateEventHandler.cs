@@ -19,14 +19,24 @@ namespace EventHighway.EventHandlers
         private readonly IDelegateService delegateService;
 
         public DelegateEventHandler(
+            Guid Id,
             Func<string, IReadOnlyDictionary<string, string>, CancellationToken, ValueTask<EventHandlerResult>> handler)
-            => this.delegateService = new DelegateService(handler);
+        {
+            this.Id = Id;
+            this.delegateService = new DelegateService(handler);
+        }
 
-        internal DelegateEventHandler(IDelegateService delegateService)
-            => this.delegateService = delegateService;
+        internal DelegateEventHandler(Guid Id, IDelegateService delegateService)
+        {
+            this.Id = Id;
+            this.delegateService = delegateService;
+        }
+
+        public Guid Id { get; }
 
         public string Name => nameof(DelegateEventHandler);
         public IEnumerable<string> RequiredParams => Array.Empty<string>();
+
 
         public async ValueTask<EventHandlerResult> HandleAsync(
             string content,

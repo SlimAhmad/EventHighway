@@ -22,9 +22,11 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.RestBearerEventHandlers
         public RestBearerEventHandlerTests()
         {
             this.restServiceMock = new Mock<IRestService>();
+            Guid identifier = Guid.NewGuid();
 
             this.restBearerEventHandler =
                 new RestBearerEventHandler(
+                    id: identifier,
                     restService: this.restServiceMock.Object);
         }
 

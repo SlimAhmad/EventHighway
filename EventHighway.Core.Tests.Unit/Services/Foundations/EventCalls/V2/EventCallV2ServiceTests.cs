@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -19,16 +19,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
     public partial class EventCallV2ServiceTests
     {
         private readonly Mock<IEventHandlerBroker> eventHandlerBrokerMock;
+        private readonly Mock<IEventHandler> eventHandlerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IEventCallV2Service eventCallV2Service;
 
         public EventCallV2ServiceTests()
         {
             this.eventHandlerBrokerMock = new Mock<IEventHandlerBroker>();
+            this.eventHandlerMock = new Mock<IEventHandler>();
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
             this.eventCallV2Service = new EventCallV2Service(
-                eventHandlerBrokers: new[] { this.eventHandlerBrokerMock.Object },
+                eventHandlerBroker: this.eventHandlerBrokerMock.Object,
                 loggingBroker: this.loggingBrokerMock.Object);
         }
 
@@ -59,6 +61,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         private class SomeCriticalEventHandlerDependencyException
             : Exception, IEventHandlerDependencyException
         { }
+
         public static TheoryData<Exception> ServiceExceptions() =>
             new TheoryData<Exception>
             {
@@ -68,6 +71,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         private class SomeDependencyValidationEventHandlerException
             : Exception, IEventHandlerValidationException
         { }
+
         private class SomeServiceEventHandlerException
             : Exception, IEventHandlerServiceException
         { }
@@ -84,4 +88,3 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         }
     }
 }
-

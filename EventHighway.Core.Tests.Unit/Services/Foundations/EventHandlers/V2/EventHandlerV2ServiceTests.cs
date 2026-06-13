@@ -1,0 +1,44 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Linq.Expressions;
+using EventHighway.Abstractions.EventHandlers;
+using EventHighway.Core.Brokers.EventHandlers;
+using EventHighway.Core.Services.Foundations.EventHandlers.V2;
+using Moq;
+using Tynamix.ObjectFiller;
+using Xeptions;
+
+namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventHandlers.V2
+{
+    public partial class EventHandlerV2ServiceTests
+    {
+        private readonly Mock<IEventHandlerBroker> eventHandlerBrokerMock;
+        private readonly IEventHandlerV2Service eventHandlerV2Service;
+
+        public EventHandlerV2ServiceTests()
+        {
+            this.eventHandlerBrokerMock = new Mock<IEventHandlerBroker>();
+
+            this.eventHandlerV2Service = new EventHandlerV2Service(
+                eventHandlerBroker: this.eventHandlerBrokerMock.Object);
+        }
+
+        private static string GetRandomString() =>
+            new MnemonicString(1).GetValue();
+
+        private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
+            actualException => actualException.SameExceptionAs(expectedException);
+
+        private static IEventHandler CreateRandomEventHandler()
+        {
+            var mock = new Mock<IEventHandler>();
+            mock.SetupGet(h => h.Id).Returns(Guid.NewGuid());
+            mock.SetupGet(h => h.Name).Returns(new MnemonicString(1).GetValue());
+            mock.SetupGet(h => h.RequiredParams).Returns(Array.Empty<string>());
+            return mock.Object;
+        }
+    }
+}
