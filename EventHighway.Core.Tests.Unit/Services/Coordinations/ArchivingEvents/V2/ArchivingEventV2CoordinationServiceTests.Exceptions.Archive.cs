@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.archivingEvent2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(validationException);
+                        .Returns(CreateThrowingAsyncEnumerable(validationException));
 
             // when
             ValueTask archiveDeadEventV2sTask =
@@ -95,7 +95,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.archivingEvent2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(dependencyException);
+                        .Returns(CreateThrowingAsyncEnumerable(dependencyException));
 
             // when
             ValueTask archiveDeadEventV2sTask =
@@ -163,7 +163,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.archivingEvent2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveAllDeadEventV2sWithListenersAsync(
                     It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(serviceException);
+                        .Returns(CreateThrowingAsyncEnumerable(serviceException));
 
             // when
             ValueTask archiveDeadEventV2sTask =

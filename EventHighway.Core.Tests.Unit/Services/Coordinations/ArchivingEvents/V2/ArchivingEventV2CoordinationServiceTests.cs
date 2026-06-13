@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
@@ -273,6 +274,24 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             return CreateEventV2Filler()
                 .Create(count: GetRandomNumber())
                     .AsQueryable();
+        }
+
+        private static async IAsyncEnumerable<EventV2> CreateAsyncEnumerable(
+            IEnumerable<EventV2> eventV2s)
+        {
+            foreach (EventV2 eventV2 in eventV2s)
+                yield return eventV2;
+
+            await Task.CompletedTask;
+        }
+
+        private static async IAsyncEnumerable<EventV2> CreateThrowingAsyncEnumerable(Exception exception)
+        {
+            await Task.CompletedTask;
+            throw exception;
+#pragma warning disable CS0162
+            yield break;
+#pragma warning restore CS0162
         }
 
         private static Filler<EventV2> CreateEventV2Filler()
