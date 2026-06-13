@@ -35,7 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption(someMessage);
-            someInnerException.AddData(GetRandomString(), GetRandomString());
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
 
             return new TheoryData<Xeption>
             {
