@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
@@ -40,6 +41,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
 
             return new TheoryData<Xeption>
             {
@@ -57,6 +59,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
 
             return new TheoryData<Xeption>
             {
