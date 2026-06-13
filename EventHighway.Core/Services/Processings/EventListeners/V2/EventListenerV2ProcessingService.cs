@@ -26,7 +26,10 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
         }
 
         public ValueTask<IQueryable<EventListenerV2>> RetrieveAllEventListenerV2sAsync() =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            return await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync();
+        });
 
         public ValueTask<EventListenerV2> AddEventListenerV2Async(
             EventListenerV2 eventListenerV2,
