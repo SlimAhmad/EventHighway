@@ -3,17 +3,76 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
-using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 using Xeptions;
 
 namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
 {
     internal partial class EventArchiveV2OrchestrationService
     {
+        private delegate ValueTask<IQueryable<EventArchiveV2>> ReturningEventArchiveV2sFunction();
+        private delegate ValueTask<IQueryable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2sFunction();
         private delegate ValueTask ReturningNothingFunction();
+
+        private async ValueTask<IQueryable<EventArchiveV2>> TryCatch(
+            ReturningEventArchiveV2sFunction returningEventArchiveV2sFunction)
+        {
+            try
+            {
+                return await returningEventArchiveV2sFunction();
+            }
+            catch (EventArchiveV2DependencyException eventArchiveV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2DependencyException);
+            }
+            catch (EventArchiveV2ServiceException eventArchiveV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventArchiveV2OrchestrationServiceException =
+                    new FailedEventArchiveV2OrchestrationServiceException(
+                        message: "Failed event archive service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventArchiveV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<IQueryable<ListenerEventArchiveV2>> TryCatch(
+            ReturningListenerEventArchiveV2sFunction returningListenerEventArchiveV2sFunction)
+        {
+            try
+            {
+                return await returningListenerEventArchiveV2sFunction();
+            }
+            catch (ListenerEventArchiveV2DependencyException listenerEventArchiveV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(listenerEventArchiveV2DependencyException);
+            }
+            catch (ListenerEventArchiveV2ServiceException listenerEventArchiveV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(listenerEventArchiveV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventArchiveV2OrchestrationServiceException =
+                    new FailedEventArchiveV2OrchestrationServiceException(
+                        message: "Failed event archive service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventArchiveV2OrchestrationServiceException);
+            }
+        }
 
         private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
         {
