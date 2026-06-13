@@ -12,9 +12,11 @@ using EventHighway.Core.Clients.ArchivingEvents.V2;
 using EventHighway.Core.Clients.EventAddresses.V2;
 using EventHighway.Core.Clients.EventListeners.V2;
 using EventHighway.Core.Clients.Events.V2;
+using EventHighway.Core.Clients.HealthChecks.V2;
 using EventHighway.Core.Clients.ListenerEvents.V2;
 using EventHighway.Core.Services.Coordinations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Coordinations.Events.V2;
+using EventHighway.Core.Services.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Services.Foundations.EventArchives.V2;
 using EventHighway.Core.Services.Foundations.EventCalls.V2;
@@ -60,6 +62,7 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         public IEventAddressV2Client EventAddressV2Client { get; private set; }
         public IEventListenerV2Client EventListenerV2Client { get; private set; }
         public IEventV2Client EventV2Client { get; private set; }
+        public IHealthV2Client HealthV2Client { get; private set; }
         public IListenerEventV2Client ListenerEventV2Client { get; private set; }
 
         private void InitializeClients(IServiceProvider serviceProvider)
@@ -78,6 +81,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
 
             this.EventV2Client =
                 serviceProvider.GetRequiredService<IEventV2Client>();
+
+            this.HealthV2Client =
+                serviceProvider.GetRequiredService<IHealthV2Client>();
 
             this.ListenerEventV2Client =
                 serviceProvider.GetRequiredService<IListenerEventV2Client>();
@@ -175,6 +181,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IArchivingEventV2CoordinationService,
                 ArchivingEventV2CoordinationService>();
+
+            services.AddTransient<
+                IHealthV2CoordinationService,
+                HealthV2CoordinationService>();
         }
 
         private static void RegisterClients(IServiceCollection services)
@@ -194,6 +204,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IArchivingEventV2Client,
                 ArchivingEventV2Client>();
+
+            services.AddTransient<
+                IHealthV2Client,
+                HealthV2Client>();
 
             services.AddTransient<
                 IListenerEventV2Client,
