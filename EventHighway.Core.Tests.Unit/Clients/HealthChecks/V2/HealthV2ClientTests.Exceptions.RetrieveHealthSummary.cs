@@ -63,7 +63,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
 
             string someMessage = GetRandomString();
             var someInnerException = new Xeption(someMessage);
-            someInnerException.AddData(GetRandomString(), GetRandomString());
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
 
             var healthV2CoordinationDependencyException =
                 new HealthV2CoordinationDependencyException(
@@ -108,7 +108,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
 
             string someMessage = GetRandomString();
             var someInnerException = new Xeption(someMessage);
-            someInnerException.AddData(GetRandomString(), GetRandomString());
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var healthV2CoordinationServiceException =
                 new HealthV2CoordinationServiceException(
