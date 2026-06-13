@@ -9,10 +9,14 @@ using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Clients.EventAddresses;
 using EventHighway.Core.Clients.EventAddresses.V1;
+using EventHighway.Core.Clients.EventAddresses.V2;
+using EventHighway.Core.Clients.EventHighways.V2;
 using EventHighway.Core.Clients.EventListeners;
 using EventHighway.Core.Clients.EventListeners.V1;
+using EventHighway.Core.Clients.EventListeners.V2;
 using EventHighway.Core.Clients.Events;
 using EventHighway.Core.Clients.Events.V1;
+using EventHighway.Core.Clients.Events.V2;
 using EventHighway.Core.Clients.ListenerEvents.V1;
 using EventHighway.Core.Clients.ListenerEvents.V2;
 using EventHighway.Core.Services.Coordinations.Events;
@@ -20,17 +24,17 @@ using EventHighway.Core.Services.Coordinations.Events.V1;
 using EventHighway.Core.Services.Coordinations.Events.V2;
 using EventHighway.Core.Services.Foundations.EventAddresses;
 using EventHighway.Core.Services.Foundations.EventAddresses.V1;
+using EventHighway.Core.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Services.Foundations.EventArchives.V1;
 using EventHighway.Core.Services.Foundations.EventCalls;
 using EventHighway.Core.Services.Foundations.EventCalls.V1;
-using EventHighway.Core.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Services.Foundations.EventCalls.V2;
 using EventHighway.Core.Services.Foundations.EventListeners;
-using EventHighway.Core.Services.Foundations.Events.V2;
 using EventHighway.Core.Services.Foundations.EventListeners.V1;
 using EventHighway.Core.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Services.Foundations.Events;
 using EventHighway.Core.Services.Foundations.Events.V1;
+using EventHighway.Core.Services.Foundations.Events.V2;
 using EventHighway.Core.Services.Foundations.ListenerEventArchives.V1;
 using EventHighway.Core.Services.Foundations.ListernEvents;
 using EventHighway.Core.Services.Foundations.ListernEvents.V1;
@@ -38,20 +42,20 @@ using EventHighway.Core.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V1;
 using EventHighway.Core.Services.Orchestrations.EventListeners;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V1;
+using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
 using EventHighway.Core.Services.Orchestrations.Events;
 using EventHighway.Core.Services.Orchestrations.Events.V1;
 using EventHighway.Core.Services.Orchestrations.Events.V2;
 using EventHighway.Core.Services.Processings.EventAddresses.V1;
 using EventHighway.Core.Services.Processings.EventAddresses.V2;
-using EventHighway.Core.Services.Processings.Events.V2;
 using EventHighway.Core.Services.Processings.EventCalls;
 using EventHighway.Core.Services.Processings.EventCalls.V1;
 using EventHighway.Core.Services.Processings.EventCalls.V2;
 using EventHighway.Core.Services.Processings.EventListeners;
-using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
 using EventHighway.Core.Services.Processings.EventListeners.V1;
 using EventHighway.Core.Services.Processings.EventListeners.V2;
 using EventHighway.Core.Services.Processings.Events.V1;
+using EventHighway.Core.Services.Processings.Events.V2;
 using EventHighway.Core.Services.Processings.ListenerEvents;
 using EventHighway.Core.Services.Processings.ListenerEvents.V1;
 using EventHighway.Core.Services.Processings.ListenerEvents.V2;
@@ -78,7 +82,8 @@ namespace EventHighway.Core.Clients.EventHighways
         public IEventAddressesV1Client EventAddressV1s { get; set; }
         public IEventListenerV1sClient EventListenerV1s { get; set; }
         public IListenerEventV1sClient ListenerEventV1s { get; set; }
-        public IListenerEventV2sClient ListenerEventV2s { get; set; }
+        public IListenerEventV2Client ListenerEventV2s { get; set; }
+        public IClientV2 V2 { get; private set; }
 
         private void InitializeClients(IServiceProvider serviceProvider)
         {
@@ -107,7 +112,9 @@ namespace EventHighway.Core.Clients.EventHighways
                 serviceProvider.GetRequiredService<IListenerEventV1sClient>();
 
             this.ListenerEventV2s =
-                serviceProvider.GetRequiredService<IListenerEventV2sClient>();
+                serviceProvider.GetRequiredService<IListenerEventV2Client>();
+
+            this.V2 = serviceProvider.GetRequiredService<IClientV2>();
         }
 
         private IServiceProvider ConfigureDependencies()
@@ -150,11 +157,13 @@ namespace EventHighway.Core.Clients.EventHighways
             services.AddTransient<IEventV1Service, EventV1Service>();
             services.AddTransient<IEventListenerV1Service, EventListenerV1Service>();
             services.AddTransient<IListenerEventV1Service, ListenerEventV1Service>();
+            services.AddTransient<IListenerEventV2Service, ListenerEventV2Service>();
             services.AddTransient<IEventCallV1Service, EventCallV1Service>();
             services.AddTransient<IEventCallV2Service, EventCallV2Service>();
             services.AddTransient<IEventV2Service, EventV2Service>();
             services.AddTransient<IEventAddressV2Service, EventAddressV2Service>();
             services.AddTransient<IEventAddressV1Service, EventAddressV1Service>();
+            services.AddTransient<IEventListenerV2Service, EventListenerV2Service>();
             services.AddTransient<IEventArchiveV1Service, EventArchiveV1Service>();
             services.AddTransient<IListenerEventArchiveV1Service, ListenerEventArchiveV1Service>();
             services.AddTransient<IEventListenerV2Service, EventListenerV2Service>();
@@ -305,8 +314,24 @@ namespace EventHighway.Core.Clients.EventHighways
                 ListenerEventV1sClient>();
 
             services.AddTransient<
-                IListenerEventV2sClient,
-                ListenerEventV2sClient>();
+                IListenerEventV2Client,
+                ListenerEventV2Client>();
+
+            services.AddTransient<
+                IEventAddressV2Client,
+                EventAddressV2Client>();
+
+            services.AddTransient<
+                IEventListenerV2Client,
+                EventListenerV2Client>();
+
+            services.AddTransient<
+                IEventV2Client,
+                EventV2Client>();
+
+            services.AddTransient<
+                IClientV2,
+                ClientV2>();
 
             services.AddTransient<
                 IEventHighwayClient,

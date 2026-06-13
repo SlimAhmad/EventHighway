@@ -1,0 +1,168 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Clients.EventListeners.V2.Exceptions;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
+using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
+using Xeptions;
+
+namespace EventHighway.Core.Clients.EventListeners.V2
+{
+    internal class EventListenerV2Client : IEventListenerV2Client
+    {
+        private readonly IEventListenerV2OrchestrationService eventListenerV2OrchestrationService;
+
+        public EventListenerV2Client(IEventListenerV2OrchestrationService eventListenerV2OrchestrationService) =>
+            this.eventListenerV2OrchestrationService = eventListenerV2OrchestrationService;
+
+        public async ValueTask<EventListenerV2> RegisterEventListenerV2Async(
+            EventListenerV2 eventListenerV2,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventListenerV2OrchestrationService
+                    .AddEventListenerV2Async(eventListenerV2, cancellationToken);
+            }
+            catch (EventListenerV2OrchestrationValidationException
+                eventListenerV2OrchestrationValidationException)
+            {
+                throw CreateEventListenerV2ClientValidationException(
+                    eventListenerV2OrchestrationValidationException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationDependencyValidationException
+                eventListenerV2OrchestrationDependencyValidationException)
+            {
+                throw CreateEventListenerV2ClientValidationException(
+                    eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationDependencyException
+                eventListenerV2OrchestrationDependencyException)
+            {
+                throw CreateEventListenerV2ClientDependencyException(
+                    eventListenerV2OrchestrationDependencyException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationServiceException
+                eventListenerV2OrchestrationServiceException)
+            {
+                throw CreateEventListenerV2ClientDependencyException(
+                    eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventListenerV2ClientServiceException(exception as Xeption);
+            }
+        }
+
+        public async ValueTask<IQueryable<EventListenerV2>> RetrieveEventListenerV2sByEventAddressIdAsync(
+            Guid eventAddressId,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventListenerV2OrchestrationService
+                    .RetrieveEventListenerV2sByEventAddressIdAsync(eventAddressId, cancellationToken);
+            }
+            catch (EventListenerV2OrchestrationValidationException
+                eventListenerV2OrchestrationValidationException)
+            {
+                throw CreateEventListenerV2ClientValidationException(
+                    eventListenerV2OrchestrationValidationException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationDependencyValidationException
+                eventListenerV2OrchestrationDependencyValidationException)
+            {
+                throw CreateEventListenerV2ClientValidationException(
+                    eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationDependencyException
+                eventListenerV2OrchestrationDependencyException)
+            {
+                throw CreateEventListenerV2ClientDependencyException(
+                    eventListenerV2OrchestrationDependencyException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationServiceException
+                eventListenerV2OrchestrationServiceException)
+            {
+                throw CreateEventListenerV2ClientDependencyException(
+                    eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventListenerV2ClientServiceException(exception as Xeption);
+            }
+        }
+
+        public async ValueTask<EventListenerV2> RemoveEventListenerV2ByIdAsync(
+            Guid eventListenerV2Id,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventListenerV2OrchestrationService
+                    .RemoveEventListenerV2ByIdAsync(eventListenerV2Id, cancellationToken);
+            }
+            catch (EventListenerV2OrchestrationValidationException
+                eventListenerV2OrchestrationValidationException)
+            {
+                throw CreateEventListenerV2ClientValidationException(
+                    eventListenerV2OrchestrationValidationException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationDependencyValidationException
+                eventListenerV2OrchestrationDependencyValidationException)
+            {
+                throw CreateEventListenerV2ClientValidationException(
+                    eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationDependencyException
+                eventListenerV2OrchestrationDependencyException)
+            {
+                throw CreateEventListenerV2ClientDependencyException(
+                    eventListenerV2OrchestrationDependencyException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationServiceException
+                eventListenerV2OrchestrationServiceException)
+            {
+                throw CreateEventListenerV2ClientDependencyException(
+                    eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventListenerV2ClientServiceException(exception as Xeption);
+            }
+        }
+
+        private static EventListenerV2ClientValidationException
+            CreateEventListenerV2ClientValidationException(Xeption innerException)
+        {
+            return new EventListenerV2ClientValidationException(
+                message: "Event listener client validation error occurred, fix the errors and try again.",
+                innerException: innerException,
+                data: innerException.Data);
+        }
+
+        private static EventListenerV2ClientDependencyException
+            CreateEventListenerV2ClientDependencyException(Xeption innerException)
+        {
+            return new EventListenerV2ClientDependencyException(
+                message: "Event listener client dependency error occurred, contact support.",
+                innerException: innerException,
+                data: innerException.Data);
+        }
+
+        private static EventListenerV2ClientServiceException
+            CreateEventListenerV2ClientServiceException(Xeption innerException)
+        {
+            return new EventListenerV2ClientServiceException(
+                message: "Event listener client service error occurred, contact support.",
+                innerException: innerException,
+                data: innerException.Data);
+        }
+    }
+}
