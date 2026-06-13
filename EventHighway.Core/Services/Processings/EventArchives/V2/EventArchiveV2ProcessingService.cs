@@ -2,6 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
@@ -22,6 +24,9 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
             this.eventArchiveV2Service = eventArchiveV2Service;
             this.loggingBroker = loggingBroker;
         }
+
+        public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync() =>
+            throw new NotImplementedException();
 
         public ValueTask<EventArchiveV2> AddEventArchiveV2Async(
             EventArchiveV2 eventArchiveV2,
