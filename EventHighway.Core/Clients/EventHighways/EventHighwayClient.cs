@@ -82,7 +82,7 @@ namespace EventHighway.Core.Clients.EventHighways
         {
             using (var scope = serviceProvider.CreateScope())
             {
-                var storageBroker = scope.ServiceProvider.GetRequiredService<StorageBroker>();
+                var storageBroker = (StorageBroker)scope.ServiceProvider.GetRequiredService<IStorageBroker>();
                 storageBroker.Database.Migrate();
             }
 
@@ -138,9 +138,6 @@ namespace EventHighway.Core.Clients.EventHighways
                 IStorageBroker,
                 StorageBroker>(_ =>
                     new StorageBroker(this.dataConnectionString));
-
-            services.AddTransient<StorageBroker>(_ =>
-                new StorageBroker(this.dataConnectionString));
 
             services.AddTransient<IApiBroker, ApiBroker>();
         }
