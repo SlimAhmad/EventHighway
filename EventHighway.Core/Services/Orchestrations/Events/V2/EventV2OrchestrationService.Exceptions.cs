@@ -5,6 +5,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
@@ -19,6 +20,7 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
     {
         private delegate ValueTask<EventV2> ReturningEventV2Function();
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
+        private delegate ValueTask<IQueryable<EventAddressV2>> ReturningEventAddressV2sFunction();
         private delegate ValueTask<EventCallV2> ReturningEventCallV2Function();
 
         private async ValueTask<EventV2> TryCatch(ReturningEventV2Function returningEventV2Function)
@@ -120,6 +122,33 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             catch (EventV2ProcessingServiceException eventV2ProcessingServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventV2ProcessingServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventV2OrchestrationServiceException =
+                    new FailedEventV2OrchestrationServiceException(
+                        message: "Failed event service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<IQueryable<EventAddressV2>> TryCatch(
+            ReturningEventAddressV2sFunction returningEventAddressV2sFunction)
+        {
+            try
+            {
+                return await returningEventAddressV2sFunction();
+            }
+            catch (EventAddressV2ProcessingDependencyException eventAddressV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventAddressV2ProcessingDependencyException);
+            }
+            catch (EventAddressV2ProcessingServiceException eventAddressV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventAddressV2ProcessingServiceException);
             }
             catch (Exception exception)
             {
