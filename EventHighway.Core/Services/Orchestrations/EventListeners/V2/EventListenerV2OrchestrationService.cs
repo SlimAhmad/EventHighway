@@ -43,7 +43,8 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
 
         public ValueTask<IEnumerable<IEventHandler>> RetrieveAllEventHandlerV2sAsync(
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(() =>
+            ValueTask.FromResult(this.eventHandlerV2Service.RetrieveAllEventHandlerV2s()));
 
         public ValueTask<EventListenerV2> AddEventListenerV2Async(
             EventListenerV2 eventListenerV2,
