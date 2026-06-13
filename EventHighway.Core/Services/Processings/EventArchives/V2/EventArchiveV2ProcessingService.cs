@@ -26,7 +26,10 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
         }
 
         public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync() =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            return await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync();
+        });
 
         public ValueTask<EventArchiveV2> AddEventArchiveV2Async(
             EventArchiveV2 eventArchiveV2,
