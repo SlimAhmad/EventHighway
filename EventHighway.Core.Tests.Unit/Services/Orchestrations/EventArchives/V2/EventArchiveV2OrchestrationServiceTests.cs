@@ -4,10 +4,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
 using EventHighway.Core.Services.Foundations.EventArchives.V2;
 using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
@@ -115,15 +117,38 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 
+        private static int GetRandomNumber() =>
+            new IntRange(min: 2, max: 9).GetValue();
+
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
+
+        private static IQueryable<EventArchiveV2> CreateRandomEventArchiveV2s() =>
+            CreateEventArchiveV2Filler().Create(count: GetRandomNumber()).AsQueryable();
 
         private static EventArchiveV2 CreateRandomEventArchiveV2() =>
             CreateEventArchiveV2Filler().Create();
 
+        private static IQueryable<ListenerEventArchiveV2> CreateRandomListenerEventArchiveV2s() =>
+            CreateListenerEventArchiveV2Filler().Create(count: GetRandomNumber()).AsQueryable();
+
         private static Filler<EventArchiveV2> CreateEventArchiveV2Filler()
         {
             var filler = new Filler<EventArchiveV2>();
+
+            filler.Setup()
+                .OnType<DateTimeOffset>()
+                    .Use(GetRandomDateTimeOffset)
+
+                .OnType<DateTimeOffset?>()
+                    .Use(GetRandomDateTimeOffset());
+
+            return filler;
+        }
+
+        private static Filler<ListenerEventArchiveV2> CreateListenerEventArchiveV2Filler()
+        {
+            var filler = new Filler<ListenerEventArchiveV2>();
 
             filler.Setup()
                 .OnType<DateTimeOffset>()
