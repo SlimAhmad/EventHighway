@@ -148,6 +148,23 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
 
+        private static IEnumerable<IEventHandler> CreateRandomEventHandlers()
+        {
+            int count = GetRandomNumber();
+            var handlers = new List<IEventHandler>();
+
+            for (int i = 0; i < count; i++)
+            {
+                var mock = new Mock<IEventHandler>();
+                mock.SetupGet(h => h.Id).Returns(Guid.NewGuid());
+                mock.SetupGet(h => h.Name).Returns(GetRandomString());
+                mock.SetupGet(h => h.RequiredParams).Returns(System.Array.Empty<string>());
+                handlers.Add(mock.Object);
+            }
+
+            return handlers;
+        }
+
         private static IQueryable<ListenerEventV2> CreateRandomListenerEventV2s() =>
             CreateListenerEventV2Filler().Create(count: GetRandomNumber()).AsQueryable();
 
