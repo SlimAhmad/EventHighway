@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.HealthChecks.V2.Exceptions;
@@ -25,7 +24,66 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
         public async ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthSummaryV2Async(
             CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await this.healthV2CoordinationService
+                    .RetrieveHealthSummaryV2Async(cancellationToken);
+            }
+            catch (HealthV2CoordinationValidationException
+                healthV2CoordinationValidationException)
+            {
+                throw CreateHealthV2ClientValidationException(
+                    healthV2CoordinationValidationException.InnerException as Xeption);
+            }
+            catch (HealthV2CoordinationDependencyValidationException
+                healthV2CoordinationDependencyValidationException)
+            {
+                throw CreateHealthV2ClientValidationException(
+                    healthV2CoordinationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (HealthV2CoordinationDependencyException
+                healthV2CoordinationDependencyException)
+            {
+                throw CreateHealthV2ClientDependencyException(
+                    healthV2CoordinationDependencyException.InnerException as Xeption);
+            }
+            catch (HealthV2CoordinationServiceException
+                healthV2CoordinationServiceException)
+            {
+                throw CreateHealthV2ClientDependencyException(
+                    healthV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateHealthV2ClientServiceException(exception as Xeption);
+            }
+        }
+
+        private static HealthV2ClientValidationException
+            CreateHealthV2ClientValidationException(Xeption innerException)
+        {
+            return new HealthV2ClientValidationException(
+                message: "Health client validation error occurred, fix the errors and try again.",
+                innerException: innerException,
+                data: innerException.Data);
+        }
+
+        private static HealthV2ClientDependencyException
+            CreateHealthV2ClientDependencyException(Xeption innerException)
+        {
+            return new HealthV2ClientDependencyException(
+                message: "Health client dependency error occurred, contact support.",
+                innerException: innerException,
+                data: innerException.Data);
+        }
+
+        private static HealthV2ClientServiceException
+            CreateHealthV2ClientServiceException(Xeption innerException)
+        {
+            return new HealthV2ClientServiceException(
+                message: "Health client service error occurred, contact support.",
+                innerException: innerException,
+                data: innerException.Data);
         }
     }
 }
