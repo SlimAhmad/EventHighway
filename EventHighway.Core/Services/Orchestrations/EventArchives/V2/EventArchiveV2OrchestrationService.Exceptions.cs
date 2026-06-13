@@ -9,7 +9,7 @@ using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
-using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 using Xeptions;
 
 namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2

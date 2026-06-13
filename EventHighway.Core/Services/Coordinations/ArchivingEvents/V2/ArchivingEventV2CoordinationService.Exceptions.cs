@@ -6,7 +6,7 @@ using System;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
-using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 using Xeptions;
 
 namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2

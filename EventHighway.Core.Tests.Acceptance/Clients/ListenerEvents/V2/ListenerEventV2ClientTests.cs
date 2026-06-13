@@ -59,7 +59,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
 
             await CreateRandomEventV2sAsync(inputEventAddressV2Id);
             await CreateRandomEventListenerV2sAsync(inputEventAddressV2Id);
-
+            await Task.Delay(TimeSpan.FromSeconds(2));
             await this.clientBroker.FireScheduledPendingEventV2sAsync();
 
             return await this.clientBroker.RetrieveAllListenerEventV2sAsync();

@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -62,24 +62,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                     It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
-
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
-
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); this.loggingBrokerMock.VerifyNoOtherCalls();
+                        this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
