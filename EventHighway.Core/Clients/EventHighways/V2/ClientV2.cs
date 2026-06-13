@@ -32,6 +32,7 @@ using EventHighway.Core.Services.Processings.EventCalls.V2;
 using EventHighway.Core.Services.Processings.EventListeners.V2;
 using EventHighway.Core.Services.Processings.Events.V2;
 using EventHighway.Core.Services.Processings.ListenerEvents.V2;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EventHighway.Core.Clients.EventHighways.V2
@@ -64,6 +65,12 @@ namespace EventHighway.Core.Clients.EventHighways.V2
 
         private void InitializeClients(IServiceProvider serviceProvider)
         {
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var storageBroker = scope.ServiceProvider.GetRequiredService<StorageBroker>();
+                storageBroker.Database.Migrate();
+            }
+
             this.eventHandlerV2Service =
                 serviceProvider.GetRequiredService<IEventHandlerV2Service>();
 
@@ -108,6 +115,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
                 IStorageBroker,
                 StorageBroker>(_ =>
                     new StorageBroker(this.dataConnectionString));
+
+            services.AddTransient<StorageBroker>(_ =>
+                new StorageBroker(this.dataConnectionString));
 
             services.AddSingleton<IEventHandlerBroker>(this.eventHandlerBroker);
         }

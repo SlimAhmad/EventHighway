@@ -8,7 +8,6 @@ using EventHighway.Core.Brokers.Apis;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
-using EventHighway.Core.Clients.ArchivingEvents.V2;
 using EventHighway.Core.Clients.EventAddresses;
 using EventHighway.Core.Clients.EventAddresses.V1;
 using EventHighway.Core.Clients.EventHighways.V2;
@@ -33,7 +32,6 @@ using EventHighway.Core.Services.Foundations.ListenerEventArchives.V1;
 using EventHighway.Core.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.ListernEvents;
 using EventHighway.Core.Services.Foundations.ListernEvents.V1;
-using EventHighway.Core.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V1;
 using EventHighway.Core.Services.Orchestrations.EventListeners;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V1;
@@ -47,6 +45,7 @@ using EventHighway.Core.Services.Processings.EventListeners.V1;
 using EventHighway.Core.Services.Processings.Events.V1;
 using EventHighway.Core.Services.Processings.ListenerEvents;
 using EventHighway.Core.Services.Processings.ListenerEvents.V1;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EventHighway.Core.Clients.EventHighways
@@ -81,6 +80,12 @@ namespace EventHighway.Core.Clients.EventHighways
 
         private void InitializeClients(IServiceProvider serviceProvider)
         {
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var storageBroker = scope.ServiceProvider.GetRequiredService<StorageBroker>();
+                storageBroker.Database.Migrate();
+            }
+
             this.EventAddresses =
                 serviceProvider.GetRequiredService<IEventAddressesClient>();
 
@@ -131,8 +136,11 @@ namespace EventHighway.Core.Clients.EventHighways
 
             services.AddTransient<
                 IStorageBroker,
-                StorageBroker>(broker =>
+                StorageBroker>(_ =>
                     new StorageBroker(this.dataConnectionString));
+
+            services.AddTransient<StorageBroker>(_ =>
+                new StorageBroker(this.dataConnectionString));
 
             services.AddTransient<IApiBroker, ApiBroker>();
         }
