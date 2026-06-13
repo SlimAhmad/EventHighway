@@ -3,13 +3,17 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Models.Services.Foundations.EventHandler.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Processings.EventListeners.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.ListenerEvents.V2.Exceptions;
+using EventHighway.Core.Services.Foundations.EventHandlers.V2;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
 using EventHighway.Core.Services.Processings.EventListeners.V2;
 using EventHighway.Core.Services.Processings.ListenerEvents.V2;
@@ -23,6 +27,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
     {
         private readonly Mock<IEventListenerV2ProcessingService> eventListenerV2ProcessingServiceMock;
         private readonly Mock<IListenerEventV2ProcessingService> listenerEventV2ProcessingServiceMock;
+        private readonly Mock<IEventHandlerV2Service> eventHandlerV2ServiceMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IEventListenerV2OrchestrationService eventListenerV2OrchestrationService;
 
@@ -34,12 +39,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
             this.listenerEventV2ProcessingServiceMock =
                 new Mock<IListenerEventV2ProcessingService>();
 
+            this.eventHandlerV2ServiceMock =
+                new Mock<IEventHandlerV2Service>();
+
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
             this.eventListenerV2OrchestrationService =
                 new EventListenerV2OrchestrationService(
                     eventListenerV2ProcessingService: this.eventListenerV2ProcessingServiceMock.Object,
                     listenerEventV2ProcessingService: this.listenerEventV2ProcessingServiceMock.Object,
+                    eventHandlerV2Service: this.eventHandlerV2ServiceMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }
 
@@ -106,6 +115,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                     someInnerException),
 
                 new ListenerEventV2ProcessingServiceException(
+                    someMessage,
+                    someInnerException),
+            };
+        }
+
+        public static TheoryData<Xeption> EventHandlerV2DependencyExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+
+            return new TheoryData<Xeption>
+            {
+                new EventHandlerV2ServiceException(
                     someMessage,
                     someInnerException),
             };

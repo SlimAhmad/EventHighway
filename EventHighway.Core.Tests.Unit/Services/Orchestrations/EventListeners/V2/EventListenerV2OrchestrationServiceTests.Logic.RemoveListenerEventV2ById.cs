@@ -61,8 +61,24 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
 
             this.eventListenerV2ProcessingServiceMock
                 .VerifyNoOtherCalls();
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
 
-            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
+
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

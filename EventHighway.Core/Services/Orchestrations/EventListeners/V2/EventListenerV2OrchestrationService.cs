@@ -3,12 +3,15 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Services.Foundations.EventHandlers.V2;
 using EventHighway.Core.Services.Processings.EventListeners.V2;
 using EventHighway.Core.Services.Processings.ListenerEvents.V2;
 
@@ -18,17 +21,28 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
     {
         private readonly IEventListenerV2ProcessingService eventListenerV2ProcessingService;
         private readonly IListenerEventV2ProcessingService listenerEventV2ProcessingService;
+        private readonly IEventHandlerV2Service eventHandlerV2Service;
         private readonly ILoggingBroker loggingBroker;
 
         public EventListenerV2OrchestrationService(
             IEventListenerV2ProcessingService eventListenerV2ProcessingService,
             IListenerEventV2ProcessingService listenerEventV2ProcessingService,
+            IEventHandlerV2Service eventHandlerV2Service,
             ILoggingBroker loggingBroker)
         {
             this.eventListenerV2ProcessingService = eventListenerV2ProcessingService;
             this.listenerEventV2ProcessingService = listenerEventV2ProcessingService;
+            this.eventHandlerV2Service = eventHandlerV2Service;
             this.loggingBroker = loggingBroker;
         }
+
+        public ValueTask<IQueryable<EventListenerV2>> RetrieveAllEventListenerV2sAsync(
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask<IEnumerable<IEventHandler>> RetrieveAllEventHandlerV2sAsync(
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
 
         public ValueTask<EventListenerV2> AddEventListenerV2Async(
             EventListenerV2 eventListenerV2,

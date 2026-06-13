@@ -1,0 +1,48 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using FluentAssertions;
+using Force.DeepCloner;
+using Moq;
+
+namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
+{
+    public partial class EventListenerV2OrchestrationServiceTests
+    {
+        [Fact]
+        public async Task ShouldRetrieveAllEventListenerV2sAsync()
+        {
+            // given
+            IQueryable<EventListenerV2> randomEventListenerV2s = CreateRandomEventListenerV2s();
+            IQueryable<EventListenerV2> retrievedEventListenerV2s = randomEventListenerV2s;
+            IQueryable<EventListenerV2> expectedEventListenerV2s = randomEventListenerV2s.DeepClone();
+
+            this.eventListenerV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllEventListenerV2sAsync())
+                    .ReturnsAsync(retrievedEventListenerV2s);
+
+            // when
+            IQueryable<EventListenerV2> actualEventListenerV2s =
+                await this.eventListenerV2OrchestrationService
+                    .RetrieveAllEventListenerV2sAsync(
+                        TestContext.Current.CancellationToken);
+
+            // then
+            actualEventListenerV2s.Should().BeEquivalentTo(expectedEventListenerV2s);
+
+            this.eventListenerV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllEventListenerV2sAsync(),
+                    Times.Once);
+
+            this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+    }
+}
