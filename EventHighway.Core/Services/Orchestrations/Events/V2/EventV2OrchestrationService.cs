@@ -35,6 +35,14 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             this.loggingBroker = loggingBroker;
         }
 
+        public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync(
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         public ValueTask<EventV2> SubmitEventV2Async(
             EventV2 eventV2,
             CancellationToken cancellationToken = default) =>
