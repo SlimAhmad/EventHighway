@@ -16,14 +16,14 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
 {
     internal partial class EventCallV2Service : IEventCallV2Service
     {
-        private readonly IEnumerable<IEventHandlerBroker> eventHandlerBrokers;
+        private readonly IEventHandlerBroker eventHandlerBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventCallV2Service(
-            IEnumerable<IEventHandlerBroker> eventHandlerBrokers,
+            IEventHandlerBroker eventHandlerBroker,
             ILoggingBroker loggingBroker)
         {
-            this.eventHandlerBrokers = eventHandlerBrokers;
+            this.eventHandlerBroker = eventHandlerBroker;
             this.loggingBroker = loggingBroker;
         }
 
@@ -34,9 +34,9 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
         {
             ValidateEventCallV2OnRun(eventCallV2);
 
-            IEventHandlerBroker handler =
-                this.eventHandlerBrokers.Single(
-                    broker => broker.Name == eventCallV2.HandlerName);
+            IEventHandler handler =
+                this.eventHandlerBroker.GetAll()
+                    .Single(h => h.Id == eventCallV2.HandlerId);
 
             ValidateHandlerConfigurations(handler, eventCallV2.HandlerConfigurations);
 

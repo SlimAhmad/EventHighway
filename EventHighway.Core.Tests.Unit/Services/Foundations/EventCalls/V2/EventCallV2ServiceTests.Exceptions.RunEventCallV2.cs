@@ -24,15 +24,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
             criticalDependencyException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.Name)
+            this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
+                .Returns(new[] { this.eventHandlerMock.Object });
+
+            this.eventHandlerMock.SetupGet(handler => handler.Id)
+                .Returns(someEventCallV2.HandlerId);
+
+            this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(someEventCallV2.HandlerName);
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.RequiredParams)
+            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
                 .Returns(System.Array.Empty<string>());
 
-            this.eventHandlerBrokerMock
-                .Setup(broker =>
-                    broker.HandleAsync(
+            this.eventHandlerMock
+                .Setup(handler =>
+                    handler.HandleAsync(
                         It.IsAny<string>(),
                         It.IsAny<IReadOnlyDictionary<string, string>>(),
                         It.IsAny<CancellationToken>()))
@@ -61,27 +67,34 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             actualEventCallV2DependencyException.Should()
                 .BeEquivalentTo(expectedEventCallV2DependencyException);
 
-            this.eventHandlerBrokerMock.VerifyGet(
-                broker => broker.Name,
+            this.eventHandlerBrokerMock.Verify(broker => broker.GetAll(),
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.VerifyGet(
-                broker => broker.RequiredParams,
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+
+            this.eventHandlerMock.VerifyGet(handler => handler.Id,
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.Verify(broker =>
-                broker.HandleAsync(
+            this.eventHandlerMock.VerifyGet(handler => handler.Name,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.Verify(handler =>
+                handler.HandleAsync(
                     It.IsAny<string>(),
                     It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
+
+            this.eventHandlerMock.VerifyNoOtherCalls();
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogCriticalAsync(It.Is(SameExceptionAs(
                     expectedEventCallV2DependencyException))),
                         Times.Once);
 
-            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -94,14 +107,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
             dependencyValidationException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.Name)
+            this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
+                .Returns(new[] { this.eventHandlerMock.Object });
+
+            this.eventHandlerMock.SetupGet(handler => handler.Id)
+                .Returns(someEventCallV2.HandlerId);
+
+            this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(someEventCallV2.HandlerName);
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.RequiredParams)
+            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
                 .Returns(System.Array.Empty<string>());
 
-            this.eventHandlerBrokerMock.Setup(broker =>
-                broker.HandleAsync(
+            this.eventHandlerMock.Setup(handler =>
+                handler.HandleAsync(
                     It.IsAny<string>(),
                     It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()))
@@ -132,25 +151,34 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             actualEventCallV2DependencyValidationException.Should()
                 .BeEquivalentTo(expectedEventCallV2DependencyValidationException);
 
-            this.eventHandlerBrokerMock.VerifyGet(broker => broker.Name,
+            this.eventHandlerBrokerMock.Verify(broker => broker.GetAll(),
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.VerifyGet(broker => broker.RequiredParams,
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+
+            this.eventHandlerMock.VerifyGet(handler => handler.Id,
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.Verify(broker =>
-                broker.HandleAsync(
+            this.eventHandlerMock.VerifyGet(handler => handler.Name,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.Verify(handler =>
+                handler.HandleAsync(
                     It.IsAny<string>(),
                     It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
+
+            this.eventHandlerMock.VerifyNoOtherCalls();
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventCallV2DependencyValidationException))),
                         Times.Once);
 
-            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -163,15 +191,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.Name)
+            this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
+                .Returns(new[] { this.eventHandlerMock.Object });
+
+            this.eventHandlerMock.SetupGet(handler => handler.Id)
+                .Returns(someEventCallV2.HandlerId);
+
+            this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(someEventCallV2.HandlerName);
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.RequiredParams)
+            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
                 .Returns(System.Array.Empty<string>());
 
-            this.eventHandlerBrokerMock
-                .Setup(broker =>
-                    broker.HandleAsync(
+            this.eventHandlerMock
+                .Setup(handler =>
+                    handler.HandleAsync(
                         It.IsAny<string>(),
                         It.IsAny<IReadOnlyDictionary<string, string>>(),
                         It.IsAny<CancellationToken>()))
@@ -200,25 +234,34 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             actualEventCallV2DependencyException.Should()
                 .BeEquivalentTo(expectedEventCallV2DependencyException);
 
-            this.eventHandlerBrokerMock.VerifyGet(broker => broker.Name,
+            this.eventHandlerBrokerMock.Verify(broker => broker.GetAll(),
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.VerifyGet(broker => broker.RequiredParams,
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+
+            this.eventHandlerMock.VerifyGet(handler => handler.Id,
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.Verify(broker =>
-                broker.HandleAsync(
+            this.eventHandlerMock.VerifyGet(handler => handler.Name,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.Verify(handler =>
+                handler.HandleAsync(
                     It.IsAny<string>(),
                     It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
+
+            this.eventHandlerMock.VerifyNoOtherCalls();
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventCallV2DependencyException))),
                         Times.Once);
 
-            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -230,14 +273,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.Name)
+            this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
+                .Returns(new[] { this.eventHandlerMock.Object });
+
+            this.eventHandlerMock.SetupGet(handler => handler.Id)
+                .Returns(someEventCallV2.HandlerId);
+
+            this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(someEventCallV2.HandlerName);
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.RequiredParams)
+            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
                 .Returns(System.Array.Empty<string>());
 
-            this.eventHandlerBrokerMock
-                .Setup(broker => broker.HandleAsync(
+            this.eventHandlerMock
+                .Setup(handler => handler.HandleAsync(
                     It.IsAny<string>(),
                     It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()))
@@ -266,27 +315,34 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             actualEventCallV2ServiceException.Should()
                 .BeEquivalentTo(expectedEventCallV2ServiceException);
 
-            this.eventHandlerBrokerMock.VerifyGet(
-                broker => broker.Name,
+            this.eventHandlerBrokerMock.Verify(broker => broker.GetAll(),
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.VerifyGet(
-                broker => broker.RequiredParams,
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+
+            this.eventHandlerMock.VerifyGet(handler => handler.Id,
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.Verify(broker =>
-                broker.HandleAsync(
+            this.eventHandlerMock.VerifyGet(handler => handler.Name,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.Verify(handler =>
+                handler.HandleAsync(
                     It.IsAny<string>(),
                     It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
+
+            this.eventHandlerMock.VerifyNoOtherCalls();
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventCallV2ServiceException))),
                         Times.Once);
 
-            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

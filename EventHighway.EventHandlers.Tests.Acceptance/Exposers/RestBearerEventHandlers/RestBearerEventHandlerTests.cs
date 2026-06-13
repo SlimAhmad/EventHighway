@@ -18,7 +18,8 @@ namespace EventHighway.EventHandlers.Tests.Acceptance.Exposers.RestBearerEventHa
         public RestBearerEventHandlerTests()
         {
             this.wireMockServer = WireMockServer.Start();
-            this.restBearerEventHandler = new RestBearerEventHandler();
+            Guid identifier = Guid.NewGuid();
+            this.restBearerEventHandler = new RestBearerEventHandler(id: identifier);
         }
 
         private static string GetRandomString() =>

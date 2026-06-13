@@ -34,7 +34,6 @@ namespace EventHighway.Core.Brokers.Storages
         public StorageBroker(string connectionString)
         {
             this.connectionString = connectionString;
-            this.Database.Migrate();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>

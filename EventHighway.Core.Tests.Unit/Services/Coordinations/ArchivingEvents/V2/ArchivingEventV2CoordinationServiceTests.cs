@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -14,12 +14,12 @@ using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.EventsArchives.V1;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
-using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V1;
+using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2;
 using EventHighway.Core.Services.Coordinations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2;
-using EventHighway.Core.Services.Orchestrations.EventArchives.V1;
+using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
 using Tynamix.ObjectFiller;
@@ -29,21 +29,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 {
     public partial class ArchivingEventV2CoordinationServiceTests
     {
-        private readonly Mock<IArchivingEvent2OrchestrationService> archivingEvent2OrchestrationServiceMock;
-        private readonly Mock<IEventArchiveV1OrchestrationService> eventArchiveV1OrchestrationServiceMock;
+        private readonly Mock<IArchivingEventV2OrchestrationService> archivingEventV2OrchestrationServiceMock;
+        private readonly Mock<IEventArchiveV2OrchestrationService> eventArchiveV2OrchestrationServiceMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly ICompareLogic compareLogic;
-        private readonly IArchivingEventV2CoordinationService archivingEventV1CoordinationService;
+        private readonly IArchivingEventV2CoordinationService archivingEventV2CoordinationService;
 
         public ArchivingEventV2CoordinationServiceTests()
         {
-            this.archivingEvent2OrchestrationServiceMock =
-                new Mock<IArchivingEvent2OrchestrationService>(
+            this.archivingEventV2OrchestrationServiceMock =
+                new Mock<IArchivingEventV2OrchestrationService>(
                     behavior: MockBehavior.Strict);
 
-            this.eventArchiveV1OrchestrationServiceMock =
-                new Mock<IEventArchiveV1OrchestrationService>(
+            this.eventArchiveV2OrchestrationServiceMock =
+                new Mock<IEventArchiveV2OrchestrationService>(
                     behavior: MockBehavior.Strict);
 
             this.dateTimeBrokerMock = new Mock<IDateTimeBroker>(
@@ -53,17 +53,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             var compareConfiguration = new ComparisonConfig();
             this.compareLogic = new CompareLogic(compareConfiguration);
 
-            this.archivingEventV1CoordinationService =
+            this.archivingEventV2CoordinationService =
                 new ArchivingEventV2CoordinationService(
-                    archivingEvent2OrchestrationService:
-                        this.archivingEvent2OrchestrationServiceMock.Object,
-                    eventArchiveV1OrchestrationService:
-                        this.eventArchiveV1OrchestrationServiceMock.Object,
+                    archivingEventV2OrchestrationService:
+                        this.archivingEventV2OrchestrationServiceMock.Object,
+                    eventArchiveV2OrchestrationService:
+                        this.eventArchiveV2OrchestrationServiceMock.Object,
                     dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }
 
-        public static TheoryData<Xeption> ArchivingEvent2ValidationExceptions()
+        public static TheoryData<Xeption> ArchivingEventV2ValidationExceptions()
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
@@ -71,17 +71,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             return new TheoryData<Xeption>
             {
-                new ArchivingEvent2OrchestrationValidationException(
+                new ArchivingEventV2OrchestrationValidationException(
                     someMessage,
                     someInnerException),
 
-                new ArchivingEvent2OrchestrationDependencyValidationException(
+                new ArchivingEventV2OrchestrationDependencyValidationException(
                     someMessage,
                     someInnerException),
             };
         }
 
-        public static TheoryData<Xeption> ArchivingEvent2DependencyExceptions()
+        public static TheoryData<Xeption> ArchivingEventV2DependencyExceptions()
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
@@ -89,17 +89,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             return new TheoryData<Xeption>
             {
-                new ArchivingEvent2OrchestrationDependencyException(
+                new ArchivingEventV2OrchestrationDependencyException(
                     someMessage,
                     someInnerException),
 
-                new ArchivingEvent2OrchestrationServiceException(
+                new ArchivingEventV2OrchestrationServiceException(
                     someMessage,
                     someInnerException),
             };
         }
 
-        public static TheoryData<Xeption> EventArchiveV1ValidationExceptions()
+        public static TheoryData<Xeption> EventArchiveV2ValidationExceptions()
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
@@ -107,17 +107,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             return new TheoryData<Xeption>
             {
-                new EventArchiveV1OrchestrationValidationException(
+                new EventArchiveV2OrchestrationValidationException(
                     someMessage,
                     someInnerException),
 
-                new EventArchiveV1OrchestrationDependencyValidationException(
+                new EventArchiveV2OrchestrationDependencyValidationException(
                     someMessage,
                     someInnerException),
             };
         }
 
-        public static TheoryData<Xeption> EventArchiveV1DependencyExceptions()
+        public static TheoryData<Xeption> EventArchiveV2DependencyExceptions()
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
@@ -125,11 +125,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             return new TheoryData<Xeption>
             {
-                new EventArchiveV1OrchestrationDependencyException(
+                new EventArchiveV2OrchestrationDependencyException(
                     someMessage,
                     someInnerException),
 
-                new EventArchiveV1OrchestrationServiceException(
+                new EventArchiveV2OrchestrationServiceException(
                     someMessage,
                     someInnerException),
             };
@@ -172,13 +172,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         .AreEqual;
         }
 
-        private Expression<Func<EventArchiveV1, bool>> SameEventArchiveV1As(
-            EventArchiveV1 expectedEventArchiveV1)
+        private Expression<Func<EventArchiveV2, bool>> SameEventArchiveV2As(
+            EventArchiveV2 expectedEventArchiveV2)
         {
-            return actualEventArchiveV1 =>
+            return actualEventArchiveV2 =>
                 this.compareLogic.Compare(
-                    expectedEventArchiveV1,
-                    actualEventArchiveV1)
+                    expectedEventArchiveV2,
+                    actualEventArchiveV2)
                         .AreEqual;
         }
 
@@ -219,6 +219,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 GetRandomDateTimeOffset();
 
             Guid randomEventAddressId = GetRandomId();
+            int randomRemainingRetryAttempts = GetRandomNumber();
 
             return new
             {
@@ -229,6 +230,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 CreatedDate = randomCreatedDate,
                 UpdatedDate = randomUpdatedDate,
                 ScheduledDate = randomScheduledDate,
+                RemainingRetryAttempts = randomRemainingRetryAttempts,
                 EventAddressId = randomEventAddressId
             };
         }

@@ -22,9 +22,11 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.RestSecretEventHandlers
         public RestSecretEventHandlerTests()
         {
             this.restServiceMock = new Mock<IRestService>();
+            Guid identifier = Guid.NewGuid();
 
             this.restSecretEventHandler =
                 new RestSecretEventHandler(
+                    id: identifier,
                     restService: this.restServiceMock.Object);
         }
 

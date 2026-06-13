@@ -60,15 +60,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             expectedEventCallV2.ResponseMessage =
                 returnedEventHandlerResult.ResponseMessage;
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.Name)
+            this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
+                .Returns(new[] { this.eventHandlerMock.Object });
+
+            this.eventHandlerMock.SetupGet(handler => handler.Id)
+                .Returns(inputEventCallV2.HandlerId);
+
+            this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(randomHandlerName);
 
-            this.eventHandlerBrokerMock.Setup(broker => broker.RequiredParams)
+            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
                 .Returns(new[] { randomConfigName });
 
-            this.eventHandlerBrokerMock
-                .Setup(broker =>
-                    broker.HandleAsync(
+            this.eventHandlerMock
+                .Setup(handler =>
+                    handler.HandleAsync(
                         inputEventCallV2.Content,
                         It.Is<IReadOnlyDictionary<string, string>>(d =>
                             d[randomConfigName] == randomConfigValue),
@@ -83,21 +89,29 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             // then
             actualEventCallV2.Should().BeEquivalentTo(expectedEventCallV2);
 
-            this.eventHandlerBrokerMock.VerifyGet(broker => broker.Name,
+            this.eventHandlerBrokerMock.Verify(broker => broker.GetAll(),
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.VerifyGet(broker => broker.RequiredParams,
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+
+            this.eventHandlerMock.VerifyGet(handler => handler.Id,
                 Times.AtLeastOnce);
 
-            this.eventHandlerBrokerMock.Verify(broker =>
-                broker.HandleAsync(
+            this.eventHandlerMock.VerifyGet(handler => handler.Name,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
+                Times.AtLeastOnce);
+
+            this.eventHandlerMock.Verify(handler =>
+                handler.HandleAsync(
                     inputEventCallV2.Content,
                     It.Is<IReadOnlyDictionary<string, string>>(d =>
                         d[randomConfigName] == randomConfigValue),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
 
-            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+            this.eventHandlerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

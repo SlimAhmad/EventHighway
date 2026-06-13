@@ -57,6 +57,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                         retrievedEventListenerV2 =>
                             new EventCallV2
                             {
+                                HandlerId = retrievedEventListenerV2.HandlerId,
                                 HandlerName = retrievedEventListenerV2.HandlerName,
                                 HandlerConfigurations =
                                     retrievedEventListenerV2.HandlerConfigurations?.ToList()
@@ -240,6 +241,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                         retrievedEventListenerV2 =>
                             new EventCallV2
                             {
+                                HandlerId = retrievedEventListenerV2.HandlerId,
                                 HandlerName = retrievedEventListenerV2.HandlerName,
                                 HandlerConfigurations =
                                     retrievedEventListenerV2.HandlerConfigurations?.ToList()

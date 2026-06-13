@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +31,8 @@ namespace EventHighway.Abstractions.EventHandlers
     /// </remarks>
     public interface IEventHandler
     {
+        Guid Id { get; }
+
         /// <summary>
         /// Gets the unique name that identifies this handler within the EventHighway pipeline.
         /// </summary>

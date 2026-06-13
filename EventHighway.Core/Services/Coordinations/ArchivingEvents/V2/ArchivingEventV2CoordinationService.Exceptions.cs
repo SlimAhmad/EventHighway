@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -6,7 +6,7 @@ using System;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
-using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V1;
+using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2;
 using Xeptions;
 
 namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
@@ -21,53 +21,53 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             {
                 await returningNothingFunction();
             }
-            catch (ArchivingEvent2OrchestrationValidationException
-                archivingEvent2OrchestrationValidationException)
+            catch (ArchivingEventV2OrchestrationValidationException
+                archivingEventV2OrchestrationValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    archivingEvent2OrchestrationValidationException);
+                    archivingEventV2OrchestrationValidationException);
             }
-            catch (ArchivingEvent2OrchestrationDependencyValidationException
-                archivingEvent2OrchestrationDependencyValidationException)
+            catch (ArchivingEventV2OrchestrationDependencyValidationException
+                archivingEventV2OrchestrationDependencyValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    archivingEvent2OrchestrationDependencyValidationException);
+                    archivingEventV2OrchestrationDependencyValidationException);
             }
-            catch (EventArchiveV1OrchestrationValidationException
-                eventArchiveV1OrchestrationValidationException)
+            catch (EventArchiveV2OrchestrationValidationException
+                eventArchiveV2OrchestrationValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventArchiveV1OrchestrationValidationException);
+                    eventArchiveV2OrchestrationValidationException);
             }
-            catch (EventArchiveV1OrchestrationDependencyValidationException
-                eventArchiveV1OrchestrationDependencyValidationException)
+            catch (EventArchiveV2OrchestrationDependencyValidationException
+                eventArchiveV2OrchestrationDependencyValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventArchiveV1OrchestrationDependencyValidationException);
+                    eventArchiveV2OrchestrationDependencyValidationException);
             }
-            catch (ArchivingEvent2OrchestrationDependencyException
-                archivingEvent2OrchestrationDependencyException)
+            catch (ArchivingEventV2OrchestrationDependencyException
+                archivingEventV2OrchestrationDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
-                    archivingEvent2OrchestrationDependencyException);
+                    archivingEventV2OrchestrationDependencyException);
             }
-            catch (ArchivingEvent2OrchestrationServiceException
-                archivingEvent2OrchestrationServiceException)
+            catch (ArchivingEventV2OrchestrationServiceException
+                archivingEventV2OrchestrationServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
-                    archivingEvent2OrchestrationServiceException);
+                    archivingEventV2OrchestrationServiceException);
             }
-            catch (EventArchiveV1OrchestrationDependencyException
-                eventArchiveV1OrchestrationDependencyException)
+            catch (EventArchiveV2OrchestrationDependencyException
+                eventArchiveV2OrchestrationDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
-                    eventArchiveV1OrchestrationDependencyException);
+                    eventArchiveV2OrchestrationDependencyException);
             }
-            catch (EventArchiveV1OrchestrationServiceException
-                eventArchiveV1OrchestrationServiceException)
+            catch (EventArchiveV2OrchestrationServiceException
+                eventArchiveV2OrchestrationServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
-                    eventArchiveV1OrchestrationServiceException);
+                    eventArchiveV2OrchestrationServiceException);
             }
             catch (Exception exception)
             {

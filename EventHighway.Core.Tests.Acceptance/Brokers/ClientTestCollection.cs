@@ -5,6 +5,6 @@
 namespace EventHighway.Core.Tests.Acceptance.Brokers
 {
     [CollectionDefinition(nameof(ClientTestCollection))]
-    public class ClientTestCollection : ICollectionFixture<ClientBroker>
+    public class ClientTestCollection
     { }
 }

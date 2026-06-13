@@ -5,8 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.EventHandlers.Models.Foundations.Delegates.Exceptions;
 using EventHighway.EventHandlers.Services.Delegates;
@@ -24,9 +22,11 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
         public DelegateEventHandlerTests()
         {
             this.delegateServiceMock = new Mock<IDelegateService>();
+            Guid identifier = Guid.NewGuid();
 
             this.delegateEventHandler =
                 new DelegateEventHandler(
+                    Id: identifier,
                     delegateService: this.delegateServiceMock.Object);
         }
 

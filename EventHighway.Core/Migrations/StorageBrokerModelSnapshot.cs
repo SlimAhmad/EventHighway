@@ -178,6 +178,9 @@ namespace EventHighway.Core.Migrations
                     b.Property<Guid>("EventAddressId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("HandlerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("HandlerName")
                         .HasColumnType("nvarchar(max)");
 

@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 
@@ -9,6 +10,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventCall.V2
 {
     public class EventCallV2
     {
+        public Guid HandlerId { get; set; }
         public string HandlerName { get; set; }
         public List<HandlerConfiguration> HandlerConfigurations { get; set; } = new();
         public string Content { get; set; }

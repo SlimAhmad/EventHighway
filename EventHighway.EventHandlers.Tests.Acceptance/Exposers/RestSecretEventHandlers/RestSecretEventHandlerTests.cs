@@ -18,7 +18,8 @@ namespace EventHighway.EventHandlers.Tests.Acceptance.Exposers.RestSecretEventHa
         public RestSecretEventHandlerTests()
         {
             this.wireMockServer = WireMockServer.Start();
-            this.restSecretEventHandler = new RestSecretEventHandler();
+            Guid identifier = Guid.NewGuid();
+            this.restSecretEventHandler = new RestSecretEventHandler(id: identifier);
         }
 
         private static string GetRandomString() =>
