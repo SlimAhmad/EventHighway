@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventHandler.V2.Exceptions;
 using FluentAssertions;
@@ -18,6 +19,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventHandlers.V2
             // given
             IEventHandler someEventHandler = CreateRandomEventHandler();
             var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             this.eventHandlerBrokerMock
                 .Setup(broker => broker.Register(It.IsAny<IEventHandler>()))

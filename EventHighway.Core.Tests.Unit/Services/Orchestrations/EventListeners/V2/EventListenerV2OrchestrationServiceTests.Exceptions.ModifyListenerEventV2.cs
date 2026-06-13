@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -18,8 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
     {
         [Theory]
         [MemberData(nameof(ListenerEventV2ValidationExceptions))]
-        public async Task ShouldThrowDependencyValidationOnModifyListenerEventV2IfDependencyValidationErrorAndLogItAsync(
-            Xeption listenerEventV2ValidationException)
+        public async Task 
+            ShouldThrowDependencyValidationOnModifyListenerEventV2IfDependencyValidationErrorAndLogItAsync(
+                Xeption listenerEventV2ValidationException)
         {
             // given
             CancellationToken randomCancellationToken =
@@ -65,21 +66,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                         Times.Once);
 
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
             this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
-
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
 
@@ -132,21 +120,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                         Times.Once);
 
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
             this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
-
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
 
@@ -205,21 +180,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                         Times.Once);
 
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
             this.eventHandlerV2ServiceMock.VerifyNoOtherCalls();
-
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); 
-            this.eventHandlerV2ServiceMock.VerifyNoOtherCalls(); this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
     }
