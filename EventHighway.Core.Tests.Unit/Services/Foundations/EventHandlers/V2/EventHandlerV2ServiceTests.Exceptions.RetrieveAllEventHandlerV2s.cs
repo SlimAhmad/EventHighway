@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventHandler.V2.Exceptions;
 using FluentAssertions;
 using Moq;
@@ -18,6 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventHandlers.V2
         {
             // given
             var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedEventHandlerV2ServiceException =
                 new FailedEventHandlerV2ServiceException(
