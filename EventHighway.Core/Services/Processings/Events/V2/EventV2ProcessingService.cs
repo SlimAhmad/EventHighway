@@ -31,7 +31,10 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         }
 
         public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync() =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            return await this.eventV2Service.RetrieveAllEventV2sAsync();
+        });
 
         public ValueTask<EventV2> AddEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
