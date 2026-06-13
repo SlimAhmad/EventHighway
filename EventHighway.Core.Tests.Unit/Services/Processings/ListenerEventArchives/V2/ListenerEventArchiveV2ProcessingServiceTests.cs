@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -40,9 +41,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
 
-            someInnerException.Data.Add(
-                key: GetRandomString(),
-                value: new List<string> { GetRandomString() });
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
 
             return new TheoryData<Xeption>
             {
@@ -61,9 +60,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
 
-            someInnerException.Data.Add(
-                key: GetRandomString(),
-                value: new List<string> { GetRandomString() });
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
 
             return new TheoryData<Xeption>
             {
@@ -85,6 +82,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
 
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
+
+        private static IQueryable<ListenerEventArchiveV2> CreateRandomListenerEventArchiveV2s() =>
+            CreateListenerEventArchiveV2Filler().Create(count: GetRandomNumber()).AsQueryable();
 
         private static ListenerEventArchiveV2 CreateRandomListenerEventArchiveV2() =>
             CreateListenerEventArchiveV2Filler().Create();

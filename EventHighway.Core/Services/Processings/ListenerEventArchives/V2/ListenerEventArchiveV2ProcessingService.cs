@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
@@ -22,6 +23,10 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             this.listenerEventArchiveV2Service = listenerEventArchiveV2Service;
             this.loggingBroker = loggingBroker;
         }
+
+        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync() =>
+            TryCatch(async () =>
+                await this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync());
 
         public ValueTask<ListenerEventArchiveV2> AddListenerEventArchiveV2Async(
             ListenerEventArchiveV2 listenerEventArchiveV2,
