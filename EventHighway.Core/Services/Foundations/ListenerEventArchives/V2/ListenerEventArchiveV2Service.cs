@@ -42,6 +42,9 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
         });
 
         public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync() =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
+        });
     }
 }
