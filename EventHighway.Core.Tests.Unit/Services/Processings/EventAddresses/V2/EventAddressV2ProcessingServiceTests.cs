@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
@@ -80,8 +81,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
+        private static int GetRandomNumber() =>
+            new IntRange(min: 2, max: 9).GetValue();
+
         private static EventAddressV2 CreateRandomEventAddressV2() =>
             CreateEventAddressV2Filler().Create();
+
+        private static IQueryable<EventAddressV2> CreateRandomEventAddressV2s() =>
+            CreateEventAddressV2Filler()
+                .Create(count: GetRandomNumber())
+                    .AsQueryable();
 
         private static Filler<EventAddressV2> CreateEventAddressV2Filler()
         {
