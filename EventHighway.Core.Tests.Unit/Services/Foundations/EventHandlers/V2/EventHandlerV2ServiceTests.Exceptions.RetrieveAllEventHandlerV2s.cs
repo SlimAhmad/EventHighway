@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventHandler.V2.Exceptions;
 using FluentAssertions;
 using Moq;
@@ -14,16 +13,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventHandlers.V2
     public partial class EventHandlerV2ServiceTests
     {
         [Fact]
-        public void ShouldThrowServiceExceptionOnRegisterIfUnexpectedExceptionOccurs()
+        public void ShouldThrowServiceExceptionOnRetrieveAllIfUnexpectedExceptionOccurs()
         {
             // given
-            IEventHandler someEventHandler = CreateRandomEventHandler();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
-
-            this.eventHandlerBrokerMock
-                .Setup(broker => broker.Register(It.IsAny<IEventHandler>()))
-                .Throws(serviceException);
 
             var failedEventHandlerV2ServiceException =
                 new FailedEventHandlerV2ServiceException(
@@ -36,19 +30,23 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventHandlers.V2
                     message: "Event handler service error occurred, contact support.",
                     innerException: failedEventHandlerV2ServiceException);
 
+            this.eventHandlerBrokerMock
+                .Setup(broker => broker.GetAll())
+                .Throws(serviceException);
+
             // when
-            Action registerEventHandlerV2Action = () =>
-                this.eventHandlerV2Service.RegisterEventHandlerV2(someEventHandler);
+            Action retrieveAllAction = () =>
+                this.eventHandlerV2Service.RetrieveAllEventHandlerV2s();
 
             EventHandlerV2ServiceException actualEventHandlerV2ServiceException =
-                Assert.Throws<EventHandlerV2ServiceException>(registerEventHandlerV2Action);
+                Assert.Throws<EventHandlerV2ServiceException>(retrieveAllAction);
 
             // then
             actualEventHandlerV2ServiceException.Should()
                 .BeEquivalentTo(expectedEventHandlerV2ServiceException);
 
             this.eventHandlerBrokerMock.Verify(broker =>
-                broker.Register(someEventHandler),
+                broker.GetAll(),
                 Times.Once);
 
             this.eventHandlerBrokerMock.VerifyNoOtherCalls();

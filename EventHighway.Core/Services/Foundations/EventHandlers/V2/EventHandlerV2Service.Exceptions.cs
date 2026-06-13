@@ -3,6 +3,8 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventHandler.V2.Exceptions;
 using Xeptions;
 
@@ -11,6 +13,25 @@ namespace EventHighway.Core.Services.Foundations.EventHandlers.V2
     internal partial class EventHandlerV2Service
     {
         private delegate void ReturningVoidFunction();
+        private delegate IEnumerable<IEventHandler> ReturningEventHandlersFunction();
+
+        private IEnumerable<IEventHandler> TryCatch(ReturningEventHandlersFunction returningEventHandlersFunction)
+        {
+            try
+            {
+                return returningEventHandlersFunction();
+            }
+            catch (Exception serviceException)
+            {
+                var failedEventHandlerV2ServiceException =
+                    new FailedEventHandlerV2ServiceException(
+                        message: "Failed event handler service error occurred, contact support.",
+                        innerException: serviceException,
+                        data: serviceException.Data);
+
+                throw CreateServiceException(failedEventHandlerV2ServiceException);
+            }
+        }
 
         private void TryCatch(ReturningVoidFunction returningVoidFunction)
         {
