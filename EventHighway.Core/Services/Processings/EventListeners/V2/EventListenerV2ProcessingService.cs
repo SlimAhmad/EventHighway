@@ -25,6 +25,9 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             this.loggingBroker = loggingBroker;
         }
 
+        public ValueTask<IQueryable<EventListenerV2>> RetrieveAllEventListenerV2sAsync() =>
+            throw new NotImplementedException();
+
         public ValueTask<EventListenerV2> AddEventListenerV2Async(
             EventListenerV2 eventListenerV2,
             CancellationToken cancellationToken = default) =>

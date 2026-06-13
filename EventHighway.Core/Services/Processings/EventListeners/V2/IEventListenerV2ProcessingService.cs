@@ -12,6 +12,8 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
 {
     internal interface IEventListenerV2ProcessingService
     {
+        ValueTask<IQueryable<EventListenerV2>> RetrieveAllEventListenerV2sAsync();
+
         ValueTask<EventListenerV2> AddEventListenerV2Async(
             EventListenerV2 eventListenerV2,
             CancellationToken cancellationToken = default);
