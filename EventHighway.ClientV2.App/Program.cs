@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Clients.EventHighways;
+using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -303,6 +304,8 @@ public partial class Program
             client,
             studentEvent.Id,
             courseEvent.Id);
+
+        await PrintHealthSummaryAsync(client);
     }
 
     private static async ValueTask<EventHandlerResult> PostWithBearerTokenAsync(
@@ -350,6 +353,29 @@ public partial class Program
             ResponseCode = ((int)response.StatusCode).ToString(),
             ResponseMessage = response.ReasonPhrase ?? string.Empty
         };
+    }
+
+    private static async Task PrintHealthSummaryAsync(EventHighwayClient client)
+    {
+        IEnumerable<HealthCheckItemV2> summary =
+            await client.V2.HealthV2Client.RetrieveHealthSummaryV2Async();
+
+        Console.WriteLine("\n── Health Summary ──");
+
+        string? currentGrouping = null;
+
+        foreach (HealthCheckItemV2 item in summary)
+        {
+            if (item.Grouping != currentGrouping)
+            {
+                currentGrouping = item.Grouping;
+                Console.WriteLine($"\n  {currentGrouping}");
+            }
+
+            Console.WriteLine($"    [{item.Status,-6}] {item.Item}: {item.Value}");
+        }
+
+        Console.WriteLine();
     }
 
     private static async Task PrintListenerEventResultsAsync(
