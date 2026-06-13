@@ -183,6 +183,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                     .AsQueryable();
         }
 
+        private static IQueryable<EventAddressV2> CreateRandomEventAddressV2s() =>
+            CreateEventAddressV2Filler().Create(count: GetRandomNumber()).AsQueryable();
+
         private static EventAddressV2 CreateRandomEventAddressV2() =>
             CreateEventAddressV2Filler().Create();
 
