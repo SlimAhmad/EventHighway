@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -20,6 +21,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         {
             // given
             SqlException sqlException = CreateSqlException();
+            sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
             var failedStorageListenerEventArchiveV2Exception =
                 new FailedStorageListenerEventArchiveV2Exception(
@@ -67,6 +69,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         {
             // given
             var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedListenerEventArchiveV2ServiceException =
                 new FailedListenerEventArchiveV2ServiceException(
