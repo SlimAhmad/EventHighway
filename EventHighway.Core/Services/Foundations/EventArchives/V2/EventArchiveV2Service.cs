@@ -45,6 +45,11 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             return await this.storageBroker.SelectAllEventArchiveV2sAsync();
         });
 
+        public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public ValueTask<EventArchiveV2> RetrieveEventArchiveV2ByIdAsync(
             Guid eventArchiveV2Id,
             CancellationToken cancellationToken = default) =>

@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 
 namespace EventHighway.Core.Services.Foundations.EventArchives.V2
@@ -17,6 +18,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             CancellationToken cancellationToken = default);
 
         ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync();
+        ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync();
 
         ValueTask<EventArchiveV2> RetrieveEventArchiveV2ByIdAsync(
             Guid eventArchiveV2Id,
