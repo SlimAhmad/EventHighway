@@ -26,6 +26,6 @@ namespace EventHighway.Core.Services.Foundations.EventHandlers.V2
             });
 
         public IEnumerable<IEventHandler> RetrieveAllEventHandlerV2s() =>
-            throw new NotImplementedException();
+            TryCatch(() => this.eventHandlerBroker.GetAll());
     }
 }
