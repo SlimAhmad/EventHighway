@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,5 +39,11 @@ namespace EventHighway.Core.Brokers.Storages
             EventArchiveV2 eventArchiveV2,
             CancellationToken cancellationToken = default) =>
             await DeleteAsync(eventArchiveV2, cancellationToken);
+
+        public async ValueTask InsertBulkEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+            await BulkInsertAsync(eventArchiveV2s, true, cancellationToken);
+
     }
 }
