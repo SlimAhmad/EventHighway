@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
@@ -51,6 +52,16 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             ListenerEventArchiveV2 listenerEventArchiveV2)
         {
             if (listenerEventArchiveV2 is null)
+            {
+                throw new NullListenerEventArchiveV2Exception(
+                    message: "Listener event archive is null.");
+            }
+        }
+
+        private static void ValidateListenerEventArchiveV2sIsNotNull(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s)
+        {
+            if (listenerEventArchiveV2s is null)
             {
                 throw new NullListenerEventArchiveV2Exception(
                     message: "Listener event archive is null.");

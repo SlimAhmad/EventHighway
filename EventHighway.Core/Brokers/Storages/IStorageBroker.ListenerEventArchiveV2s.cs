@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,14 @@ namespace EventHighway.Core.Brokers.Storages
             CancellationToken cancellationToken = default);
 
         ValueTask<IQueryable<ListenerEventArchiveV2>> SelectAllListenerEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default);
+
+        ValueTask InsertBulkListenerEventArchiveV2sAsync(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
+            CancellationToken cancellationToken = default);
+
+        ValueTask DeleteBulkListenerEventArchiveV2sAsync(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
             CancellationToken cancellationToken = default);
     }
 }

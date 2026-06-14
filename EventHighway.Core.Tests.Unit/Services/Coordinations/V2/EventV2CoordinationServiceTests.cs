@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -277,7 +277,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
                 .OnProperty(eventListenerV2 =>
                     eventListenerV2.ListenerEventV2s).IgnoreIt()
-
 
                 .OnType<EventAddressV2>().IgnoreIt()
                 .OnType<EventV2>().IgnoreIt()
