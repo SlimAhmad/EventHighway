@@ -2,14 +2,11 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
-using FluentAssertions;
-using Force.DeepCloner;
 using Moq;
 
 namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2

@@ -33,7 +33,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             CancellationToken cancellationToken = default);
 
         ValueTask BulkRemoveEventArchiveV2sAsync(
-            IEnumerable<EventArchiveV2> eventArchiveV2s, 
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default);
     }
 }
