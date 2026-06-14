@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
-using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
-using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
 using Microsoft.Data.SqlClient;
