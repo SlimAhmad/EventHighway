@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
@@ -49,6 +50,15 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
         private static void ValidateEventArchiveV2IsNotNull(EventArchiveV2 eventArchiveV2)
         {
             if (eventArchiveV2 is null)
+            {
+                throw new NullEventArchiveV2Exception(
+                    message: "Event archive is null.");
+            }
+        }
+
+        private static void ValidateEventArchiveV2sIsNotNull(IEnumerable<EventArchiveV2> eventArchiveV2s)
+        {
+            if (eventArchiveV2s is null)
             {
                 throw new NullEventArchiveV2Exception(
                     message: "Event archive is null.");

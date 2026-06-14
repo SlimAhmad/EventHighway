@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
@@ -17,7 +16,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
     {
         [Theory]
         [MemberData(nameof(ListenerEventArchiveV2DependencyExceptions))]
-        public async Task 
+        public async Task
             ShouldThrowDependencyExceptionOnRetrieveAllListenerEventArchivesIfDependencyExceptionOccursAndLogItAsync(
                 Xeption dependencyException)
         {
