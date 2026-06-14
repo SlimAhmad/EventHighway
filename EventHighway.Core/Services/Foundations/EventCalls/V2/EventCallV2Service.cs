@@ -51,7 +51,7 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 eventCallV2.ResponseMessage =
                     "One or more promoted properties could not be extracted from the event content. " +
                     "Check that the event listener is correctly configured. " +
-                    "Promoted properties must match property names in the event content.";
+                    "Promoted properties must match property names in the event content. (Case Sensitive)";
 
                 return eventCallV2;
             }
@@ -67,7 +67,10 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 {
                     eventCallV2.IsSuccess = false;
                     eventCallV2.ResponseCode = "BadFilterCriteria";
-                    eventCallV2.ResponseMessage = filterError;
+                    eventCallV2.ResponseMessage =
+                        "The filter criteria expression is invalid. " +
+                        "Check that the expression is correctly formatted and uses a valid Dynamic Expresso expression syntax. " +
+                        "See the Dynamic Expresso documentation for more details - https://github.com/dynamicexpresso/DynamicExpresso";
 
                     return eventCallV2;
                 }
