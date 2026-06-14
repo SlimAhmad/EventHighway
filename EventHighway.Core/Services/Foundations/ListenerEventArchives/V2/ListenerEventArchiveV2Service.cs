@@ -48,10 +48,12 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
         });
 
-        public ValueTask BulkAddListenerEventArchiveV2sAsync(
+        public async ValueTask BulkAddListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
+
+            await this.storageBroker.InsertBulkListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
         }
 
         public ValueTask BulkRemoveListenerEventArchiveV2sAsync(
