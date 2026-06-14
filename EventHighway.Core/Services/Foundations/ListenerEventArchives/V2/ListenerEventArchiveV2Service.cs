@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,5 +47,11 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
         {
             return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
         });
+
+        public ValueTask BulkRemoveListenerEventArchiveV2sAsync(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
