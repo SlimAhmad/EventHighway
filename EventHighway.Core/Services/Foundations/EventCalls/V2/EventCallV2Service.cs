@@ -69,8 +69,10 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                     eventCallV2.ResponseCode = "BadFilterCriteria";
                     eventCallV2.ResponseMessage =
                         "The filter criteria expression is invalid. " +
-                        "Check that the expression is correctly formatted and uses a valid Dynamic Expresso expression syntax. " +
-                        "See the Dynamic Expresso documentation for more details - https://github.com/dynamicexpresso/DynamicExpresso";
+                        "Check that the expression is correctly formatted " +
+                        "and uses a valid Dynamic Expresso expression syntax. " +
+                        "See the Dynamic Expresso documentation for more details - " +
+                        "https://github.com/dynamicexpresso/DynamicExpresso";
 
                     return eventCallV2;
                 }

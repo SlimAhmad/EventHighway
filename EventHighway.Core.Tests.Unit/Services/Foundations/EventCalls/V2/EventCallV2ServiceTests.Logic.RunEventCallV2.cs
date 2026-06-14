@@ -243,8 +243,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             expectedEventCallV2.ResponseCode = "BadFilterCriteria";
             expectedEventCallV2.ResponseMessage =
                 "The filter criteria expression is invalid. " +
-                "Check that the expression is correctly formatted and uses a valid Dynamic Expresso expression syntax. " +
-                "See the Dynamic Expresso documentation for more details - https://github.com/dynamicexpresso/DynamicExpresso";
+                "Check that the expression is correctly formatted " +
+                "and uses a valid Dynamic Expresso expression syntax. " +
+                "See the Dynamic Expresso documentation for more details - " +
+                "https://github.com/dynamicexpresso/DynamicExpresso";
 
             this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
                 .Returns(new[] { this.eventHandlerMock.Object });
