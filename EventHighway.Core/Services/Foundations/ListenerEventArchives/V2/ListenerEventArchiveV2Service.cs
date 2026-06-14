@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 
 namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
@@ -48,15 +49,33 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
         });
 
-        public ValueTask BulkAddListenerEventArchiveV2sAsync(
+        public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
+            List<ListenerEventArchiveV2> validItems = new List<ListenerEventArchiveV2>();
 
-            await this.storageBroker.InsertBulkListenerEventArchiveV2sAsync(
-                listenerEventArchiveV2s, cancellationToken);
+            DateTimeOffset archivedDate =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            foreach (ListenerEventArchiveV2 item in listenerEventArchiveV2s)
+            {
+                item.ArchivedDate = archivedDate;
+
+                try
+                {
+                    await ValidateListenerEventArchiveV2OnAddAsync(item);
+                    validItems.Add(item);
+                }
+                catch (Exception)
+                { }
+            }
+
+            await this.storageBroker.InsertBulkListenerEventArchiveV2sAsync(validItems, cancellationToken);
+
+            return validItems;
         });
 
         public ValueTask BulkRemoveListenerEventArchiveV2sAsync(

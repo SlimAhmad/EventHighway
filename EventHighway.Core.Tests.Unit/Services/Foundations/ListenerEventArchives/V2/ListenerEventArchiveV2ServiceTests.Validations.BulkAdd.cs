@@ -29,7 +29,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     innerException: nullListenerEventArchiveV2Exception);
 
             // when
-            ValueTask bulkAddListenerEventArchiveV2sTask =
+            ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
                 this.listenerEventArchiveV2Service.BulkAddListenerEventArchiveV2sAsync(
                     nullListenerEventArchiveV2s,
                     TestContext.Current.CancellationToken);

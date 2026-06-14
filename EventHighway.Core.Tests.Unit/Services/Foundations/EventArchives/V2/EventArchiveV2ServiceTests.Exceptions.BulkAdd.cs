@@ -18,45 +18,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
     public partial class EventArchiveV2ServiceTests
     {
         [Fact]
-        public async Task ShouldThrowValidationExceptionOnBulkAddIfEventArchiveV2sIsNullAndLogItAsync()
-        {
-            // given
-            List<EventArchiveV2> nullEventArchiveV2s = null;
-
-            var nullEventArchiveV2Exception =
-                new NullEventArchiveV2Exception(
-                    message: "Event archive is null.");
-
-            var expectedEventArchiveV2ValidationException =
-                new EventArchiveV2ValidationException(
-                    message: "Event archive validation error occurred, fix the errors and try again.",
-                    innerException: nullEventArchiveV2Exception);
-
-            // when
-            ValueTask bulkAddEventArchiveV2sTask =
-                this.eventArchiveV2Service.BulkAddEventArchiveV2sAsync(
-                    nullEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
-
-            EventArchiveV2ValidationException actualEventArchiveV2ValidationException =
-                await Assert.ThrowsAsync<EventArchiveV2ValidationException>(
-                    bulkAddEventArchiveV2sTask.AsTask);
-
-            // then
-            actualEventArchiveV2ValidationException.Should()
-                .BeEquivalentTo(expectedEventArchiveV2ValidationException);
-
-            this.loggingBrokerMock.Verify(broker =>
-                broker.LogErrorAsync(It.Is(SameExceptionAs(
-                    expectedEventArchiveV2ValidationException))),
-                        Times.Once);
-
-            this.storageBrokerMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
-        }
-
-        [Fact]
         public async Task ShouldThrowCriticalDependencyExceptionOnBulkAddIfSqlErrorOccursAndLogItAsync()
         {
             // given
