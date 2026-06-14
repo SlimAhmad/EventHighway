@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,10 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
 
         ValueTask<EventArchiveV2> RemoveEventArchiveV2ByIdAsync(
             Guid eventArchiveV2Id,
+            CancellationToken cancellationToken = default);
+
+        ValueTask BulkAddEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default);
     }
 }
