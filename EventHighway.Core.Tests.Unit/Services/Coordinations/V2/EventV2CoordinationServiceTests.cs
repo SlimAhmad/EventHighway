@@ -144,6 +144,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             };
         }
 
+        public static TheoryData<DateTimeOffset, DateTimeOffset?, string> InvalidContentWithScheduledDates()
+        {
+            DateTimeOffset fixedDateTimeOffset =
+                new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+            return new TheoryData<DateTimeOffset, DateTimeOffset?, string>
+            {
+                { fixedDateTimeOffset, fixedDateTimeOffset.AddDays(-2), null },
+                { fixedDateTimeOffset, null, null },
+                { fixedDateTimeOffset, fixedDateTimeOffset.AddDays(-2), "not valid json" },
+                { fixedDateTimeOffset, null, "not valid json" },
+            };
+        }
+
         public static TheoryData<DateTimeOffset, DateTimeOffset?> ScheduledDates()
         {
             DateTimeOffset fixedDateTimeOffset =

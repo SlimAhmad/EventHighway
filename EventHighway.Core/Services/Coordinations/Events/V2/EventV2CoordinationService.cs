@@ -180,7 +180,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             string content,
             string promotedProperties)
         {
-            if (string.IsNullOrWhiteSpace(promotedProperties))
+            if (string.IsNullOrWhiteSpace(promotedProperties) || string.IsNullOrWhiteSpace(content))
                 return new List<PromotedProperty>();
 
             IEnumerable<string> keys = promotedProperties
@@ -188,13 +188,20 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
 
             var result = new List<PromotedProperty>();
 
-            foreach (string key in keys)
+            try
             {
-                result.Add(new PromotedProperty
+                foreach (string key in keys)
                 {
-                    Name = key,
-                    Value = this.jsonSerializationBroker.GetJsonPropertyValue(content, key)
-                });
+                    result.Add(new PromotedProperty
+                    {
+                        Name = key,
+                        Value = this.jsonSerializationBroker.GetJsonPropertyValue(content, key)
+                    });
+                }
+            }
+            catch
+            {
+                return new List<PromotedProperty>();
             }
 
             return result;
