@@ -84,10 +84,10 @@ public partial class Program
 
                 var tokenPayload = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
-                    ["client_id"]     = "client",
+                    ["client_id"] = "client",
                     ["client_secret"] = "secret",
-                    ["scope"]         = "enrollment",
-                    ["grant_type"]    = "client_credentials"
+                    ["scope"] = "enrollment",
+                    ["grant_type"] = "client_credentials"
                 });
 
                 HttpResponseMessage tokenResponse =
@@ -317,10 +317,10 @@ public partial class Program
 
         var tokenPayload = new FormUrlEncodedContent(new Dictionary<string, string>
         {
-            ["client_id"]     = "client",
+            ["client_id"] = "client",
             ["client_secret"] = "secret",
-            ["scope"]         = "courses",
-            ["grant_type"]    = "client_credentials"
+            ["scope"] = "courses",
+            ["grant_type"] = "client_credentials"
         });
 
         HttpResponseMessage tokenResponse =
