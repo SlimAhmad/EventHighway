@@ -18,6 +18,8 @@ namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
         public Guid HandlerId { get; set; }
         public string HandlerName { get; set; }
         public IEnumerable<HandlerConfiguration> HandlerConfigurations { get; set; }
+        public string PromotedProperties { get; set; }
+        public string FilterCriteria { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset UpdatedDate { get; set; }
 
