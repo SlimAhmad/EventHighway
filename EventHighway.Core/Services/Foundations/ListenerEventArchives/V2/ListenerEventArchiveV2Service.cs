@@ -54,7 +54,8 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
         {
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
 
-            await this.storageBroker.DeleteBulkListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
+            await this.storageBroker.DeleteBulkListenerEventArchiveV2sAsync(
+                listenerEventArchiveV2s, cancellationToken);
         });
     }
 }
