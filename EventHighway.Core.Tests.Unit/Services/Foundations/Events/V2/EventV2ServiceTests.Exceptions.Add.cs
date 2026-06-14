@@ -134,7 +134,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             var foreignKeyConstraintConflictException =
                 new ForeignKeyConstraintConflictException(someMessage);
-            
+
             foreignKeyConstraintConflictException.Data.Add(
                 "ErrorCode",
                 new List<string> { "ForeignKeyConstraintConflictExceptionError" });

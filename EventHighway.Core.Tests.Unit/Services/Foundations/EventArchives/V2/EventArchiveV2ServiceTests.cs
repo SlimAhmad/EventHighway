@@ -50,6 +50,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
 
             return comparisonResult.AreEqual;
         }
+
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 

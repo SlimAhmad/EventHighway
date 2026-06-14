@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 
 namespace EventHighway.Core.Services.Foundations.EventArchives.V2
@@ -30,7 +29,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             CancellationToken cancellationToken = default);
 
         ValueTask<IEnumerable<EventArchiveV2>> BulkAddEventArchiveV2sAsync(
-            IEnumerable<EventArchiveV2> eventArchiveV2s, 
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default);
     }
 }

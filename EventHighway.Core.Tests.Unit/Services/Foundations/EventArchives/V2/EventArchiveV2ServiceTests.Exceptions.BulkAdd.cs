@@ -11,7 +11,6 @@ using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 
 namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
