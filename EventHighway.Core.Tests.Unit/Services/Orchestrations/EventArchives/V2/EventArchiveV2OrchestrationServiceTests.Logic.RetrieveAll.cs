@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using FluentAssertions;

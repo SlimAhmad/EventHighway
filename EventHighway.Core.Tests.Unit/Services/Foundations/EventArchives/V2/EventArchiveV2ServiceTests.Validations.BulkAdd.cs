@@ -2,9 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
@@ -16,7 +14,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
     public partial class EventArchiveV2ServiceTests
     {
         [Fact]
-        public async Task ShouldThrowValidationExceptionOnBulkRemoveIfEventArchiveV2sIsNullAndLogItAsync()
+        public async Task ShouldThrowValidationExceptionOnBulkAddIfEventArchiveV2sIsNullAndLogItAsync()
         {
             // given
             IEnumerable<EventArchiveV2> nullEventArchiveV2s = null;
@@ -31,8 +29,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     innerException: nullEventArchiveV2Exception);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
-                this.eventArchiveV2Service.BulkRemoveEventArchiveV2sAsync(
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
+                this.eventArchiveV2Service.BulkAddEventArchiveV2sAsync(
                     nullEventArchiveV2s,
                     TestContext.Current.CancellationToken);
 
