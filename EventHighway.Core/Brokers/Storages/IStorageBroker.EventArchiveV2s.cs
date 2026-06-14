@@ -34,5 +34,9 @@ namespace EventHighway.Core.Brokers.Storages
         ValueTask InsertBulkEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default);
+
+        ValueTask DeleteBulkEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default);
     }
 }
