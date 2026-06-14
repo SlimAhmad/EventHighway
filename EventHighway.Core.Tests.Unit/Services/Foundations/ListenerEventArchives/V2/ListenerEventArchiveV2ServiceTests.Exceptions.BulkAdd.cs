@@ -24,8 +24,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             IQueryable<ListenerEventArchiveV2> randomListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s();
 
-            List<ListenerEventArchiveV2> inputListenerEventArchiveV2s =
-                randomListenerEventArchiveV2s.ToList();
+            IEnumerable<ListenerEventArchiveV2> inputListenerEventArchiveV2s =
+                randomListenerEventArchiveV2s;
 
             SqlException sqlException = CreateSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
@@ -88,7 +88,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             IQueryable<ListenerEventArchiveV2> randomListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s();
 
-            List<ListenerEventArchiveV2> inputListenerEventArchiveV2s =
+            IEnumerable<ListenerEventArchiveV2> inputListenerEventArchiveV2s =
                 randomListenerEventArchiveV2s.ToList();
 
             var serviceException = new Exception();
