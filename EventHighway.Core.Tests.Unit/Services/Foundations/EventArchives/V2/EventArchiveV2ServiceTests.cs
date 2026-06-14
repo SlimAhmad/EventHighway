@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -11,6 +12,7 @@ using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Services.Foundations.EventArchives.V2;
+using KellermanSoftware.CompareNetObjects;
 using Microsoft.Data.SqlClient;
 using Moq;
 using Tynamix.ObjectFiller;
@@ -37,6 +39,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 loggingBroker: this.loggingBrokerMock.Object);
         }
 
+        private static bool SameEventArchiveV2sAs(
+            List<EventArchiveV2> expectedEventArchiveV2s,
+            List<EventArchiveV2> actualEventArchiveV2s)
+        {
+            var compareLogic = new CompareLogic();
+
+            ComparisonResult comparisonResult =
+                compareLogic.Compare(expectedEventArchiveV2s, actualEventArchiveV2s);
+
+            return comparisonResult.AreEqual;
+        }
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 

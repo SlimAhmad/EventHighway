@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
@@ -18,7 +19,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
     {
         private delegate ValueTask<EventArchiveV2> ReturningEventArchiveV2Function();
         private delegate ValueTask<IQueryable<EventArchiveV2>> ReturningEventArchiveV2sFunction();
-        private delegate ValueTask ReturningNothingFunction();
+        private delegate ValueTask<IEnumerable<EventArchiveV2>> ReturningEnumrableEventArchiveV2sFunction();
 
         private async ValueTask<EventArchiveV2> TryCatch(
             ReturningEventArchiveV2Function returningEventArchiveV2Function)
@@ -140,11 +141,12 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             }
         }
 
-        private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
+        private async ValueTask<IEnumerable<EventArchiveV2>> TryCatch(
+            ReturningEnumrableEventArchiveV2sFunction returningEnumrableEventArchiveV2sFunction)
         {
             try
             {
-                await returningNothingFunction();
+                return await returningEnumrableEventArchiveV2sFunction();
             }
             catch (NullEventArchiveV2Exception nullEventArchiveV2Exception)
             {

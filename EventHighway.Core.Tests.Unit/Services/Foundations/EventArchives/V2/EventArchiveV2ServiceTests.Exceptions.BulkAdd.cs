@@ -22,12 +22,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnBulkAddIfSqlErrorOccursAndLogItAsync()
         {
             // given
+            DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
+
             IQueryable<EventArchiveV2> randomEventArchiveV2s =
                 CreateRandomEventArchiveV2s();
 
             List<EventArchiveV2> inputEventArchiveV2s =
                 randomEventArchiveV2s.ToList();
-
 
             SqlException sqlException = CreateSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
@@ -47,14 +48,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     message: "Event archive dependency error occurred, contact support.",
                     innerException: failedStorageEventArchiveV2Exception);
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTime);
+
             this.storageBrokerMock.Setup(broker =>
                 broker.InsertBulkEventArchiveV2sAsync(
-                    inputEventArchiveV2s,
+                    It.IsAny<List<EventArchiveV2>>(),
                         It.IsAny<CancellationToken>()))
                             .ThrowsAsync(sqlException);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
                 this.eventArchiveV2Service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                         TestContext.Current.CancellationToken);
@@ -69,9 +74,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.InsertBulkEventArchiveV2sAsync(
-                    inputEventArchiveV2s,
-                    It.IsAny<CancellationToken>()),
-                        Times.Once);
+                    It.IsAny<List<EventArchiveV2>>(),
+                        It.IsAny<CancellationToken>()),
+                            Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogCriticalAsync(It.Is(SameExceptionAs(
@@ -80,7 +85,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
-                    Times.Once);
+                    Times.Exactly(inputEventArchiveV2s.Count + 1));
 
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -91,6 +96,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowServiceExceptionOnBulkAddIfExceptionOccursAndLogItAsync()
         {
             // given
+            DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
+
             IQueryable<EventArchiveV2> randomEventArchiveV2s =
                 CreateRandomEventArchiveV2s();
 
@@ -114,32 +121,35 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     message: "Event archive service error occurred, contact support.",
                     innerException: failedEventArchiveV2ServiceException);
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTime);
+
             this.storageBrokerMock.Setup(broker =>
                 broker.InsertBulkEventArchiveV2sAsync(
-                    inputEventArchiveV2s,
+                    It.IsAny<List<EventArchiveV2>>(),
                         It.IsAny<CancellationToken>()))
                             .ThrowsAsync(serviceException);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
                 this.eventArchiveV2Service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
+                        TestContext.Current.CancellationToken);
 
             // then
             EventArchiveV2ServiceException actualEventArchiveV2ServiceException =
                 await Assert.ThrowsAsync<EventArchiveV2ServiceException>(
                     bulkAddEventArchiveV2sTask.AsTask);
 
-
             actualEventArchiveV2ServiceException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2ServiceException);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.InsertBulkEventArchiveV2sAsync(
-                    inputEventArchiveV2s,
-                    It.IsAny<CancellationToken>()),
-                        Times.Once);
+                    It.IsAny<List<EventArchiveV2>>(),
+                        It.IsAny<CancellationToken>()),
+                            Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
@@ -148,7 +158,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
-                    Times.Once);
+                    Times.Exactly(inputEventArchiveV2s.Count + 1));
 
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
