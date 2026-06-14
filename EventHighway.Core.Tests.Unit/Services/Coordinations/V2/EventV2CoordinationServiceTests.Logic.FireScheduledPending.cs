@@ -62,6 +62,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                                     retrievedEventListenerV2.HandlerConfigurations?.ToList()
                                         ?? new List<HandlerConfiguration>(),
                                 Content = eventV2.Content,
+                                RequiredPromotedProperties =
+                                    SplitPromotedPropertyKeys(retrievedEventListenerV2.PromotedProperties),
                             })).ToList();
 
             int expectedDateTimeBrokerCalls =
@@ -199,6 +201,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.jsonSerializationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -246,6 +249,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                                     retrievedEventListenerV2.HandlerConfigurations?.ToList()
                                         ?? new List<HandlerConfiguration>(),
                                 Content = eventV2.Content,
+                                RequiredPromotedProperties =
+                                    SplitPromotedPropertyKeys(retrievedEventListenerV2.PromotedProperties),
                             })).ToList();
 
             List<Exception> eventCallExceptions =
@@ -384,6 +389,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.jsonSerializationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

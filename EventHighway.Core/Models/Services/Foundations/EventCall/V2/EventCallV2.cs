@@ -15,6 +15,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventCall.V2
         public string HandlerName { get; set; }
         public List<HandlerConfiguration> HandlerConfigurations { get; set; } = new();
         public string Content { get; set; }
+        public IEnumerable<string> RequiredPromotedProperties { get; set; } = new List<string>();
         public List<PromotedProperty> PromotedProperties { get; set; } = new();
         public string FilterCriteria { get; set; }
         public string Response { get; set; }
