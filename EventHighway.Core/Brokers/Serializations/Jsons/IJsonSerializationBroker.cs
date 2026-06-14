@@ -9,5 +9,6 @@ namespace EventHighway.Core.Brokers.Serializations.Jsons
         string Serialize<T>(T value);
         T Deserialize<T>(string json);
         string GetJsonPropertyValue(string json, string propertyName);
+        bool CheckIfPropertyExist(string json, string propertyName);
     }
 }

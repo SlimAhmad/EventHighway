@@ -22,5 +22,11 @@ namespace EventHighway.Core.Brokers.Serializations.Jsons
                 ? element.GetString()
                 : null;
         }
+
+        public bool CheckIfPropertyExist(string json, string propertyName)
+        {
+            using JsonDocument document = JsonDocument.Parse(json);
+            return document.RootElement.TryGetProperty(propertyName, out _);
+        }
     }
 }

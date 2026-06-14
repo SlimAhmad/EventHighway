@@ -199,11 +199,14 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             {
                 foreach (string key in keys)
                 {
-                    result.Add(new PromotedProperty
+                    if (this.jsonSerializationBroker.CheckIfPropertyExist(content, key))
                     {
-                        Name = key,
-                        Value = this.jsonSerializationBroker.GetJsonPropertyValue(content, key)
-                    });
+                        result.Add(new PromotedProperty
+                        {
+                            Name = key,
+                            Value = this.jsonSerializationBroker.GetJsonPropertyValue(content, key)
+                        });
+                    }
                 }
             }
             catch
