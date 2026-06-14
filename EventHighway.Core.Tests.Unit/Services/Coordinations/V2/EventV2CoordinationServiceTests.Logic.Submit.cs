@@ -155,6 +155,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                                 retrievedEventListenerV2.HandlerConfigurations?.ToList()
                                     ?? new List<HandlerConfiguration>(),
                             Content = inputImmediateEventV2.Content,
+                            RequiredPromotedProperties =
+                                string.IsNullOrWhiteSpace(retrievedEventListenerV2.PromotedProperties)
+                                    ? Array.Empty<string>()
+                                    : retrievedEventListenerV2.PromotedProperties
+                                        .Split(',', StringSplitOptions.RemoveEmptyEntries
+                                            | StringSplitOptions.TrimEntries),
                         }).ToList();
 
             int expectedDateTimeBrokerCalls =
@@ -349,6 +355,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                             ?? new List<HandlerConfiguration>(),
                     Content = inputImmediateEventV2.Content,
                     FilterCriteria = null,
+                    RequiredPromotedProperties = new[] { promotedPropertyKey1, promotedPropertyKey2 },
                     PromotedProperties = expectedPromotedProperties,
                 };
 
@@ -532,6 +539,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                             ?? new List<HandlerConfiguration>(),
                     Content = invalidContent,
                     FilterCriteria = null,
+                    RequiredPromotedProperties = new[] { promotedPropertyKey },
                     PromotedProperties = new List<PromotedProperty>(),
                 };
 

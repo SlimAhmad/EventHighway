@@ -145,12 +145,16 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 HandlerName = eventListenerV2.HandlerName,
                 HandlerConfigurations = eventListenerV2.HandlerConfigurations?.ToList() ?? [],
                 FilterCriteria = eventListenerV2.FilterCriteria,
-                PromotedProperties = PromoteProperties(eventV2.Content, eventListenerV2.PromotedProperties),
+                RequiredPromotedProperties = SplitPromotedPropertyKeys(eventListenerV2.PromotedProperties),
                 Response = null
             };
 
             try
             {
+                eventCallV2.PromotedProperties = PromoteProperties(
+                    content: eventV2.Content,
+                    promotedProperties: eventListenerV2.PromotedProperties);
+
                 EventCallV2 ranEventCallV2 =
                     await this.eventV2OrchestrationService
                         .RunEventCallV2Async(eventCallV2, cancellationToken);
@@ -176,6 +180,11 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 .ModifyListenerEventV2Async(listenerEventV2, cancellationToken);
         }
 
+        private static IEnumerable<string> SplitPromotedPropertyKeys(string promotedProperties) =>
+            string.IsNullOrWhiteSpace(promotedProperties)
+                ? Array.Empty<string>()
+                : promotedProperties.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
         private List<PromotedProperty> PromoteProperties(
             string content,
             string promotedProperties)
@@ -183,9 +192,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             if (string.IsNullOrWhiteSpace(promotedProperties) || string.IsNullOrWhiteSpace(content))
                 return new List<PromotedProperty>();
 
-            IEnumerable<string> keys = promotedProperties
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
+            IEnumerable<string> keys = SplitPromotedPropertyKeys(promotedProperties);
             var result = new List<PromotedProperty>();
 
             try
