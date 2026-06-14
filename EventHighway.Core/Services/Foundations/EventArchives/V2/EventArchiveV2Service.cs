@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -74,6 +75,44 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             ValidateEventArchiveV2Exists(maybeEventArchiveV2, eventArchiveV2Id);
 
             return await this.storageBroker.DeleteEventArchiveV2Async(maybeEventArchiveV2, cancellationToken);
+        });
+
+        public ValueTask<IEnumerable<EventArchiveV2>> BulkAddEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s, CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
+            List<EventArchiveV2> validItems = new List<EventArchiveV2>();
+
+            DateTimeOffset archivedDate =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            foreach (EventArchiveV2 item in eventArchiveV2s)
+            {
+                item.ArchivedDate = archivedDate;
+
+                try
+                {
+                    await ValidateEventArchiveV2OnAddAsync(item);
+                    validItems.Add(item);
+                }
+                catch (Exception)
+                { }
+            }
+
+            await this.storageBroker.InsertBulkEventArchiveV2sAsync(validItems, cancellationToken);
+
+            return validItems;
+        });
+
+        public ValueTask BulkRemoveEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
+
+            await this.storageBroker.DeleteBulkEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
         });
     }
 }
