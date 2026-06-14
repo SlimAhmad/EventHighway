@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
@@ -253,6 +254,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             return filler;
         }
+
+        private static IEnumerable<string> SplitPromotedPropertyKeys(string promotedProperties) =>
+            string.IsNullOrWhiteSpace(promotedProperties)
+                ? Array.Empty<string>()
+                : promotedProperties.Split(
+                    ',',
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         private static Filler<EventListenerV2> CreateEventListenerV2Filler()
         {
