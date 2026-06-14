@@ -16,7 +16,8 @@ namespace EventHighway.Core.Brokers.Storages
             HandlerConfiguration handlerConfiguration,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IQueryable<HandlerConfiguration>> SelectAllHandlerConfigurationsAsync();
+        ValueTask<IQueryable<HandlerConfiguration>> SelectAllHandlerConfigurationsAsync(
+            CancellationToken cancellationToken = default);
 
         ValueTask<HandlerConfiguration> SelectHandlerConfigurationByIdAsync(
             Guid handlerConfigurationId,

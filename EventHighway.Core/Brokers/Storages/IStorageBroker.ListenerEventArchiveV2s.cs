@@ -15,6 +15,7 @@ namespace EventHighway.Core.Brokers.Storages
             ListenerEventArchiveV2 listenerEventArchiveV2,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IQueryable<ListenerEventArchiveV2>> SelectAllListenerEventArchiveV2sAsync();
+        ValueTask<IQueryable<ListenerEventArchiveV2>> SelectAllListenerEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default);
     }
 }

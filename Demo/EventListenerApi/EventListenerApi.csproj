@@ -7,10 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="EFxceptions" Version="1.0.3" />
-		<PackageReference Include="EFxceptions.Identity" Version="0.4.5" />
+		<PackageReference Include="EFxceptions" Version="10.0.0" />
+		<PackageReference Include="EFxceptions.Identity" Version="10.0.0" />
 		<PackageReference Include="EventHighway" Version="2.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
 	</ItemGroup>
 
 </Project>

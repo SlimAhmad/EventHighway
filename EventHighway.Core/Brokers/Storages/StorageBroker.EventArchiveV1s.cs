@@ -20,8 +20,9 @@ namespace EventHighway.Core.Brokers.Storages
             CancellationToken cancellationToken = default) =>
             await InsertAsync(eventArchiveV1, cancellationToken);
 
-        public async ValueTask<IQueryable<EventArchiveV1>> SelectAllEventArchiveV1sAsync() =>
-            SelectAll<EventArchiveV1>();
+        public async ValueTask<IQueryable<EventArchiveV1>> SelectAllEventArchiveV1sAsync(
+            CancellationToken cancellationToken = default) =>
+            await SelectAllAsync<EventArchiveV1>(cancellationToken);
 
         public async ValueTask<EventArchiveV1> SelectEventArchiveV1ByIdAsync(
             Guid eventArchiveV1Id,

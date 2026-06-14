@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,20 +25,26 @@ using EventHighway.Core.Models.Services.Foundations.ListenerEvents;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V1;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using Microsoft.EntityFrameworkCore;
+using STX.EFCore.Client.Clients;
 
 namespace EventHighway.Core.Brokers.Storages
 {
     internal partial class StorageBroker : EFxceptionsContext, IStorageBroker
     {
         private readonly string connectionString;
+        private readonly IEFCoreClient efCoreClient;
 
         public StorageBroker(string connectionString)
         {
             this.connectionString = connectionString;
+            efCoreClient = new EFCoreClient(this);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             optionsBuilder.UseSqlServer(this.connectionString);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -61,47 +68,63 @@ namespace EventHighway.Core.Brokers.Storages
         }
 
         private async ValueTask<T> InsertAsync<T>(T @object, CancellationToken cancellationToken = default)
-        {
-            var broker = new StorageBroker(this.connectionString);
-            broker.Entry(@object).State = EntityState.Added;
-            await broker.SaveChangesAsync(cancellationToken);
+             where T : class =>
+                 await efCoreClient.InsertAsync(@object, cancellationToken);
 
-            return @object;
-        }
+        private async ValueTask<IQueryable<T>> SelectAllAsync<T>(CancellationToken cancellationToken = default)
+            where T : class =>
+                await efCoreClient.SelectAllAsync<T>(cancellationToken);
 
-        private async ValueTask<T> SelectAsync<T>(
-            object[] objectIds,
-            CancellationToken cancellationToken = default)
-            where T : class
-        {
-            var broker = new StorageBroker(this.connectionString);
-
-            return await broker.FindAsync<T>(objectIds, cancellationToken);
-        }
-
-        private IQueryable<T> SelectAll<T>() where T : class
-        {
-            var broker = new StorageBroker(this.connectionString);
-
-            return broker.Set<T>();
-        }
+        private async ValueTask<T> SelectAsync<T>(object[] @objectIds, CancellationToken cancellationToken = default)
+            where T : class =>
+                await efCoreClient.SelectAsync<T>(@objectIds, cancellationToken);
 
         private async ValueTask<T> UpdateAsync<T>(T @object, CancellationToken cancellationToken = default)
-        {
-            var broker = new StorageBroker(this.connectionString);
-            broker.Entry(@object).State = EntityState.Modified;
-            await broker.SaveChangesAsync(cancellationToken);
-
-            return @object;
-        }
+            where T : class =>
+                await efCoreClient.UpdateAsync(@object, cancellationToken);
 
         private async ValueTask<T> DeleteAsync<T>(T @object, CancellationToken cancellationToken = default)
-        {
-            var broker = new StorageBroker(this.connectionString);
-            broker.Entry(@object).State = EntityState.Deleted;
-            await broker.SaveChangesAsync(cancellationToken);
+            where T : class =>
+                await efCoreClient.DeleteAsync(@object, cancellationToken);
 
-            return @object;
-        }
+        private async ValueTask BulkInsertAsync<T>(
+            IEnumerable<T> objects,
+            bool useTransaction = true,
+            CancellationToken cancellationToken = default)
+                where T : class =>
+                    await efCoreClient.BulkInsertAsync<T>(objects, useTransaction, cancellationToken);
+
+        private async ValueTask<IEnumerable<T>> BulkReadAsync<T>(
+            IEnumerable<T> objects,
+            CancellationToken cancellationToken = default)
+                where T : class =>
+                    await efCoreClient.BulkReadAsync<T>(objects, cancellationToken);
+
+        private async ValueTask BulkUpdateAsync<T>(
+            IEnumerable<T> objects,
+            bool useTransaction = true,
+            CancellationToken cancellationToken = default)
+                where T : class =>
+                    await efCoreClient.BulkUpdateAsync<T>(objects, useTransaction, cancellationToken);
+
+        private async ValueTask BulkDeleteAsync<T>(
+            IEnumerable<T> objects,
+            bool useTransaction = true,
+            CancellationToken cancellationToken = default)
+                where T : class =>
+                    await efCoreClient.BulkDeleteAsync<T>(objects, useTransaction, cancellationToken);
+
+        private async ValueTask BulkUpsertAsync<T>(
+            IEnumerable<T> objects,
+            bool useTransaction = true,
+            CancellationToken cancellationToken = default)
+                where T : class =>
+                    await efCoreClient.BulkUpsertAsync<T>(objects, useTransaction, cancellationToken);
+
+        private async ValueTask<bool> ExistsAsync<T>(
+            object[] objectIds,
+            CancellationToken cancellationToken = default)
+                where T : class =>
+                    await efCoreClient.ExistsAsync<T>(objectIds, cancellationToken);
     }
 }

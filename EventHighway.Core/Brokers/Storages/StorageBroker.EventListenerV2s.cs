@@ -26,8 +26,9 @@ namespace EventHighway.Core.Brokers.Storages
             return eventListenerV2;
         }
 
-        public async ValueTask<IQueryable<EventListenerV2>> SelectAllEventListenerV2sAsync() =>
-            SelectAll<EventListenerV2>().Include(e => e.HandlerConfigurations);
+        public async ValueTask<IQueryable<EventListenerV2>> SelectAllEventListenerV2sAsync(
+            CancellationToken cancellationToken = default) =>
+            (await SelectAllAsync<EventListenerV2>(cancellationToken)).Include(e => e.HandlerConfigurations);
 
         public async ValueTask<EventListenerV2> SelectEventListenerV2ByIdAsync(
             Guid eventListenerV2Id,
