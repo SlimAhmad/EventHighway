@@ -36,13 +36,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
 
             var failedStorageListenerEventArchiveV2Exception =
                 new FailedStorageListenerEventArchiveV2Exception(
-                    message: "Failed event archive storage error occurred, contact support.",
+                    message: "Failed listener event archive storage error occurred, contact support.",
                     innerException: sqlException,
                     data: sqlException.Data);
 
             var expectedListenerEventArchiveV2DependencyException =
                 new ListenerEventArchiveV2DependencyException(
-                    message: "Event archive dependency error occurred, contact support.",
+                    message: "Listener event archive dependency error occurred, contact support.",
                     innerException: failedStorageListenerEventArchiveV2Exception);
 
             this.storageBrokerMock.Setup(broker =>
@@ -99,13 +99,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
 
             var failedListenerEventArchiveV2ServiceException =
                 new FailedListenerEventArchiveV2ServiceException(
-                    message: "Failed event archive service error occurred, contact support.",
+                    message: "Failed listener event archive service error occurred, contact support.",
                     innerException: serviceException,
                     data: serviceException.Data);
 
             var expectedListenerEventArchiveV2ServiceException =
                 new ListenerEventArchiveV2ServiceException(
-                    message: "Event archive service error occurred, contact support.",
+                    message: "Listener event archive service error occurred, contact support.",
                     innerException: failedListenerEventArchiveV2ServiceException);
 
             this.storageBrokerMock.Setup(broker =>
