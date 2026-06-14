@@ -48,13 +48,16 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
         });
 
-        public async ValueTask BulkAddListenerEventArchiveV2sAsync(
-            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s, CancellationToken cancellationToken = default)
+        public ValueTask BulkAddListenerEventArchiveV2sAsync(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
 
-            await this.storageBroker.InsertBulkListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
-        }
+            await this.storageBroker.InsertBulkListenerEventArchiveV2sAsync(
+                listenerEventArchiveV2s, cancellationToken);
+        });
 
         public ValueTask BulkRemoveListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
@@ -63,7 +66,8 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
         {
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
 
-            await this.storageBroker.DeleteBulkListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
+            await this.storageBroker.DeleteBulkListenerEventArchiveV2sAsync(
+                listenerEventArchiveV2s, cancellationToken);
         });
     }
 }
