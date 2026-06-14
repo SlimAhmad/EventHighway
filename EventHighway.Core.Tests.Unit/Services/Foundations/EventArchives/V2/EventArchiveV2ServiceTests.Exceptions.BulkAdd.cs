@@ -84,7 +84,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
-                    Times.Exactly(inputEventArchiveV2s.Count + 1));
+                    Times.Exactly(inputEventArchiveV2s.Count() + 1));
 
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -157,7 +157,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
-                    Times.Exactly(inputEventArchiveV2s.Count + 1));
+                    Times.Exactly(inputEventArchiveV2s.Count() + 1));
 
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();

@@ -104,5 +104,15 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
 
             return validItems;
         });
+
+        public ValueTask BulkRemoveEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
+
+            await this.storageBroker.DeleteBulkEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
+        });
     }
 }
