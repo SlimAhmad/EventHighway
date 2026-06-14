@@ -77,12 +77,13 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             return await this.storageBroker.DeleteEventArchiveV2Async(maybeEventArchiveV2, cancellationToken);
         });
 
-        public async ValueTask BulkAddEventArchiveV2sAsync(
-            IEnumerable<EventArchiveV2> eventArchiveV2s, CancellationToken cancellationToken = default)
+        public ValueTask BulkAddEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s, CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
-            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s); 
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
             await this.storageBroker.InsertBulkEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
-        }
+        });
     }
 }
