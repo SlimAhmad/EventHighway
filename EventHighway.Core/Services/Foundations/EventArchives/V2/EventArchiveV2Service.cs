@@ -83,6 +83,14 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
         {
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
+            DateTimeOffset archivedDate = 
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            foreach (EventArchiveV2 item in eventArchiveV2s)
+            {
+                item.ArchivedDate = archivedDate;
+            }
+
             await this.storageBroker.InsertBulkEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
         });
     }
