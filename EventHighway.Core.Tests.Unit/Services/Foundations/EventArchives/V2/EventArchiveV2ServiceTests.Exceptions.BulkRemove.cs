@@ -25,7 +25,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 CreateRandomEventArchiveV2s();
 
             IEnumerable<EventArchiveV2> inputEventArchiveV2s =
-                randomEventArchiveV2s.ToList();
+                randomEventArchiveV2s;
 
             SqlException sqlException = CreateSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
@@ -52,14 +52,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                         .ThrowsAsync(sqlException);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask bulkRemoveEventArchiveV2sTask =
                 this.eventArchiveV2Service.BulkRemoveEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     TestContext.Current.CancellationToken);
 
             EventArchiveV2DependencyException actualEventArchiveV2DependencyException =
                 await Assert.ThrowsAsync<EventArchiveV2DependencyException>(
-                    bulkAddEventArchiveV2sTask.AsTask);
+                    bulkRemoveEventArchiveV2sTask.AsTask);
 
             // then
             actualEventArchiveV2DependencyException.Should()
@@ -89,7 +89,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 CreateRandomEventArchiveV2s();
 
             IEnumerable<EventArchiveV2> inputEventArchiveV2s =
-                randomEventArchiveV2s.ToList();
+                randomEventArchiveV2s;
 
             var serviceException = new Exception();
 
@@ -115,14 +115,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                         .ThrowsAsync(serviceException);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask bulkRemoveEventArchiveV2sTask =
                 this.eventArchiveV2Service.BulkRemoveEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     TestContext.Current.CancellationToken);
 
             EventArchiveV2ServiceException actualEventArchiveV2ServiceException =
                 await Assert.ThrowsAsync<EventArchiveV2ServiceException>(
-                    bulkAddEventArchiveV2sTask.AsTask);
+                    bulkRemoveEventArchiveV2sTask.AsTask);
 
             // then
             actualEventArchiveV2ServiceException.Should()

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
+using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 
 namespace EventHighway.Core.Models.Services.Foundations.EventCall.V2
 {
@@ -14,6 +15,8 @@ namespace EventHighway.Core.Models.Services.Foundations.EventCall.V2
         public string HandlerName { get; set; }
         public List<HandlerConfiguration> HandlerConfigurations { get; set; } = new();
         public string Content { get; set; }
+        public List<PromotedProperty> PromotedProperties { get; set; } = new();
+        public string FilterCriteria { get; set; }
         public string Response { get; set; }
         public string ResponseCode { get; set; }
         public string ResponseMessage { get; set; }

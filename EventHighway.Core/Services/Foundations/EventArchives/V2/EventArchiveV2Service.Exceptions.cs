@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
@@ -18,6 +19,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
     {
         private delegate ValueTask<EventArchiveV2> ReturningEventArchiveV2Function();
         private delegate ValueTask<IQueryable<EventArchiveV2>> ReturningEventArchiveV2sFunction();
+        private delegate ValueTask<IEnumerable<EventArchiveV2>> ReturningEnumrableEventArchiveV2sFunction();
         private delegate ValueTask ReturningNothingFunction();
 
         private async ValueTask<EventArchiveV2> TryCatch(
@@ -140,7 +142,44 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             }
         }
 
-        private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
+        private async ValueTask<IEnumerable<EventArchiveV2>> TryCatch(
+            ReturningEnumrableEventArchiveV2sFunction returningEnumrableEventArchiveV2sFunction)
+        {
+            try
+            {
+                return await returningEnumrableEventArchiveV2sFunction();
+            }
+            catch (NullEventArchiveV2Exception nullEventArchiveV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullEventArchiveV2Exception);
+            }
+            catch (SqlException sqlException)
+            {
+                var failedStorageEventArchiveV2Exception =
+                    new FailedStorageEventArchiveV2Exception(
+                        message: "Failed event archive storage error occurred, contact support.",
+                        innerException: sqlException,
+                        data: sqlException.Data);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(
+                    failedStorageEventArchiveV2Exception);
+            }
+            catch (Exception serviceException)
+            {
+                var failedEventArchiveV2ServiceException =
+                    new FailedEventArchiveV2ServiceException(
+                        message: "Failed event archive service error occurred, contact support.",
+                        innerException: serviceException,
+                        data: serviceException.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventArchiveV2ServiceException);
+            }
+        }
+
+        private async ValueTask TryCatch(
+            ReturningNothingFunction returningNothingFunction)
         {
             try
             {
