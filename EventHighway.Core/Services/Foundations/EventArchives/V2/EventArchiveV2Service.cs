@@ -80,6 +80,8 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
         public async ValueTask BulkAddEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s, CancellationToken cancellationToken = default)
         {
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s); 
+
             await this.storageBroker.InsertBulkEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
         }
     }
