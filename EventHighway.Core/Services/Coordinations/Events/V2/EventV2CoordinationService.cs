@@ -3,15 +3,18 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Brokers.Serializations.Jsons;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
 using EventHighway.Core.Services.Orchestrations.Events.V2;
 
@@ -21,17 +24,20 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
     {
         private readonly IEventV2OrchestrationService eventV2OrchestrationService;
         private readonly IEventListenerV2OrchestrationService eventListenerV2OrchestrationService;
+        private readonly IJsonSerializationBroker jsonSerializationBroker;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventV2CoordinationService(
             IEventV2OrchestrationService eventV2OrchestrationService,
             IEventListenerV2OrchestrationService eventListenerV2OrchestrationService,
+            IJsonSerializationBroker jsonSerializationBroker,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2OrchestrationService = eventV2OrchestrationService;
             this.eventListenerV2OrchestrationService = eventListenerV2OrchestrationService;
+            this.jsonSerializationBroker = jsonSerializationBroker;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
         }
@@ -138,6 +144,8 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 HandlerId = eventListenerV2.HandlerId,
                 HandlerName = eventListenerV2.HandlerName,
                 HandlerConfigurations = eventListenerV2.HandlerConfigurations?.ToList() ?? [],
+                FilterCriteria = eventListenerV2.FilterCriteria,
+                PromotedProperties = PromoteProperties(eventV2.Content, eventListenerV2.PromotedProperties),
                 Response = null
             };
 
@@ -150,7 +158,10 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 listenerEventV2.Response = ranEventCallV2.Response;
                 listenerEventV2.ResponseCode = ranEventCallV2.ResponseCode;
                 listenerEventV2.ResponseMessage = ranEventCallV2.ResponseMessage;
-                listenerEventV2.Status = ListenerEventStatusV2.Success;
+
+                listenerEventV2.Status = ranEventCallV2.IsSuccess
+                    ? ListenerEventStatusV2.Success
+                    : ListenerEventStatusV2.Error;
             }
             catch (Exception exception)
             {
@@ -163,6 +174,30 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
 
             await this.eventListenerV2OrchestrationService
                 .ModifyListenerEventV2Async(listenerEventV2, cancellationToken);
+        }
+
+        private List<PromotedProperty> PromoteProperties(
+            string content,
+            string promotedProperties)
+        {
+            if (string.IsNullOrWhiteSpace(promotedProperties))
+                return new List<PromotedProperty>();
+
+            IEnumerable<string> keys = promotedProperties
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            var result = new List<PromotedProperty>();
+
+            foreach (string key in keys)
+            {
+                result.Add(new PromotedProperty
+                {
+                    Name = key,
+                    Value = this.jsonSerializationBroker.GetJsonPropertyValue(content, key)
+                });
+            }
+
+            return result;
         }
 
         private static ListenerEventV2 CreateListenerEventV2(

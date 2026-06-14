@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Brokers.Serializations.Jsons;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -29,6 +30,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
     {
         private readonly Mock<IEventV2OrchestrationService> eventV2OrchestrationServiceMock;
         private readonly Mock<IEventListenerV2OrchestrationService> eventListenerV2OrchestrationServiceMock;
+        private readonly Mock<IJsonSerializationBroker> jsonSerializationBrokerMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly ICompareLogic compareLogic;
@@ -42,6 +44,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock =
                 new Mock<IEventListenerV2OrchestrationService>(
                     behavior: MockBehavior.Strict);
+
+            this.jsonSerializationBrokerMock =
+                new Mock<IJsonSerializationBroker>();
 
             this.dateTimeBrokerMock = new Mock<IDateTimeBroker>(
                 behavior: MockBehavior.Strict);
@@ -58,6 +63,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 new EventV2CoordinationService(
                     eventV2OrchestrationService: this.eventV2OrchestrationServiceMock.Object,
                     eventListenerV2OrchestrationService: this.eventListenerV2OrchestrationServiceMock.Object,
+                    jsonSerializationBroker: this.jsonSerializationBrokerMock.Object,
                     dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }
@@ -170,10 +176,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             CreateEventV2Filler().Create();
 
         private static IQueryable<EventListenerV2> CreateRandomEventListenerV2s() =>
-            CreateEventListenerV2Filler().Create(count: GetRandomNumber()).AsQueryable();
+            CreateEventListenerV2Filler().Create(count: GetRandomNumber())
+                .Select(l => { l.PromotedProperties = null; l.FilterCriteria = null; return l; })
+                    .AsQueryable();
 
         private static IQueryable<EventListenerV2> CreateRandomEventListenerV2s(int count) =>
-            CreateEventListenerV2Filler().Create(count).AsQueryable();
+            CreateEventListenerV2Filler().Create(count)
+                .Select(l => { l.PromotedProperties = null; l.FilterCriteria = null; return l; })
+                    .AsQueryable();
 
         private static Guid GetRandomId() =>
             Guid.NewGuid();
@@ -245,6 +255,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
                 .OnProperty(eventListenerV2 =>
                     eventListenerV2.ListenerEventV2s).IgnoreIt()
+
 
                 .OnType<EventAddressV2>().IgnoreIt()
                 .OnType<EventV2>().IgnoreIt()

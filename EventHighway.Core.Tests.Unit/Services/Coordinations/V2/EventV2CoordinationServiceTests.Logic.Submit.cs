@@ -12,6 +12,7 @@ using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using FluentAssertions;
 using Force.DeepCloner;
 using Moq;
@@ -95,6 +96,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.jsonSerializationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -278,6 +280,212 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.jsonSerializationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Theory]
+        [MemberData(nameof(ScheduledDates))]
+        public async Task ShouldPromotePropertiesWhenSubmittingImmediateEventV2Async(
+            DateTimeOffset randomDateTimeOffset,
+            DateTimeOffset? scheduledDate)
+        {
+            // given
+            var mockSequence = new MockSequence();
+            string promotedPropertyKey1 = GetRandomString();
+            string promotedPropertyKey2 = GetRandomString();
+            string promotedPropertyValue1 = GetRandomString();
+            string promotedPropertyValue2 = GetRandomString();
+            string promotedPropertiesCsv = $"{promotedPropertyKey1},{promotedPropertyKey2}";
+
+            EventV2 randomEventV2 = CreateRandomEventV2();
+            EventV2 inputEventV2 = randomEventV2;
+            inputEventV2.ScheduledDate = scheduledDate;
+            EventV2 inputImmediateEventV2 = inputEventV2;
+            inputImmediateEventV2.Type = EventTypeV2.Immediate;
+            EventV2 submittedEventV2 = inputImmediateEventV2;
+            EventV2 expectedEventV2 = submittedEventV2.DeepClone();
+
+            IQueryable<EventListenerV2> randomEventListenerV2s =
+                CreateRandomEventListenerV2s(count: 1);
+
+            EventListenerV2 retrievedEventListenerV2 =
+                randomEventListenerV2s.Single();
+
+            retrievedEventListenerV2.PromotedProperties = promotedPropertiesCsv;
+            retrievedEventListenerV2.FilterCriteria = null;
+
+            IQueryable<EventListenerV2> retrievedEventListenerV2s =
+                new[] { retrievedEventListenerV2 }.AsQueryable();
+
+            var expectedPromotedProperties = new List<PromotedProperty>
+            {
+                new PromotedProperty { Name = promotedPropertyKey1, Value = promotedPropertyValue1 },
+                new PromotedProperty { Name = promotedPropertyKey2, Value = promotedPropertyValue2 },
+            };
+
+            ListenerEventV2 inputListenerEventV2 =
+                new ListenerEventV2
+                {
+                    EventListenerId = retrievedEventListenerV2.Id,
+                    EventId = inputImmediateEventV2.Id,
+                    Status = ListenerEventStatusV2.Pending,
+                    EventAddressId = inputImmediateEventV2.EventAddressId,
+                    CreatedDate = randomDateTimeOffset,
+                    UpdatedDate = randomDateTimeOffset
+                };
+
+            ListenerEventV2 addedListenerEventV2 =
+                inputListenerEventV2.DeepClone();
+
+            EventCallV2 expectedInputCallEventV2 =
+                new EventCallV2
+                {
+                    HandlerId = retrievedEventListenerV2.HandlerId,
+                    HandlerName = retrievedEventListenerV2.HandlerName,
+                    HandlerConfigurations =
+                        retrievedEventListenerV2.HandlerConfigurations?.ToList()
+                            ?? new List<HandlerConfiguration>(),
+                    Content = inputImmediateEventV2.Content,
+                    FilterCriteria = null,
+                    PromotedProperties = expectedPromotedProperties,
+                };
+
+            var ranEventCall = new EventCallV2
+            {
+                HandlerName = expectedInputCallEventV2.HandlerName,
+                Content = expectedInputCallEventV2.Content,
+                Response = GetRandomString(),
+                ResponseCode = GetRandomString(),
+                ResponseMessage = GetRandomString(),
+                IsSuccess = true
+            };
+
+            this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTimeOffset);
+
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.SubmitEventV2Async(
+                        inputImmediateEventV2,
+                        TestContext.Current.CancellationToken))
+                            .ReturnsAsync(submittedEventV2);
+
+            this.eventListenerV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                        inputImmediateEventV2.EventAddressId,
+                        TestContext.Current.CancellationToken))
+                            .ReturnsAsync(retrievedEventListenerV2s);
+
+            this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTimeOffset);
+
+            this.eventListenerV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.AddListenerEventV2Async(
+                        It.Is(SameListenerEventAs(inputListenerEventV2)),
+                        TestContext.Current.CancellationToken))
+                            .ReturnsAsync(addedListenerEventV2);
+
+            this.jsonSerializationBrokerMock.Setup(broker =>
+                broker.GetJsonPropertyValue(
+                    inputImmediateEventV2.Content,
+                    promotedPropertyKey1))
+                        .Returns(promotedPropertyValue1);
+
+            this.jsonSerializationBrokerMock.Setup(broker =>
+                broker.GetJsonPropertyValue(
+                    inputImmediateEventV2.Content,
+                    promotedPropertyKey2))
+                        .Returns(promotedPropertyValue2);
+
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RunEventCallV2Async(
+                        It.Is(SameEventCallAs(expectedInputCallEventV2)),
+                        TestContext.Current.CancellationToken))
+                            .ReturnsAsync(ranEventCall);
+
+            this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTimeOffset);
+
+            addedListenerEventV2.UpdatedDate = randomDateTimeOffset;
+            addedListenerEventV2.Status = ListenerEventStatusV2.Success;
+            addedListenerEventV2.Response = ranEventCall.Response;
+            addedListenerEventV2.ResponseCode = ranEventCall.ResponseCode;
+            addedListenerEventV2.ResponseMessage = ranEventCall.ResponseMessage;
+
+            this.eventListenerV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.ModifyListenerEventV2Async(
+                        It.Is(SameListenerEventAs(addedListenerEventV2)),
+                        TestContext.Current.CancellationToken))
+                            .ReturnsAsync(addedListenerEventV2);
+
+            // when
+            EventV2 actualEventV2 =
+                await this.eventV2CoordinationService
+                    .SubmitEventV2Async(
+                        inputEventV2,
+                        TestContext.Current.CancellationToken);
+
+            // then
+            actualEventV2.Should().BeEquivalentTo(expectedEventV2);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Exactly(callCount: 3));
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.SubmitEventV2Async(
+                    inputImmediateEventV2,
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    inputImmediateEventV2.EventAddressId,
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.AddListenerEventV2Async(
+                    It.Is(SameListenerEventAs(inputListenerEventV2)),
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.jsonSerializationBrokerMock.Verify(broker =>
+                broker.GetJsonPropertyValue(
+                    inputImmediateEventV2.Content,
+                    promotedPropertyKey1),
+                        Times.Once);
+
+            this.jsonSerializationBrokerMock.Verify(broker =>
+                broker.GetJsonPropertyValue(
+                    inputImmediateEventV2.Content,
+                    promotedPropertyKey2),
+                        Times.Once);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RunEventCallV2Async(
+                    It.Is(SameEventCallAs(expectedInputCallEventV2)),
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.ModifyListenerEventV2Async(
+                    It.Is(SameListenerEventAs(addedListenerEventV2)),
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.jsonSerializationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
