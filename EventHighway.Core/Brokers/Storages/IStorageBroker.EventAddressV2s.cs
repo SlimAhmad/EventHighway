@@ -16,7 +16,8 @@ namespace EventHighway.Core.Brokers.Storages
             EventAddressV2 eventAddressV2,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IQueryable<EventAddressV2>> SelectAllEventAddressV2sAsync();
+        ValueTask<IQueryable<EventAddressV2>> SelectAllEventAddressV2sAsync(
+            CancellationToken cancellationToken = default);
 
         ValueTask<EventAddressV2> SelectEventAddressV2ByIdAsync(
             Guid eventAddressV2Id,
