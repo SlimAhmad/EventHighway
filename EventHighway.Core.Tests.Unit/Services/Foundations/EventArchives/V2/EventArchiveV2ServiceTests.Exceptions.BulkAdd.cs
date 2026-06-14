@@ -19,7 +19,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
     public partial class EventArchiveV2ServiceTests
     {
         [Fact]
-        public async Task ShouldThrowValidationExceptionOnRemoveBulkIfEventArchiveV2sIsNullAndLogItAsync()
+        public async Task ShouldThrowValidationExceptionOnBulkAddIfEventArchiveV2sIsNullAndLogItAsync()
         {
             // given
             List<EventArchiveV2> nullEventArchiveV2s = null;
@@ -58,7 +58,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         }
 
         [Fact]
-        public async Task ShouldThrowCriticalDependencyExceptionOnRemoveBulkIfSqlErrorOccursAndLogItAsync()
+        public async Task ShouldThrowCriticalDependencyExceptionOnBulkAddIfSqlErrorOccursAndLogItAsync()
         {
             // given
             IQueryable<EventArchiveV2> randomEventArchiveV2s =
@@ -122,7 +122,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         }
 
         [Fact]
-        public async Task ShouldThrowServiceExceptionOnRemoveBulkIfExceptionOccursAndLogItAsync()
+        public async Task ShouldThrowServiceExceptionOnBulkAddIfExceptionOccursAndLogItAsync()
         {
             // given
             IQueryable<EventArchiveV2> randomEventArchiveV2s =
