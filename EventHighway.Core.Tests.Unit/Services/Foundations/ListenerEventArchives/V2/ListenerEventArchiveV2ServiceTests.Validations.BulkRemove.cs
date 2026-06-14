@@ -21,11 +21,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
 
             var nullListenerEventArchiveV2Exception =
                 new NullListenerEventArchiveV2Exception(
-                    message: "Event archive is null.");
+                    message: "Listener event archive is null.");
 
             var expectedListenerEventArchiveV2ValidationException =
                 new ListenerEventArchiveV2ValidationException(
-                    message: "Event archive validation error occurred, fix the errors and try again.",
+                    message: "Listener event archive validation error occurred, fix the errors and try again.",
                     innerException: nullListenerEventArchiveV2Exception);
 
             // when
