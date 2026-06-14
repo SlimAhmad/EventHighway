@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,17 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
         TryCatch(async () =>
         {
             return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
+        });
+
+        public ValueTask BulkRemoveListenerEventArchiveV2sAsync(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
+
+            await this.storageBroker.DeleteBulkListenerEventArchiveV2sAsync(
+                listenerEventArchiveV2s, cancellationToken);
         });
     }
 }

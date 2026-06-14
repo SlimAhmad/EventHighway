@@ -18,6 +18,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
     {
         private delegate ValueTask<IQueryable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2sFunction();
         private delegate ValueTask<ListenerEventArchiveV2> ReturningListenerEventArchiveV2Function();
+        private delegate ValueTask ReturningNothingFunction();
 
         private async ValueTask<IQueryable<ListenerEventArchiveV2>> TryCatch(
             ReturningListenerEventArchiveV2sFunction returningListenerEventArchiveV2sFunction)
@@ -120,6 +121,41 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
                         data: dbUpdateException.Data);
 
                 throw await CreateAndLogDependencyExceptionAsync(
+                    failedStorageListenerEventArchiveV2Exception);
+            }
+            catch (Exception serviceException)
+            {
+                var failedListenerEventArchiveV2ServiceException =
+                    new FailedListenerEventArchiveV2ServiceException(
+                        message: "Failed listener event archive service error occurred, contact support.",
+                        innerException: serviceException,
+                        data: serviceException.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedListenerEventArchiveV2ServiceException);
+            }
+        }
+
+        private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
+        {
+            try
+            {
+                await returningNothingFunction();
+            }
+            catch (NullListenerEventArchiveV2Exception nullListenerEventArchiveV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullListenerEventArchiveV2Exception);
+            }
+            catch (SqlException sqlException)
+            {
+                var failedStorageListenerEventArchiveV2Exception =
+                    new FailedStorageListenerEventArchiveV2Exception(
+                        message: "Failed listener event archive storage error occurred, contact support.",
+                        innerException: sqlException,
+                        data: sqlException.Data);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(
                     failedStorageListenerEventArchiveV2Exception);
             }
             catch (Exception serviceException)
