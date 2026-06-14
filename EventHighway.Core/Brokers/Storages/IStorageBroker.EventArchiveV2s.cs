@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,14 @@ namespace EventHighway.Core.Brokers.Storages
 
         ValueTask<EventArchiveV2> DeleteEventArchiveV2Async(
             EventArchiveV2 eventArchiveV2,
+            CancellationToken cancellationToken = default);
+
+        ValueTask InsertBulkEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default);
+
+        ValueTask DeleteBulkEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default);
     }
 }

@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
