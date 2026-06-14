@@ -82,6 +82,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             filler.Setup()
                 .OnProperty(call => call.HandlerConfigurations)
+                .IgnoreIt()
+                .OnProperty(call => call.FilterCriteria)
+                .IgnoreIt()
+                .OnProperty(call => call.RequiredPromotedProperties)
+                .IgnoreIt()
+                .OnProperty(call => call.PromotedProperties)
                 .IgnoreIt();
 
             return filler;
