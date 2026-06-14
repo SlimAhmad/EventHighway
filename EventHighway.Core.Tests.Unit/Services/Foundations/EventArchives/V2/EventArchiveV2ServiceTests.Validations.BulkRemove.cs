@@ -19,7 +19,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnBulkRemoveIfEventArchiveV2sIsNullAndLogItAsync()
         {
             // given
-            List<EventArchiveV2> nullEventArchiveV2s = null;
+            IEnumerable<EventArchiveV2> nullEventArchiveV2s = null;
 
             var nullEventArchiveV2Exception =
                 new NullEventArchiveV2Exception(

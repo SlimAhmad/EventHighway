@@ -22,7 +22,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnBulkAddIfEventArchiveV2sIsNullAndLogItAsync()
         {
             // given
-            List<EventArchiveV2> nullEventArchiveV2s = null;
+            IEnumerable<EventArchiveV2> nullEventArchiveV2s = null;
 
             var nullEventArchiveV2Exception =
                 new NullEventArchiveV2Exception(
@@ -64,8 +64,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             IQueryable<EventArchiveV2> randomEventArchiveV2s =
                 CreateRandomEventArchiveV2s();
 
-            List<EventArchiveV2> inputEventArchiveV2s =
-                randomEventArchiveV2s.ToList();
+            IEnumerable<EventArchiveV2> inputEventArchiveV2s =
+                randomEventArchiveV2s;
 
             SqlException sqlException = CreateSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
@@ -128,8 +128,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             IQueryable<EventArchiveV2> randomEventArchiveV2s =
                 CreateRandomEventArchiveV2s();
 
-            List<EventArchiveV2> inputEventArchiveV2s =
-                randomEventArchiveV2s.ToList();
+            IEnumerable<EventArchiveV2> inputEventArchiveV2s =
+                randomEventArchiveV2s;
 
             var serviceException = new Exception();
 
