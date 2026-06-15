@@ -3,10 +3,13 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
 
@@ -15,13 +18,16 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
     internal partial class ListenerEventArchiveV2ProcessingService : IListenerEventArchiveV2ProcessingService
     {
         private readonly IListenerEventArchiveV2Service listenerEventArchiveV2Service;
+        private readonly IConfigurationBroker configurationBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public ListenerEventArchiveV2ProcessingService(
             IListenerEventArchiveV2Service listenerEventArchiveV2Service,
+            IConfigurationBroker configurationBroker,
             ILoggingBroker loggingBroker)
         {
             this.listenerEventArchiveV2Service = listenerEventArchiveV2Service;
+            this.configurationBroker = configurationBroker;
             this.loggingBroker = loggingBroker;
         }
 
@@ -39,18 +45,20 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 .AddListenerEventArchiveV2Async(listenerEventArchiveV2, cancellationToken);
         });
 
-        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveNextBatchOfArchivedEventV2sAsync(
+        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
             DateTimeOffset olderThan,
-            int batchSize,
             CancellationToken cancellationToken) =>
         TryCatch(async () =>
         {
+            BatchConfiguration batchConfiguration = this.configurationBroker.GetBatchConfiguration();
+            ValidateOnRetrieveNextPurgeBatchOfArchivedEventV2s(olderThan, batchConfiguration);
+
             IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2 =
                 await this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync();
 
             listenerEventArchiveV2 = FilterListenerEventArchiveV2sOlderThan(
                 olderThan, listenerEventArchiveV2)
-                    .Take(batchSize);
+                    .Take(batchConfiguration.BatchSizeForBulkProcessing);
 
             return listenerEventArchiveV2;
         });

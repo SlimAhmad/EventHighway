@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -15,6 +16,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
     internal partial class ListenerEventArchiveV2ProcessingService
     {
         private delegate ValueTask<IQueryable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2sFunction();
+        private delegate ValueTask<List<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2ListsFunction();
         private delegate ValueTask<ListenerEventArchiveV2> ReturningListenerEventArchiveV2Function();
 
         private async ValueTask<IQueryable<ListenerEventArchiveV2>> TryCatch(
@@ -23,6 +25,42 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             try
             {
                 return await returningListenerEventArchiveV2sFunction();
+            }
+            catch (InvalidListenerEventArchiveV2ProcessingException invalidListenerEventArchiveV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(invalidListenerEventArchiveV2ProcessingException);
+            }
+            catch (ListenerEventArchiveV2DependencyException listenerEventArchiveV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(listenerEventArchiveV2DependencyException);
+            }
+            catch (ListenerEventArchiveV2ServiceException listenerEventArchiveV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(listenerEventArchiveV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedListenerEventArchiveV2ProcessingServiceException =
+                    new FailedListenerEventArchiveV2ProcessingServiceException(
+                        message: "Failed listener event archive service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedListenerEventArchiveV2ProcessingServiceException);
+            }
+        }
+
+        private async ValueTask<List<ListenerEventArchiveV2>> TryCatch(
+            ReturningListenerEventArchiveV2ListsFunction returningListenerEventArchiveV2ListsFunction)
+        {
+            try
+            {
+                return await returningListenerEventArchiveV2ListsFunction();
+            }
+            catch (InvalidListenerEventArchiveV2ProcessingException invalidListenerEventArchiveV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(invalidListenerEventArchiveV2ProcessingException);
             }
             catch (ListenerEventArchiveV2DependencyException listenerEventArchiveV2DependencyException)
             {

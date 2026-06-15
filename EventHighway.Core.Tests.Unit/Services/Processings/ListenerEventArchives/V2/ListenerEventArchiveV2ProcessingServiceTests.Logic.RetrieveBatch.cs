@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using FluentAssertions;
 using Moq;
@@ -16,11 +17,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
     public partial class ListenerEventArchiveV2ProcessingServiceTests
     {
         [Fact]
-        public async Task ShouldRetrieveNextBatchOfArchivedEventV2sAsync()
+        public async Task ShouldRetrieveNextPurgeBatchOfArchivedEventV2sAsync()
         {
             // given
             DateTimeOffset olderThan = GetRandomDateTimeOffset();
-            int batchSize = GetRandomNumber();
+
+            var batchConfiguration = new BatchConfiguration
+            {
+                BatchSizeForBulkProcessing = GetRandomNumber()
+            };
 
             IQueryable<ListenerEventArchiveV2> randomListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s();
@@ -42,7 +47,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             IQueryable<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
                 retrievedListenerEventArchiveV2s
                     .Where(item => item.ArchivedDate < olderThan)
-                    .Take(batchSize);
+                    .Take(batchConfiguration.BatchSizeForBulkProcessing);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(batchConfiguration);
 
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync())
@@ -51,14 +60,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             // when
             IQueryable<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
                 await this.listenerEventArchiveV2ProcessingService
-                    .RetrieveNextBatchOfArchivedEventV2sAsync(
+                    .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
                         olderThan,
-                        batchSize,
                         CancellationToken.None);
 
             // then
             actualListenerEventArchiveV2s.Should()
                 .BeEquivalentTo(expectedListenerEventArchiveV2s);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(),
+                    Times.Once);
+
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

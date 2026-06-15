@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,9 +19,8 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             ListenerEventArchiveV2 listenerEventArchiveV2,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveNextBatchOfArchivedEventV2sAsync(
+        ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
             DateTimeOffset olderThan,
-            int batchSize,
             CancellationToken cancellationToken);
     }
 }
