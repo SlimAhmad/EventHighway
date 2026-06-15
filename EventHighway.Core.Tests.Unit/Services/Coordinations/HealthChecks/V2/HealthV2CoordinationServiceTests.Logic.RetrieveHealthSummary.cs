@@ -542,6 +542,97 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
         }
 
         [Fact]
+        public async Task ShouldReturnRedForHandlersWhenNoneAreRegisteredAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var randomEventAddressV2s = CreateRandomEventAddressV2s();
+            var randomEventListenerV2s = CreateRandomEventListenerV2s();
+
+            var randomEventV2s = CreateRandomEventV2s(
+                immediateCount: 2,
+                scheduledCount: 1,
+                deadCount: 0);
+
+            var randomListenerEventV2s = CreateRandomListenerEventV2s(
+                successCount: 5,
+                pendingCount: 1,
+                errorCount: 0);
+
+            var emptyHandlers = CreateRandomEventHandlers(count: 0);
+            var randomEventArchiveV2s = CreateRandomEventArchiveV2s();
+
+            var randomListenerEventArchiveV2s = CreateRandomListenerEventArchiveV2s(
+                successCount: 2,
+                errorCount: 0);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventV2s);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventAddressV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventListenerV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(emptyHandlers);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventArchiveV2s);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventArchiveV2s);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.healthV2CoordinationService
+                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+                .StatusCode.Should().Be((int)HealthStatusV2.Red);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldReturnAmberForHandlersWhenNoneAreRegisteredAsync()
         {
             // given

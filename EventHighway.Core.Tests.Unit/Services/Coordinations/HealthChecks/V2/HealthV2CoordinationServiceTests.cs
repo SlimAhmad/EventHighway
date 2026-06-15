@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Abstractions.EventHandlers;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -32,6 +34,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
         private readonly Mock<IEventV2OrchestrationService> eventV2OrchestrationServiceMock;
         private readonly Mock<IEventListenerV2OrchestrationService> eventListenerV2OrchestrationServiceMock;
         private readonly Mock<IEventArchiveV2OrchestrationService> eventArchiveV2OrchestrationServiceMock;
+        private readonly Mock<IConfigurationBroker> configurationBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IHealthV2CoordinationService healthV2CoordinationService;
 
@@ -46,6 +49,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock =
                 new Mock<IEventArchiveV2OrchestrationService>();
 
+            this.configurationBrokerMock = new Mock<IConfigurationBroker>();
+
+            this.configurationBrokerMock
+                .Setup(broker => broker.GetEventHighwayConfiguration())
+                .Returns(new EventHighwayConfiguration());
+
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
             this.healthV2CoordinationService =
@@ -56,6 +65,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                         this.eventListenerV2OrchestrationServiceMock.Object,
                     eventArchiveV2OrchestrationService:
                         this.eventArchiveV2OrchestrationServiceMock.Object,
+                    configurationBroker:
+                        this.configurationBrokerMock.Object,
                     loggingBroker:
                         this.loggingBrokerMock.Object);
         }
