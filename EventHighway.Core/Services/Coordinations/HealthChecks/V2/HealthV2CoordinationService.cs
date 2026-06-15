@@ -102,9 +102,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 this.configurationBroker.GetEventHighwayConfiguration();
 
             HealthStatusV2 deadEventsStatus =
-                deadEvents == 0 ? HealthStatusV2.Green
-                : deadEvents <= 5 ? HealthStatusV2.Amber
-                : HealthStatusV2.Red;
+                ComputeRagStatus(deadEvents, HealthMetric.DeadEvents, config);
 
             HealthStatusV2 errorRateStatus =
                 errorRate < 10 ? HealthStatusV2.Green
