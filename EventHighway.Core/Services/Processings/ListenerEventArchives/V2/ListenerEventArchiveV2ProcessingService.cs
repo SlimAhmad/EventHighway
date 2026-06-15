@@ -39,12 +39,13 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 .AddListenerEventArchiveV2Async(listenerEventArchiveV2, cancellationToken);
         });
 
-        public async ValueTask BulkRemoveListenerEventArchiveV2sAsync(
+        public ValueTask BulkRemoveListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s, 
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
-            await this.listenerEventArchiveV2Service
-                .BulkRemoveListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
-        }
+            await this.listenerEventArchiveV2Service.BulkRemoveListenerEventArchiveV2sAsync(
+                listenerEventArchiveV2s, cancellationToken);
+        });
     }
 }
