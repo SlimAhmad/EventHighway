@@ -13,13 +13,43 @@ using Xeptions;
 
 namespace EventHighway.Core.Clients.Events.V2
 {
+    /// <summary>
+    /// Represents the V2 event client implementation, handling event submission, scheduled event
+    /// firing, and event removal operations while managing coordination service exceptions.
+    /// </summary>
     internal class EventV2Client : IEventV2Client
     {
         private readonly IEventV2CoordinationService eventV2CoordinationService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventV2Client"/> class with the
+        /// specified event coordination service.
+        /// </summary>
+        /// <param name="eventV2CoordinationService">The coordination service for managing
+        /// events.</param>
+        /// <exception cref="ArgumentNullException">Thrown when eventV2CoordinationService is
+        /// null.</exception>
         public EventV2Client(IEventV2CoordinationService eventV2CoordinationService) =>
             this.eventV2CoordinationService = eventV2CoordinationService;
 
+        /// <summary>
+        /// Submits an event asynchronously by delegating to the coordination service and
+        /// handling any exceptions that occur.
+        /// </summary>
+        /// <param name="eventV2">The event to submit.</param>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{EventV2}"/> representing the asynchronous operation
+        /// that returns the submitted event.</returns>
+        /// <exception cref="EventV2ClientValidationException">Thrown when validation errors
+        /// occur in the coordination service.</exception>
+        /// <exception cref="EventV2ClientDependencyException">Thrown when dependency or
+        /// service errors occur.</exception>
+        /// <exception cref="EventV2ClientServiceException">Thrown when an unexpected error
+        /// occurs during submission.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
         public async ValueTask<EventV2> SubmitEventV2Async(
             EventV2 eventV2,
             CancellationToken cancellationToken = default)
@@ -59,6 +89,22 @@ namespace EventHighway.Core.Clients.Events.V2
             }
         }
 
+        /// <summary>
+        /// Fires scheduled pending events asynchronously by delegating to the coordination
+        /// service and handling any exceptions that occur.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        /// <exception cref="EventV2ClientValidationException">Thrown when validation errors
+        /// occur in the coordination service.</exception>
+        /// <exception cref="EventV2ClientDependencyException">Thrown when dependency or
+        /// service errors occur.</exception>
+        /// <exception cref="EventV2ClientServiceException">Thrown when an unexpected error
+        /// occurs during firing.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
         public async ValueTask FireScheduledPendingEventV2sAsync(
             CancellationToken cancellationToken = default)
         {
@@ -91,6 +137,24 @@ namespace EventHighway.Core.Clients.Events.V2
             }
         }
 
+        /// <summary>
+        /// Removes an event by its identifier asynchronously by delegating to the coordination
+        /// service and handling any exceptions that occur.
+        /// </summary>
+        /// <param name="eventV2Id">The identifier of the event to remove.</param>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{EventV2}"/> representing the asynchronous operation
+        /// that returns the removed event.</returns>
+        /// <exception cref="EventV2ClientValidationException">Thrown when validation errors
+        /// occur in the coordination service.</exception>
+        /// <exception cref="EventV2ClientDependencyException">Thrown when dependency or
+        /// service errors occur.</exception>
+        /// <exception cref="EventV2ClientServiceException">Thrown when an unexpected error
+        /// occurs during removal.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
         public async ValueTask<EventV2> RemoveEventV2ByIdAsync(
             Guid eventV2Id,
             CancellationToken cancellationToken = default)

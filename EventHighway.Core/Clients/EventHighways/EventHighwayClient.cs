@@ -52,11 +52,25 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EventHighway.Core.Clients.EventHighways
 {
+    /// <summary>
+    /// Represents the main client for the EventHighway system, providing access to various
+    /// event management operations including events, listeners, addresses, and their operations
+    /// across different API versions.
+    /// </summary>
     public class EventHighwayClient : IEventHighwayClient
     {
         private readonly string dataConnectionString;
         private readonly EventHighwayConfiguration configuration;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventHighwayClient"/> class with the
+        /// specified data connection string.
+        /// </summary>
+        /// <param name="dataConnectionString">The connection string for the data storage.</param>
+        /// <exception cref="ArgumentNullException">Thrown when dataConnectionString is null or
+        /// empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when required services cannot be
+        /// configured or database cannot be initialized.</exception>
         public EventHighwayClient(string dataConnectionString)
         {
             this.dataConnectionString = dataConnectionString;
@@ -65,6 +79,17 @@ namespace EventHighway.Core.Clients.EventHighways
             InitializeClients(serviceProvider);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventHighwayClient"/> class with the
+        /// specified data connection string and configuration.
+        /// </summary>
+        /// <param name="dataConnectionString">The connection string for the data storage.</param>
+        /// <param name="configuration">The EventHighway configuration. If null, a default
+        /// configuration will be created.</param>
+        /// <exception cref="ArgumentNullException">Thrown when dataConnectionString is null or
+        /// empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when required services cannot be
+        /// configured or database cannot be initialized.</exception>
         public EventHighwayClient(string dataConnectionString, EventHighwayConfiguration configuration)
         {
             this.dataConnectionString = dataConnectionString;
@@ -73,6 +98,16 @@ namespace EventHighway.Core.Clients.EventHighways
             InitializeClients(serviceProvider);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventHighwayClient"/> class with the
+        /// specified data connection string and event handlers.
+        /// </summary>
+        /// <param name="dataConnectionString">The connection string for the data storage.</param>
+        /// <param name="eventHandlers">The event handlers to register with the client.</param>
+        /// <exception cref="ArgumentNullException">Thrown when dataConnectionString is null or
+        /// empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when required services cannot be
+        /// configured or database cannot be initialized.</exception>
         public EventHighwayClient(string dataConnectionString, params IEventHandler[] eventHandlers)
             : this(dataConnectionString)
         {
@@ -80,6 +115,18 @@ namespace EventHighway.Core.Clients.EventHighways
                 this.V2.RegisterEventHandler(eventHandler);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventHighwayClient"/> class with the
+        /// specified data connection string, configuration, and event handlers.
+        /// </summary>
+        /// <param name="dataConnectionString">The connection string for the data storage.</param>
+        /// <param name="configuration">The EventHighway configuration. If null, a default
+        /// configuration will be created.</param>
+        /// <param name="eventHandlers">The event handlers to register with the client.</param>
+        /// <exception cref="ArgumentNullException">Thrown when dataConnectionString is null or
+        /// empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when required services cannot be
+        /// configured or database cannot be initialized.</exception>
         public EventHighwayClient(
             string dataConnectionString,
             EventHighwayConfiguration configuration,
@@ -90,14 +137,49 @@ namespace EventHighway.Core.Clients.EventHighways
                 this.V2.RegisterEventHandler(eventHandler);
         }
 
+        /// <summary>
+        /// Gets the client for managing event addresses.
+        /// </summary>
         public IEventAddressesClient EventAddresses { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing event listeners.
+        /// </summary>
         public IEventListenersClient EventListeners { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing events.
+        /// </summary>
         public IEventsClient Events { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing events in V1 API.
+        /// </summary>
         public IEventV1sClient EventV1s { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing events in V1 API with V1 operations.
+        /// </summary>
         public IEventV1sClientV1 EventV1sV1 { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing event addresses in V1 API.
+        /// </summary>
         public IEventAddressesV1Client EventAddressV1s { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing event listeners in V1 API.
+        /// </summary>
         public IEventListenerV1sClient EventListenerV1s { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing listener events in V1 API.
+        /// </summary>
         public IListenerEventV1sClient ListenerEventV1s { get; private set; }
+
+        /// <summary>
+        /// Gets the V2 API client for advanced event management and handler registration.
+        /// </summary>
         public IClientV2 V2 { get; private set; }
 
         private void InitializeClients(IServiceProvider serviceProvider)
