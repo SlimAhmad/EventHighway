@@ -113,6 +113,12 @@ namespace EventHighway.Core.Clients.Events.V2
                 await this.eventV2CoordinationService
                     .FireScheduledPendingEventV2sAsync(cancellationToken);
             }
+            catch (EventV2CoordinationValidationException
+                eventV2CoordinationValidationException)
+            {
+                throw CreateEventV2ClientValidationException(
+                    eventV2CoordinationValidationException.InnerException as Xeption);
+            }
             catch (EventV2CoordinationDependencyValidationException
                 eventV2CoordinationDependencyValidationException)
             {
