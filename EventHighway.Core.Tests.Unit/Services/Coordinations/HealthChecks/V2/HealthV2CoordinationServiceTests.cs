@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
-using EventHighway.Core.Models.Configurations;
+using EventHighway.Core.Models.Configurations.Healths;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -52,8 +52,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.configurationBrokerMock = new Mock<IConfigurationBroker>();
 
             this.configurationBrokerMock
-                .Setup(broker => broker.GetEventHighwayConfiguration())
-                .Returns(new EventHighwayConfiguration());
+                .Setup(broker => broker.GetHealthConfiguration())
+                .Returns(new HealthConfiguration());
 
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 

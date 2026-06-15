@@ -6,6 +6,6 @@ namespace EventHighway.Core.Models.Configurations.BatchProcessings
 {
     public class BatchConfiguration
     {
-        public int SizeForBulkProcessing { get; set; }
+        public int BatchSizeForBulkProcessing { get; set; }
     }
 }

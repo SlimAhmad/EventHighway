@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
-using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Models.Configurations.Healths;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -98,17 +97,17 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
             int handlerCount = allHandlers.Count();
 
-            EventHighwayConfiguration config =
-                this.configurationBroker.GetEventHighwayConfiguration();
+            HealthConfiguration healthConfig =
+                this.configurationBroker.GetHealthConfiguration();
 
             HealthStatusV2 deadEventsStatus =
-                ComputeRagStatus(deadEvents, HealthMetric.DeadEvents, config);
+                ComputeRagStatus(deadEvents, HealthMetric.DeadEvents, healthConfig);
 
             HealthStatusV2 errorRateStatus =
-                ComputeRagStatus((decimal)errorRate, HealthMetric.ErrorRate, config);
+                ComputeRagStatus((decimal)errorRate, HealthMetric.ErrorRate, healthConfig);
 
             HealthStatusV2 handlerStatus =
-                ComputeRagStatus(handlerCount, HealthMetric.HandlerCount, config);
+                ComputeRagStatus(handlerCount, HealthMetric.HandlerCount, healthConfig);
 
             return new List<HealthCheckItemV2>
             {
@@ -133,10 +132,10 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
         private static HealthStatusV2 ComputeRagStatus(
             decimal value,
             HealthMetric metric,
-            EventHighwayConfiguration config)
+            HealthConfiguration healthConfig)
         {
             RagThreshold threshold =
-                config.Health.Thresholds.FirstOrDefault(t => t.Metric == metric);
+                healthConfig.Thresholds.FirstOrDefault(t => t.Metric == metric);
 
             if (threshold is null)
                 return HealthStatusV2.NA;

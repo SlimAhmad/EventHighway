@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Models.Configurations.Healths;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using FluentAssertions;
@@ -641,8 +640,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
-            var configWithoutDeadEvents = new EventHighwayConfiguration();
-            configWithoutDeadEvents.Health.Thresholds.RemoveAll(
+            var configWithoutDeadEvents = new HealthConfiguration();
+            configWithoutDeadEvents.Thresholds.RemoveAll(
                 t => t.Metric == HealthMetric.DeadEvents);
 
             var randomEventAddressV2s = CreateRandomEventAddressV2s();
@@ -666,7 +665,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 errorCount: 0);
 
             this.configurationBrokerMock
-                .Setup(broker => broker.GetEventHighwayConfiguration())
+                .Setup(broker => broker.GetHealthConfiguration())
                 .Returns(configWithoutDeadEvents);
 
             this.eventV2OrchestrationServiceMock.Setup(service =>
@@ -739,8 +738,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
-            var configWithoutErrorRate = new EventHighwayConfiguration();
-            configWithoutErrorRate.Health.Thresholds.RemoveAll(
+            var configWithoutErrorRate = new HealthConfiguration();
+            configWithoutErrorRate.Thresholds.RemoveAll(
                 t => t.Metric == HealthMetric.ErrorRate);
 
             var randomEventAddressV2s = CreateRandomEventAddressV2s();
@@ -764,7 +763,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 errorCount: 0);
 
             this.configurationBrokerMock
-                .Setup(broker => broker.GetEventHighwayConfiguration())
+                .Setup(broker => broker.GetHealthConfiguration())
                 .Returns(configWithoutErrorRate);
 
             this.eventV2OrchestrationServiceMock.Setup(service =>
@@ -837,8 +836,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
-            var configWithoutHandlerCount = new EventHighwayConfiguration();
-            configWithoutHandlerCount.Health.Thresholds.RemoveAll(
+            var configWithoutHandlerCount = new HealthConfiguration();
+            configWithoutHandlerCount.Thresholds.RemoveAll(
                 t => t.Metric == HealthMetric.HandlerCount);
 
             var randomEventAddressV2s = CreateRandomEventAddressV2s();
@@ -862,7 +861,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 errorCount: 0);
 
             this.configurationBrokerMock
-                .Setup(broker => broker.GetEventHighwayConfiguration())
+                .Setup(broker => broker.GetHealthConfiguration())
                 .Returns(configWithoutHandlerCount);
 
             this.eventV2OrchestrationServiceMock.Setup(service =>
