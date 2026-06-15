@@ -12,13 +12,41 @@ using Xeptions;
 
 namespace EventHighway.Core.Clients.ArchivingEvents.V2
 {
+    /// <summary>
+    /// Represents the V2 archiving event client implementation, handling the archival of dead
+    /// events and managing coordination service exceptions.
+    /// </summary>
     internal class ArchivingEventV2Client : IArchivingEventV2Client
     {
         private readonly IArchivingEventV2CoordinationService archivingEventV2CoordinationService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArchivingEventV2Client"/> class with
+        /// the specified archiving event coordination service.
+        /// </summary>
+        /// <param name="archivingEventV2CoordinationService">The coordination service for
+        /// archiving events.</param>
+        /// <exception cref="ArgumentNullException">Thrown when archivingEventV2CoordinationService
+        /// is null.</exception>
         public ArchivingEventV2Client(IArchivingEventV2CoordinationService archivingEventV2CoordinationService) =>
             this.archivingEventV2CoordinationService = archivingEventV2CoordinationService;
 
+        /// <summary>
+        /// Archives dead events asynchronously by delegating to the coordination service and
+        /// handling any exceptions that occur.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        /// <exception cref="ArchivingEventV2ClientValidationException">Thrown when validation
+        /// errors occur in the coordination service.</exception>
+        /// <exception cref="ArchivingEventV2ClientDependencyException">Thrown when dependency
+        /// or service errors occur in the coordination service.</exception>
+        /// <exception cref="ArchivingEventV2ClientServiceException">Thrown when an unexpected
+        /// error occurs during archiving.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
         public async ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default)
         {
             try

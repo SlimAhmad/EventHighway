@@ -4,11 +4,13 @@
 
 using System;
 using EventHighway.Abstractions.EventHandlers;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.EventHandlers;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Serializations.Jsons;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Clients.ArchivingEvents.V2;
 using EventHighway.Core.Clients.EventAddresses.V2;
 using EventHighway.Core.Clients.EventListeners.V2;
@@ -40,31 +42,79 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EventHighway.Core.Clients.EventHighways.V2
 {
+    /// <summary>
+    /// Represents the V2 client implementation for the EventHighway system, providing access to
+    /// various V2 event management operations and supporting event handler registration.
+    /// </summary>
     internal class ClientV2 : IClientV2
     {
         private readonly string dataConnectionString;
+        private readonly EventHighwayConfiguration configuration;
         private readonly EventHandlerBroker eventHandlerBroker;
         private IEventHandlerV2Service eventHandlerV2Service;
 
-        public ClientV2(string dataConnectionString)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClientV2"/> class with the specified
+        /// data connection string and configuration.
+        /// </summary>
+        /// <param name="dataConnectionString">The connection string for the data storage.</param>
+        /// <param name="configuration">The EventHighway configuration. If null, a default
+        /// configuration will be created.</param>
+        /// <exception cref="ArgumentException">Thrown when dataConnectionString is null or
+        /// empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when required services cannot be
+        /// configured or database cannot be initialized.</exception>
+        public ClientV2(string dataConnectionString, EventHighwayConfiguration configuration)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(dataConnectionString);
             this.dataConnectionString = dataConnectionString;
+            this.configuration = configuration ?? new EventHighwayConfiguration();
             this.eventHandlerBroker = new EventHandlerBroker();
             IServiceProvider serviceProvider = ConfigureDependencies();
             InitializeClients(serviceProvider);
         }
 
+        /// <summary>
+        /// Registers an event handler with the V2 client. This method supports method chaining
+        /// by returning the current instance.
+        /// </summary>
+        /// <param name="eventHandler">The event handler to register.</param>
+        /// <returns>The current <see cref="IClientV2"/> instance for method chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when eventHandler is null.</exception>
         public IClientV2 RegisterEventHandler(IEventHandler eventHandler)
         {
             this.eventHandlerV2Service.RegisterEventHandlerV2(eventHandler);
             return this;
         }
 
+        /// <summary>
+        /// Gets the client for managing archived events in V2 API.
+        /// </summary>
         public IArchivingEventV2Client ArchivingEventV2Client { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing event addresses in V2 API.
+        /// </summary>
         public IEventAddressV2Client EventAddressV2Client { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing event listeners in V2 API.
+        /// </summary>
         public IEventListenerV2Client EventListenerV2Client { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing events in V2 API.
+        /// </summary>
         public IEventV2Client EventV2Client { get; private set; }
+
+        /// <summary>
+        /// Gets the client for performing health checks in V2 API.
+        /// </summary>
         public IHealthV2Client HealthV2Client { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing listener events in V2 API.
+        /// </summary>
         public IListenerEventV2Client ListenerEventV2Client { get; private set; }
 
         private void InitializeClients(IServiceProvider serviceProvider)
@@ -125,6 +175,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
                     new StorageBroker(this.dataConnectionString));
 
             services.AddSingleton<IEventHandlerBroker>(this.eventHandlerBroker);
+
+            services.AddSingleton<IConfigurationBroker>(
+                _ => new ConfigurationBroker(this.configuration));
         }
 
         private static void RegisterFoundationServices(IServiceCollection services)
