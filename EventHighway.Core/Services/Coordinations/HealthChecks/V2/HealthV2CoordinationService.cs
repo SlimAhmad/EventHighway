@@ -105,9 +105,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 ComputeRagStatus(deadEvents, HealthMetric.DeadEvents, config);
 
             HealthStatusV2 errorRateStatus =
-                errorRate < 10 ? HealthStatusV2.Green
-                : errorRate <= 25 ? HealthStatusV2.Amber
-                : HealthStatusV2.Red;
+                ComputeRagStatus((decimal)errorRate, HealthMetric.ErrorRate, config);
 
             HealthStatusV2 handlerStatus =
                 ComputeRagStatus(handlerCount, HealthMetric.HandlerCount, config);
