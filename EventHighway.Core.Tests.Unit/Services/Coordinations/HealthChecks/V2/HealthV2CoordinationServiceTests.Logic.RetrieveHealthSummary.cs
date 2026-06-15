@@ -837,6 +837,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 TestContext.Current.CancellationToken;
 
             var configWithoutHandlerCount = new HealthConfiguration();
+            
             configWithoutHandlerCount.Thresholds.RemoveAll(
                 t => t.Metric == HealthMetric.HandlerCount);
 
