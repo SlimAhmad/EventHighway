@@ -4,11 +4,13 @@
 
 using System;
 using EventHighway.Abstractions.EventHandlers;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.EventHandlers;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Serializations.Jsons;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Clients.ArchivingEvents.V2;
 using EventHighway.Core.Clients.EventAddresses.V2;
 using EventHighway.Core.Clients.EventListeners.V2;
@@ -43,12 +45,14 @@ namespace EventHighway.Core.Clients.EventHighways.V2
     internal class ClientV2 : IClientV2
     {
         private readonly string dataConnectionString;
+        private readonly EventHighwayConfiguration configuration;
         private readonly EventHandlerBroker eventHandlerBroker;
         private IEventHandlerV2Service eventHandlerV2Service;
 
-        public ClientV2(string dataConnectionString)
+        public ClientV2(string dataConnectionString, EventHighwayConfiguration configuration)
         {
             this.dataConnectionString = dataConnectionString;
+            this.configuration = configuration ?? new EventHighwayConfiguration();
             this.eventHandlerBroker = new EventHandlerBroker();
             IServiceProvider serviceProvider = ConfigureDependencies();
             InitializeClients(serviceProvider);
@@ -125,6 +129,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
                     new StorageBroker(this.dataConnectionString));
 
             services.AddSingleton<IEventHandlerBroker>(this.eventHandlerBroker);
+
+            services.AddSingleton<IConfigurationBroker>(
+                _ => new ConfigurationBroker(this.configuration));
         }
 
         private static void RegisterFoundationServices(IServiceCollection services)

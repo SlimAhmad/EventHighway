@@ -5,9 +5,11 @@
 using System;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.Apis;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Clients.EventAddresses;
 using EventHighway.Core.Clients.EventAddresses.V1;
 using EventHighway.Core.Clients.EventHighways.V2;
@@ -53,16 +55,36 @@ namespace EventHighway.Core.Clients.EventHighways
     public class EventHighwayClient : IEventHighwayClient
     {
         private readonly string dataConnectionString;
+        private readonly EventHighwayConfiguration configuration;
 
         public EventHighwayClient(string dataConnectionString)
         {
             this.dataConnectionString = dataConnectionString;
+            this.configuration = new EventHighwayConfiguration();
+            IServiceProvider serviceProvider = ConfigureDependencies();
+            InitializeClients(serviceProvider);
+        }
+
+        public EventHighwayClient(string dataConnectionString, EventHighwayConfiguration configuration)
+        {
+            this.dataConnectionString = dataConnectionString;
+            this.configuration = configuration ?? new EventHighwayConfiguration();
             IServiceProvider serviceProvider = ConfigureDependencies();
             InitializeClients(serviceProvider);
         }
 
         public EventHighwayClient(string dataConnectionString, params IEventHandler[] eventHandlers)
             : this(dataConnectionString)
+        {
+            foreach (IEventHandler eventHandler in eventHandlers)
+                this.V2.RegisterEventHandler(eventHandler);
+        }
+
+        public EventHighwayClient(
+            string dataConnectionString,
+            EventHighwayConfiguration configuration,
+            params IEventHandler[] eventHandlers)
+            : this(dataConnectionString, configuration)
         {
             foreach (IEventHandler eventHandler in eventHandlers)
                 this.V2.RegisterEventHandler(eventHandler);
@@ -110,7 +132,7 @@ namespace EventHighway.Core.Clients.EventHighways
             this.ListenerEventV1s =
                 serviceProvider.GetRequiredService<IListenerEventV1sClient>();
 
-            this.V2 = new ClientV2(this.dataConnectionString);
+            this.V2 = new ClientV2(this.dataConnectionString, this.configuration);
         }
 
         private IServiceProvider ConfigureDependencies()
@@ -140,6 +162,9 @@ namespace EventHighway.Core.Clients.EventHighways
                     new StorageBroker(this.dataConnectionString));
 
             services.AddTransient<IApiBroker, ApiBroker>();
+
+            services.AddSingleton<IConfigurationBroker>(
+                _ => new ConfigurationBroker(this.configuration));
         }
 
         private static void RegisterFoundationServices(IServiceCollection services)
