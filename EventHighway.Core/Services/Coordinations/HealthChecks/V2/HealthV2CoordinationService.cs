@@ -6,7 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Models.Configurations;
+using EventHighway.Core.Models.Configurations.Healths;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -22,17 +25,20 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
         private readonly IEventV2OrchestrationService eventV2OrchestrationService;
         private readonly IEventListenerV2OrchestrationService eventListenerV2OrchestrationService;
         private readonly IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService;
+        private readonly IConfigurationBroker configurationBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public HealthV2CoordinationService(
             IEventV2OrchestrationService eventV2OrchestrationService,
             IEventListenerV2OrchestrationService eventListenerV2OrchestrationService,
             IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService,
+            IConfigurationBroker configurationBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2OrchestrationService = eventV2OrchestrationService;
             this.eventListenerV2OrchestrationService = eventListenerV2OrchestrationService;
             this.eventArchiveV2OrchestrationService = eventArchiveV2OrchestrationService;
+            this.configurationBroker = configurationBroker;
             this.loggingBroker = loggingBroker;
         }
 
@@ -92,6 +98,9 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
             int handlerCount = allHandlers.Count();
 
+            EventHighwayConfiguration config =
+                this.configurationBroker.GetEventHighwayConfiguration();
+
             HealthStatusV2 deadEventsStatus =
                 deadEvents == 0 ? HealthStatusV2.Green
                 : deadEvents <= 5 ? HealthStatusV2.Amber
@@ -103,7 +112,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 : HealthStatusV2.Red;
 
             HealthStatusV2 handlerStatus =
-                handlerCount >= 1 ? HealthStatusV2.Green : HealthStatusV2.Amber;
+                ComputeRagStatus(handlerCount, HealthMetric.HandlerCount, config);
 
             return new List<HealthCheckItemV2>
             {
@@ -124,6 +133,34 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 CreateItem("Event Handlers", "Registered Handlers", handlerCount.ToString(), null, handlerStatus),
             };
         });
+
+        private static HealthStatusV2 ComputeRagStatus(
+            decimal value,
+            HealthMetric metric,
+            EventHighwayConfiguration config)
+        {
+            RagThreshold threshold =
+                config.Health.Thresholds.FirstOrDefault(t => t.Metric == metric);
+
+            if (threshold is null)
+                return HealthStatusV2.NA;
+
+            if (threshold.Green < threshold.Red)
+            {
+                if (value <= threshold.Green) return HealthStatusV2.Green;
+                if (value >= threshold.Red) return HealthStatusV2.Red;
+                return HealthStatusV2.Amber;
+            }
+
+            if (threshold.Green > threshold.Red)
+            {
+                if (value >= threshold.Green) return HealthStatusV2.Green;
+                if (value <= threshold.Red) return HealthStatusV2.Red;
+                return HealthStatusV2.Amber;
+            }
+
+            return HealthStatusV2.NA;
+        }
 
         private static HealthCheckItemV2 CreateItem(
             string grouping,
