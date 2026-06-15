@@ -830,6 +830,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+        
         [Fact]
         public async Task ShouldReturnNAForHandlerCountWhenNoThresholdIsConfiguredAsync()
         {
