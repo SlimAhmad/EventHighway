@@ -44,7 +44,24 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             int batchSize,
             CancellationToken cancellationToken)
         {
-           throw new NotImplementedException();
+            IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2 =
+                await this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync();
+
+            listenerEventArchiveV2 = FilterListenerEventArchiveV2sOlderThan(
+                olderThan, listenerEventArchiveV2)
+                    .Take(batchSize);
+
+            return listenerEventArchiveV2;
+        }
+
+        private static IQueryable<ListenerEventArchiveV2> FilterListenerEventArchiveV2sOlderThan(
+            DateTimeOffset olderThan,
+            IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2s)
+        {
+            listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                listenerEventArchiveV2 => listenerEventArchiveV2.ArchivedDate < olderThan);
+
+            return listenerEventArchiveV2s;
         }
     }
 }
