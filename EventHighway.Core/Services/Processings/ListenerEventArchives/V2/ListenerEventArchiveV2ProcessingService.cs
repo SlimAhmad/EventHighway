@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,5 +38,13 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             return await this.listenerEventArchiveV2Service
                 .AddListenerEventArchiveV2Async(listenerEventArchiveV2, cancellationToken);
         });
+
+        public async ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveNextBatchOfArchivedEventV2sAsync(
+            DateTimeOffset olderThan,
+            int batchSize,
+            CancellationToken cancellationToken)
+        {
+           throw new NotImplementedException();
+        }
     }
 }
