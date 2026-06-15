@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Processings.ListenerEventArchives.V2.Exceptions;
 using FluentAssertions;
@@ -22,10 +23,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             Xeption dependencyException)
         {
             // given
-            var expectedListenerEventArchiveV2ProcessingDependencyException =
+            var batchConfiguration = new BatchConfiguration
+            {
+                BatchSizeForBulkProcessing = 10
+            };
+
+            var expectedException =
                 new ListenerEventArchiveV2ProcessingDependencyException(
                     message: "Listener event archive dependency error occurred, contact support.",
                     innerException: dependencyException.InnerException as Xeption);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(batchConfiguration);
 
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync())
@@ -33,29 +43,33 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
 
             // when
             ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveBatchTask =
-              this.listenerEventArchiveV2ProcessingService
-                  .RetrieveNextBatchOfArchivedEventV2sAsync(
-                      DateTimeOffset.UtcNow,
-                      10,
-                      CancellationToken.None);
+                this.listenerEventArchiveV2ProcessingService
+                    .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
+                        DateTimeOffset.UtcNow,
+                        CancellationToken.None);
 
             ListenerEventArchiveV2ProcessingDependencyException actualException =
-                await Assert.ThrowsAsync<ListenerEventArchiveV2ProcessingDependencyException>(
-                    retrieveBatchTask.AsTask);
+                await Assert.ThrowsAsync<
+                    ListenerEventArchiveV2ProcessingDependencyException>(
+                        retrieveBatchTask.AsTask);
 
             // then
             actualException.Should()
-                .BeEquivalentTo(expectedListenerEventArchiveV2ProcessingDependencyException);
+                .BeEquivalentTo(expectedException);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
 
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
-                broker.LogErrorAsync(It.Is(SameExceptionAs(
-                    expectedListenerEventArchiveV2ProcessingDependencyException))),
-                        Times.Once);
+                broker.LogErrorAsync(It.Is(SameExceptionAs(expectedException))),
+                    Times.Once);
 
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
