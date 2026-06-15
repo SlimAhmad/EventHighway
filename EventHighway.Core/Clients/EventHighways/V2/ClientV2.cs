@@ -60,12 +60,13 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         /// <param name="dataConnectionString">The connection string for the data storage.</param>
         /// <param name="configuration">The EventHighway configuration. If null, a default
         /// configuration will be created.</param>
-        /// <exception cref="ArgumentNullException">Thrown when dataConnectionString is null or
+        /// <exception cref="ArgumentException">Thrown when dataConnectionString is null or
         /// empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when required services cannot be
         /// configured or database cannot be initialized.</exception>
         public ClientV2(string dataConnectionString, EventHighwayConfiguration configuration)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(dataConnectionString);
             this.dataConnectionString = dataConnectionString;
             this.configuration = configuration ?? new EventHighwayConfiguration();
             this.eventHandlerBroker = new EventHandlerBroker();

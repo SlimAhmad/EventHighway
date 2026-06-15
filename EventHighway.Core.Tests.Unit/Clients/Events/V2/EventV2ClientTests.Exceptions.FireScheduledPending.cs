@@ -15,6 +15,56 @@ namespace EventHighway.Core.Tests.Unit.Clients.Events.V2
     public partial class EventV2ClientTests
     {
         [Fact]
+        public async Task ShouldThrowValidationExceptionOnFireIfValidationErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
+
+            var eventV2CoordinationValidationException =
+                new EventV2CoordinationValidationException(
+                    someMessage,
+                    someInnerException);
+
+            var expectedEventV2ClientValidationException =
+                new EventV2ClientValidationException(
+                    message: "Event client validation error occurred, fix the errors and try again.",
+                    innerException: eventV2CoordinationValidationException
+                        .InnerException as Xeption,
+                    data: (eventV2CoordinationValidationException
+                        .InnerException as Xeption).Data);
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(eventV2CoordinationValidationException);
+
+            // when
+            ValueTask fireScheduledPendingEventV2sTask =
+                this.eventV2Client.FireScheduledPendingEventV2sAsync(
+                    randomCancellationToken);
+
+            EventV2ClientValidationException actualEventV2ClientValidationException =
+                await Assert.ThrowsAsync<EventV2ClientValidationException>(
+                    fireScheduledPendingEventV2sTask.AsTask);
+
+            // then
+            actualEventV2ClientValidationException.Should()
+                .BeEquivalentTo(expectedEventV2ClientValidationException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task
             ShouldThrowValidationExceptionOnFireIfDependencyValidationErrorOccursAsync()
         {

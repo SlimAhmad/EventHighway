@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.EventAddresses.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2.Exceptions;
-using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
 using EventHighway.Core.Services.Foundations.EventAddresses.V2;
 using Xeptions;
 
@@ -108,17 +107,15 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             {
                 return await this.eventAddressV2Service.RetrieveAllEventAddressV2sAsync();
             }
-            catch (EventListenerV2OrchestrationDependencyException
-                eventListenerV2OrchestrationDependencyException)
+            catch (EventAddressV2DependencyException eventAddressV2DependencyException)
             {
                 throw CreateEventAddressV2ClientDependencyException(
-                    eventListenerV2OrchestrationDependencyException.InnerException as Xeption);
+                    eventAddressV2DependencyException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationServiceException
-                eventListenerV2OrchestrationServiceException)
+            catch (EventAddressV2ServiceException eventAddressV2ServiceException)
             {
                 throw CreateEventAddressV2ClientDependencyException(
-                    eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+                    eventAddressV2ServiceException.InnerException as Xeption);
             }
             catch (Exception exception)
             {

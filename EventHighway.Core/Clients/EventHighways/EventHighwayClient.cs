@@ -67,12 +67,13 @@ namespace EventHighway.Core.Clients.EventHighways
         /// specified data connection string.
         /// </summary>
         /// <param name="dataConnectionString">The connection string for the data storage.</param>
-        /// <exception cref="ArgumentNullException">Thrown when dataConnectionString is null or
+        /// <exception cref="ArgumentException">Thrown when dataConnectionString is null or
         /// empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when required services cannot be
         /// configured or database cannot be initialized.</exception>
         public EventHighwayClient(string dataConnectionString)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(dataConnectionString);
             this.dataConnectionString = dataConnectionString;
             this.configuration = new EventHighwayConfiguration();
             IServiceProvider serviceProvider = ConfigureDependencies();
@@ -86,12 +87,13 @@ namespace EventHighway.Core.Clients.EventHighways
         /// <param name="dataConnectionString">The connection string for the data storage.</param>
         /// <param name="configuration">The EventHighway configuration. If null, a default
         /// configuration will be created.</param>
-        /// <exception cref="ArgumentNullException">Thrown when dataConnectionString is null or
+        /// <exception cref="ArgumentException">Thrown when dataConnectionString is null or
         /// empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when required services cannot be
         /// configured or database cannot be initialized.</exception>
         public EventHighwayClient(string dataConnectionString, EventHighwayConfiguration configuration)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(dataConnectionString);
             this.dataConnectionString = dataConnectionString;
             this.configuration = configuration ?? new EventHighwayConfiguration();
             IServiceProvider serviceProvider = ConfigureDependencies();
@@ -104,7 +106,7 @@ namespace EventHighway.Core.Clients.EventHighways
         /// </summary>
         /// <param name="dataConnectionString">The connection string for the data storage.</param>
         /// <param name="eventHandlers">The event handlers to register with the client.</param>
-        /// <exception cref="ArgumentNullException">Thrown when dataConnectionString is null or
+        /// <exception cref="ArgumentException">Thrown when dataConnectionString is null or
         /// empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when required services cannot be
         /// configured or database cannot be initialized.</exception>
@@ -123,7 +125,7 @@ namespace EventHighway.Core.Clients.EventHighways
         /// <param name="configuration">The EventHighway configuration. If null, a default
         /// configuration will be created.</param>
         /// <param name="eventHandlers">The event handlers to register with the client.</param>
-        /// <exception cref="ArgumentNullException">Thrown when dataConnectionString is null or
+        /// <exception cref="ArgumentException">Thrown when dataConnectionString is null or
         /// empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when required services cannot be
         /// configured or database cannot be initialized.</exception>
