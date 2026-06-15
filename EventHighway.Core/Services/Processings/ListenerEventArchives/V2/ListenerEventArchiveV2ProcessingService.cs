@@ -39,10 +39,11 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 .AddListenerEventArchiveV2Async(listenerEventArchiveV2, cancellationToken);
         });
 
-        public async ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveNextBatchOfArchivedEventV2sAsync(
+        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveNextBatchOfArchivedEventV2sAsync(
             DateTimeOffset olderThan,
             int batchSize,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken) =>
+        TryCatch(async () =>
         {
             IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2 =
                 await this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync();
@@ -52,7 +53,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                     .Take(batchSize);
 
             return listenerEventArchiveV2;
-        }
+        });
 
         private static IQueryable<ListenerEventArchiveV2> FilterListenerEventArchiveV2sOlderThan(
             DateTimeOffset olderThan,
