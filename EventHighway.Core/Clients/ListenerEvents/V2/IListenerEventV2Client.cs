@@ -10,11 +10,49 @@ using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 
 namespace EventHighway.Core.Clients.ListenerEvents.V2
 {
+    /// <summary>
+    /// Defines the contract for the V2 listener event client, providing operations to retrieve
+    /// and remove listener events.
+    /// </summary>
     public interface IListenerEventV2Client
     {
+        /// <summary>
+        /// Retrieves all listener events asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{IQueryable}"/> representing the asynchronous
+        /// operation that returns a queryable collection of all listener events.</returns>
+        /// <exception cref="ListenerEventV2ClientValidationException">Thrown when validation
+        /// errors occur.</exception>
+        /// <exception cref="ListenerEventV2ClientDependencyException">Thrown when dependency or
+        /// service errors occur.</exception>
+        /// <exception cref="ListenerEventV2ClientServiceException">Thrown when an unexpected
+        /// error occurs during retrieval.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
         ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
             CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Removes a listener event by its identifier asynchronously.
+        /// </summary>
+        /// <param name="listenerEventV2Id">The identifier of the listener event to
+        /// remove.</param>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{ListenerEventV2}"/> representing the asynchronous
+        /// operation that returns the removed listener event.</returns>
+        /// <exception cref="ListenerEventV2ClientValidationException">Thrown when validation
+        /// errors occur.</exception>
+        /// <exception cref="ListenerEventV2ClientDependencyException">Thrown when dependency or
+        /// service errors occur.</exception>
+        /// <exception cref="ListenerEventV2ClientServiceException">Thrown when an unexpected
+        /// error occurs during removal.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
         ValueTask<ListenerEventV2> RemoveListenerEventV2ByIdAsync(
             Guid listenerEventV2Id,
             CancellationToken cancellationToken = default);

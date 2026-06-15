@@ -18,6 +18,14 @@ namespace EventHighway.EventHandlers
     {
         private readonly IDelegateService delegateService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DelegateEventHandler"/> class with the specified
+        /// identifier and event handler delegate.
+        /// </summary>
+        /// <param name="Id">The unique identifier for this event handler.</param>
+        /// <param name="handler">An asynchronous delegate that processes event content and
+        /// parameters, accepting content, handler parameters, and a cancellation token, and returning
+        /// an <see cref="EventHandlerResult"/>.</param>
         public DelegateEventHandler(
             Guid Id,
             Func<string, IReadOnlyDictionary<string, string>, CancellationToken, ValueTask<EventHandlerResult>> handler)
@@ -32,12 +40,39 @@ namespace EventHighway.EventHandlers
             this.delegateService = delegateService;
         }
 
+        /// <summary>
+        /// Gets the unique identifier for this event handler.
+        /// </summary>
         public Guid Id { get; }
 
+        /// <summary>
+        /// Gets the name of this event handler.
+        /// </summary>
         public string Name => nameof(DelegateEventHandler);
+
+        /// <summary>
+        /// Gets a collection of required parameters for this event handler.
+        /// </summary>
         public IEnumerable<string> RequiredParams => Array.Empty<string>();
 
 
+        /// <summary>
+        /// Handles an event asynchronously by invoking the registered event handler delegate with the
+        /// provided content and parameters.
+        /// </summary>
+        /// <param name="content">The event content to be processed by the handler.</param>
+        /// <param name="handlerParams">A read-only dictionary of parameters to be passed to the
+        /// handler.</param>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{EventHandlerResult}"/> representing the asynchronous
+        /// operation that returns the result of handling the event.</returns>
+        /// <exception cref="DelegateEventHandlerValidationException">Thrown when the delegate
+        /// service encounters validation errors during event handling.</exception>
+        /// <exception cref="DelegateEventHandlerDependencyException">Thrown when the delegate
+        /// service encounters dependency-related errors during event handling.</exception>
+        /// <exception cref="DelegateEventHandlerServiceException">Thrown when an unexpected error
+        /// occurs during event handling.</exception>
         public async ValueTask<EventHandlerResult> HandleAsync(
             string content,
             IReadOnlyDictionary<string, string> handlerParams,

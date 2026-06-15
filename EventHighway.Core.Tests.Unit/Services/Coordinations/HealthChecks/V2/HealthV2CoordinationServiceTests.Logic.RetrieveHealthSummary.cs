@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Configurations.Healths;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using FluentAssertions;
 using Moq;
@@ -171,9 +172,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -262,9 +268,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -353,9 +364,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -444,9 +460,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -535,14 +556,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
         [Fact]
-        public async Task ShouldReturnAmberForHandlersWhenNoneAreRegisteredAsync()
+        public async Task ShouldReturnRedForHandlersWhenNoneAreRegisteredAsync()
         {
             // given
             CancellationToken randomCancellationToken =
@@ -603,7 +629,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 
             // then
             actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
-                .StatusCode.Should().Be((int)HealthStatusV2.Amber);
+                .StatusCode.Should().Be((int)HealthStatusV2.Red);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllEventV2sAsync(randomCancellationToken), Times.Once);
@@ -626,9 +652,328 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldReturnNAForDeadEventsWhenNoThresholdIsConfiguredAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var configWithoutDeadEvents = new HealthConfiguration();
+            configWithoutDeadEvents.Thresholds.RemoveAll(
+                t => t.Metric == HealthMetric.DeadEvents);
+
+            var randomEventAddressV2s = CreateRandomEventAddressV2s();
+            var randomEventListenerV2s = CreateRandomEventListenerV2s();
+
+            var randomEventV2s = CreateRandomEventV2s(
+                immediateCount: 2,
+                scheduledCount: 1,
+                deadCount: 3);
+
+            var randomListenerEventV2s = CreateRandomListenerEventV2s(
+                successCount: 9,
+                pendingCount: 0,
+                errorCount: 0);
+
+            var randomHandlers = CreateRandomEventHandlers(count: 1);
+            var randomEventArchiveV2s = CreateRandomEventArchiveV2s();
+
+            var randomListenerEventArchiveV2s = CreateRandomListenerEventArchiveV2s(
+                successCount: 2,
+                errorCount: 0);
+
+            this.configurationBrokerMock
+                .Setup(broker => broker.GetHealthConfiguration())
+                .Returns(configWithoutDeadEvents);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventV2s);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventAddressV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventListenerV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomHandlers);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventArchiveV2s);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventArchiveV2s);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.healthV2CoordinationService
+                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Dead (0 retries)")
+                .StatusCode.Should().Be((int)HealthStatusV2.NA);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldReturnNAForErrorRateWhenNoThresholdIsConfiguredAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var configWithoutErrorRate = new HealthConfiguration();
+            
+            configWithoutErrorRate.Thresholds.RemoveAll(
+                t => t.Metric == HealthMetric.ErrorRate);
+
+            var randomEventAddressV2s = CreateRandomEventAddressV2s();
+            var randomEventListenerV2s = CreateRandomEventListenerV2s();
+
+            var randomEventV2s = CreateRandomEventV2s(
+                immediateCount: 2,
+                scheduledCount: 1,
+                deadCount: 0);
+
+            var randomListenerEventV2s = CreateRandomListenerEventV2s(
+                successCount: 7,
+                pendingCount: 0,
+                errorCount: 3);
+
+            var randomHandlers = CreateRandomEventHandlers(count: 1);
+            var randomEventArchiveV2s = CreateRandomEventArchiveV2s();
+
+            var randomListenerEventArchiveV2s = CreateRandomListenerEventArchiveV2s(
+                successCount: 2,
+                errorCount: 0);
+
+            this.configurationBrokerMock
+                .Setup(broker => broker.GetHealthConfiguration())
+                .Returns(configWithoutErrorRate);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventV2s);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventAddressV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventListenerV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomHandlers);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventArchiveV2s);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventArchiveV2s);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.healthV2CoordinationService
+                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Error Rate %")
+                .StatusCode.Should().Be((int)HealthStatusV2.NA);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+        
+        [Fact]
+        public async Task ShouldReturnNAForHandlerCountWhenNoThresholdIsConfiguredAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var configWithoutHandlerCount = new HealthConfiguration();
+            
+            configWithoutHandlerCount.Thresholds.RemoveAll(
+                t => t.Metric == HealthMetric.HandlerCount);
+
+            var randomEventAddressV2s = CreateRandomEventAddressV2s();
+            var randomEventListenerV2s = CreateRandomEventListenerV2s();
+
+            var randomEventV2s = CreateRandomEventV2s(
+                immediateCount: 2,
+                scheduledCount: 1,
+                deadCount: 0);
+
+            var randomListenerEventV2s = CreateRandomListenerEventV2s(
+                successCount: 9,
+                pendingCount: 0,
+                errorCount: 0);
+
+            var emptyHandlers = CreateRandomEventHandlers(count: 0);
+            var randomEventArchiveV2s = CreateRandomEventArchiveV2s();
+
+            var randomListenerEventArchiveV2s = CreateRandomListenerEventArchiveV2s(
+                successCount: 2,
+                errorCount: 0);
+
+            this.configurationBrokerMock
+                .Setup(broker => broker.GetHealthConfiguration())
+                .Returns(configWithoutHandlerCount);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventV2s);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventAddressV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventListenerV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(emptyHandlers);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventArchiveV2s);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventArchiveV2s);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.healthV2CoordinationService
+                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+                .StatusCode.Should().Be((int)HealthStatusV2.NA);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

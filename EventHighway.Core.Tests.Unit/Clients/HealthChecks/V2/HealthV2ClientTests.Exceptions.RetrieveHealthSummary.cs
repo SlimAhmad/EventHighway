@@ -143,5 +143,43 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
 
             this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRetrieveHealthSummaryIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedHealthV2ClientServiceException =
+                new HealthV2ClientServiceException(
+                    message: "Health client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.healthV2CoordinationServiceMock.Setup(service =>
+                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask<IEnumerable<HealthCheckItemV2>> retrieveTask =
+                this.healthV2Client.RetrieveHealthSummaryV2Async(randomCancellationToken);
+
+            HealthV2ClientServiceException actualException =
+                await Assert.ThrowsAsync<HealthV2ClientServiceException>(
+                    retrieveTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(expectedHealthV2ClientServiceException);
+
+            this.healthV2CoordinationServiceMock.Verify(service =>
+                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
     }
 }

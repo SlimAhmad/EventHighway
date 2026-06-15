@@ -12,14 +12,50 @@ using EventHighway.Core.Clients.ListenerEvents.V2;
 
 namespace EventHighway.Core.Clients.EventHighways.V2
 {
+    /// <summary>
+    /// Defines the V2 API contract for the EventHighway client, providing access to event
+    /// management operations including event archiving, addresses, listeners, events, health
+    /// checks, and listener events.
+    /// </summary>
     public interface IClientV2
     {
+        /// <summary>
+        /// Registers an event handler with the EventHighway V2 client. This method supports
+        /// method chaining by returning the current instance.
+        /// </summary>
+        /// <param name="eventHandler">The event handler to register.</param>
+        /// <returns>The current <see cref="IClientV2"/> instance for method chaining.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when eventHandler is null.</exception>
         IClientV2 RegisterEventHandler(IEventHandler eventHandler);
+
+        /// <summary>
+        /// Gets the client for managing archived events in V2 API.
+        /// </summary>
         IArchivingEventV2Client ArchivingEventV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for managing event addresses in V2 API.
+        /// </summary>
         IEventAddressV2Client EventAddressV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for managing event listeners in V2 API.
+        /// </summary>
         IEventListenerV2Client EventListenerV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for managing events in V2 API.
+        /// </summary>
         IEventV2Client EventV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for performing health checks in V2 API.
+        /// </summary>
         IHealthV2Client HealthV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for managing listener events in V2 API.
+        /// </summary>
         IListenerEventV2Client ListenerEventV2Client { get; }
     }
 }
