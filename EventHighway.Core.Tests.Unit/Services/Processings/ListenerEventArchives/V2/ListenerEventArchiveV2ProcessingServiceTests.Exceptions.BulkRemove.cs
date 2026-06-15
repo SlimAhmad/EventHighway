@@ -122,5 +122,68 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken cancellationToken =
+                TestContext.Current.CancellationToken;
+
+            IQueryable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s();
+
+            var serviceException = new Exception();
+
+            serviceException.Data.Add(
+                key: GetRandomString(),
+                value: new List<string> { GetRandomString() });
+
+            var failedServiceException =
+                new FailedListenerEventArchiveV2ProcessingServiceException(
+                    message: "Failed listener event archive service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedException =
+                new ListenerEventArchiveV2ProcessingServiceException(
+                    message: "Listener event archive service error occurred, contact support.",
+                    innerException: failedServiceException);
+
+            this.listenerEventArchiveV2ServiceMock.Setup(service =>
+                service.BulkRemoveListenerEventArchiveV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventArchiveV2>>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask bulkRemoveTask =
+                this.listenerEventArchiveV2ProcessingService
+                    .BulkRemoveListenerEventArchiveV2sAsync(
+                        someListenerEventArchiveV2s,
+                        cancellationToken);
+
+            var actualException =
+                await Assert.ThrowsAsync<
+                    ListenerEventArchiveV2ProcessingServiceException>(
+                        bulkRemoveTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(expectedException);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.BulkRemoveListenerEventArchiveV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventArchiveV2>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(
+                    It.Is(SameExceptionAs(expectedException))),
+                        Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
