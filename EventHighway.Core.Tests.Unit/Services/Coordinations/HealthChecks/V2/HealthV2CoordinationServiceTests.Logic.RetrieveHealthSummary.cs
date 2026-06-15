@@ -172,9 +172,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -263,9 +268,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -354,9 +364,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -445,9 +460,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -536,9 +556,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -627,9 +652,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -726,9 +756,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
         [Fact]
@@ -824,9 +859,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
         [Fact]
@@ -922,9 +962,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
