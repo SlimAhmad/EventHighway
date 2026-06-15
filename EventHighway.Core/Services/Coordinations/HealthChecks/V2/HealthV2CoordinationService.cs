@@ -84,8 +84,8 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             int successListenerEvents = allListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Success);
             int errorListenerEvents = allListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Error);
 
-            double errorRate = totalListenerEvents > 0
-                ? (double)errorListenerEvents / totalListenerEvents * 100
+            decimal errorRate = totalListenerEvents > 0
+                ? (decimal)errorListenerEvents / totalListenerEvents * 100
                 : 0;
 
             int totalArchivedEvents = allArchivedEvents.Count();
@@ -104,7 +104,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 ComputeRagStatus(deadEvents, HealthMetric.DeadEvents, healthConfig);
 
             HealthStatusV2 errorRateStatus =
-                ComputeRagStatus((decimal)errorRate, HealthMetric.ErrorRate, healthConfig);
+                ComputeRagStatus(errorRate, HealthMetric.ErrorRate, healthConfig);
 
             HealthStatusV2 handlerStatus =
                 ComputeRagStatus(handlerCount, HealthMetric.HandlerCount, healthConfig);
