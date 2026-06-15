@@ -766,6 +766,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldReturnNAForErrorRateWhenNoThresholdIsConfiguredAsync()
         {
@@ -869,6 +870,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldReturnNAForHandlerCountWhenNoThresholdIsConfiguredAsync()
         {
