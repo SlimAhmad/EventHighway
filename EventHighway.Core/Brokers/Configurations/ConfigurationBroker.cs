@@ -3,6 +3,8 @@
 // ----------------------------------------------------------------------------------
 
 using EventHighway.Core.Models.Configurations;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
+using EventHighway.Core.Models.Configurations.Healths;
 
 namespace EventHighway.Core.Brokers.Configurations
 {
@@ -13,7 +15,10 @@ namespace EventHighway.Core.Brokers.Configurations
         public ConfigurationBroker(EventHighwayConfiguration configuration) =>
             this.configuration = configuration;
 
-        public EventHighwayConfiguration GetEventHighwayConfiguration() =>
-            this.configuration;
+        public HealthConfiguration GetHealthConfiguration() =>
+            this.configuration.Health;
+
+        public BatchConfiguration GetBatchConfiguration() =>
+            this.configuration.BatchProcessing;
     }
 }
