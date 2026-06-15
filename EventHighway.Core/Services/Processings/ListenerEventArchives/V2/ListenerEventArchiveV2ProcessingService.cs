@@ -2,7 +2,6 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -44,7 +43,8 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s, 
             CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            await this.listenerEventArchiveV2Service
+                .BulkRemoveListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
         }
     }
 }
