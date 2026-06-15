@@ -66,5 +66,61 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnRetrieveBatchIfOlderThanIsInvalidAndLogItAsync()
+        {
+            // given
+            DateTimeOffset olderThan = default;
+
+            var batchConfiguration = new BatchConfiguration
+            {
+                BatchSizeForBulkProcessing = 10
+            };
+
+            var invalidListenerEventArchiveV2ProcessingException =
+                new InvalidListenerEventArchiveV2ProcessingException(
+                    message: "Listener event archive is invalid, fix the errors and try again.");
+
+            invalidListenerEventArchiveV2ProcessingException.UpsertDataList(
+                key: nameof(olderThan),
+                value: "Required.");
+
+            var expectedException =
+                new ListenerEventArchiveV2ProcessingValidationException(
+                    message: "Listener event archive validation error occurred, fix the errors and try again.",
+                    innerException: invalidListenerEventArchiveV2ProcessingException);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(batchConfiguration);
+
+            // when
+            ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveBatchTask =
+                this.listenerEventArchiveV2ProcessingService
+                    .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
+                        olderThan,
+                        CancellationToken.None);
+
+            // then
+            var actualException =
+                await Assert.ThrowsAsync<
+                    ListenerEventArchiveV2ProcessingValidationException>(
+                        retrieveBatchTask.AsTask);
+
+            actualException.Should().BeEquivalentTo(expectedException);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(expectedException))),
+                    Times.Once);
+
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
