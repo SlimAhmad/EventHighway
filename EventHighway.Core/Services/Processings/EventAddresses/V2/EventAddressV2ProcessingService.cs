@@ -43,10 +43,13 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
                 cancellationToken);
         });
 
-        public async ValueTask<EventAddressV2> RetrieveOrRegisterEventAddressV2Async(
+        public ValueTask<EventAddressV2> RetrieveOrRegisterEventAddressV2Async(
             EventAddressV2 eventAddressV2,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateOnRetrieveOrRegisterEventAddressV2(eventAddressV2);
+
             IQueryable<EventAddressV2> allEventAddressV2s =
                 await this.eventAddressV2Service.RetrieveAllEventAddressV2sAsync();
 
@@ -59,6 +62,6 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             return await this.eventAddressV2Service.AddEventAddressV2Async(
                 eventAddressV2,
                 cancellationToken);
-        }
+        });
     }
 }
