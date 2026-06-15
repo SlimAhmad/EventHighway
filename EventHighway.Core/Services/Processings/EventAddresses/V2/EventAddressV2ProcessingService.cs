@@ -42,5 +42,12 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
                 eventAddressV2Id,
                 cancellationToken);
         });
+
+        public async ValueTask<EventAddressV2> RetrieveOrRegisterEventAddressV2Async(
+            EventAddressV2 eventAddressV2,
+            CancellationToken cancellationToken = default)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
