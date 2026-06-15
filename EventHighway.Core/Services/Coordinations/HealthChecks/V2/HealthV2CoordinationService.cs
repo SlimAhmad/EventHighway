@@ -111,21 +111,21 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
             return new List<HealthCheckItemV2>
             {
-                CreateItem("Event Addresses", "Total", totalAddresses.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Event Listeners", "Total", totalListeners.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Active Events", "Total", totalEvents.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Active Events", "Immediate", immediateEvents.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Active Events", "Scheduled", scheduledEvents.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Active Events", "Dead (0 retries)", deadEvents.ToString(), null, deadEventsStatus),
-                CreateItem("Listener Events", "Total", totalListenerEvents.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Listener Events", "Pending", pendingListenerEvents.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Listener Events", "Successful", successListenerEvents.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Listener Events", "Errors", errorListenerEvents.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Listener Events", "Error Rate %", $"{errorRate:F2}", null, errorRateStatus),
-                CreateItem("Event Archives", "Total Archived Events", totalArchivedEvents.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Event Archives", "Total Archived Listener Events", totalArchivedListenerEvents.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Event Archives", "Archived Listener Errors", archivedListenerErrors.ToString(), null, HealthStatusV2.NA),
-                CreateItem("Event Handlers", "Registered Handlers", handlerCount.ToString(), null, handlerStatus),
+                CreateItem("Event Addresses", "Total", totalAddresses.ToString(), HealthStatusV2.NA),
+                CreateItem("Event Listeners", "Total", totalListeners.ToString(), HealthStatusV2.NA),
+                CreateItem("Active Events", "Total", totalEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Active Events", "Immediate", immediateEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Active Events", "Scheduled", scheduledEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Active Events", "Dead (0 retries)", deadEvents.ToString(), deadEventsStatus),
+                CreateItem("Listener Events", "Total", totalListenerEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Listener Events", "Pending", pendingListenerEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Listener Events", "Successful", successListenerEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Listener Events", "Errors", errorListenerEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Listener Events", "Error Rate %", $"{errorRate:F2}", errorRateStatus),
+                CreateItem("Event Archives", "Total Archived Events", totalArchivedEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Event Archives", "Total Archived Listener Events", totalArchivedListenerEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Event Archives", "Archived Listener Errors", archivedListenerErrors.ToString(), HealthStatusV2.NA),
+                CreateItem("Event Handlers", "Registered Handlers", handlerCount.ToString(), handlerStatus),
             };
         });
 
@@ -161,7 +161,6 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             string grouping,
             string item,
             string value,
-            string description,
             HealthStatusV2 status)
         {
             return new HealthCheckItemV2
@@ -169,7 +168,6 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 Grouping = grouping,
                 Item = item,
                 Value = value,
-                Description = description,
                 StatusCode = (int)status,
                 Status = status.ToString()
             };
