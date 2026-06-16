@@ -112,5 +112,57 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
 
             this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveOrRegisterIfServiceErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
+
+            var eventAddressV2ProcessingServiceException =
+                new EventAddressV2ProcessingServiceException(
+                    someMessage,
+                    someInnerException);
+
+            var expectedEventAddressV2ClientDependencyException =
+                new EventAddressV2ClientDependencyException(
+                    message: "Event address client dependency error occurred, contact support.",
+                    innerException: eventAddressV2ProcessingServiceException.InnerException as Xeption,
+                    data: (eventAddressV2ProcessingServiceException.InnerException as Xeption).Data);
+
+            this.eventAddressV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveOrRegisterEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(eventAddressV2ProcessingServiceException);
+
+            // when
+            ValueTask<EventAddressV2> retrieveOrRegisterEventAddressV2Task =
+                this.eventAddressV2Client.RetrieveOrRegisterEventAddressV2Async(
+                    someEventAddressV2,
+                    randomCancellationToken);
+
+            EventAddressV2ClientDependencyException actualEventAddressV2ClientDependencyException =
+                await Assert.ThrowsAsync<EventAddressV2ClientDependencyException>(
+                    retrieveOrRegisterEventAddressV2Task.AsTask);
+
+            // then
+            actualEventAddressV2ClientDependencyException.Should()
+                .BeEquivalentTo(expectedEventAddressV2ClientDependencyException);
+
+            this.eventAddressV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveOrRegisterEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
