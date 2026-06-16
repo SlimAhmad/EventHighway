@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     .Returns(batchConfiguration);
 
             // when
-            ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveBatchTask =
+            ValueTask<List<ListenerEventArchiveV2>> retrieveBatchTask =
                 this.listenerEventArchiveV2ProcessingService
                     .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
                         DateTimeOffset.UtcNow,
@@ -96,7 +97,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     .Returns(batchConfiguration);
 
             // when
-            ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveBatchTask =
+            ValueTask<List<ListenerEventArchiveV2>> retrieveBatchTask =
                 this.listenerEventArchiveV2ProcessingService
                     .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
                         olderThan,

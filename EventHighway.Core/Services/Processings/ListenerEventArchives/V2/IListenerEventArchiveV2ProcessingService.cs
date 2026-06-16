@@ -19,7 +19,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             ListenerEventArchiveV2 listenerEventArchiveV2,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
+        ValueTask<List<ListenerEventArchiveV2>> RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
             DateTimeOffset olderThan,
             CancellationToken cancellationToken);
     }

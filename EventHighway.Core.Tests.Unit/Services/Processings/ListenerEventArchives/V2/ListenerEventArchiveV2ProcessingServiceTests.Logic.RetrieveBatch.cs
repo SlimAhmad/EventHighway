@@ -58,7 +58,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     .ReturnsAsync(retrievedListenerEventArchiveV2s);
 
             // when
-            IQueryable<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
+            List<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
                 await this.listenerEventArchiveV2ProcessingService
                     .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
                         olderThan,
