@@ -64,7 +64,39 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             EventAddressV2 eventAddressV2,
             CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await this.eventAddressV2ProcessingService
+                    .RetrieveOrRegisterEventAddressV2Async(eventAddressV2, cancellationToken);
+            }
+            catch (EventAddressV2ProcessingValidationException
+                eventAddressV2ProcessingValidationException)
+            {
+                throw CreateEventAddressV2ClientValidationException(
+                    eventAddressV2ProcessingValidationException.InnerException as Xeption);
+            }
+            catch (EventAddressV2ProcessingDependencyValidationException
+                eventAddressV2ProcessingDependencyValidationException)
+            {
+                throw CreateEventAddressV2ClientValidationException(
+                    eventAddressV2ProcessingDependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventAddressV2ProcessingDependencyException
+                eventAddressV2ProcessingDependencyException)
+            {
+                throw CreateEventAddressV2ClientDependencyException(
+                    eventAddressV2ProcessingDependencyException.InnerException as Xeption);
+            }
+            catch (EventAddressV2ProcessingServiceException
+                eventAddressV2ProcessingServiceException)
+            {
+                throw CreateEventAddressV2ClientDependencyException(
+                    eventAddressV2ProcessingServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventAddressV2ClientServiceException(exception as Xeption);
+            }
         }
 
         public async ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync(
