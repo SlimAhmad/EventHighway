@@ -207,6 +207,11 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             }
         }
 
+        public ValueTask<EventListenerV2> RetrieveOrRegisterEventListenerV2Async(
+            EventListenerV2 eventListenerV2,
+            CancellationToken cancellationToken = default) =>
+            throw new System.NotImplementedException();
+
         private static EventListenerV2ClientValidationException
             CreateEventListenerV2ClientValidationException(Xeption innerException)
         {
