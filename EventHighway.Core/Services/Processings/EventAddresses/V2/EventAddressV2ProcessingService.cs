@@ -43,14 +43,17 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
                 cancellationToken);
         });
 
-        public async ValueTask<EventAddressV2> RemoveEventAddressV2ByIdAsync(
+        public ValueTask<EventAddressV2> RemoveEventAddressV2ByIdAsync(
             Guid eventAddressV2Id,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateOnRemoveEventAddressV2ById(eventAddressV2Id);
+
             return await this.eventAddressV2Service.RemoveEventAddressV2ByIdAsync(
                 eventAddressV2Id,
                 cancellationToken);
-        }
+        });
 
         public ValueTask<EventAddressV2> RegisterEventAddressV2Async(
             EventAddressV2 eventAddressV2,

@@ -13,6 +13,9 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
         private static void ValidateOnRegisterEventAddressV2(EventAddressV2 eventAddressV2) =>
             ValidateEventAddressV2IsNotNull(eventAddressV2);
 
+        private static void ValidateOnRemoveEventAddressV2ById(Guid eventAddressV2Id) =>
+            ValidateEventAddressV2Id(eventAddressV2Id);
+
         private static void ValidateOnRetrieveOrRegisterEventAddressV2(EventAddressV2 eventAddressV2)
         {
             ValidateEventAddressV2IsNotNull(eventAddressV2);
