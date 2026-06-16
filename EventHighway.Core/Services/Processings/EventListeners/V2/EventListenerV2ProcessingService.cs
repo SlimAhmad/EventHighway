@@ -68,10 +68,13 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
                 cancellationToken);
         });
 
-        public async ValueTask<EventListenerV2> RetrieveOrRegisterEventListenerV2Async(
+        public ValueTask<EventListenerV2> RetrieveOrRegisterEventListenerV2Async(
             EventListenerV2 eventListenerV2,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateEventListenerV2IsNotNull(eventListenerV2);
+
             IQueryable<EventListenerV2> allEventListenerV2s =
                 await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync();
 
@@ -84,6 +87,6 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             return await this.eventListenerV2Service.AddEventListenerV2Async(
                 eventListenerV2,
                 cancellationToken);
-        }
+        });
     }
 }
