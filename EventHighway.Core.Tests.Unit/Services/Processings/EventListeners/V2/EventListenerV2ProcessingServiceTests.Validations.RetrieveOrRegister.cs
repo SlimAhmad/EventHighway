@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -59,6 +59,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventListenerV2ServiceMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldThrowValidationExceptionOnRetrieveOrRegisterIfIdIsInvalidAndLogItAsync()
         {
