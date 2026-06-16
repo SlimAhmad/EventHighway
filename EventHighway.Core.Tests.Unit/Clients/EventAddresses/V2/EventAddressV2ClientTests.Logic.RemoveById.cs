@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
             EventAddressV2 expectedEventAddressV2 =
                 removedEventAddressV2.DeepClone();
 
-            this.eventAddressV2ServiceMock.Setup(service =>
+            this.eventAddressV2ProcessingServiceMock.Setup(service =>
                 service.RemoveEventAddressV2ByIdAsync(
                     inputEventAddressV2Id,
                     randomCancellationToken))
@@ -47,16 +47,16 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
                         randomCancellationToken);
 
             // then
-            actualEventAddressV2.Should()
-                .BeEquivalentTo(expectedEventAddressV2);
+            actualEventAddressV2.Should().BeEquivalentTo(
+                expectedEventAddressV2);
 
-            this.eventAddressV2ServiceMock.Verify(service =>
+            this.eventAddressV2ProcessingServiceMock.Verify(service =>
                 service.RemoveEventAddressV2ByIdAsync(
                     inputEventAddressV2Id,
                     randomCancellationToken),
                         Times.Once);
 
-            this.eventAddressV2ServiceMock.VerifyNoOtherCalls();
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
     }
 }
