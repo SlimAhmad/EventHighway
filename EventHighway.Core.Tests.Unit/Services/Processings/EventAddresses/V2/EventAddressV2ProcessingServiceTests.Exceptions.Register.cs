@@ -121,5 +121,65 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             this.eventAddressV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRegisterIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventAddressV2 someEventAddressV2 =
+                CreateRandomEventAddressV2();
+
+            var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedEventAddressV2ProcessingServiceException =
+                new FailedEventAddressV2ProcessingServiceException(
+                    message: "Failed event address service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedEventAddressV2ProcessingServiceException =
+                new EventAddressV2ProcessingServiceException(
+                    message: "Event address service error occurred, contact support.",
+                    innerException: failedEventAddressV2ProcessingServiceException);
+
+            this.eventAddressV2ServiceMock.Setup(service =>
+                service.AddEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    randomCancellationToken))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<EventAddressV2> registerEventAddressV2Task =
+                this.eventAddressV2ProcessingService.RegisterEventAddressV2Async(
+                    someEventAddressV2,
+                    randomCancellationToken);
+
+            EventAddressV2ProcessingServiceException
+                actualEventAddressV2ProcessingServiceException =
+                    await Assert.ThrowsAsync<EventAddressV2ProcessingServiceException>(
+                        registerEventAddressV2Task.AsTask);
+
+            // then
+            actualEventAddressV2ProcessingServiceException.Should().BeEquivalentTo(
+                expectedEventAddressV2ProcessingServiceException);
+
+            this.eventAddressV2ServiceMock.Verify(service =>
+                service.AddEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    randomCancellationToken),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventAddressV2ProcessingServiceException))),
+                        Times.Once);
+
+            this.eventAddressV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
