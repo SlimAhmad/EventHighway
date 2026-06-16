@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,10 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
         ValueTask<ListenerEventArchiveV2> AddListenerEventArchiveV2Async(
             ListenerEventArchiveV2 listenerEventArchiveV2,
             CancellationToken cancellationToken = default);
+
+        ValueTask<List<ListenerEventArchiveV2>> RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
+            DateTimeOffset olderThan,
+            CancellationToken cancellationToken);
 
         ValueTask BulkRemoveListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
