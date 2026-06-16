@@ -2,6 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
@@ -106,6 +108,62 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventAddressV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventAddressV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRetrieveOrRegisterIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventAddressV2 someEventAddressV2 =
+                CreateRandomEventAddressV2();
+
+            var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedEventAddressV2ProcessingServiceException =
+                new FailedEventAddressV2ProcessingServiceException(
+                    message: "Failed event address service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedEventAddressV2ProcessingServiceException =
+                new EventAddressV2ProcessingServiceException(
+                    message: "Event address service error occurred, contact support.",
+                    innerException: failedEventAddressV2ProcessingServiceException);
+
+            this.eventAddressV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventAddressV2sAsync())
+                    .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<EventAddressV2> retrieveOrRegisterEventAddressV2Task =
+                this.eventAddressV2ProcessingService.RetrieveOrRegisterEventAddressV2Async(
+                    someEventAddressV2,
+                    randomCancellationToken);
+
+            EventAddressV2ProcessingServiceException
+                actualEventAddressV2ProcessingServiceException =
+                    await Assert.ThrowsAsync<EventAddressV2ProcessingServiceException>(
+                        retrieveOrRegisterEventAddressV2Task.AsTask);
+
+            // then
+            actualEventAddressV2ProcessingServiceException.Should().BeEquivalentTo(
+                expectedEventAddressV2ProcessingServiceException);
+
+            this.eventAddressV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventAddressV2sAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventAddressV2ProcessingServiceException))),
                         Times.Once);
 
             this.eventAddressV2ServiceMock.VerifyNoOtherCalls();
