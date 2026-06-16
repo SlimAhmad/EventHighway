@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.EventAddresses.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Models.Services.Processings.EventAddresses.V2.Exceptions;
 using FluentAssertions;
 using Moq;
 using Xeptions;
@@ -50,6 +51,58 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
             // then
             actualEventAddressV2ClientValidationException.Should()
                 .BeEquivalentTo(expectedEventAddressV2ClientValidationException);
+
+            this.eventAddressV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveOrRegisterEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveOrRegisterIfDependencyErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
+
+            var eventAddressV2ProcessingDependencyException =
+                new EventAddressV2ProcessingDependencyException(
+                    someMessage,
+                    someInnerException);
+
+            var expectedEventAddressV2ClientDependencyException =
+                new EventAddressV2ClientDependencyException(
+                    message: "Event address client dependency error occurred, contact support.",
+                    innerException: eventAddressV2ProcessingDependencyException.InnerException as Xeption,
+                    data: (eventAddressV2ProcessingDependencyException.InnerException as Xeption).Data);
+
+            this.eventAddressV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveOrRegisterEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(eventAddressV2ProcessingDependencyException);
+
+            // when
+            ValueTask<EventAddressV2> retrieveOrRegisterEventAddressV2Task =
+                this.eventAddressV2Client.RetrieveOrRegisterEventAddressV2Async(
+                    someEventAddressV2,
+                    randomCancellationToken);
+
+            EventAddressV2ClientDependencyException actualEventAddressV2ClientDependencyException =
+                await Assert.ThrowsAsync<EventAddressV2ClientDependencyException>(
+                    retrieveOrRegisterEventAddressV2Task.AsTask);
+
+            // then
+            actualEventAddressV2ClientDependencyException.Should()
+                .BeEquivalentTo(expectedEventAddressV2ClientDependencyException);
 
             this.eventAddressV2ProcessingServiceMock.Verify(service =>
                 service.RetrieveOrRegisterEventAddressV2Async(
