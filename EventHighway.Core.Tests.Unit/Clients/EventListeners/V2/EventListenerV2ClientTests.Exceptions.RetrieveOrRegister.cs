@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -60,6 +60,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventListeners.V2
 
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldThrowDependencyExceptionOnRetrieveOrRegisterIfDependencyErrorOccursAsync()
         {
@@ -111,6 +112,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventListeners.V2
 
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldThrowDependencyExceptionOnRetrieveOrRegisterIfServiceErrorOccursAsync()
         {
