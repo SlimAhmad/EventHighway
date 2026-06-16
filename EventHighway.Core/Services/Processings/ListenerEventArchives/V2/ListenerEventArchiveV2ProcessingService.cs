@@ -63,6 +63,15 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             return listenerEventArchiveV2.ToList();
         });
 
+        public ValueTask BulkRemoveListenerEventArchiveV2sAsync(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            await this.listenerEventArchiveV2Service.BulkRemoveListenerEventArchiveV2sAsync(
+                listenerEventArchiveV2s, cancellationToken);
+        });
+
         private static IQueryable<ListenerEventArchiveV2> FilterListenerEventArchiveV2sOlderThan(
             DateTimeOffset olderThan,
             IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2s)

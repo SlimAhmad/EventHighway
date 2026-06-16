@@ -22,5 +22,9 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
         ValueTask<List<ListenerEventArchiveV2>> RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
             DateTimeOffset olderThan,
             CancellationToken cancellationToken);
+
+        ValueTask BulkRemoveListenerEventArchiveV2sAsync(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
+            CancellationToken cancellationToken = default);
     }
 }
