@@ -210,6 +210,8 @@ public partial class Program
         var studentEvent = new EventV2
         {
             Id = Guid.NewGuid(),
+            EventName = "Student Enrolled Event",
+            Type = EventTypeV2.Scheduled,
             Content = "42,17,85",
             EventAddressId = studentEnrolledAddress.Id,
             ScheduledDate = DateTimeOffset.UtcNow.AddSeconds(-1),
@@ -285,6 +287,8 @@ public partial class Program
         var courseEvent = new EventV2
         {
             Id = Guid.NewGuid(),
+            EventName = "Course Completed Event",
+            Type = EventTypeV2.Scheduled,
             Content = "88,92,75,95,83",
             EventAddressId = courseCompletedAddress.Id,
             ScheduledDate = DateTimeOffset.UtcNow.AddSeconds(-1),
