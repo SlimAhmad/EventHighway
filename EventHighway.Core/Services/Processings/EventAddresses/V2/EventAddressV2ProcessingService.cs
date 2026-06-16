@@ -47,7 +47,9 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             EventAddressV2 eventAddressV2,
             CancellationToken cancellationToken = default)
         {
-            throw new System.NotImplementedException();
+            return await this.eventAddressV2Service.AddEventAddressV2Async(
+                eventAddressV2,
+                cancellationToken);
         }
 
         public ValueTask<EventAddressV2> RetrieveOrRegisterEventAddressV2Async(
