@@ -66,5 +66,57 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             this.eventAddressV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(DependencyExceptions))]
+        public async Task ShouldThrowDependencyExceptionOnRemoveByIdIfDependencyExceptionOccursAndLogItAsync(
+            Xeption dependencyException)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid someEventAddressV2Id = GetRandomId();
+
+            var expectedEventAddressV2ProcessingDependencyException =
+                new EventAddressV2ProcessingDependencyException(
+                    message: "Event address dependency error occurred, contact support.",
+                    innerException: dependencyException.InnerException as Xeption);
+
+            this.eventAddressV2ServiceMock.Setup(service =>
+                service.RemoveEventAddressV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    randomCancellationToken))
+                        .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask<EventAddressV2> removeEventAddressV2ByIdTask =
+                this.eventAddressV2ProcessingService.RemoveEventAddressV2ByIdAsync(
+                    someEventAddressV2Id,
+                    randomCancellationToken);
+
+            EventAddressV2ProcessingDependencyException
+                actualEventAddressV2ProcessingDependencyException =
+                    await Assert.ThrowsAsync<EventAddressV2ProcessingDependencyException>(
+                        removeEventAddressV2ByIdTask.AsTask);
+
+            // then
+            actualEventAddressV2ProcessingDependencyException.Should().BeEquivalentTo(
+                expectedEventAddressV2ProcessingDependencyException);
+
+            this.eventAddressV2ServiceMock.Verify(service =>
+                service.RemoveEventAddressV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    randomCancellationToken),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventAddressV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventAddressV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
