@@ -73,7 +73,7 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            ValidateEventListenerV2IsNotNull(eventListenerV2);
+            ValidateOnRetrieveOrRegisterEventListenerV2(eventListenerV2);
 
             IQueryable<EventListenerV2> allEventListenerV2s =
                 await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync();
