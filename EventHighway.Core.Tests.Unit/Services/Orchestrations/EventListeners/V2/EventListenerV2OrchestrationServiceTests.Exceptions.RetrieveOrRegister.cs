@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -70,6 +70,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
+
         [Theory]
         [MemberData(nameof(EventListenerV2DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRetrieveOrRegisterIfDependencyExceptionOccursAndLogItAsync(
@@ -123,6 +124,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldThrowServiceExceptionOnRetrieveOrRegisterIfServiceExceptionOccursAndLogItAsync()
         {
