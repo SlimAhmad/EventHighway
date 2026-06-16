@@ -376,7 +376,16 @@ public partial class Program
                 Console.WriteLine($"\n  {currentGrouping}");
             }
 
+            Console.ForegroundColor = item.Status switch
+            {
+                nameof(HealthStatusV2.Green) => ConsoleColor.Green,
+                nameof(HealthStatusV2.Amber) => ConsoleColor.Yellow,
+                nameof(HealthStatusV2.Red)   => ConsoleColor.Red,
+                _                            => ConsoleColor.Gray,
+            };
+
             Console.WriteLine($"    [{item.Status,-6}] {item.Item}: {item.Value}");
+            Console.ResetColor();
         }
 
         Console.WriteLine();
