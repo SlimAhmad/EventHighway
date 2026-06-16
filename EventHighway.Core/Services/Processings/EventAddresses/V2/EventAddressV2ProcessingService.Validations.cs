@@ -10,6 +10,9 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
 {
     internal partial class EventAddressV2ProcessingService
     {
+        private static void ValidateOnRegisterEventAddressV2(EventAddressV2 eventAddressV2) =>
+            ValidateEventAddressV2IsNotNull(eventAddressV2);
+
         private static void ValidateOnRetrieveOrRegisterEventAddressV2(EventAddressV2 eventAddressV2)
         {
             ValidateEventAddressV2IsNotNull(eventAddressV2);
