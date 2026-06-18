@@ -14,6 +14,9 @@ namespace EventHighway.Core.Brokers.Storages
         {
             model.ToTable("ListenerEventArchiveV2s");
             model.HasKey(listenerEventArchiveV2 => listenerEventArchiveV2.Id);
+
+            model.Property(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
+                .IsRequired();
         }
     }
 }

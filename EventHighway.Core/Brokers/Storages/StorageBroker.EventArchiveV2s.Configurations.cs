@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,6 +15,11 @@ namespace EventHighway.Core.Brokers.Storages
         {
             model.ToTable("EventArchiveV2s");
             model.HasKey(eventArchiveV2 => eventArchiveV2.Id);
+
+            model.HasMany<ListenerEventArchiveV2>(eventArchiveV2 => eventArchiveV2.ListenerEventArchiveV2s)
+                .WithOne()
+                .HasForeignKey(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
