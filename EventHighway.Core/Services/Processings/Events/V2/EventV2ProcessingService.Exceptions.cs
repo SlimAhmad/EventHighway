@@ -14,8 +14,47 @@ namespace EventHighway.Core.Services.Processings.Events.V2
 {
     internal partial class EventV2ProcessingService
     {
+        private delegate ValueTask ReturningNothingFunction();
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
         private delegate ValueTask<EventV2> ReturningEventV2Function();
+
+        private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
+        {
+            try
+            {
+                await returningNothingFunction();
+            }
+            catch (NullEventV2ProcessingException nullEventV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullEventV2ProcessingException);
+            }
+            catch (EventV2ValidationException eventV2ValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(eventV2ValidationException);
+            }
+            catch (EventV2DependencyValidationException eventV2DependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(eventV2DependencyValidationException);
+            }
+            catch (EventV2DependencyException eventV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventV2DependencyException);
+            }
+            catch (EventV2ServiceException eventV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventV2ProcessingServiceException =
+                    new FailedEventV2ProcessingServiceException(
+                        message: "Failed event service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventV2ProcessingServiceException);
+            }
+        }
 
         private async ValueTask<IQueryable<EventV2>> TryCatch(ReturningEventV2sFunction returningEventV2sFunction)
         {

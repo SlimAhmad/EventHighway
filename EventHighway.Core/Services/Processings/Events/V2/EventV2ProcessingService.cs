@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -88,6 +89,16 @@ namespace EventHighway.Core.Services.Processings.Events.V2
 
             return await this.eventV2Service.RemoveEventV2ByIdAsync(
                 eventV2Id, cancellationToken);
+        });
+
+        public ValueTask BulkRemoveEventV2sAsync(
+            IEnumerable<EventV2> eventV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateEventV2sIsNotNull(eventV2s);
+
+            await this.eventV2Service.BulkRemoveEventV2sAsync(eventV2s, cancellationToken);
         });
 
         private async ValueTask<EventV2> SetEventV2AsImmediateAsync(
