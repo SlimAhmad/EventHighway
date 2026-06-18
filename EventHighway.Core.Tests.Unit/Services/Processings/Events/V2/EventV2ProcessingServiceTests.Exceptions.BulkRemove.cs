@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -110,6 +111,62 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            IQueryable<EventV2> someEventV2s = CreateRandomEventV2s();
+            IEnumerable<EventV2> inputEventV2s = someEventV2s;
+            var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedEventV2ProcessingServiceException =
+                new FailedEventV2ProcessingServiceException(
+                    message: "Failed event service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedEventV2ProcessingServiceException =
+                new EventV2ProcessingServiceException(
+                    message: "Event service error occurred, contact support.",
+                    innerException: failedEventV2ProcessingServiceException);
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.BulkRemoveEventV2sAsync(
+                    inputEventV2s,
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask bulkRemoveEventV2sTask =
+                this.eventV2ProcessingService.BulkRemoveEventV2sAsync(
+                    inputEventV2s,
+                    TestContext.Current.CancellationToken);
+
+            EventV2ProcessingServiceException actualEventV2ProcessingServiceException =
+                await Assert.ThrowsAsync<EventV2ProcessingServiceException>(
+                    bulkRemoveEventV2sTask.AsTask);
+
+            // then
+            actualEventV2ProcessingServiceException.Should()
+                .BeEquivalentTo(expectedEventV2ProcessingServiceException);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.BulkRemoveEventV2sAsync(
+                    inputEventV2s,
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2ProcessingServiceException))),
                         Times.Once);
 
             this.eventV2ServiceMock.VerifyNoOtherCalls();
