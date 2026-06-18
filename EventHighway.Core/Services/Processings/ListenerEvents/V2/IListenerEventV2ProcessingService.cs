@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,10 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
 
         ValueTask<ListenerEventV2> RemoveListenerEventV2ByIdAsync(
             Guid listenerEventV2Id,
+            CancellationToken cancellationToken = default);
+
+        ValueTask BulkRemoveListenerEventV2sAsync(
+            IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default);
     }
 }

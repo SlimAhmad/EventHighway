@@ -14,8 +14,52 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
 {
     internal partial class ListenerEventV2ProcessingService
     {
+        private delegate ValueTask ReturningNothingFunction();
         private delegate ValueTask<ListenerEventV2> ReturningListenerEventV2Function();
         private delegate ValueTask<IQueryable<ListenerEventV2>> ReturningListenerEventV2sFunction();
+
+        private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
+        {
+            try
+            {
+                await returningNothingFunction();
+            }
+            catch (ListenerEventV2ValidationException
+                listenerEventV2ValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2ValidationException);
+            }
+            catch (ListenerEventV2DependencyValidationException
+                listenerEventV2DependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2DependencyValidationException);
+            }
+            catch (ListenerEventV2DependencyException
+                listenerEventV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventV2DependencyException);
+            }
+            catch (ListenerEventV2ServiceException
+                listenerEventV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedListenerEventV2ProcessingServiceException =
+                    new FailedListenerEventV2ProcessingServiceException(
+                        message: "Failed listener event service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedListenerEventV2ProcessingServiceException);
+            }
+        }
 
         private async ValueTask<ListenerEventV2> TryCatch(
             ReturningListenerEventV2Function returningListenerEventV2Function)
