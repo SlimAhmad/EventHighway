@@ -25,17 +25,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 inputEventArchiveV2s.SelectMany(eventArchiveV2 =>
                     eventArchiveV2.ListenerEventArchiveV2s);
 
-            this.listenerEventArchiveV2ServiceMock.Setup(service =>
-                service.BulkAddListenerEventArchiveV2sAsync(
-                    inputListenerEventArchiveV2s,
-                    It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(inputListenerEventArchiveV2s);
+            var mockSequence = new MockSequence();
 
-            this.eventArchiveV2ServiceMock.Setup(service =>
-                service.BulkAddEventArchiveV2sAsync(
-                    inputEventArchiveV2s,
-                    It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(inputEventArchiveV2s);
+            this.eventArchiveV2ServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.BulkAddEventArchiveV2sAsync(
+                        inputEventArchiveV2s,
+                        It.IsAny<CancellationToken>()))
+                            .ReturnsAsync(inputEventArchiveV2s);
+
+            this.listenerEventArchiveV2ServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.BulkAddListenerEventArchiveV2sAsync(
+                        inputListenerEventArchiveV2s,
+                        It.IsAny<CancellationToken>()))
+                            .ReturnsAsync(inputListenerEventArchiveV2s);
 
             // when
             await this.eventArchiveV2OrchestrationService.BulkAddEventArchiveV2sAsync(
@@ -43,15 +47,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 TestContext.Current.CancellationToken);
 
             // then
-            this.listenerEventArchiveV2ServiceMock.Verify(service =>
-                service.BulkAddListenerEventArchiveV2sAsync(
-                    inputListenerEventArchiveV2s,
-                    It.IsAny<CancellationToken>()),
-                        Times.Once);
-
             this.eventArchiveV2ServiceMock.Verify(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    inputListenerEventArchiveV2s,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
