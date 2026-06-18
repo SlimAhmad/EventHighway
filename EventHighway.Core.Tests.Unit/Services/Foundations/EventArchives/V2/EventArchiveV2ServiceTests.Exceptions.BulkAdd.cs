@@ -52,7 +52,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     .ReturnsAsync(randomDateTime);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.InsertBulkEventArchiveV2sAsync(
+                broker.BulkInsertEventArchiveV2sAsync(
                     It.IsAny<List<EventArchiveV2>>(),
                         It.IsAny<CancellationToken>()))
                             .ThrowsAsync(sqlException);
@@ -72,7 +72,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 .BeEquivalentTo(expectedEventArchiveV2DependencyException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertBulkEventArchiveV2sAsync(
+                broker.BulkInsertEventArchiveV2sAsync(
                     It.IsAny<List<EventArchiveV2>>(),
                         It.IsAny<CancellationToken>()),
                             Times.Once);
@@ -125,7 +125,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     .ReturnsAsync(randomDateTime);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.InsertBulkEventArchiveV2sAsync(
+                broker.BulkInsertEventArchiveV2sAsync(
                     It.IsAny<List<EventArchiveV2>>(),
                         It.IsAny<CancellationToken>()))
                             .ThrowsAsync(serviceException);
@@ -145,7 +145,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 .BeEquivalentTo(expectedEventArchiveV2ServiceException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertBulkEventArchiveV2sAsync(
+                broker.BulkInsertEventArchiveV2sAsync(
                     It.IsAny<List<EventArchiveV2>>(),
                         It.IsAny<CancellationToken>()),
                             Times.Once);

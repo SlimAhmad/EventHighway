@@ -40,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             }
 
             this.storageBrokerMock.Setup(broker =>
-                broker.InsertBulkEventArchiveV2sAsync(
+                broker.BulkInsertEventArchiveV2sAsync(
                     It.Is<List<EventArchiveV2>>(actual =>
                         SameEventArchiveV2sAs(expectedEventArchiveV2s, actual)),
                             It.IsAny<CancellationToken>()))
@@ -65,7 +65,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     Times.Exactly(inputEventArchiveV2s.Count + 1));
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertBulkEventArchiveV2sAsync(
+                broker.BulkInsertEventArchiveV2sAsync(
                     It.Is<List<EventArchiveV2>>(actual =>
                         SameEventArchiveV2sAs(expectedEventArchiveV2s, actual)),
                             It.IsAny<CancellationToken>()),

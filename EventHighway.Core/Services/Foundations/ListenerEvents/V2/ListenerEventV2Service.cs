@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -74,6 +75,16 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             ValidateListenerEventV2Exists(maybeListenerEventV2, listenerEventV2Id);
 
             return await this.storageBroker.DeleteListenerEventV2Async(maybeListenerEventV2, cancellationToken);
+        });
+
+        public ValueTask BulkRemoveListenerEventV2sAsync(
+            IEnumerable<ListenerEventV2> listenerEventV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateListenerEventV2sIsNotNull(listenerEventV2s);
+
+            await this.storageBroker.BulkDeleteListenerEventV2sAsync(listenerEventV2s, cancellationToken);
         });
     }
 }
