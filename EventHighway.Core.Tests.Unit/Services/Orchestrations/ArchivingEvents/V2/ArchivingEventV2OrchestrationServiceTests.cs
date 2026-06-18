@@ -41,6 +41,36 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     loggingBroker: this.loggingBrokerMock.Object);
         }
 
+        public static TheoryData<Xeption> DependencyValidationExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
+
+            return new TheoryData<Xeption>
+            {
+                new EventV2ProcessingValidationException(someMessage, someInnerException),
+                new EventV2ProcessingDependencyValidationException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingValidationException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingDependencyValidationException(someMessage, someInnerException),
+            };
+        }
+
+        public static TheoryData<Xeption> DependencyExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
+
+            return new TheoryData<Xeption>
+            {
+                new EventV2ProcessingDependencyException(someMessage, someInnerException),
+                new EventV2ProcessingServiceException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingDependencyException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingServiceException(someMessage, someInnerException),
+            };
+        }
+
         public static TheoryData<Xeption> EventV2ValidationExceptions()
         {
             string someMessage = GetRandomString();
