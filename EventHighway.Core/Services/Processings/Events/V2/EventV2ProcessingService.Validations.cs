@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
 
@@ -13,6 +14,15 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         private static void ValidateEventV2IsNotNull(EventV2 eventV2)
         {
             if (eventV2 is null)
+            {
+                throw new NullEventV2ProcessingException(
+                    message: "Event is null.");
+            }
+        }
+
+        private static void ValidateEventV2sIsNotNull(IEnumerable<EventV2> eventV2s)
+        {
+            if (eventV2s is null)
             {
                 throw new NullEventV2ProcessingException(
                     message: "Event is null.");
