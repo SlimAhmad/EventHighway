@@ -16,8 +16,41 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
 {
     internal partial class EventV2Service
     {
+        private delegate ValueTask ReturningNothingFunction();
         private delegate ValueTask<EventV2> ReturningEventV2Function();
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
+
+        private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
+        {
+            try
+            {
+                await returningNothingFunction();
+            }
+            catch (NullEventV2Exception nullEventV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullEventV2Exception);
+            }
+            catch (SqlException sqlException)
+            {
+                var failedStorageEventV2Exception =
+                    new FailedStorageEventV2Exception(
+                        message: "Failed event storage error occurred, contact support.",
+                        innerException: sqlException,
+                        data: sqlException.Data);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(failedStorageEventV2Exception);
+            }
+            catch (Exception serviceException)
+            {
+                var failedEventV2ServiceException =
+                    new FailedEventV2ServiceException(
+                        message: "Failed event service error occurred, contact support.",
+                        innerException: serviceException,
+                        data: serviceException.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventV2ServiceException);
+            }
+        }
 
         private async ValueTask<EventV2> TryCatch(ReturningEventV2Function returningEventV2Function)
         {
