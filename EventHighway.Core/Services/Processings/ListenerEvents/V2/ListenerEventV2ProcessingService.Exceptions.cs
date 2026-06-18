@@ -24,6 +24,12 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             {
                 await returningNothingFunction();
             }
+            catch (NullListenerEventV2ProcessingException
+                nullListenerEventV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullListenerEventV2ProcessingException);
+            }
             catch (ListenerEventV2ValidationException
                 listenerEventV2ValidationException)
             {
