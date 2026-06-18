@@ -46,7 +46,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     innerException: failedStorageEventArchiveV2Exception);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.DeleteBulkEventArchiveV2sAsync(
+                broker.BulkDeleteEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()))
                         .ThrowsAsync(sqlException);
@@ -66,7 +66,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 .BeEquivalentTo(expectedEventArchiveV2DependencyException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.DeleteBulkEventArchiveV2sAsync(
+                broker.BulkDeleteEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
@@ -109,7 +109,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     innerException: failedEventArchiveV2ServiceException);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.DeleteBulkEventArchiveV2sAsync(
+                broker.BulkDeleteEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()))
                         .ThrowsAsync(serviceException);
@@ -129,7 +129,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 .BeEquivalentTo(expectedEventArchiveV2ServiceException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.DeleteBulkEventArchiveV2sAsync(
+                broker.BulkDeleteEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()),
                         Times.Once);

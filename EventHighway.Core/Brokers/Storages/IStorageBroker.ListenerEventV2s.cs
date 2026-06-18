@@ -32,11 +32,11 @@ namespace EventHighway.Core.Brokers.Storages
             ListenerEventV2 listenerEventV2,
             CancellationToken cancellationToken = default);
 
-        ValueTask InsertBulkListenerEventV2sAsync(
+        ValueTask BulkInsertListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default);
 
-        ValueTask DeleteBulkListenerEventV2sAsync(
+        ValueTask BulkDeleteListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default);
     }

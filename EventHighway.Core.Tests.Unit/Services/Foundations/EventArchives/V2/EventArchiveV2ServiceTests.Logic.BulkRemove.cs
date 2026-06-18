@@ -24,7 +24,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 randomEventArchiveV2s;
 
             this.storageBrokerMock.Setup(broker =>
-                broker.DeleteBulkEventArchiveV2sAsync(
+                broker.BulkDeleteEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                         It.IsAny<CancellationToken>()))
                             .Returns(ValueTask.CompletedTask);
@@ -36,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
 
             // then
             this.storageBrokerMock.Verify(broker =>
-                broker.DeleteBulkEventArchiveV2sAsync(
+                broker.BulkDeleteEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                         It.IsAny<CancellationToken>()),
                             Times.Once);

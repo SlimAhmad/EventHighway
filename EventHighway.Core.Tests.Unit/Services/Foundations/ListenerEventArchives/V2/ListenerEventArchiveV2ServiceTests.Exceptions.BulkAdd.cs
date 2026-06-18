@@ -52,7 +52,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     .ReturnsAsync(randomDateTime);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.InsertBulkListenerEventArchiveV2sAsync(
+                broker.BulkInsertListenerEventArchiveV2sAsync(
                     It.IsAny<List<ListenerEventArchiveV2>>(),
                         It.IsAny<CancellationToken>()))
                             .ThrowsAsync(sqlException);
@@ -72,7 +72,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 .BeEquivalentTo(expectedListenerEventArchiveV2DependencyException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertBulkListenerEventArchiveV2sAsync(
+                broker.BulkInsertListenerEventArchiveV2sAsync(
                     It.IsAny<List<ListenerEventArchiveV2>>(),
                         It.IsAny<CancellationToken>()),
                             Times.Once);
@@ -125,7 +125,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     .ReturnsAsync(randomDateTime);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.InsertBulkListenerEventArchiveV2sAsync(
+                broker.BulkInsertListenerEventArchiveV2sAsync(
                     It.IsAny<List<ListenerEventArchiveV2>>(),
                         It.IsAny<CancellationToken>()))
                             .ThrowsAsync(serviceException);
@@ -145,7 +145,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 .BeEquivalentTo(expectedListenerEventArchiveV2ServiceException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertBulkListenerEventArchiveV2sAsync(
+                broker.BulkInsertListenerEventArchiveV2sAsync(
                     It.IsAny<List<ListenerEventArchiveV2>>(),
                         It.IsAny<CancellationToken>()),
                             Times.Once);
