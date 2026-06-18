@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,6 +71,16 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             ValidateEventV2Exists(maybeEventV2, eventV2Id);
 
             return await this.storageBroker.DeleteEventV2Async(maybeEventV2, cancellationToken);
+        });
+
+        public ValueTask BulkRemoveEventV2sAsync(
+            IEnumerable<EventV2> eventV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateEventV2sIsNotNull(eventV2s);
+
+            await this.storageBroker.BulkDeleteEventV2sAsync(eventV2s, cancellationToken);
         });
     }
 }
