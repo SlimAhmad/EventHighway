@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2.Exceptions;
@@ -137,6 +138,15 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
         private static void ValidateListenerEventV2IsNotNull(ListenerEventV2 listenerEventV2)
         {
             if (listenerEventV2 is null)
+            {
+                throw new NullListenerEventV2Exception(
+                    message: "Listener event is null.");
+            }
+        }
+
+        private static void ValidateListenerEventV2sIsNotNull(IEnumerable<ListenerEventV2> listenerEventV2s)
+        {
+            if (listenerEventV2s is null)
             {
                 throw new NullListenerEventV2Exception(
                     message: "Listener event is null.");

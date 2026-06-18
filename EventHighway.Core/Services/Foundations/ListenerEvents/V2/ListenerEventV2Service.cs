@@ -77,11 +77,14 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             return await this.storageBroker.DeleteListenerEventV2Async(maybeListenerEventV2, cancellationToken);
         });
 
-        public async ValueTask BulkRemoveListenerEventV2sAsync(
+        public ValueTask BulkRemoveListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateListenerEventV2sIsNotNull(listenerEventV2s);
+
             await this.storageBroker.BulkDeleteListenerEventV2sAsync(listenerEventV2s, cancellationToken);
-        }
+        });
     }
 }
