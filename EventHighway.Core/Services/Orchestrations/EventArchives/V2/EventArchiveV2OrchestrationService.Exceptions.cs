@@ -80,6 +80,12 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             {
                 await returningNothingFunction();
             }
+            catch (NullEventArchiveV2sOrchestrationException
+                nullEventArchiveV2sOrchestrationException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullEventArchiveV2sOrchestrationException);
+            }
             catch (NullEventArchiveV2OrchestrationException
                 nullEventArchiveV2OrchestrationException)
             {

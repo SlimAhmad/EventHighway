@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 
@@ -21,6 +22,15 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             {
                 throw new NullEventArchiveV2OrchestrationException(
                     message: "Event archive is null.");
+            }
+        }
+
+        private static void ValidateEventArchiveV2sIsNotNull(IEnumerable<EventArchiveV2> eventArchiveV2s)
+        {
+            if (eventArchiveV2s is null)
+            {
+                throw new NullEventArchiveV2sOrchestrationException(
+                    message: "Event archives are null.");
             }
         }
 
