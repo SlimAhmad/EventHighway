@@ -21,6 +21,10 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             {
                 await returningNothingFunction();
             }
+            catch (NullArchivingEventV2sOrchestrationException nullArchivingEventV2sOrchestrationException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullArchivingEventV2sOrchestrationException);
+            }
             catch (NullArchivingEventV2OrchestrationException nullArchivingEventV2OrchestrationException)
             {
                 throw await CreateAndLogValidationExceptionAsync(nullArchivingEventV2OrchestrationException);
