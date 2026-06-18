@@ -13,6 +13,6 @@ namespace EventHighway.Core.Models.Configurations.BatchProcessings
         /// Gets or sets the number of items processed in a single bulk-processing batch.
         /// A value of <c>0</c> (the default) disables bulk processing.
         /// </summary>
-        public int BatchSizeForBulkProcessing { get; set; }
+        public int BatchSizeForBulkProcessing { get; set; } = 10000;
     }
 }
