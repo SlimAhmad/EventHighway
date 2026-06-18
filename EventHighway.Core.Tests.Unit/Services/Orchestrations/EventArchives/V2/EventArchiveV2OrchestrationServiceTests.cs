@@ -111,6 +111,58 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             };
         }
 
+        public static TheoryData<Xeption> DependencyValidationExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
+
+            return new TheoryData<Xeption>
+            {
+                new EventArchiveV2ValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventArchiveV2DependencyValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new ListenerEventArchiveV2ValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new ListenerEventArchiveV2DependencyValidationException(
+                    someMessage,
+                    someInnerException),
+            };
+        }
+
+        public static TheoryData<Xeption> DependencyExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
+
+            return new TheoryData<Xeption>
+            {
+                new EventArchiveV2DependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new EventArchiveV2ServiceException(
+                    someMessage,
+                    someInnerException),
+
+                new ListenerEventArchiveV2DependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new ListenerEventArchiveV2ServiceException(
+                    someMessage,
+                    someInnerException),
+            };
+        }
+
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 

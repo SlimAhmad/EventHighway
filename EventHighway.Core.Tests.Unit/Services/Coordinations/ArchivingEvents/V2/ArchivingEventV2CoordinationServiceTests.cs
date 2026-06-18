@@ -134,6 +134,58 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             };
         }
 
+        public static TheoryData<Xeption> DependencyValidationExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
+
+            return new TheoryData<Xeption>
+            {
+                new ArchivingEventV2OrchestrationValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new ArchivingEventV2OrchestrationDependencyValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventArchiveV2OrchestrationValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventArchiveV2OrchestrationDependencyValidationException(
+                    someMessage,
+                    someInnerException),
+            };
+        }
+
+        public static TheoryData<Xeption> DependencyExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
+
+            return new TheoryData<Xeption>
+            {
+                new ArchivingEventV2OrchestrationDependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new ArchivingEventV2OrchestrationServiceException(
+                    someMessage,
+                    someInnerException),
+
+                new EventArchiveV2OrchestrationDependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new EventArchiveV2OrchestrationServiceException(
+                    someMessage,
+                    someInnerException),
+            };
+        }
+
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 

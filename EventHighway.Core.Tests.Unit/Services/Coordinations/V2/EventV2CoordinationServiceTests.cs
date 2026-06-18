@@ -137,6 +137,56 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             };
         }
 
+        public static TheoryData<Xeption> DependencyValidationExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+
+            return new TheoryData<Xeption>
+            {
+                new EventV2OrchestrationValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventV2OrchestrationDependencyValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventListenerV2OrchestrationValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventListenerV2OrchestrationDependencyValidationException(
+                    someMessage,
+                    someInnerException)
+            };
+        }
+
+        public static TheoryData<Xeption> DependencyExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+
+            return new TheoryData<Xeption>
+            {
+                new EventV2OrchestrationDependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new EventV2OrchestrationServiceException(
+                    someMessage,
+                    someInnerException),
+
+                new EventListenerV2OrchestrationDependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new EventListenerV2OrchestrationServiceException(
+                    someMessage,
+                    someInnerException),
+            };
+        }
+
         public static TheoryData<Exception> PlainException()
         {
             return new TheoryData<Exception>
