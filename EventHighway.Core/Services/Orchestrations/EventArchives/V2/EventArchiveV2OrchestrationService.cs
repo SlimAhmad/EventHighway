@@ -2,6 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,5 +56,10 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
 
             await this.eventArchiveV2Service.AddEventArchiveV2Async(eventArchiveV2, cancellationToken);
         });
+
+        public ValueTask BulkAddEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
     }
 }
