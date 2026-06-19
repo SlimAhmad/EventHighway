@@ -29,15 +29,6 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             }
         }
 
-        private static void ValidateOnRetrieveAllDeadEventV2sWithListeners(int take)
-        {
-            Validate(
-                message: "Event is invalid, fix the errors and try again.",
-
-                (Rule: IsInvalid(take),
-                Parameter: "take"));
-        }
-
         private static void ValidateEventV2Id(Guid eventV2Id)
         {
             Validate(
@@ -51,12 +42,6 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         {
             Condition = id == Guid.Empty,
             Message = "Required"
-        };
-
-        private static dynamic IsInvalid(int take) => new
-        {
-            Condition = take < 0,
-            Message = "Value must be greater than or equal to 0"
         };
 
         private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)

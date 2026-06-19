@@ -47,9 +47,15 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 
             ValidateOnRetrieveAllDeadEventV2sWithListeners(batchConfiguration);
 
-            return await this.eventV2ProcessingService
-                .RetrieveAllDeadEventV2sWithListenersAsync(
-                    batchConfiguration.BatchSizeForBulkProcessing);
+            IQueryable<EventV2> deadEventV2s =
+                await this.eventV2ProcessingService
+                    .RetrieveAllDeadEventV2sWithListenersAsync();
+
+            int take = batchConfiguration.BatchSizeForBulkProcessing;
+
+            return take == 0
+                ? deadEventV2s.AsEnumerable()
+                : deadEventV2s.Take(take).AsEnumerable();
         });
 
         public ValueTask BulkRemoveEventV2AndListenerEventV2sAsync(
