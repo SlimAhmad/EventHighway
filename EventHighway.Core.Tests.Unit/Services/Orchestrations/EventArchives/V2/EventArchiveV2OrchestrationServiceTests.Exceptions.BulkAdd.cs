@@ -40,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                         .ThrowsAsync(validationException);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     TestContext.Current.CancellationToken);
@@ -97,7 +97,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                         .ThrowsAsync(dependencyException);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     TestContext.Current.CancellationToken);
@@ -159,7 +159,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                         .ThrowsAsync(exception);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     TestContext.Current.CancellationToken);

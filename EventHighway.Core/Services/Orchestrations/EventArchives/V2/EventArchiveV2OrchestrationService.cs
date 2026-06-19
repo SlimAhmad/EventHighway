@@ -57,22 +57,15 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             }
         });
 
-        public ValueTask BulkAddEventArchiveV2sAsync(
+        public ValueTask<IEnumerable<EventArchiveV2>> BulkAddEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
-            await this.eventArchiveV2ProcessingService
+            return await this.eventArchiveV2ProcessingService
                 .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
-
-            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s =
-                eventArchiveV2s.SelectMany(eventArchiveV2 =>
-                    eventArchiveV2.ListenerEventArchiveV2s);
-
-            await this.listenerEventArchiveV2ProcessingService
-                .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
         });
 
         public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(

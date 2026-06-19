@@ -18,6 +18,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
     internal partial class EventArchiveV2OrchestrationService
     {
         private delegate ValueTask<IQueryable<EventArchiveV2>> ReturningEventArchiveV2sFunction();
+        private delegate ValueTask<IEnumerable<EventArchiveV2>> ReturningEventArchiveV2EnumerableFunction();
         private delegate ValueTask<IQueryable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2sFunction();
         private delegate ValueTask<IEnumerable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2EnumerableFunction();
         private delegate ValueTask ReturningNothingFunction();
@@ -28,6 +29,48 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             try
             {
                 return await returningEventArchiveV2sFunction();
+            }
+            catch (EventArchiveV2ProcessingDependencyException eventArchiveV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingDependencyException);
+            }
+            catch (EventArchiveV2ProcessingServiceException eventArchiveV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventArchiveV2OrchestrationServiceException =
+                    new FailedEventArchiveV2OrchestrationServiceException(
+                        message: "Failed event archive service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventArchiveV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<EventArchiveV2>> TryCatch(
+            ReturningEventArchiveV2EnumerableFunction returningEventArchiveV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningEventArchiveV2EnumerableFunction();
+            }
+            catch (NullEventArchiveV2sOrchestrationException nullEventArchiveV2sOrchestrationException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullEventArchiveV2sOrchestrationException);
+            }
+            catch (EventArchiveV2ProcessingValidationException eventArchiveV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2ProcessingValidationException);
+            }
+            catch (EventArchiveV2ProcessingDependencyValidationException
+                eventArchiveV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2ProcessingDependencyValidationException);
             }
             catch (EventArchiveV2ProcessingDependencyException eventArchiveV2ProcessingDependencyException)
             {

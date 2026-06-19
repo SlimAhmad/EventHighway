@@ -30,7 +30,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     innerException: nullEventArchiveV2sOrchestrationException);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddEventArchiveV2sAsync(
                     nullEventArchiveV2s,
                     TestContext.Current.CancellationToken);
