@@ -156,6 +156,11 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             {
                 return await returningListenerEventV2sFunction();
             }
+            catch (NullListenerEventV2Exception nullListenerEventV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullListenerEventV2Exception);
+            }
             catch (SqlException sqlException)
             {
                 var failedStorageListenerEventV2Exception =

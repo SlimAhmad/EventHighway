@@ -153,6 +153,15 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             }
         }
 
+        private static void ValidateEventIdsIsNotNull(IEnumerable<Guid> eventIds)
+        {
+            if (eventIds is null)
+            {
+                throw new NullListenerEventV2Exception(
+                    message: "Listener event is null.");
+            }
+        }
+
         private static dynamic IsInvalid(Guid id) => new
         {
             Condition = id == default,
