@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -23,19 +23,29 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // given
             var mockSequence = new MockSequence();
 
-            DateTimeOffset randomDateTimeOffset =
-                GetRandomDateTimeOffset();
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            DateTimeOffset retrievedDateTimeOffset = randomDateTimeOffset;
 
-            DateTimeOffset retrievedDateTimeOffset =
-                randomDateTimeOffset;
+            List<dynamic> randomEventV2sProperties = CreateRandomEventV2sProperties();
 
-            List<dynamic> randomListenerEventV2sProperties =
-                CreateRandomListenerEventV2sProperties();
+            List<EventV2> retrievedEventV2s =
+                randomEventV2sProperties.Select(item =>
+                    new EventV2
+                    {
+                        Id = item.Id,
+                        Content = item.Content,
+                        EventName = item.EventName,
+                        Type = (EventTypeV2)item.Type,
+                        CreatedDate = item.CreatedDate,
+                        UpdatedDate = item.UpdatedDate,
+                        ScheduledDate = item.ScheduledDate,
+                        RemainingRetryAttempts = item.RemainingRetryAttempts,
+                        EventAddressId = item.EventAddressId
+                    }).ToList();
 
-            List<dynamic> randomEventV2sProperties =
-                CreateRandomEventV2sProperties();
+            List<dynamic> randomListenerEventV2sProperties = CreateRandomListenerEventV2sProperties();
 
-            ICollection<ListenerEventV2> retrievedListenerEventV2s =
+            List<ListenerEventV2> retrievedListenerEventV2s =
                 randomListenerEventV2sProperties.Select(item =>
                     new ListenerEventV2
                     {
@@ -51,23 +61,26 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         EventListenerId = item.EventListenerId
                     }).ToList();
 
-            List<EventV2> retrievedEventV2s =
+            IEnumerable<Guid> inputEventV2Ids =
+                retrievedEventV2s.Select(eventV2 => eventV2.Id).ToList();
+
+            List<EventArchiveV2> expectedEventArchiveV2s =
                 randomEventV2sProperties.Select(item =>
-                    new EventV2
+                    new EventArchiveV2
                     {
                         Id = item.Id,
                         Content = item.Content,
                         EventName = item.EventName,
-                        Type = (EventTypeV2)item.Type,
+                        Type = (EventArchiveTypeV2)item.Type,
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.UpdatedDate,
                         ScheduledDate = item.ScheduledDate,
                         RemainingRetryAttempts = item.RemainingRetryAttempts,
                         EventAddressId = item.EventAddressId,
-                        ListenerEventV2s = retrievedListenerEventV2s
+                        ArchivedDate = retrievedDateTimeOffset
                     }).ToList();
 
-            List<ListenerEventArchiveV2> mappedListenerEventArchiveV2s =
+            List<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
                 randomListenerEventV2sProperties.Select(item =>
                     new ListenerEventArchiveV2
                     {
@@ -85,79 +98,114 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         EventArchiveV2Id = item.EventId
                     }).ToList();
 
-            List<EventArchiveV2> mappedEventArchiveV2s =
-                randomEventV2sProperties.Select(item =>
-                    new EventArchiveV2
-                    {
-                        Id = item.Id,
-                        Content = item.Content,
-                        EventName = item.EventName,
-                        Type = (EventArchiveTypeV2)item.Type,
-                        CreatedDate = item.CreatedDate,
-                        UpdatedDate = item.UpdatedDate,
-                        ScheduledDate = item.ScheduledDate,
-                        RemainingRetryAttempts = item.RemainingRetryAttempts,
-                        EventAddressId = item.EventAddressId,
-                        ArchivedDate = retrievedDateTimeOffset,
-                        ListenerEventArchiveV2s = mappedListenerEventArchiveV2s
-                    }).ToList();
+            // Step 1
+            this.dateTimeBrokerMock
+                .InSequence(mockSequence).Setup(broker =>
+                    broker.GetDateTimeOffsetAsync())
+                        .ReturnsAsync(retrievedDateTimeOffset);
 
+            // Step 2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveAllDeadEventV2sWithListenersAsync())
+                    service.RetrieveBatchOfDeadEventV2sAsync())
                         .ReturnsAsync((IEnumerable<EventV2>)retrievedEventV2s);
 
-            foreach ((EventArchiveV2 mappedEventArchiveV2, EventV2 retrievedEventV2)
-                in mappedEventArchiveV2s.Zip(retrievedEventV2s))
-            {
-                this.dateTimeBrokerMock
-                    .InSequence(mockSequence).Setup(broker =>
-                        broker.GetDateTimeOffsetAsync())
-                            .ReturnsAsync(retrievedDateTimeOffset);
+            // Step 3
+            this.eventArchiveV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.BulkAddEventArchiveV2sAsync(
+                        It.Is(SameEventArchiveV2sAs(expectedEventArchiveV2s)),
+                        It.IsAny<CancellationToken>()))
+                            .Returns(ValueTask.CompletedTask);
 
-                this.eventArchiveV2OrchestrationServiceMock
-                    .InSequence(mockSequence).Setup(service =>
-                        service.AddEventArchiveV2WithListenerEventArchiveV2sAsync(
-                            It.Is(SameEventArchiveV2As(mappedEventArchiveV2)),
-                            It.IsAny<CancellationToken>()))
-                                .Returns(ValueTask.CompletedTask);
+            // Step 4
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RetrieveBatchOfListenerEventV2sAsync(
+                        It.Is(SameEventV2IdsAs(inputEventV2Ids)),
+                        It.IsAny<CancellationToken>()))
+                            .ReturnsAsync((IEnumerable<ListenerEventV2>)retrievedListenerEventV2s);
 
-                this.archivingEventV2OrchestrationServiceMock
-                    .InSequence(mockSequence).Setup(service =>
-                        service.RemoveEventV2AndListenerEventV2sAsync(
-                            It.Is(SameEventV2As(retrievedEventV2)),
-                            It.IsAny<CancellationToken>()))
-                                .Returns(ValueTask.CompletedTask);
-            }
+            // Step 5
+            this.eventArchiveV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.BulkAddListenerEventArchiveV2sAsync(
+                        It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                        It.IsAny<CancellationToken>()))
+                            .ReturnsAsync(expectedListenerEventArchiveV2s);
+
+            // Step 6
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.BulkRemoveListenerEventV2sAsync(
+                        It.Is(SameListenerEventV2sAs(retrievedListenerEventV2s)),
+                        It.IsAny<CancellationToken>()))
+                            .Returns(ValueTask.CompletedTask);
+
+            // Step 7
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RetrieveBatchOfListenerEventV2sAsync(
+                        It.Is(SameEventV2IdsAs(inputEventV2Ids)),
+                        It.IsAny<CancellationToken>()))
+                            .ReturnsAsync(Enumerable.Empty<ListenerEventV2>());
+
+            // Step 8
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.BulkRemoveEventV2sAsync(
+                        It.Is(SameEventV2sAs(retrievedEventV2s)),
+                        It.IsAny<CancellationToken>()))
+                            .Returns(ValueTask.CompletedTask);
+
+            // Step 9
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RetrieveBatchOfDeadEventV2sAsync())
+                        .ReturnsAsync(Enumerable.Empty<EventV2>());
 
             // when
             await this.archivingEventV2CoordinationService
                 .ArchiveDeadEventV2sAsync(TestContext.Current.CancellationToken);
 
             // then
-            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(),
-                    Times.Once);
-
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
-                    Times.Exactly(mappedEventArchiveV2s.Count));
+                    Times.Once);
 
-            foreach ((EventArchiveV2 mappedEventArchiveV2, EventV2 retrievedEventV2)
-                in mappedEventArchiveV2s.Zip(retrievedEventV2s))
-            {
-                this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                    service.AddEventArchiveV2WithListenerEventArchiveV2sAsync(
-                        It.Is(SameEventArchiveV2As(mappedEventArchiveV2)),
-                        It.IsAny<CancellationToken>()),
-                            Times.Once);
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfDeadEventV2sAsync(),
+                    Times.Exactly(2));
 
-                this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                    service.RemoveEventV2AndListenerEventV2sAsync(
-                        It.Is(SameEventV2As(retrievedEventV2)),
-                        It.IsAny<CancellationToken>()),
-                            Times.Once);
-            }
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.BulkAddEventArchiveV2sAsync(
+                    It.Is(SameEventArchiveV2sAs(expectedEventArchiveV2s)),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfListenerEventV2sAsync(
+                    It.Is(SameEventV2IdsAs(inputEventV2Ids)),
+                    It.IsAny<CancellationToken>()),
+                        Times.Exactly(2));
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.Is(SameListenerEventV2sAs(retrievedListenerEventV2s)),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.BulkRemoveEventV2sAsync(
+                    It.Is(SameEventV2sAs(retrievedEventV2s)),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();

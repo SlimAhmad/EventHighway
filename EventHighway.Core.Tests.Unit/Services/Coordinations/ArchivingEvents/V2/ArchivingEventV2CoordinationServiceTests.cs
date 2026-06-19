@@ -14,6 +14,7 @@ using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 using EventHighway.Core.Services.Coordinations.ArchivingEvents.V2;
@@ -230,6 +231,56 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 this.compareLogic.Compare(
                     expectedEventArchiveV2,
                     actualEventArchiveV2)
+                        .AreEqual;
+        }
+
+        private Expression<Func<IEnumerable<EventArchiveV2>, bool>> SameEventArchiveV2sAs(
+            IEnumerable<EventArchiveV2> expectedEventArchiveV2s)
+        {
+            return actualEventArchiveV2s =>
+                this.compareLogic.Compare(
+                    expectedEventArchiveV2s,
+                    actualEventArchiveV2s)
+                        .AreEqual;
+        }
+
+        private Expression<Func<IEnumerable<EventV2>, bool>> SameEventV2sAs(
+            IEnumerable<EventV2> expectedEventV2s)
+        {
+            return actualEventV2s =>
+                this.compareLogic.Compare(
+                    expectedEventV2s,
+                    actualEventV2s)
+                        .AreEqual;
+        }
+
+        private Expression<Func<IEnumerable<Guid>, bool>> SameEventV2IdsAs(
+            IEnumerable<Guid> expectedEventV2Ids)
+        {
+            return actualEventV2Ids =>
+                this.compareLogic.Compare(
+                    expectedEventV2Ids,
+                    actualEventV2Ids)
+                        .AreEqual;
+        }
+
+        private Expression<Func<IEnumerable<ListenerEventV2>, bool>> SameListenerEventV2sAs(
+            IEnumerable<ListenerEventV2> expectedListenerEventV2s)
+        {
+            return actualListenerEventV2s =>
+                this.compareLogic.Compare(
+                    expectedListenerEventV2s,
+                    actualListenerEventV2s)
+                        .AreEqual;
+        }
+
+        private Expression<Func<IEnumerable<ListenerEventArchiveV2>, bool>> SameListenerEventArchiveV2sAs(
+            IEnumerable<ListenerEventArchiveV2> expectedListenerEventArchiveV2s)
+        {
+            return actualListenerEventArchiveV2s =>
+                this.compareLogic.Compare(
+                    expectedListenerEventArchiveV2s,
+                    actualListenerEventArchiveV2s)
                         .AreEqual;
         }
 
