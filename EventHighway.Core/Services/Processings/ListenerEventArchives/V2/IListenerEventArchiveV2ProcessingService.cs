@@ -23,6 +23,10 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             DateTimeOffset olderThan,
             CancellationToken cancellationToken);
 
+        ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
+            CancellationToken cancellationToken = default);
+
         ValueTask BulkRemoveListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
             CancellationToken cancellationToken = default);

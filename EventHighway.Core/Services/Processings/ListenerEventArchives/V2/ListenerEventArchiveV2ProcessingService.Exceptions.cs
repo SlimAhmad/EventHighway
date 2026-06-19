@@ -16,6 +16,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
     internal partial class ListenerEventArchiveV2ProcessingService
     {
         private delegate ValueTask<IQueryable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2sFunction();
+        private delegate ValueTask<IEnumerable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2EnumerableFunction();
         private delegate ValueTask<List<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2ListsFunction();
         private delegate ValueTask<ListenerEventArchiveV2> ReturningListenerEventArchiveV2Function();
         private delegate ValueTask ReturningNothingFunction();
@@ -38,6 +39,56 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             catch (ListenerEventArchiveV2ServiceException listenerEventArchiveV2ServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(listenerEventArchiveV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedListenerEventArchiveV2ProcessingServiceException =
+                    new FailedListenerEventArchiveV2ProcessingServiceException(
+                        message: "Failed listener event archive service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedListenerEventArchiveV2ProcessingServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<ListenerEventArchiveV2>> TryCatch(
+            ReturningListenerEventArchiveV2EnumerableFunction returningListenerEventArchiveV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningListenerEventArchiveV2EnumerableFunction();
+            }
+            catch (NullListenerEventArchiveV2ProcessingException
+                nullListenerEventArchiveV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullListenerEventArchiveV2ProcessingException);
+            }
+            catch (ListenerEventArchiveV2ValidationException
+                listenerEventArchiveV2ValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ValidationException);
+            }
+            catch (ListenerEventArchiveV2DependencyValidationException
+                listenerEventArchiveV2DependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2DependencyValidationException);
+            }
+            catch (ListenerEventArchiveV2DependencyException
+                listenerEventArchiveV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2DependencyException);
+            }
+            catch (ListenerEventArchiveV2ServiceException
+                listenerEventArchiveV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2ServiceException);
             }
             catch (Exception exception)
             {
