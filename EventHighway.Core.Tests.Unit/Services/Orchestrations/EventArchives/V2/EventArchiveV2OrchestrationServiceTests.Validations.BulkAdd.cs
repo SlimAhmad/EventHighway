@@ -49,21 +49,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     expectedEventArchiveV2OrchestrationValidationException))),
                         Times.Once);
 
-            this.eventArchiveV2ServiceMock.Verify(service =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     It.IsAny<IEnumerable<EventArchiveV2>>(),
                     It.IsAny<System.Threading.CancellationToken>()),
                         Times.Never);
 
-            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     It.IsAny<IEnumerable<ListenerEventArchiveV2>>(),
                     It.IsAny<System.Threading.CancellationToken>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
     }
 }

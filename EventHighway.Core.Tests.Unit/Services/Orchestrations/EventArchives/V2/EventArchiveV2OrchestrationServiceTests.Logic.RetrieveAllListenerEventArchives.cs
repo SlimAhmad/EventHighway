@@ -26,7 +26,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             IQueryable<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
                 randomListenerEventArchiveV2s.DeepClone();
 
-            this.listenerEventArchiveV2ServiceMock.Setup(service =>
+            this.listenerEventArchiveV2ProcessingServiceMock.Setup(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync())
                     .ReturnsAsync(retrievedListenerEventArchiveV2s);
 
@@ -40,12 +40,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             actualListenerEventArchiveV2s.Should()
                 .BeEquivalentTo(expectedListenerEventArchiveV2s);
 
-            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(),
                     Times.Once);
 
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

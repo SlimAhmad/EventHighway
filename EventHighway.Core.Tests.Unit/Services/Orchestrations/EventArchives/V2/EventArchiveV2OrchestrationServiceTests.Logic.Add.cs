@@ -35,21 +35,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             // then
             foreach (ListenerEventArchiveV2 listenerEventArchiveV2 in inputListenerEventArchiveV2s)
             {
-                this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
                     service.AddListenerEventArchiveV2Async(
                         listenerEventArchiveV2,
                         TestContext.Current.CancellationToken),
                             Times.Once);
             }
 
-            this.eventArchiveV2ServiceMock.Verify(service =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.AddEventArchiveV2Async(
                     inputEventArchiveV2,
                     TestContext.Current.CancellationToken),
                         Times.Once);
 
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

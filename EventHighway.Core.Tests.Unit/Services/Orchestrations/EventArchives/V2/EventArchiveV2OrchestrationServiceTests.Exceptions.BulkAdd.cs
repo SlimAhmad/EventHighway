@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     message: "Event archive validation error occurred, fix the errors and try again.",
                     innerException: validationException.InnerException as Xeption);
 
-            this.eventArchiveV2ServiceMock.Setup(service =>
+            this.eventArchiveV2ProcessingServiceMock.Setup(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()))
@@ -54,7 +54,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             actualEventArchiveV2OrchestrationDependencyValidationException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2OrchestrationDependencyValidationException);
 
-            this.eventArchiveV2ServiceMock.Verify(service =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()),
@@ -65,15 +65,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     expectedEventArchiveV2OrchestrationDependencyValidationException))),
                         Times.Once);
 
-            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     It.IsAny<IEnumerable<ListenerEventArchiveV2>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
         [Theory]
         [MemberData(nameof(EventArchiveV2DependencyExceptions))]
@@ -90,7 +90,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     message: "Event archive dependency error occurred, contact support.",
                     innerException: dependencyException.InnerException as Xeption);
 
-            this.eventArchiveV2ServiceMock.Setup(service =>
+            this.eventArchiveV2ProcessingServiceMock.Setup(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()))
@@ -111,7 +111,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             actualEventArchiveV2OrchestrationDependencyException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2OrchestrationDependencyException);
 
-            this.eventArchiveV2ServiceMock.Verify(service =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()),
@@ -122,15 +122,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     expectedEventArchiveV2OrchestrationDependencyException))),
                         Times.Once);
 
-            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     It.IsAny<IEnumerable<ListenerEventArchiveV2>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
         [Fact]
         public async Task ShouldThrowServiceExceptionOnBulkAddIfExceptionOccursAndLogItAsync()
@@ -152,7 +152,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     message: "Event archive service error occurred, contact support.",
                     innerException: failedEventArchiveV2OrchestrationServiceException);
 
-            this.eventArchiveV2ServiceMock.Setup(service =>
+            this.eventArchiveV2ProcessingServiceMock.Setup(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()))
@@ -173,7 +173,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             actualEventArchiveV2OrchestrationServiceException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2OrchestrationServiceException);
 
-            this.eventArchiveV2ServiceMock.Verify(service =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()),
@@ -184,15 +184,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     expectedEventArchiveV2OrchestrationServiceException))),
                         Times.Once);
 
-            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     It.IsAny<IEnumerable<ListenerEventArchiveV2>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
     }
 }

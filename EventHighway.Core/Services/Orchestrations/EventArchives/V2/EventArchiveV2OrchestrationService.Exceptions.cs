@@ -6,10 +6,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
-using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
-using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
+using EventHighway.Core.Models.Services.Processings.EventArchives.V2.Exceptions;
+using EventHighway.Core.Models.Services.Processings.ListenerEventArchives.V2.Exceptions;
 using Xeptions;
 
 namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
@@ -27,13 +27,13 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             {
                 return await returningEventArchiveV2sFunction();
             }
-            catch (EventArchiveV2DependencyException eventArchiveV2DependencyException)
+            catch (EventArchiveV2ProcessingDependencyException eventArchiveV2ProcessingDependencyException)
             {
-                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2DependencyException);
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingDependencyException);
             }
-            catch (EventArchiveV2ServiceException eventArchiveV2ServiceException)
+            catch (EventArchiveV2ProcessingServiceException eventArchiveV2ProcessingServiceException)
             {
-                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ServiceException);
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingServiceException);
             }
             catch (Exception exception)
             {
@@ -54,13 +54,15 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             {
                 return await returningListenerEventArchiveV2sFunction();
             }
-            catch (ListenerEventArchiveV2DependencyException listenerEventArchiveV2DependencyException)
+            catch (ListenerEventArchiveV2ProcessingDependencyException
+                listenerEventArchiveV2ProcessingDependencyException)
             {
-                throw await CreateAndLogDependencyExceptionAsync(listenerEventArchiveV2DependencyException);
+                throw await CreateAndLogDependencyExceptionAsync(listenerEventArchiveV2ProcessingDependencyException);
             }
-            catch (ListenerEventArchiveV2ServiceException listenerEventArchiveV2ServiceException)
+            catch (ListenerEventArchiveV2ProcessingServiceException
+                listenerEventArchiveV2ProcessingServiceException)
             {
-                throw await CreateAndLogDependencyExceptionAsync(listenerEventArchiveV2ServiceException);
+                throw await CreateAndLogDependencyExceptionAsync(listenerEventArchiveV2ProcessingServiceException);
             }
             catch (Exception exception)
             {
@@ -98,53 +100,53 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 throw await CreateAndLogValidationExceptionAsync(
                     nullListenerEventArchiveV2sOrchestrationException);
             }
-            catch (EventArchiveV2ValidationException
-                eventArchiveV2ValidationException)
+            catch (EventArchiveV2ProcessingValidationException
+                eventArchiveV2ProcessingValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventArchiveV2ValidationException);
+                    eventArchiveV2ProcessingValidationException);
             }
-            catch (EventArchiveV2DependencyValidationException
-                eventArchiveV2DependencyValidationException)
+            catch (EventArchiveV2ProcessingDependencyValidationException
+                eventArchiveV2ProcessingDependencyValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventArchiveV2DependencyValidationException);
+                    eventArchiveV2ProcessingDependencyValidationException);
             }
-            catch (ListenerEventArchiveV2ValidationException
-                listenerEventArchiveV2ValidationException)
+            catch (ListenerEventArchiveV2ProcessingValidationException
+                listenerEventArchiveV2ProcessingValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    listenerEventArchiveV2ValidationException);
+                    listenerEventArchiveV2ProcessingValidationException);
             }
-            catch (ListenerEventArchiveV2DependencyValidationException
-                listenerEventArchiveV2DependencyValidationException)
+            catch (ListenerEventArchiveV2ProcessingDependencyValidationException
+                listenerEventArchiveV2ProcessingDependencyValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
-                    listenerEventArchiveV2DependencyValidationException);
+                    listenerEventArchiveV2ProcessingDependencyValidationException);
             }
-            catch (EventArchiveV2DependencyException
-                eventArchiveV2DependencyException)
+            catch (EventArchiveV2ProcessingDependencyException
+                eventArchiveV2ProcessingDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
-                    eventArchiveV2DependencyException);
+                    eventArchiveV2ProcessingDependencyException);
             }
-            catch (EventArchiveV2ServiceException
-                eventArchiveV2ServiceException)
+            catch (EventArchiveV2ProcessingServiceException
+                eventArchiveV2ProcessingServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
-                    eventArchiveV2ServiceException);
+                    eventArchiveV2ProcessingServiceException);
             }
-            catch (ListenerEventArchiveV2DependencyException
-                listenerEventArchiveV2DependencyException)
+            catch (ListenerEventArchiveV2ProcessingDependencyException
+                listenerEventArchiveV2ProcessingDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
-                    listenerEventArchiveV2DependencyException);
+                    listenerEventArchiveV2ProcessingDependencyException);
             }
-            catch (ListenerEventArchiveV2ServiceException
-                listenerEventArchiveV2ServiceException)
+            catch (ListenerEventArchiveV2ProcessingServiceException
+                listenerEventArchiveV2ProcessingServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
-                    listenerEventArchiveV2ServiceException);
+                    listenerEventArchiveV2ProcessingServiceException);
             }
             catch (Exception exception)
             {

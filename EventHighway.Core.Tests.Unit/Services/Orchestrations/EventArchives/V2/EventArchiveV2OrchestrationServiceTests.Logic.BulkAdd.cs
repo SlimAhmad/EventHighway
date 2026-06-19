@@ -27,14 +27,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
 
             var mockSequence = new MockSequence();
 
-            this.eventArchiveV2ServiceMock
+            this.eventArchiveV2ProcessingServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.BulkAddEventArchiveV2sAsync(
                         inputEventArchiveV2s,
                         It.IsAny<CancellationToken>()))
                             .ReturnsAsync(inputEventArchiveV2s);
 
-            this.listenerEventArchiveV2ServiceMock
+            this.listenerEventArchiveV2ProcessingServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.BulkAddListenerEventArchiveV2sAsync(
                         inputListenerEventArchiveV2s,
@@ -47,20 +47,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 TestContext.Current.CancellationToken);
 
             // then
-            this.eventArchiveV2ServiceMock.Verify(service =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
-            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     inputListenerEventArchiveV2s,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

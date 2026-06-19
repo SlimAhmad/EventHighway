@@ -50,21 +50,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     expectedEventArchiveV2OrchestrationValidationException))),
                         Times.Once);
 
-            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.AddListenerEventArchiveV2Async(
                     It.IsAny<ListenerEventArchiveV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.eventArchiveV2ServiceMock.Verify(broker =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(broker =>
                 broker.AddEventArchiveV2Async(
                     It.IsAny<EventArchiveV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -104,21 +104,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     expectedEventArchiveV2OrchestrationValidationException))),
                         Times.Once);
 
-            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.AddListenerEventArchiveV2Async(
                     It.IsAny<ListenerEventArchiveV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
-            this.eventArchiveV2ServiceMock.Verify(broker =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(broker =>
                 broker.AddEventArchiveV2Async(
                     It.IsAny<EventArchiveV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
     }
 }
