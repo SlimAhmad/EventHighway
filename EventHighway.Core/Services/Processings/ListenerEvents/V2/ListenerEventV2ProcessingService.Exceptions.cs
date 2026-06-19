@@ -170,6 +170,18 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
                 throw await CreateAndLogValidationExceptionAsync(
                     invalidListenerEventV2ProcessingException);
             }
+            catch (ListenerEventV2ValidationException
+                listenerEventV2ValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2ValidationException);
+            }
+            catch (ListenerEventV2DependencyValidationException
+                listenerEventV2DependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2DependencyValidationException);
+            }
         }
 
         private async ValueTask<ListenerEventV2ProcessingValidationException> CreateAndLogValidationExceptionAsync(
