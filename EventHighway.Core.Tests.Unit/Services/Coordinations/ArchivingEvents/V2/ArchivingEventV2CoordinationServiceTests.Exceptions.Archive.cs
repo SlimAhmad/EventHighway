@@ -30,9 +30,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     innerException: validationException.InnerException as Xeption);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(
-                    It.IsAny<CancellationToken>()))
-                        .Returns(CreateThrowingAsyncEnumerable(validationException));
+                service.RetrieveAllDeadEventV2sWithListenersAsync())
+                    .ThrowsAsync(validationException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
@@ -49,9 +48,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyValidationException);
 
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(
-                    It.IsAny<CancellationToken>()),
-                        Times.Once);
+                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                    Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
@@ -92,9 +90,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     innerException: dependencyException.InnerException as Xeption);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(
-                    It.IsAny<CancellationToken>()))
-                        .Returns(CreateThrowingAsyncEnumerable(dependencyException));
+                service.RetrieveAllDeadEventV2sWithListenersAsync())
+                    .ThrowsAsync(dependencyException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
@@ -111,9 +108,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyException);
 
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(
-                    It.IsAny<CancellationToken>()),
-                        Times.Once);
+                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                    Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
@@ -161,9 +157,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     innerException: failedArchivingEventV2CoordinationServiceException);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(
-                    It.IsAny<CancellationToken>()))
-                        .Returns(CreateThrowingAsyncEnumerable(serviceException));
+                service.RetrieveAllDeadEventV2sWithListenersAsync())
+                    .ThrowsAsync(serviceException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
@@ -180,9 +175,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationServiceException);
 
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(
-                    It.IsAny<CancellationToken>()),
-                        Times.Once);
+                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                    Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(

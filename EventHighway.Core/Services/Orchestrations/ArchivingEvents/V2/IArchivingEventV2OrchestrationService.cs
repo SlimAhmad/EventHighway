@@ -11,8 +11,7 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 {
     public interface IArchivingEventV2OrchestrationService
     {
-        IAsyncEnumerable<EventV2> RetrieveAllDeadEventV2sWithListenersAsync(
-            CancellationToken cancellationToken = default);
+        ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync();
 
         ValueTask RemoveEventV2AndListenerEventV2sAsync(
             EventV2 eventV2,

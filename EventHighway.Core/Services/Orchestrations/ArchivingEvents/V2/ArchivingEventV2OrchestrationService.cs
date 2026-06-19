@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -22,19 +23,25 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
     {
         private readonly IEventV2ProcessingService eventV2ProcessingService;
         private readonly IListenerEventV2ProcessingService listenerEventV2ProcessingService;
+        private readonly IConfigurationBroker configurationBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public ArchivingEventV2OrchestrationService(
             IEventV2ProcessingService eventV2ProcessingService,
             IListenerEventV2ProcessingService listenerEventV2ProcessingService,
+            IConfigurationBroker configurationBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2ProcessingService = eventV2ProcessingService;
             this.listenerEventV2ProcessingService = listenerEventV2ProcessingService;
+            this.configurationBroker = configurationBroker;
             this.loggingBroker = loggingBroker;
         }
 
-        public async IAsyncEnumerable<EventV2> RetrieveAllDeadEventV2sWithListenersAsync(
+        public ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync() =>
+            throw new NotImplementedException();
+
+        private async IAsyncEnumerable<EventV2> RetrieveAllDeadEventV2sWithListenersAsyncLegacy(
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             IQueryable<EventV2> eventV2s;
