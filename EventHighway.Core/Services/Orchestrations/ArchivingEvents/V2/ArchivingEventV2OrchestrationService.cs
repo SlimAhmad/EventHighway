@@ -39,65 +39,15 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         }
 
         public ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync() =>
-            throw new NotImplementedException();
-
-        private async IAsyncEnumerable<EventV2> RetrieveAllDeadEventV2sWithListenersAsyncLegacy(
-            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        TryCatch(async () =>
         {
-            IQueryable<EventV2> eventV2s;
+            int take = this.configurationBroker
+                .GetBatchConfiguration()
+                    .BatchSizeForBulkProcessing;
 
-            try
-            {
-                eventV2s =
-                    await this.eventV2ProcessingService.RetrieveAllDeadEventV2sWithListenersAsync();
-            }
-            catch (EventV2ProcessingDependencyException eventV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventV2ProcessingDependencyException);
-            }
-            catch (EventV2ProcessingServiceException eventV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventV2ProcessingServiceException);
-            }
-            catch (Exception exception)
-            {
-                var failedArchivingEventV2OrchestrationServiceException =
-                    new FailedArchivingEventV2OrchestrationServiceException(
-                        message: "Failed event service error occurred, contact support.",
-                        innerException: exception,
-                        data: exception.Data);
-
-                throw await CreateAndLogServiceExceptionAsync(failedArchivingEventV2OrchestrationServiceException);
-            }
-
-            await foreach (EventV2 eventV2 in StreamDeadEventV2sAsync(eventV2s, cancellationToken))
-            {
-                yield return eventV2;
-            }
-        }
-
-        private static async IAsyncEnumerable<EventV2> StreamDeadEventV2sAsync(
-            IQueryable<EventV2> query,
-            [EnumeratorCancellation] CancellationToken cancellationToken)
-        {
-            if (query is IAsyncEnumerable<EventV2> asyncEnumerable)
-            {
-                await foreach (EventV2 eventV2 in asyncEnumerable.WithCancellation(cancellationToken))
-                {
-                    yield return eventV2;
-                }
-            }
-            else
-            {
-                foreach (EventV2 eventV2 in query)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    yield return eventV2;
-                }
-
-                await Task.CompletedTask;
-            }
-        }
+            return await this.eventV2ProcessingService
+                .RetrieveAllDeadEventV2sWithListenersAsync(take);
+        });
 
         public ValueTask BulkRemoveEventV2AndListenerEventV2sAsync(
             IEnumerable<EventV2> eventV2s,
