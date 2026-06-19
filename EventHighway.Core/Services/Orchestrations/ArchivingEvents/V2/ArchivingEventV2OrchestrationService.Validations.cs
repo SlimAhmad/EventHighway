@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
@@ -11,6 +12,20 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 {
     internal partial class ArchivingEventV2OrchestrationService
     {
+        private static void ValidateOnRetrieveBatchOfListenerEventV2s(
+            IEnumerable<Guid> eventV2Ids,
+            BatchConfiguration batchConfiguration)
+        {
+            Validate(
+                message: "Event is invalid, fix the errors and try again.",
+
+                (Rule: IsNull(eventV2Ids),
+                Parameter: nameof(eventV2Ids)),
+
+                (Rule: IsInvalid(batchConfiguration.BatchSizeForBulkProcessing),
+                Parameter: nameof(BatchConfiguration.BatchSizeForBulkProcessing)));
+        }
+
         private static void ValidateOnRetrieveBatchOfDead(
             BatchConfiguration batchConfiguration)
         {
@@ -30,6 +45,12 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
                 (Rule: IsInvalid(batchConfiguration.BatchSizeForBulkProcessing),
                 Parameter: nameof(BatchConfiguration.BatchSizeForBulkProcessing)));
         }
+
+        private static dynamic IsNull(IEnumerable<Guid> value) => new
+        {
+            Condition = value is null,
+            Message = "Value is required"
+        };
 
         private static dynamic IsInvalidBatchSize(int value) => new
         {
