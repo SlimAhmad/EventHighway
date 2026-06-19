@@ -56,6 +56,11 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             return deadEventV2s.Take(take).AsEnumerable();
         });
 
+        public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sAsync(
+            IEnumerable<Guid> eventV2Ids,
+            CancellationToken cancellationToken = default) =>
+                throw new System.NotImplementedException();
+
         public ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync() =>
         TryCatch(async () =>
         {
