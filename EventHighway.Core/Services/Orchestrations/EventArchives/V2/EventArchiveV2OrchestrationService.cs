@@ -75,10 +75,15 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
         });
 
-        public async ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
+        public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
             CancellationToken cancellationToken = default) =>
-            await this.listenerEventArchiveV2ProcessingService
+        TryCatch(async () =>
+        {
+            ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
+
+            return await this.listenerEventArchiveV2ProcessingService
                 .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
+        });
     }
 }

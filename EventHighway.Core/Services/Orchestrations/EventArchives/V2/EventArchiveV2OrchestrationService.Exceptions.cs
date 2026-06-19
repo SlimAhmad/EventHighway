@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
@@ -18,6 +19,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
     {
         private delegate ValueTask<IQueryable<EventArchiveV2>> ReturningEventArchiveV2sFunction();
         private delegate ValueTask<IQueryable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2sFunction();
+        private delegate ValueTask<IEnumerable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2EnumerableFunction();
         private delegate ValueTask ReturningNothingFunction();
 
         private async ValueTask<IQueryable<EventArchiveV2>> TryCatch(
@@ -73,6 +75,22 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                         data: exception.Data);
 
                 throw await CreateAndLogServiceExceptionAsync(failedEventArchiveV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<ListenerEventArchiveV2>> TryCatch(
+            ReturningListenerEventArchiveV2EnumerableFunction
+                returningListenerEventArchiveV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningListenerEventArchiveV2EnumerableFunction();
+            }
+            catch (NullListenerEventArchiveV2sOrchestrationException
+                nullListenerEventArchiveV2sOrchestrationException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullListenerEventArchiveV2sOrchestrationException);
             }
         }
 
