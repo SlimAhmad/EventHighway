@@ -17,7 +17,62 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
     public partial class ArchivingEventV2OrchestrationServiceTests
     {
         [Theory]
-        [MemberData(nameof(EventV2DependencyExceptions))]
+        [MemberData(nameof(DependencyValidationExceptions))]
+        public async Task ShouldThrowDependencyValidationExceptionOnRetrieveDeadIfDependencyValidationErrorOccursAndLogItAsync(
+            Xeption eventV2ValidationException)
+        {
+            // given
+            BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
+            int inputTake = randomBatchConfiguration.BatchSizeForBulkProcessing;
+
+            var expectedArchivingEventV2OrchestrationDependencyValidationException =
+                new ArchivingEventV2OrchestrationDependencyValidationException(
+                    message: "Event validation error occurred, fix the errors and try again.",
+                    innerException: eventV2ValidationException.InnerException as Xeption);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(randomBatchConfiguration);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllDeadEventV2sWithListenersAsync(inputTake))
+                    .ThrowsAsync(eventV2ValidationException);
+
+            // when
+            ValueTask<IEnumerable<EventV2>> retrieveAllDeadEventV2sWithListenersTask =
+                this.archivingEventV2OrchestrationService
+                    .RetrieveAllDeadEventV2sWithListenersAsync();
+
+            ArchivingEventV2OrchestrationDependencyValidationException
+                actualArchivingEventV2OrchestrationDependencyValidationException =
+                    await Assert.ThrowsAsync<ArchivingEventV2OrchestrationDependencyValidationException>(
+                        retrieveAllDeadEventV2sWithListenersTask.AsTask);
+
+            // then
+            actualArchivingEventV2OrchestrationDependencyValidationException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2OrchestrationDependencyValidationException);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
+            this.eventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllDeadEventV2sWithListenersAsync(inputTake),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedArchivingEventV2OrchestrationDependencyValidationException))),
+                        Times.Once);
+
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Theory]
+        [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRetrieveDeadIfEventV2DependencyOccursAndLogItAsync(
             Xeption eventV2DependencyException)
         {

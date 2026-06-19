@@ -46,6 +46,25 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventV2ProcessingServiceException);
             }
+            catch (ListenerEventV2ProcessingValidationException listenerEventV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2ProcessingValidationException);
+            }
+            catch (ListenerEventV2ProcessingDependencyValidationException
+                listenerEventV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2ProcessingDependencyValidationException);
+            }
+            catch (ListenerEventV2ProcessingDependencyException listenerEventV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(listenerEventV2ProcessingDependencyException);
+            }
+            catch (ListenerEventV2ProcessingServiceException listenerEventV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(listenerEventV2ProcessingServiceException);
+            }
             catch (Exception exception)
             {
                 var failedArchivingEventV2OrchestrationServiceException =
