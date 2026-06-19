@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
     public partial class EventV2ProcessingServiceTests
     {
         [Theory]
-        [MemberData(nameof(ValidationExceptions))]
+        [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationOnBulkRemoveIfDependencyValidationErrorOccursAndLogItAsync(
             Xeption eventV2ValidationException)
         {
