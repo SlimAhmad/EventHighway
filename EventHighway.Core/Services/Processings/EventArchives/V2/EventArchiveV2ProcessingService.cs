@@ -32,11 +32,16 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
             return await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync();
         });
 
-        public async ValueTask<IEnumerable<EventArchiveV2>> BulkAddEventArchiveV2sAsync(
+        public ValueTask<IEnumerable<EventArchiveV2>> BulkAddEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default) =>
-                await this.eventArchiveV2Service
-                    .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
+        TryCatch(async () =>
+        {
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
+
+            return await this.eventArchiveV2Service
+                .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
+        });
 
         public ValueTask<EventArchiveV2> AddEventArchiveV2Async(
             EventArchiveV2 eventArchiveV2,
