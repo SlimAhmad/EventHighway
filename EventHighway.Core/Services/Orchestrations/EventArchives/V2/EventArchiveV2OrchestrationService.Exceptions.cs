@@ -92,6 +92,41 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 throw await CreateAndLogValidationExceptionAsync(
                     nullListenerEventArchiveV2sOrchestrationException);
             }
+            catch (ListenerEventArchiveV2ProcessingValidationException
+                listenerEventArchiveV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingValidationException);
+            }
+            catch (ListenerEventArchiveV2ProcessingDependencyValidationException
+                listenerEventArchiveV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingDependencyValidationException);
+            }
+            catch (ListenerEventArchiveV2ProcessingDependencyException
+                listenerEventArchiveV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2ProcessingDependencyException);
+            }
+            catch (ListenerEventArchiveV2ProcessingServiceException
+                listenerEventArchiveV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2ProcessingServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventArchiveV2OrchestrationServiceException =
+                    new FailedEventArchiveV2OrchestrationServiceException(
+                        message: "Failed event archive service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventArchiveV2OrchestrationServiceException);
+            }
         }
 
         private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
