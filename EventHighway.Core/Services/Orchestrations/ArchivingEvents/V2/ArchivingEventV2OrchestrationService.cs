@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -41,12 +42,14 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         public ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync() =>
         TryCatch(async () =>
         {
-            int take = this.configurationBroker
-                .GetBatchConfiguration()
-                    .BatchSizeForBulkProcessing;
+            BatchConfiguration batchConfiguration =
+                this.configurationBroker.GetBatchConfiguration();
+
+            ValidateOnRetrieveAllDeadEventV2sWithListeners(batchConfiguration);
 
             return await this.eventV2ProcessingService
-                .RetrieveAllDeadEventV2sWithListenersAsync(take);
+                .RetrieveAllDeadEventV2sWithListenersAsync(
+                    batchConfiguration.BatchSizeForBulkProcessing);
         });
 
         public ValueTask BulkRemoveEventV2AndListenerEventV2sAsync(

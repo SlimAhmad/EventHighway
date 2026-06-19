@@ -25,6 +25,10 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             {
                 return await returningEventV2EnumerableFunction();
             }
+            catch (InvalidArchivingEventV2OrchestrationException invalidArchivingEventV2OrchestrationException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(invalidArchivingEventV2OrchestrationException);
+            }
             catch (EventV2ProcessingValidationException eventV2ProcessingValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(eventV2ProcessingValidationException);
