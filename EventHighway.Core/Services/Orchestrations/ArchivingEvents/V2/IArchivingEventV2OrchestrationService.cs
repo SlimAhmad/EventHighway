@@ -28,6 +28,10 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default);
 
+        ValueTask BulkRemoveEventV2sAsync(
+            IEnumerable<EventV2> eventV2s,
+            CancellationToken cancellationToken = default);
+
         ValueTask BulkRemoveEventV2AndListenerEventV2sAsync(
             IEnumerable<EventV2> eventV2s,
             CancellationToken cancellationToken = default);

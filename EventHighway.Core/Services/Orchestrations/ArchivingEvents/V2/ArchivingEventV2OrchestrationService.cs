@@ -102,6 +102,11 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
                 .BulkRemoveListenerEventV2sAsync(listenerEventV2s, cancellationToken);
         });
 
+        public ValueTask BulkRemoveEventV2sAsync(
+            IEnumerable<EventV2> eventV2s,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         public ValueTask BulkRemoveEventV2AndListenerEventV2sAsync(
             IEnumerable<EventV2> eventV2s,
             CancellationToken cancellationToken = default) =>
