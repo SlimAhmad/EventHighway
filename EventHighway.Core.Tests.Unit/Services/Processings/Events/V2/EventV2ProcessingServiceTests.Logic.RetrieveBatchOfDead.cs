@@ -15,7 +15,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
     public partial class EventV2ProcessingServiceTests
     {
         [Fact]
-        public async Task ShouldRetrieveAllDeadEventV2sWithListenersWithTakeAsync()
+        public async Task ShouldRetrieveBatchOfDeadEventV2sWithTakeAsync()
         {
             // given
             int randomTake = GetRandomNumber();
@@ -58,30 +58,31 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                 randomDeadEventV2s.Take(inputTake);
 
             this.eventV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventV2sWithListenerEventV2sAsync())
+                service.RetrieveAllEventV2sAsync())
                     .ReturnsAsync(retrievedEventV2s);
 
             // when
             IEnumerable<EventV2> actualEventV2s =
                 await this.eventV2ProcessingService
-                    .RetrieveAllDeadEventV2sWithListenersAsync(inputTake);
+                    .RetrieveBatchOfDeadEventV2sAsync(inputTake);
 
             // then
             actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
 
             this.eventV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventV2sWithListenerEventV2sAsync(),
+                service.RetrieveAllEventV2sAsync(),
                     Times.Once);
 
             this.eventV2ServiceMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
         [Fact]
-        public async Task ShouldRetrieveAllDeadEventV2sWithListenersWithoutTakeAsync()
+        public async Task ShouldRetrieveBatchOfDeadEventV2sWithoutTakeAsync()
         {
             // given
-            int noTake = 0;
+            int inputTake = 0;
 
             List<EventV2> randomScheduledEventV2s =
                 CreateRandomEventV2s(
@@ -117,22 +118,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                         .AsQueryable();
 
             IEnumerable<EventV2> expectedEventV2s =
-                randomDeadEventV2s;
+                randomDeadEventV2s.AsEnumerable();
 
             this.eventV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventV2sWithListenerEventV2sAsync())
+                service.RetrieveAllEventV2sAsync())
                     .ReturnsAsync(retrievedEventV2s);
 
             // when
             IEnumerable<EventV2> actualEventV2s =
                 await this.eventV2ProcessingService
-                    .RetrieveAllDeadEventV2sWithListenersAsync(noTake);
+                    .RetrieveBatchOfDeadEventV2sAsync(inputTake);
 
             // then
             actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
 
             this.eventV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventV2sWithListenerEventV2sAsync(),
+                service.RetrieveAllEventV2sAsync(),
                     Times.Once);
 
             this.eventV2ServiceMock.VerifyNoOtherCalls();
