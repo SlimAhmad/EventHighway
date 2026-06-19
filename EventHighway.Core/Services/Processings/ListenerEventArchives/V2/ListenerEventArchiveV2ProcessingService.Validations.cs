@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Processings.ListenerEventArchives.V2.Exceptions;
@@ -11,6 +12,16 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
 {
     internal partial class ListenerEventArchiveV2ProcessingService
     {
+        private static void ValidateListenerEventArchiveV2sIsNotNull(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s)
+        {
+            if (listenerEventArchiveV2s is null)
+            {
+                throw new NullListenerEventArchiveV2ProcessingException(
+                    message: "Listener event archive is null.");
+            }
+        }
+
         private void ValidateListenerEventArchiveV2(ListenerEventArchiveV2 listenerEventArchiveV2)
         {
             if (listenerEventArchiveV2 is null)
