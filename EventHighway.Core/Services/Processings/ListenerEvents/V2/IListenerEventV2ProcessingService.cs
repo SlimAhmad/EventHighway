@@ -30,5 +30,9 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
         ValueTask BulkRemoveListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default);
+
+        ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
+            IEnumerable<Guid> eventIds,
+            int take);
     }
 }

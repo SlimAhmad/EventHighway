@@ -72,5 +72,18 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             await this.listenerEventV2Service
                 .BulkRemoveListenerEventV2sAsync(listenerEventV2s, cancellationToken);
         });
+
+        public async ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
+            IEnumerable<Guid> eventIds,
+            int take)
+        {
+            IQueryable<ListenerEventV2> listenerEventV2s =
+                await this.listenerEventV2Service
+                    .RetrieveListenerEventV2sByEventIdsAsync(eventIds);
+
+            return take == 0
+                ? listenerEventV2s.AsEnumerable()
+                : listenerEventV2s.Take(take).AsEnumerable();
+        }
     }
 }
