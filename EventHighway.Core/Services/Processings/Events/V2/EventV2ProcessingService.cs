@@ -75,6 +75,8 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         public ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync(int take) =>
         TryCatch(async () =>
         {
+            ValidateOnRetrieveAllDeadEventV2sWithListeners(take);
+
             IQueryable<EventV2> eventV2s =
                 await this.eventV2Service.RetrieveAllEventV2sWithListenerEventV2sAsync();
 
