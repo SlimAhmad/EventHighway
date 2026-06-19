@@ -29,7 +29,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     message: "Event is invalid, fix the errors and try again.");
 
             invalidArchivingEventV2OrchestrationException.AddData(
-                key: nameof(nullEventV2Ids),
+                key: "eventV2Ids",
                 values: "Value is required");
 
             var expectedArchivingEventV2OrchestrationValidationException =

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 
 namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 {
@@ -97,6 +98,15 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             {
                 throw new NullArchivingEventV2OrchestrationException(
                     message: "Event is null.");
+            }
+        }
+
+        private static void ValidateListenerEventV2sIsNotNull(IEnumerable<ListenerEventV2> listenerEventV2s)
+        {
+            if (listenerEventV2s is null)
+            {
+                throw new NullArchivingListenerEventV2sOrchestrationException(
+                    message: "Listener events are null.");
             }
         }
     }

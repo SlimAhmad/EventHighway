@@ -96,6 +96,8 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            ValidateListenerEventV2sIsNotNull(listenerEventV2s);
+
             await this.listenerEventV2ProcessingService
                 .BulkRemoveListenerEventV2sAsync(listenerEventV2s, cancellationToken);
         });
