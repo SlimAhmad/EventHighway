@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -112,6 +113,64 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedListenerEventArchiveV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnBulkAddIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s().ToList();
+
+            var serviceException = new Exception();
+
+            var failedListenerEventArchiveV2ProcessingServiceException =
+                new FailedListenerEventArchiveV2ProcessingServiceException(
+                    message: "Failed listener event archive service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedListenerEventArchiveV2ProcessingServiceException =
+                new ListenerEventArchiveV2ProcessingServiceException(
+                    message: "Listener event archive service error occurred, contact support.",
+                    innerException: failedListenerEventArchiveV2ProcessingServiceException);
+
+            this.listenerEventArchiveV2ServiceMock.Setup(service =>
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
+                this.listenerEventArchiveV2ProcessingService
+                    .BulkAddListenerEventArchiveV2sAsync(
+                        someListenerEventArchiveV2s,
+                        TestContext.Current.CancellationToken);
+
+            ListenerEventArchiveV2ProcessingServiceException
+                actualListenerEventArchiveV2ProcessingServiceException =
+                    await Assert.ThrowsAsync<ListenerEventArchiveV2ProcessingServiceException>(
+                        bulkAddListenerEventArchiveV2sTask.AsTask);
+
+            // then
+            actualListenerEventArchiveV2ProcessingServiceException.Should()
+                .BeEquivalentTo(expectedListenerEventArchiveV2ProcessingServiceException);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventArchiveV2ProcessingServiceException))),
                         Times.Once);
 
             this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
