@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -54,15 +53,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                     .Union(randomDeadEventV2s)
                         .AsQueryable();
 
-            IQueryable<EventV2> expectedEventV2s =
-                randomDeadEventV2s.AsQueryable().Take(inputTake);
+            IEnumerable<EventV2> expectedEventV2s =
+                randomDeadEventV2s.Take(inputTake);
 
             this.eventV2ServiceMock.Setup(service =>
                 service.RetrieveAllEventV2sWithListenerEventV2sAsync())
                     .ReturnsAsync(retrievedEventV2s);
 
             // when
-            IQueryable<EventV2> actualEventV2s =
+            IEnumerable<EventV2> actualEventV2s =
                 await this.eventV2ProcessingService
                     .RetrieveAllDeadEventV2sWithListenersAsync(inputTake);
 
@@ -116,15 +115,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                     .Union(randomDeadEventV2s)
                         .AsQueryable();
 
-            IQueryable<EventV2> expectedEventV2s =
-                randomDeadEventV2s.AsQueryable();
+            IEnumerable<EventV2> expectedEventV2s =
+                randomDeadEventV2s;
 
             this.eventV2ServiceMock.Setup(service =>
                 service.RetrieveAllEventV2sWithListenerEventV2sAsync())
                     .ReturnsAsync(retrievedEventV2s);
 
             // when
-            IQueryable<EventV2> actualEventV2s =
+            IEnumerable<EventV2> actualEventV2s =
                 await this.eventV2ProcessingService
                     .RetrieveAllDeadEventV2sWithListenersAsync(noTake);
 

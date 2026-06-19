@@ -72,6 +72,23 @@ namespace EventHighway.Core.Services.Processings.Events.V2
                     listenerEvent.Status != ListenerEventStatusV2.Pending));
         });
 
+        public ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync(int take) =>
+        TryCatch(async () =>
+        {
+            IQueryable<EventV2> eventV2s =
+                await this.eventV2Service.RetrieveAllEventV2sWithListenerEventV2sAsync();
+
+            IQueryable<EventV2> deadEventV2s = eventV2s.Where(eventV2 =>
+                eventV2.Type == EventTypeV2.Immediate
+                && eventV2.RemainingRetryAttempts == 0
+                && eventV2.ListenerEventV2s.All(listenerEvent =>
+                    listenerEvent.Status != ListenerEventStatusV2.Pending));
+
+            return take == 0
+                ? deadEventV2s.AsEnumerable()
+                : deadEventV2s.Take(take).AsEnumerable();
+        });
+
         public ValueTask<EventV2> MarkEventV2AsImmediateAsync(
             EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
