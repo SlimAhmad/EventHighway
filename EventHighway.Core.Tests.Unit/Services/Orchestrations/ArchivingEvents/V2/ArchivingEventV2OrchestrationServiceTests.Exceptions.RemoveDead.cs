@@ -17,8 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
     public partial class ArchivingEventV2OrchestrationServiceTests
     {
         [Theory]
-        [MemberData(nameof(EventV2ValidationExceptions))]
-        [MemberData(nameof(ListenerEventV2ValidationExceptions))]
+        [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationOnRemoveDeadIfDependencyValidationErrorOccursAndLogItAsync(
             Xeption validationException)
         {
@@ -74,8 +73,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         }
 
         [Theory]
-        [MemberData(nameof(EventV2DependencyExceptions))]
-        [MemberData(nameof(ListenerEventV2DependencyExceptions))]
+        [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRemoveDeadIfDependencyExceptionOccursAndLogItAsync(
             Xeption dependencyException)
         {

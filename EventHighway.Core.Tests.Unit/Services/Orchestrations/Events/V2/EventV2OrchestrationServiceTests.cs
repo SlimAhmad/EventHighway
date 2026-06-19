@@ -161,6 +161,58 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
             };
         }
 
+        public static TheoryData<Xeption> DependencyValidationExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
+
+            return new TheoryData<Xeption>
+            {
+                new EventV2ProcessingValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventV2ProcessingDependencyValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventAddressV2ProcessingValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventAddressV2ProcessingDependencyValidationException(
+                    someMessage,
+                    someInnerException),
+            };
+        }
+
+        public static TheoryData<Xeption> DependencyExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
+
+            return new TheoryData<Xeption>
+            {
+                new EventV2ProcessingDependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new EventV2ProcessingServiceException(
+                    someMessage,
+                    someInnerException),
+
+                new EventAddressV2ProcessingDependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new EventAddressV2ProcessingServiceException(
+                    someMessage,
+                    someInnerException),
+            };
+        }
+
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 
