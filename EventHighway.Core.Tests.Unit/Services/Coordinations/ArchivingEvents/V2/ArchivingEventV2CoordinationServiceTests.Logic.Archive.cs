@@ -104,9 +104,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveAllDeadEventV2sWithListenersAsync(
-                        It.IsAny<CancellationToken>()))
-                            .Returns(CreateAsyncEnumerable(retrievedEventV2s));
+                    service.RetrieveAllDeadEventV2sWithListenersAsync())
+                        .ReturnsAsync((IEnumerable<EventV2>)retrievedEventV2s);
 
             foreach ((EventArchiveV2 mappedEventArchiveV2, EventV2 retrievedEventV2)
                 in mappedEventArchiveV2s.Zip(retrievedEventV2s))
@@ -137,9 +136,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // then
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(
-                    It.IsAny<CancellationToken>()),
-                        Times.Once);
+                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                    Times.Once);
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),

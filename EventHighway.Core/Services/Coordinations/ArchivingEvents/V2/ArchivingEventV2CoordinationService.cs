@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,9 +40,11 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         public ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            await foreach (EventV2 eventV2 in
-                this.archivingEventV2OrchestrationService
-                    .RetrieveAllDeadEventV2sWithListenersAsync(cancellationToken))
+            IEnumerable<EventV2> eventV2s =
+                await this.archivingEventV2OrchestrationService
+                    .RetrieveAllDeadEventV2sWithListenersAsync();
+
+            foreach (EventV2 eventV2 in eventV2s)
             {
                 EventArchiveV2 eventArchiveV2 =
                     await MapToEventArchiveV2Async(eventV2);
