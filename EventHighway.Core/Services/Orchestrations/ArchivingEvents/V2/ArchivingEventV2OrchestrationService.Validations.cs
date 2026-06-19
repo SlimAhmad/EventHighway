@@ -11,6 +11,16 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 {
     internal partial class ArchivingEventV2OrchestrationService
     {
+        private static void ValidateOnRetrieveBatchOfDead(
+            BatchConfiguration batchConfiguration)
+        {
+            Validate(
+                message: "Event is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalidBatchSize(batchConfiguration.BatchSizeForBulkProcessing),
+                Parameter: nameof(BatchConfiguration.BatchSizeForBulkProcessing)));
+        }
+
         private static void ValidateOnRetrieveAllDeadEventV2sWithListeners(
             BatchConfiguration batchConfiguration)
         {
@@ -20,6 +30,12 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
                 (Rule: IsInvalid(batchConfiguration.BatchSizeForBulkProcessing),
                 Parameter: nameof(BatchConfiguration.BatchSizeForBulkProcessing)));
         }
+
+        private static dynamic IsInvalidBatchSize(int value) => new
+        {
+            Condition = value <= 0,
+            Message = "Value must be greater than 0"
+        };
 
         private static dynamic IsInvalid(int value) => new
         {

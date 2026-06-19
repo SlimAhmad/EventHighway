@@ -45,6 +45,8 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             BatchConfiguration batchConfiguration =
                 this.configurationBroker.GetBatchConfiguration();
 
+            ValidateOnRetrieveBatchOfDead(batchConfiguration);
+
             IQueryable<EventV2> deadEventV2s =
                 await this.eventV2ProcessingService
                     .RetrieveAllDeadEventV2sWithListenersAsync();
