@@ -32,7 +32,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 loggingBroker: this.loggingBrokerMock.Object);
         }
 
-        public static TheoryData<Xeption> ListenerEventV2ValidationExceptions()
+        public static TheoryData<Xeption> DependencyValidationExceptions()
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();

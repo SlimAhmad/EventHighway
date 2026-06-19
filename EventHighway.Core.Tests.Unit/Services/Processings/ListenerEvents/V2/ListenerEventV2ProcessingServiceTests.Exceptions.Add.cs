@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
     public partial class ListenerEventV2ProcessingServiceTests
     {
         [Theory]
-        [MemberData(nameof(ListenerEventV2ValidationExceptions))]
+        [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationExceptionOnAddIfDependencyValidationErrorOccursAndLogItAsync(
             Xeption listenerEventV2ValidationException)
         {
