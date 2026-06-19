@@ -49,7 +49,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             };
         }
 
-        public static TheoryData<Xeption> ListenerEventV2DependencyExceptions()
+        public static TheoryData<Xeption> DependencyExceptions()
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
