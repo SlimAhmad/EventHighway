@@ -23,7 +23,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         {
             // given
             BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
-            int inputTake = randomBatchConfiguration.BatchSizeForBulkProcessing;
 
             var expectedArchivingEventV2OrchestrationDependencyValidationException =
                 new ArchivingEventV2OrchestrationDependencyValidationException(
@@ -78,7 +77,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         {
             // given
             BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
-            int inputTake = randomBatchConfiguration.BatchSizeForBulkProcessing;
 
             var expectedArchivingEventV2OrchestrationDependencyException =
                 new ArchivingEventV2OrchestrationDependencyException(

@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
@@ -16,6 +17,7 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
     {
         private delegate ValueTask<IQueryable<EventArchiveV2>> ReturningEventArchiveV2sFunction();
         private delegate ValueTask<EventArchiveV2> ReturningEventArchiveV2Function();
+        private delegate ValueTask<IEnumerable<EventArchiveV2>> ReturningEventArchiveV2EnumerableFunction();
 
         private async ValueTask<IQueryable<EventArchiveV2>> TryCatch(
             ReturningEventArchiveV2sFunction returningEventArchiveV2sFunction)
@@ -63,6 +65,56 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(
                     invalidEventArchiveV2ProcessingException);
+            }
+            catch (EventArchiveV2ValidationException
+                eventArchiveV2ValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2ValidationException);
+            }
+            catch (EventArchiveV2DependencyValidationException
+                eventArchiveV2DependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2DependencyValidationException);
+            }
+            catch (EventArchiveV2DependencyException
+                eventArchiveV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventArchiveV2DependencyException);
+            }
+            catch (EventArchiveV2ServiceException
+                eventArchiveV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventArchiveV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventArchiveV2ProcessingServiceException =
+                    new FailedEventArchiveV2ProcessingServiceException(
+                        message: "Failed event archive service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventArchiveV2ProcessingServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<EventArchiveV2>> TryCatch(
+            ReturningEventArchiveV2EnumerableFunction returningEventArchiveV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningEventArchiveV2EnumerableFunction();
+            }
+            catch (NullEventArchiveV2ProcessingException
+                nullEventArchiveV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullEventArchiveV2ProcessingException);
             }
             catch (EventArchiveV2ValidationException
                 eventArchiveV2ValidationException)

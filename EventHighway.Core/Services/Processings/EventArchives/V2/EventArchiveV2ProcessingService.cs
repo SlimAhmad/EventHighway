@@ -2,6 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +30,17 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
         TryCatch(async () =>
         {
             return await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync();
+        });
+
+        public ValueTask<IEnumerable<EventArchiveV2>> BulkAddEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
+
+            return await this.eventArchiveV2Service
+                .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
         });
 
         public ValueTask<EventArchiveV2> AddEventArchiveV2Async(

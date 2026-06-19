@@ -24,7 +24,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             List<EventV2> randomEventV2s = CreateRandomEventV2List();
             IQueryable<EventV2> retrievedEventV2s = randomEventV2s.AsQueryable();
-            IEnumerable<EventV2> expectedEventV2s = randomEventV2s.Take(inputTake);
+            IEnumerable<EventV2> expectedEventV2s = retrievedEventV2s.Take(inputTake);
 
             this.configurationBrokerMock.Setup(broker =>
                 broker.GetBatchConfiguration())
