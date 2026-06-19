@@ -40,7 +40,19 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         }
 
         public ValueTask<IEnumerable<EventV2>> RetrieveBatchOfDeadEventV2sAsync() =>
-            throw new System.NotImplementedException();
+        TryCatch(async () =>
+        {
+            BatchConfiguration batchConfiguration =
+                this.configurationBroker.GetBatchConfiguration();
+
+            IQueryable<EventV2> deadEventV2s =
+                await this.eventV2ProcessingService
+                    .RetrieveAllDeadEventV2sWithListenersAsync();
+
+            int take = batchConfiguration.BatchSizeForBulkProcessing;
+
+            return deadEventV2s.Take(take).AsEnumerable();
+        });
 
         public ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync() =>
         TryCatch(async () =>
