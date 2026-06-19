@@ -36,6 +36,27 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
                 Parameter: nameof(ListenerEventV2.Id)));
         }
 
+        private static void ValidateOnRetrieveBatchOfListenerEventV2sByEventIds(
+            IEnumerable<Guid> eventIds,
+            int take)
+        {
+            Validate(
+                (Rule: IsInvalid(eventIds), Parameter: "EventIds"),
+                (Rule: IsInvalid(take), Parameter: "Take"));
+        }
+
+        private static dynamic IsInvalid(IEnumerable<Guid> eventIds) => new
+        {
+            Condition = eventIds is null,
+            Message = "Required"
+        };
+
+        private static dynamic IsInvalid(int take) => new
+        {
+            Condition = take < 0,
+            Message = "Value must be greater than or equal to 0"
+        };
+
         private static dynamic IsInvalid(Guid id) => new
         {
             Condition = id == Guid.Empty,

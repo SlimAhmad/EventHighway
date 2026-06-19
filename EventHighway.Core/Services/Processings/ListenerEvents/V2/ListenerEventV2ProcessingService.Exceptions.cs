@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -17,6 +18,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
         private delegate ValueTask ReturningNothingFunction();
         private delegate ValueTask<ListenerEventV2> ReturningListenerEventV2Function();
         private delegate ValueTask<IQueryable<ListenerEventV2>> ReturningListenerEventV2sFunction();
+        private delegate ValueTask<IEnumerable<ListenerEventV2>> ReturningListenerEventV2EnumerableFunction();
 
         private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
         {
@@ -129,6 +131,56 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             try
             {
                 return await returningListenerEventV2sFunction();
+            }
+            catch (ListenerEventV2DependencyException
+                listenerEventV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventV2DependencyException);
+            }
+            catch (ListenerEventV2ServiceException
+                listenerEventV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedListenerEventV2ProcessingServiceException =
+                    new FailedListenerEventV2ProcessingServiceException(
+                        message: "Failed listener event service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedListenerEventV2ProcessingServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<ListenerEventV2>> TryCatch(
+            ReturningListenerEventV2EnumerableFunction returningListenerEventV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningListenerEventV2EnumerableFunction();
+            }
+            catch (InvalidListenerEventV2ProcessingException
+                invalidListenerEventV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    invalidListenerEventV2ProcessingException);
+            }
+            catch (ListenerEventV2ValidationException
+                listenerEventV2ValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2ValidationException);
+            }
+            catch (ListenerEventV2DependencyValidationException
+                listenerEventV2DependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2DependencyValidationException);
             }
             catch (ListenerEventV2DependencyException
                 listenerEventV2DependencyException)
