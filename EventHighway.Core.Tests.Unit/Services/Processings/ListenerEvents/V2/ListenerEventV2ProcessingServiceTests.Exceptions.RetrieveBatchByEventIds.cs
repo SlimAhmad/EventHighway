@@ -16,6 +16,60 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
 {
     public partial class ListenerEventV2ProcessingServiceTests
     {
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRetrieveBatchByEventIdsIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            List<Guid> someEventIds =
+                Enumerable.Range(0, GetRandomNumber())
+                    .Select(_ => Guid.NewGuid())
+                        .ToList();
+
+            int someTake = GetRandomNumber();
+            var serviceException = new Exception();
+
+            var failedListenerEventV2ProcessingServiceException =
+                new FailedListenerEventV2ProcessingServiceException(
+                    message: "Failed listener event service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedListenerEventV2ProcessingServiceException =
+                new ListenerEventV2ProcessingServiceException(
+                    message: "Listener event service error occurred, contact support.",
+                    innerException: failedListenerEventV2ProcessingServiceException);
+
+            this.listenerEventV2ServiceMock.Setup(service =>
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds))
+                    .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchByEventIdsTask =
+                this.listenerEventV2ProcessingService
+                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, someTake);
+
+            ListenerEventV2ProcessingServiceException
+                actualListenerEventV2ProcessingServiceException =
+                    await Assert.ThrowsAsync<ListenerEventV2ProcessingServiceException>(
+                        retrieveBatchByEventIdsTask.AsTask);
+
+            // then
+            actualListenerEventV2ProcessingServiceException.Should()
+                .BeEquivalentTo(expectedListenerEventV2ProcessingServiceException);
+
+            this.listenerEventV2ServiceMock.Verify(service =>
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2ProcessingServiceException))),
+                        Times.Once);
+
+            this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRetrieveBatchByEventIdsIfDependencyErrorOccursAndLogItAsync(
