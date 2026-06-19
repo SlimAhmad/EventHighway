@@ -12,6 +12,7 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
     public interface IArchivingEventV2OrchestrationService
     {
         ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync();
+        ValueTask<IEnumerable<EventV2>> RetrieveBatchOfDeadEventV2sAsync();
 
         ValueTask RemoveEventV2AndListenerEventV2sAsync(
             EventV2 eventV2,

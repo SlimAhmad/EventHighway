@@ -39,6 +39,9 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             this.loggingBroker = loggingBroker;
         }
 
+        public ValueTask<IEnumerable<EventV2>> RetrieveBatchOfDeadEventV2sAsync() =>
+            throw new System.NotImplementedException();
+
         public ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync() =>
         TryCatch(async () =>
         {
