@@ -86,5 +86,9 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
 
             await this.storageBroker.BulkDeleteListenerEventV2sAsync(listenerEventV2s, cancellationToken);
         });
+
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveListenerEventV2sByEventIdsAsync(
+            IEnumerable<Guid> eventIds) =>
+            throw new NotImplementedException();
     }
 }
