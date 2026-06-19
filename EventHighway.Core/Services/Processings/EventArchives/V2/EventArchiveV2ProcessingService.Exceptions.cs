@@ -116,6 +116,18 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
                 throw await CreateAndLogValidationExceptionAsync(
                     nullEventArchiveV2ProcessingException);
             }
+            catch (EventArchiveV2DependencyException
+                eventArchiveV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventArchiveV2DependencyException);
+            }
+            catch (EventArchiveV2ServiceException
+                eventArchiveV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventArchiveV2ServiceException);
+            }
         }
 
         private async ValueTask<EventArchiveV2ProcessingValidationException> CreateAndLogValidationExceptionAsync(
