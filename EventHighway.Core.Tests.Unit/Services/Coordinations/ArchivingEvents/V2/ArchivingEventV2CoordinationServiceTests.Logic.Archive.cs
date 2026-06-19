@@ -116,13 +116,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     service.BulkAddEventArchiveV2sAsync(
                         It.Is(SameEventArchiveV2sAs(expectedEventArchiveV2s)),
                         It.IsAny<CancellationToken>()))
-                            .Returns(ValueTask.CompletedTask);
+                            .ReturnsAsync(expectedEventArchiveV2s);
+
+            IEnumerable<Guid> archivedEventV2Ids =
+                expectedEventArchiveV2s.Select(a => a.Id).ToList();
 
             // Step 4
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveBatchOfListenerEventV2sAsync(
-                        It.Is(SameEventV2IdsAs(inputEventV2Ids)),
+                        It.Is(SameEventV2IdsAs(archivedEventV2Ids)),
                         It.IsAny<CancellationToken>()))
                             .ReturnsAsync((IEnumerable<ListenerEventV2>)retrievedListenerEventV2s);
 
@@ -142,11 +145,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         It.IsAny<CancellationToken>()))
                             .Returns(ValueTask.CompletedTask);
 
+            List<EventV2> archivedDeadEventV2s =
+                retrievedEventV2s
+                    .Where(e => archivedEventV2Ids.Contains(e.Id)).ToList();
+
             // Step 7
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveBatchOfListenerEventV2sAsync(
-                        It.Is(SameEventV2IdsAs(inputEventV2Ids)),
+                        It.Is(SameEventV2IdsAs(archivedEventV2Ids)),
                         It.IsAny<CancellationToken>()))
                             .ReturnsAsync(Enumerable.Empty<ListenerEventV2>());
 
@@ -154,7 +161,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.BulkRemoveEventV2sAsync(
-                        It.Is(SameEventV2sAs(retrievedEventV2s)),
+                        It.Is(SameEventV2sAs(archivedDeadEventV2s)),
                         It.IsAny<CancellationToken>()))
                             .Returns(ValueTask.CompletedTask);
 
@@ -185,7 +192,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfListenerEventV2sAsync(
-                    It.Is(SameEventV2IdsAs(inputEventV2Ids)),
+                    It.Is(SameEventV2IdsAs(archivedEventV2Ids)),
                     It.IsAny<CancellationToken>()),
                         Times.Exactly(2));
 
@@ -203,7 +210,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.BulkRemoveEventV2sAsync(
-                    It.Is(SameEventV2sAs(retrievedEventV2s)),
+                    It.Is(SameEventV2sAs(archivedDeadEventV2s)),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
