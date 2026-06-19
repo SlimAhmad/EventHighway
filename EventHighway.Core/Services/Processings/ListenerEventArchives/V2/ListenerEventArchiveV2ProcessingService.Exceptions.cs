@@ -78,6 +78,18 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     listenerEventArchiveV2DependencyValidationException);
             }
+            catch (ListenerEventArchiveV2DependencyException
+                listenerEventArchiveV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2DependencyException);
+            }
+            catch (ListenerEventArchiveV2ServiceException
+                listenerEventArchiveV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2ServiceException);
+            }
         }
 
         private async ValueTask<List<ListenerEventArchiveV2>> TryCatch(
