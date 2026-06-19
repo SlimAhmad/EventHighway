@@ -16,6 +16,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
     internal partial class ListenerEventArchiveV2ProcessingService
     {
         private delegate ValueTask<IQueryable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2sFunction();
+        private delegate ValueTask<IEnumerable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2EnumerableFunction();
         private delegate ValueTask<List<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2ListsFunction();
         private delegate ValueTask<ListenerEventArchiveV2> ReturningListenerEventArchiveV2Function();
         private delegate ValueTask ReturningNothingFunction();
@@ -49,6 +50,21 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
 
                 throw await CreateAndLogServiceExceptionAsync(
                     failedListenerEventArchiveV2ProcessingServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<ListenerEventArchiveV2>> TryCatch(
+            ReturningListenerEventArchiveV2EnumerableFunction returningListenerEventArchiveV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningListenerEventArchiveV2EnumerableFunction();
+            }
+            catch (NullListenerEventArchiveV2ProcessingException
+                nullListenerEventArchiveV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullListenerEventArchiveV2ProcessingException);
             }
         }
 
