@@ -1,13 +1,15 @@
-﻿// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using FluentAssertions;
 using Moq;
 using Xeptions;
@@ -18,11 +20,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
     {
         [Theory]
         [MemberData(nameof(DependencyValidationExceptions))]
-        public async Task ShouldThrowDependencyValidationOnRemoveDeadIfDependencyValidationErrorOccursAndLogItAsync(
+        public async Task ShouldThrowDependencyValidationExceptionOnBulkRemoveIfValidationExceptionOccursAndLogItAsync(
             Xeption validationException)
         {
             // given
-            EventV2 someEventV2 = CreateRandomEventV2();
+            IQueryable<EventV2> someEventV2s = CreateRandomEventV2s();
+            IEnumerable<EventV2> inputEventV2s = someEventV2s;
 
             var expectedArchivingEventV2OrchestrationDependencyValidationException =
                 new ArchivingEventV2OrchestrationDependencyValidationException(
@@ -30,29 +33,29 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     innerException: validationException.InnerException as Xeption);
 
             this.listenerEventV2ProcessingServiceMock.Setup(service =>
-                service.RemoveListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>(),
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
                     It.IsAny<CancellationToken>()))
                         .ThrowsAsync(validationException);
 
             // when
-            ValueTask removeEventV2AndListenerEventV2sTask =
-                this.archivingEventV2OrchestrationService.RemoveEventV2AndListenerEventV2sAsync(
-                    someEventV2,
+            ValueTask bulkRemoveEventV2AndListenerEventV2sTask =
+                this.archivingEventV2OrchestrationService.BulkRemoveEventV2AndListenerEventV2sAsync(
+                    inputEventV2s,
                     TestContext.Current.CancellationToken);
 
             ArchivingEventV2OrchestrationDependencyValidationException
                 actualArchivingEventV2OrchestrationDependencyValidationException =
                     await Assert.ThrowsAsync<ArchivingEventV2OrchestrationDependencyValidationException>(
-                        removeEventV2AndListenerEventV2sTask.AsTask);
+                        bulkRemoveEventV2AndListenerEventV2sTask.AsTask);
 
             // then
-            actualArchivingEventV2OrchestrationDependencyValidationException.Should().BeEquivalentTo(
-                expectedArchivingEventV2OrchestrationDependencyValidationException);
+            actualArchivingEventV2OrchestrationDependencyValidationException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2OrchestrationDependencyValidationException);
 
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
-                service.RemoveListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>(),
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -62,23 +65,23 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                         Times.Once);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.RemoveEventV2ByIdAsync(
-                    It.IsAny<Guid>(),
+                service.BulkRemoveEventV2sAsync(
+                    It.IsAny<IEnumerable<EventV2>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
-            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
-
         [Theory]
         [MemberData(nameof(DependencyExceptions))]
-        public async Task ShouldThrowDependencyExceptionOnRemoveDeadIfDependencyExceptionOccursAndLogItAsync(
+        public async Task ShouldThrowDependencyExceptionOnBulkRemoveIfDependencyExceptionOccursAndLogItAsync(
             Xeption dependencyException)
         {
             // given
-            EventV2 someEventV2 = CreateRandomEventV2();
+            IQueryable<EventV2> someEventV2s = CreateRandomEventV2s();
+            IEnumerable<EventV2> inputEventV2s = someEventV2s;
 
             var expectedArchivingEventV2OrchestrationDependencyException =
                 new ArchivingEventV2OrchestrationDependencyException(
@@ -86,29 +89,29 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     innerException: dependencyException.InnerException as Xeption);
 
             this.listenerEventV2ProcessingServiceMock.Setup(service =>
-                service.RemoveListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>(),
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
                     It.IsAny<CancellationToken>()))
                         .ThrowsAsync(dependencyException);
 
             // when
-            ValueTask removeEventV2AndListenerEventV2sTask =
-                this.archivingEventV2OrchestrationService.RemoveEventV2AndListenerEventV2sAsync(
-                    someEventV2,
+            ValueTask bulkRemoveEventV2AndListenerEventV2sTask =
+                this.archivingEventV2OrchestrationService.BulkRemoveEventV2AndListenerEventV2sAsync(
+                    inputEventV2s,
                     TestContext.Current.CancellationToken);
 
             ArchivingEventV2OrchestrationDependencyException
                 actualArchivingEventV2OrchestrationDependencyException =
                     await Assert.ThrowsAsync<ArchivingEventV2OrchestrationDependencyException>(
-                        removeEventV2AndListenerEventV2sTask.AsTask);
+                        bulkRemoveEventV2AndListenerEventV2sTask.AsTask);
 
             // then
-            actualArchivingEventV2OrchestrationDependencyException.Should().BeEquivalentTo(
-                expectedArchivingEventV2OrchestrationDependencyException);
+            actualArchivingEventV2OrchestrationDependencyException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2OrchestrationDependencyException);
 
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
-                service.RemoveListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>(),
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -118,8 +121,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                         Times.Once);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.RemoveEventV2ByIdAsync(
-                    It.IsAny<Guid>(),
+                service.BulkRemoveEventV2sAsync(
+                    It.IsAny<IEnumerable<EventV2>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
@@ -127,20 +130,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
-
         [Fact]
-        public async Task ShouldThrowServiceExceptionOnRemoveDeadIfExceptionOccursAndLogItAsync()
+        public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
         {
             // given
-            EventV2 someEventV2 = CreateRandomEventV2();
-            var serviceException = new Exception();
-            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+            IQueryable<EventV2> someEventV2s = CreateRandomEventV2s();
+            IEnumerable<EventV2> inputEventV2s = someEventV2s;
+            var exception = new Exception();
+            exception.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedArchivingEventV2OrchestrationServiceException =
                 new FailedArchivingEventV2OrchestrationServiceException(
                     message: "Failed event service error occurred, contact support.",
-                    innerException: serviceException,
-                    data: serviceException.Data);
+                    innerException: exception,
+                    data: exception.Data);
 
             var expectedArchivingEventV2OrchestrationServiceException =
                 new ArchivingEventV2OrchestrationServiceException(
@@ -148,29 +151,29 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     innerException: failedArchivingEventV2OrchestrationServiceException);
 
             this.listenerEventV2ProcessingServiceMock.Setup(service =>
-                service.RemoveListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>(),
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
                     It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(serviceException);
+                        .ThrowsAsync(exception);
 
             // when
-            ValueTask removeEventV2AndListenerEventV2sTask =
-                this.archivingEventV2OrchestrationService.RemoveEventV2AndListenerEventV2sAsync(
-                    someEventV2,
+            ValueTask bulkRemoveEventV2AndListenerEventV2sTask =
+                this.archivingEventV2OrchestrationService.BulkRemoveEventV2AndListenerEventV2sAsync(
+                    inputEventV2s,
                     TestContext.Current.CancellationToken);
 
             ArchivingEventV2OrchestrationServiceException
                 actualArchivingEventV2OrchestrationServiceException =
                     await Assert.ThrowsAsync<ArchivingEventV2OrchestrationServiceException>(
-                        removeEventV2AndListenerEventV2sTask.AsTask);
+                        bulkRemoveEventV2AndListenerEventV2sTask.AsTask);
 
             // then
-            actualArchivingEventV2OrchestrationServiceException.Should().BeEquivalentTo(
-                expectedArchivingEventV2OrchestrationServiceException);
+            actualArchivingEventV2OrchestrationServiceException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2OrchestrationServiceException);
 
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
-                service.RemoveListenerEventV2ByIdAsync(
-                    It.IsAny<Guid>(),
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -180,8 +183,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                         Times.Once);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.RemoveEventV2ByIdAsync(
-                    It.IsAny<Guid>(),
+                service.BulkRemoveEventV2sAsync(
+                    It.IsAny<IEnumerable<EventV2>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 

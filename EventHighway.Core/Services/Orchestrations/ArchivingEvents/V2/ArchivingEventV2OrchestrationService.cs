@@ -92,6 +92,23 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             }
         }
 
+        public ValueTask BulkRemoveEventV2AndListenerEventV2sAsync(
+            IEnumerable<EventV2> eventV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateEventV2sIsNotNull(eventV2s);
+
+            IEnumerable<ListenerEventV2> listenerEventV2s =
+                eventV2s.SelectMany(eventV2 => eventV2.ListenerEventV2s);
+
+            await this.listenerEventV2ProcessingService
+                .BulkRemoveListenerEventV2sAsync(listenerEventV2s, cancellationToken);
+
+            await this.eventV2ProcessingService
+                .BulkRemoveEventV2sAsync(eventV2s, cancellationToken);
+        });
+
         public ValueTask RemoveEventV2AndListenerEventV2sAsync(
             EventV2 eventV2,
             CancellationToken cancellationToken = default) =>
