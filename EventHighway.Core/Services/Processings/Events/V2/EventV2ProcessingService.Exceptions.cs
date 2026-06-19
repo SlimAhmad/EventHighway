@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -16,6 +17,7 @@ namespace EventHighway.Core.Services.Processings.Events.V2
     {
         private delegate ValueTask ReturningNothingFunction();
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
+        private delegate ValueTask<IEnumerable<EventV2>> ReturningEventV2EnumerableFunction();
         private delegate ValueTask<EventV2> ReturningEventV2Function();
 
         private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
@@ -61,6 +63,37 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             try
             {
                 return await returningEventV2sFunction();
+            }
+            catch (EventV2DependencyException eventV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventV2DependencyException);
+            }
+            catch (EventV2ServiceException eventV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventV2ProcessingServiceException =
+                    new FailedEventV2ProcessingServiceException(
+                        message: "Failed event service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventV2ProcessingServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<EventV2>> TryCatch(
+            ReturningEventV2EnumerableFunction returningEventV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningEventV2EnumerableFunction();
+            }
+            catch (InvalidEventV2ProcessingException invalidEventV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(invalidEventV2ProcessingException);
             }
             catch (EventV2DependencyException eventV2DependencyException)
             {
