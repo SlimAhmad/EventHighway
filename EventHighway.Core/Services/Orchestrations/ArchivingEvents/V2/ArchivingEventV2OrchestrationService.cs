@@ -5,16 +5,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
-using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
-using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
 using EventHighway.Core.Services.Processings.Events.V2;
 using EventHighway.Core.Services.Processings.ListenerEvents.V2;
 
@@ -107,6 +104,8 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            ValidateEventV2sIsNotNull(eventV2s);
+
             await this.eventV2ProcessingService
                 .BulkRemoveEventV2sAsync(eventV2s, cancellationToken);
         });
