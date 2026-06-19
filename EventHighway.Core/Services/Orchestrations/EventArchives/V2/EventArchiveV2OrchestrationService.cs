@@ -10,37 +10,36 @@ using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
-using EventHighway.Core.Services.Foundations.EventArchives.V2;
-using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Services.Processings.EventArchives.V2;
+using EventHighway.Core.Services.Processings.ListenerEventArchives.V2;
 
 namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
 {
     internal partial class EventArchiveV2OrchestrationService : IEventArchiveV2OrchestrationService
     {
-        private readonly IListenerEventArchiveV2Service listenerEventArchiveV2Service;
-        private readonly IEventArchiveV2Service eventArchiveV2Service;
+        private readonly IListenerEventArchiveV2ProcessingService listenerEventArchiveV2ProcessingService;
+        private readonly IEventArchiveV2ProcessingService eventArchiveV2ProcessingService;
         private readonly ILoggingBroker loggingBroker;
 
         public EventArchiveV2OrchestrationService(
-            IListenerEventArchiveV2Service listenerEventArchiveV2Service,
-            IEventArchiveV2Service eventArchiveV2Service,
+            IListenerEventArchiveV2ProcessingService listenerEventArchiveV2ProcessingService,
+            IEventArchiveV2ProcessingService eventArchiveV2ProcessingService,
             ILoggingBroker loggingBroker)
         {
-            this.listenerEventArchiveV2Service = listenerEventArchiveV2Service;
-            this.eventArchiveV2Service = eventArchiveV2Service;
+            this.listenerEventArchiveV2ProcessingService = listenerEventArchiveV2ProcessingService;
+            this.eventArchiveV2ProcessingService = eventArchiveV2ProcessingService;
             this.loggingBroker = loggingBroker;
         }
 
         public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
-            await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync());
+            await this.eventArchiveV2ProcessingService.RetrieveAllEventArchiveV2sAsync());
 
         public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
-
-            await this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync());
+            await this.listenerEventArchiveV2ProcessingService.RetrieveAllListenerEventArchiveV2sAsync());
 
         public ValueTask AddEventArchiveV2WithListenerEventArchiveV2sAsync(
             EventArchiveV2 eventArchiveV2,
@@ -48,12 +47,12 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         TryCatch(async () =>
         {
             ValidateEventArchiveV2(eventArchiveV2);
-            
-            await this.eventArchiveV2Service.AddEventArchiveV2Async(eventArchiveV2, cancellationToken);
+
+            await this.eventArchiveV2ProcessingService.AddEventArchiveV2Async(eventArchiveV2, cancellationToken);
 
             foreach (ListenerEventArchiveV2 listenerEventArchiveV2 in eventArchiveV2.ListenerEventArchiveV2s)
             {
-                await this.listenerEventArchiveV2Service
+                await this.listenerEventArchiveV2ProcessingService
                     .AddListenerEventArchiveV2Async(listenerEventArchiveV2, cancellationToken);
             }
         });
@@ -65,14 +64,25 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         {
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
-            await this.eventArchiveV2Service
+            await this.eventArchiveV2ProcessingService
                 .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
 
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s =
                 eventArchiveV2s.SelectMany(eventArchiveV2 =>
                     eventArchiveV2.ListenerEventArchiveV2s);
 
-            await this.listenerEventArchiveV2Service
+            await this.listenerEventArchiveV2ProcessingService
+                .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
+        });
+
+        public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
+
+            return await this.listenerEventArchiveV2ProcessingService
                 .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
         });
     }

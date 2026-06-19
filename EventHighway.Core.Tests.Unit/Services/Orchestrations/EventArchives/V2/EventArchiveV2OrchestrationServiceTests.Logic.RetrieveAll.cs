@@ -21,7 +21,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             IQueryable<EventArchiveV2> retrievedEventArchiveV2s = randomEventArchiveV2s;
             IQueryable<EventArchiveV2> expectedEventArchiveV2s = randomEventArchiveV2s.DeepClone();
 
-            this.eventArchiveV2ServiceMock.Setup(service =>
+            this.eventArchiveV2ProcessingServiceMock.Setup(service =>
                 service.RetrieveAllEventArchiveV2sAsync())
                     .ReturnsAsync(retrievedEventArchiveV2s);
 
@@ -34,12 +34,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             // then
             actualEventArchiveV2s.Should().BeEquivalentTo(expectedEventArchiveV2s);
 
-            this.eventArchiveV2ServiceMock.Verify(service =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.RetrieveAllEventArchiveV2sAsync(),
                     Times.Once);
 
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

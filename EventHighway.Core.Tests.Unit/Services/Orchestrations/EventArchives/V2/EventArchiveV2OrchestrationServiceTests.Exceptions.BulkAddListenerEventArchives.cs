@@ -1,12 +1,11 @@
-﻿// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
-using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 using FluentAssertions;
@@ -18,55 +17,50 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
     public partial class EventArchiveV2OrchestrationServiceTests
     {
         [Theory]
-        [MemberData(nameof(DependencyValidationExceptions))]
-        public async Task ShouldThrowDependencyValidationExceptionOnAddIfValidationExceptionOccursAndLogItAsync(
-            Xeption validationException)
+        [MemberData(nameof(ListenerEventArchiveV2ValidationExceptions))]
+        public async Task
+            ShouldThrowDependencyValidationExceptionOnBulkAddListenerEventArchiveV2sIfValidationExceptionOccursAndLogItAsync(
+                Xeption listenerEventArchiveV2ValidationException)
         {
             // given
-            EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
+            IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s().ToList();
 
             var expectedEventArchiveV2OrchestrationDependencyValidationException =
                 new EventArchiveV2OrchestrationDependencyValidationException(
                     message: "Event archive validation error occurred, fix the errors and try again.",
-                    innerException: validationException.InnerException as Xeption);
+                    innerException: listenerEventArchiveV2ValidationException.InnerException as Xeption);
 
             this.listenerEventArchiveV2ProcessingServiceMock.Setup(service =>
-                service.AddListenerEventArchiveV2Async(
-                    It.IsAny<ListenerEventArchiveV2>(),
-                    It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(validationException);
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken))
+                        .ThrowsAsync(listenerEventArchiveV2ValidationException);
 
             // when
-            ValueTask addEventArchiveV2Task =
-                this.eventArchiveV2OrchestrationService
-                    .AddEventArchiveV2WithListenerEventArchiveV2sAsync(
-                        someEventArchiveV2,
-                        TestContext.Current.CancellationToken);
+            ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
+                this.eventArchiveV2OrchestrationService.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken);
 
             EventArchiveV2OrchestrationDependencyValidationException
                 actualEventArchiveV2OrchestrationDependencyValidationException =
                     await Assert.ThrowsAsync<EventArchiveV2OrchestrationDependencyValidationException>(
-                        addEventArchiveV2Task.AsTask);
+                        bulkAddListenerEventArchiveV2sTask.AsTask);
 
             // then
             actualEventArchiveV2OrchestrationDependencyValidationException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2OrchestrationDependencyValidationException);
 
             this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
-                service.AddListenerEventArchiveV2Async(
-                    It.IsAny<ListenerEventArchiveV2>(),
-                    It.IsAny<CancellationToken>()),
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventArchiveV2OrchestrationDependencyValidationException))),
-                        Times.Once);
-
-            this.eventArchiveV2ProcessingServiceMock.Verify(broker =>
-                broker.AddEventArchiveV2Async(
-                    It.IsAny<EventArchiveV2>(),
-                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
@@ -75,55 +69,50 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         }
 
         [Theory]
-        [MemberData(nameof(DependencyExceptions))]
-        public async Task ShouldThrowDependencyExceptionOnAddIfDependencyExceptionOccursAndLogItAsync(
-            Xeption dependencyException)
+        [MemberData(nameof(ListenerEventArchiveV2DependencyExceptions))]
+        public async Task
+            ShouldThrowDependencyExceptionOnBulkAddListenerEventArchiveV2sIfDependencyExceptionOccursAndLogItAsync(
+                Xeption listenerEventArchiveV2DependencyException)
         {
             // given
-            EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
+            IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s().ToList();
 
             var expectedEventArchiveV2OrchestrationDependencyException =
                 new EventArchiveV2OrchestrationDependencyException(
                     message: "Event archive dependency error occurred, contact support.",
-                    innerException: dependencyException.InnerException as Xeption);
+                    innerException: listenerEventArchiveV2DependencyException.InnerException as Xeption);
 
             this.listenerEventArchiveV2ProcessingServiceMock.Setup(service =>
-                service.AddListenerEventArchiveV2Async(
-                    It.IsAny<ListenerEventArchiveV2>(),
-                    It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(dependencyException);
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken))
+                        .ThrowsAsync(listenerEventArchiveV2DependencyException);
 
             // when
-            ValueTask addEventArchiveV2Task =
-                this.eventArchiveV2OrchestrationService
-                    .AddEventArchiveV2WithListenerEventArchiveV2sAsync(
-                        someEventArchiveV2,
-                        TestContext.Current.CancellationToken);
+            ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
+                this.eventArchiveV2OrchestrationService.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken);
 
             EventArchiveV2OrchestrationDependencyException
                 actualEventArchiveV2OrchestrationDependencyException =
                     await Assert.ThrowsAsync<EventArchiveV2OrchestrationDependencyException>(
-                        addEventArchiveV2Task.AsTask);
+                        bulkAddListenerEventArchiveV2sTask.AsTask);
 
             // then
             actualEventArchiveV2OrchestrationDependencyException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2OrchestrationDependencyException);
 
             this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
-                service.AddListenerEventArchiveV2Async(
-                    It.IsAny<ListenerEventArchiveV2>(),
-                    It.IsAny<CancellationToken>()),
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventArchiveV2OrchestrationDependencyException))),
-                        Times.Once);
-
-            this.eventArchiveV2ProcessingServiceMock.Verify(broker =>
-                broker.AddEventArchiveV2Async(
-                    It.IsAny<EventArchiveV2>(),
-                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
@@ -132,18 +121,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         }
 
         [Fact]
-        public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
+        public async Task
+            ShouldThrowServiceExceptionOnBulkAddListenerEventArchiveV2sIfExceptionOccursAndLogItAsync()
         {
             // given
-            EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
-            var exception = new Exception();
-            exception.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+            IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s().ToList();
+
+            var serviceException = new Exception();
 
             var failedEventArchiveV2OrchestrationServiceException =
                 new FailedEventArchiveV2OrchestrationServiceException(
                     message: "Failed event archive service error occurred, contact support.",
-                    innerException: exception,
-                    data: exception.Data);
+                    innerException: serviceException,
+                    data: serviceException.Data);
 
             var expectedEventArchiveV2OrchestrationServiceException =
                 new EventArchiveV2OrchestrationServiceException(
@@ -151,42 +142,35 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     innerException: failedEventArchiveV2OrchestrationServiceException);
 
             this.listenerEventArchiveV2ProcessingServiceMock.Setup(service =>
-                service.AddListenerEventArchiveV2Async(
-                    It.IsAny<ListenerEventArchiveV2>(),
-                    It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(exception);
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken))
+                        .ThrowsAsync(serviceException);
 
             // when
-            ValueTask addEventArchiveV2Task =
-                this.eventArchiveV2OrchestrationService
-                    .AddEventArchiveV2WithListenerEventArchiveV2sAsync(
-                        someEventArchiveV2,
-                        TestContext.Current.CancellationToken);
+            ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
+                this.eventArchiveV2OrchestrationService.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken);
 
             EventArchiveV2OrchestrationServiceException
                 actualEventArchiveV2OrchestrationServiceException =
                     await Assert.ThrowsAsync<EventArchiveV2OrchestrationServiceException>(
-                        addEventArchiveV2Task.AsTask);
+                        bulkAddListenerEventArchiveV2sTask.AsTask);
 
             // then
             actualEventArchiveV2OrchestrationServiceException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2OrchestrationServiceException);
 
             this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
-                service.AddListenerEventArchiveV2Async(
-                    It.IsAny<ListenerEventArchiveV2>(),
-                    It.IsAny<CancellationToken>()),
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventArchiveV2OrchestrationServiceException))),
-                        Times.Once);
-
-            this.eventArchiveV2ProcessingServiceMock.Verify(broker =>
-                broker.AddEventArchiveV2Async(
-                    It.IsAny<EventArchiveV2>(),
-                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();

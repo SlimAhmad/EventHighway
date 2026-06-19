@@ -8,12 +8,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
-using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
-using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
-using EventHighway.Core.Services.Foundations.EventArchives.V2;
-using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Models.Services.Processings.EventArchives.V2.Exceptions;
+using EventHighway.Core.Models.Services.Processings.ListenerEventArchives.V2.Exceptions;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Services.Processings.EventArchives.V2;
+using EventHighway.Core.Services.Processings.ListenerEventArchives.V2;
 using Moq;
 using Tynamix.ObjectFiller;
 using Xeptions;
@@ -22,20 +23,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
 {
     public partial class EventArchiveV2OrchestrationServiceTests
     {
-        private readonly Mock<IListenerEventArchiveV2Service> listenerEventArchiveV2ServiceMock;
-        private readonly Mock<IEventArchiveV2Service> eventArchiveV2ServiceMock;
+        private readonly Mock<IListenerEventArchiveV2ProcessingService> listenerEventArchiveV2ProcessingServiceMock;
+        private readonly Mock<IEventArchiveV2ProcessingService> eventArchiveV2ProcessingServiceMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService;
 
         public EventArchiveV2OrchestrationServiceTests()
         {
-            this.listenerEventArchiveV2ServiceMock = new Mock<IListenerEventArchiveV2Service>();
-            this.eventArchiveV2ServiceMock = new Mock<IEventArchiveV2Service>();
+            this.listenerEventArchiveV2ProcessingServiceMock =
+                new Mock<IListenerEventArchiveV2ProcessingService>();
+
+            this.eventArchiveV2ProcessingServiceMock =
+                new Mock<IEventArchiveV2ProcessingService>();
+
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
             this.eventArchiveV2OrchestrationService = new EventArchiveV2OrchestrationService(
-                listenerEventArchiveV2Service: this.listenerEventArchiveV2ServiceMock.Object,
-                eventArchiveV2Service: this.eventArchiveV2ServiceMock.Object,
+                listenerEventArchiveV2ProcessingService:
+                    this.listenerEventArchiveV2ProcessingServiceMock.Object,
+                eventArchiveV2ProcessingService: this.eventArchiveV2ProcessingServiceMock.Object,
                 loggingBroker: this.loggingBrokerMock.Object);
         }
 
@@ -47,11 +53,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
 
             return new TheoryData<Xeption>
             {
-                new EventArchiveV2ValidationException(
+                new EventArchiveV2ProcessingValidationException(
                     someMessage,
                     someInnerException),
 
-                new EventArchiveV2DependencyValidationException(
+                new EventArchiveV2ProcessingDependencyValidationException(
                     someMessage,
                     someInnerException),
             };
@@ -65,11 +71,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
 
             return new TheoryData<Xeption>
             {
-                new EventArchiveV2DependencyException(
+                new EventArchiveV2ProcessingDependencyException(
                     someMessage,
                     someInnerException),
 
-                new EventArchiveV2ServiceException(
+                new EventArchiveV2ProcessingServiceException(
                     someMessage,
                     someInnerException),
             };
@@ -83,11 +89,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
 
             return new TheoryData<Xeption>
             {
-                new ListenerEventArchiveV2ValidationException(
+                new ListenerEventArchiveV2ProcessingValidationException(
                     someMessage,
                     someInnerException),
 
-                new ListenerEventArchiveV2DependencyValidationException(
+                new ListenerEventArchiveV2ProcessingDependencyValidationException(
                     someMessage,
                     someInnerException),
             };
@@ -101,11 +107,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
 
             return new TheoryData<Xeption>
             {
-                new ListenerEventArchiveV2DependencyException(
+                new ListenerEventArchiveV2ProcessingDependencyException(
                     someMessage,
                     someInnerException),
 
-                new ListenerEventArchiveV2ServiceException(
+                new ListenerEventArchiveV2ProcessingServiceException(
                     someMessage,
                     someInnerException),
             };
@@ -119,19 +125,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
 
             return new TheoryData<Xeption>
             {
-                new EventArchiveV2ValidationException(
+                new EventArchiveV2ProcessingValidationException(
                     someMessage,
                     someInnerException),
 
-                new EventArchiveV2DependencyValidationException(
+                new EventArchiveV2ProcessingDependencyValidationException(
                     someMessage,
                     someInnerException),
 
-                new ListenerEventArchiveV2ValidationException(
+                new ListenerEventArchiveV2ProcessingValidationException(
                     someMessage,
                     someInnerException),
 
-                new ListenerEventArchiveV2DependencyValidationException(
+                new ListenerEventArchiveV2ProcessingDependencyValidationException(
                     someMessage,
                     someInnerException),
             };
@@ -145,19 +151,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
 
             return new TheoryData<Xeption>
             {
-                new EventArchiveV2DependencyException(
+                new EventArchiveV2ProcessingDependencyException(
                     someMessage,
                     someInnerException),
 
-                new EventArchiveV2ServiceException(
+                new EventArchiveV2ProcessingServiceException(
                     someMessage,
                     someInnerException),
 
-                new ListenerEventArchiveV2DependencyException(
+                new ListenerEventArchiveV2ProcessingDependencyException(
                     someMessage,
                     someInnerException),
 
-                new ListenerEventArchiveV2ServiceException(
+                new ListenerEventArchiveV2ProcessingServiceException(
                     someMessage,
                     someInnerException),
             };

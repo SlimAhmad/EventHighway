@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
@@ -37,6 +38,16 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         private static void ValidateListenerEventArchiveV2sAreNotNull(EventArchiveV2 eventArchiveV2)
         {
             if (eventArchiveV2.ListenerEventArchiveV2s is null)
+            {
+                throw new NullListenerEventArchiveV2sOrchestrationException(
+                    message: "Listener event archives are null.");
+            }
+        }
+
+        private static void ValidateListenerEventArchiveV2sIsNotNull(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s)
+        {
+            if (listenerEventArchiveV2s is null)
             {
                 throw new NullListenerEventArchiveV2sOrchestrationException(
                     message: "Listener event archives are null.");

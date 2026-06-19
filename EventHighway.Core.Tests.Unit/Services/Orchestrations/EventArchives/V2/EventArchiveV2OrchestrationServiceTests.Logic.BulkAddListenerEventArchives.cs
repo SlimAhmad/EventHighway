@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -14,38 +15,45 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
     public partial class EventArchiveV2OrchestrationServiceTests
     {
         [Fact]
-        public async Task ShouldRetrieveAllListenerEventArchiveV2sAsync()
+        public async Task ShouldBulkAddListenerEventArchiveV2sAsync()
         {
             // given
             IQueryable<ListenerEventArchiveV2> randomListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s();
 
-            IQueryable<ListenerEventArchiveV2> retrievedListenerEventArchiveV2s =
+            IEnumerable<ListenerEventArchiveV2> inputListenerEventArchiveV2s =
                 randomListenerEventArchiveV2s;
 
-            IQueryable<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
-                randomListenerEventArchiveV2s.DeepClone();
+            IEnumerable<ListenerEventArchiveV2> addedListenerEventArchiveV2s =
+                randomListenerEventArchiveV2s;
+
+            IEnumerable<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
+                addedListenerEventArchiveV2s.DeepClone();
 
             this.listenerEventArchiveV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync())
-                    .ReturnsAsync(retrievedListenerEventArchiveV2s);
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    inputListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken))
+                        .ReturnsAsync(addedListenerEventArchiveV2s);
 
             // when
-            IQueryable<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
-                await this.eventArchiveV2OrchestrationService
-                    .RetrieveAllListenerEventArchiveV2sAsync(
-                        TestContext.Current.CancellationToken);
+            IEnumerable<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
+                await this.eventArchiveV2OrchestrationService.BulkAddListenerEventArchiveV2sAsync(
+                    inputListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken);
 
             // then
             actualListenerEventArchiveV2s.Should()
                 .BeEquivalentTo(expectedListenerEventArchiveV2s);
 
             this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(),
-                    Times.Once);
+                service.BulkAddListenerEventArchiveV2sAsync(
+                    inputListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
 
-            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

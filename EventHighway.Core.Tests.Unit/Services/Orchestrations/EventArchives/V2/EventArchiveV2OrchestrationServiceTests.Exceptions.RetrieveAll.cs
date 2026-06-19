@@ -26,7 +26,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     message: "Event archive dependency error occurred, contact support.",
                     innerException: dependencyException.InnerException as Xeption);
 
-            this.eventArchiveV2ServiceMock.Setup(service =>
+            this.eventArchiveV2ProcessingServiceMock.Setup(service =>
                 service.RetrieveAllEventArchiveV2sAsync())
                     .ThrowsAsync(dependencyException);
 
@@ -43,7 +43,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             actualException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2OrchestrationDependencyException);
 
-            this.eventArchiveV2ServiceMock.Verify(service =>
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.RetrieveAllEventArchiveV2sAsync(),
                     Times.Once);
 
@@ -52,8 +52,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     expectedEventArchiveV2OrchestrationDependencyException))),
                         Times.Once);
 
-            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
-            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
