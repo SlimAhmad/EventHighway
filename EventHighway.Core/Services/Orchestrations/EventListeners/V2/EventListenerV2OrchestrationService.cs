@@ -73,6 +73,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventAddressId(eventAddressId);
 
             return await this.eventListenerV2ProcessingService
