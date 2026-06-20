@@ -99,6 +99,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var expectedEventV2CoordinationDependencyException =
                 new EventV2CoordinationDependencyException(
                     message: "Event dependency error occurred, contact support.",
@@ -106,13 +109,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ThrowsAsync(dependencyException);
 
             // when
             ValueTask fireScheduledPendingEventV2sTask =
                 this.eventV2CoordinationService.FireScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2CoordinationDependencyException
                 actualEventV2CoordinationDependencyException =
@@ -125,7 +128,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
