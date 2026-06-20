@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
@@ -25,6 +26,24 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V2
             try
             {
                 return await returningEventListenerV2sFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventListenerV2Exception =
+                    new TimeoutEventListenerV2Exception(
+                        message: "Failed event listener timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventListenerV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (SqlException sqlException)
             {
@@ -56,6 +75,24 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V2
             try
             {
                 return await returningEventListenerV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventListenerV2Exception =
+                    new TimeoutEventListenerV2Exception(
+                        message: "Failed event listener timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventListenerV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (InvalidEventListenerV2Exception invalidEventListenerV2Exception)
             {
