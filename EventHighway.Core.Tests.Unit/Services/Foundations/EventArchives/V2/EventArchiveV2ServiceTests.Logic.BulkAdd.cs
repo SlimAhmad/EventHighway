@@ -31,6 +31,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             List<EventArchiveV2> expectedEventArchiveV2s =
                 inputEventArchiveV2s.Select(item => item.DeepClone()).ToList();
 
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllEventArchiveV2sAsync())
+                    .ReturnsAsync(new List<EventArchiveV2>().AsQueryable());
+
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
                     .ReturnsAsync(randomDateTime);
@@ -66,9 +70,86 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     Times.Exactly(inputEventArchiveV2s.Count + 1));
 
             this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllEventArchiveV2sAsync(),
+                    Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
                 broker.BulkInsertEventArchiveV2sAsync(
                     It.Is<List<EventArchiveV2>>(actual =>
                         SameEventArchiveV2sAs(expectedEventArchiveV2s, actual)),
+                            It.IsAny<CancellationToken>()),
+                                Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldBulkAddOnlyNonExistingEventArchiveV2sAndReturnAllAsync()
+        {
+            // given
+            DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
+
+            List<EventArchiveV2> existingEventArchiveV2s =
+                CreateRandomEventArchiveV2s().ToList();
+
+            List<EventArchiveV2> newEventArchiveV2s =
+                CreateRandomEventArchiveV2s().ToList();
+
+            List<EventArchiveV2> inputEventArchiveV2s =
+                existingEventArchiveV2s.Concat(newEventArchiveV2s).ToList();
+
+            IQueryable<EventArchiveV2> storedEventArchiveV2s =
+                existingEventArchiveV2s.AsQueryable();
+
+            List<EventArchiveV2> expectedItemsToBulkAdd =
+                newEventArchiveV2s.Select(item => item.DeepClone()).ToList();
+
+            foreach (EventArchiveV2 item in expectedItemsToBulkAdd)
+            {
+                item.ArchivedDate = randomDateTime;
+            }
+
+            List<EventArchiveV2> expectedEventArchiveV2s =
+                existingEventArchiveV2s.Concat(expectedItemsToBulkAdd).ToList();
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllEventArchiveV2sAsync())
+                    .ReturnsAsync(storedEventArchiveV2s);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTime);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.BulkInsertEventArchiveV2sAsync(
+                    It.Is<List<EventArchiveV2>>(actual =>
+                        SameEventArchiveV2sAs(expectedItemsToBulkAdd, actual)),
+                            It.IsAny<CancellationToken>()))
+                                .Returns(ValueTask.CompletedTask);
+
+            // when
+            IEnumerable<EventArchiveV2> actualEventArchiveV2s =
+                await this.eventArchiveV2Service.BulkAddEventArchiveV2sAsync(
+                    inputEventArchiveV2s,
+                        TestContext.Current.CancellationToken);
+
+            // then
+            actualEventArchiveV2s.Should().BeEquivalentTo(expectedEventArchiveV2s);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllEventArchiveV2sAsync(),
+                    Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Exactly(newEventArchiveV2s.Count + 1));
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.BulkInsertEventArchiveV2sAsync(
+                    It.Is<List<EventArchiveV2>>(actual =>
+                        SameEventArchiveV2sAs(expectedItemsToBulkAdd, actual)),
                             It.IsAny<CancellationToken>()),
                                 Times.Once);
 
@@ -111,6 +192,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 key: nameof(EventArchiveV2.Id),
                 value: "Required");
 
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllEventArchiveV2sAsync())
+                    .ReturnsAsync(new List<EventArchiveV2>().AsQueryable());
+
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
                     .ReturnsAsync(randomDateTime);
@@ -139,6 +224,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     invalidEventArchiveV2Exception))),
                         Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllEventArchiveV2sAsync(),
+                    Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.BulkInsertEventArchiveV2sAsync(

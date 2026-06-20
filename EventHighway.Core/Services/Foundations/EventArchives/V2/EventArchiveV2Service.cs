@@ -11,6 +11,7 @@ using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Foundations.EventArchives.V2
 {
@@ -84,29 +85,50 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
         TryCatch(async () =>
         {
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
-            List<EventArchiveV2> validItems = new List<EventArchiveV2>();
+
+            IEnumerable<Guid> incomingIds =
+                eventArchiveV2s.Select(eventArchiveV2 => eventArchiveV2.Id).ToList();
+
+            IQueryable<EventArchiveV2> storedEventArchiveV2s =
+                await this.storageBroker.SelectAllEventArchiveV2sAsync();
+
+            List<EventArchiveV2> existingItems =
+                storedEventArchiveV2s
+                    .Where(storedEventArchiveV2 => incomingIds.Contains(storedEventArchiveV2.Id))
+                        .ToList();
+
+            var existingIds = existingItems
+                .Select(existingItem => existingItem.Id)
+                    .ToHashSet();
 
             DateTimeOffset archivedDate =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();
 
-            foreach (EventArchiveV2 item in eventArchiveV2s)
+            List<EventArchiveV2> itemsToBulkAdd = new List<EventArchiveV2>();
+
+            foreach (EventArchiveV2 item in eventArchiveV2s
+                .Where(eventArchiveV2 => !existingIds.Contains(eventArchiveV2.Id)))
             {
                 item.ArchivedDate = archivedDate;
 
                 try
                 {
                     await ValidateEventArchiveV2OnAddAsync(item);
-                    validItems.Add(item);
+                    itemsToBulkAdd.Add(item);
                 }
-                catch (Exception exception)
+                catch (NullEventArchiveV2Exception nullEventArchiveV2Exception)
                 {
-                    await this.loggingBroker.LogErrorAsync(exception);
+                    await this.loggingBroker.LogErrorAsync(nullEventArchiveV2Exception);
+                }
+                catch (InvalidEventArchiveV2Exception invalidEventArchiveV2Exception)
+                {
+                    await this.loggingBroker.LogErrorAsync(invalidEventArchiveV2Exception);
                 }
             }
 
-            await this.storageBroker.BulkInsertEventArchiveV2sAsync(validItems, cancellationToken);
+            await this.storageBroker.BulkInsertEventArchiveV2sAsync(itemsToBulkAdd, cancellationToken);
 
-            return validItems;
+            return existingItems.Concat(itemsToBulkAdd).ToList();
         });
 
         public ValueTask BulkRemoveEventArchiveV2sAsync(

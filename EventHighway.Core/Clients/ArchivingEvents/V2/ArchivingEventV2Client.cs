@@ -108,7 +108,7 @@ namespace EventHighway.Core.Clients.ArchivingEvents.V2
             return new ArchivingEventV2ClientServiceException(
                 message: "Archiving event client service error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
     }
 }

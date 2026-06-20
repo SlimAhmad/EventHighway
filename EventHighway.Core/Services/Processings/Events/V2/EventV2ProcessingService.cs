@@ -63,7 +63,7 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         TryCatch(async () =>
         {
             IQueryable<EventV2> eventV2s =
-                await this.eventV2Service.RetrieveAllEventV2sWithListenerEventV2sAsync();
+                await this.eventV2Service.RetrieveAllEventV2sAsync();
 
             return eventV2s.Where(eventV2 =>
                 eventV2.Type == EventTypeV2.Immediate

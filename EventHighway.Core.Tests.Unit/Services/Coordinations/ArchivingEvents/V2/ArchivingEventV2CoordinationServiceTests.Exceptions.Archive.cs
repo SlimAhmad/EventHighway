@@ -21,16 +21,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 Xeption validationException)
         {
             // given
-            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
             var expectedArchivingEventV2CoordinationDependencyValidationException =
                 new ArchivingEventV2CoordinationDependencyValidationException(
                     message: "Archiving event validation error occurred, fix the errors and try again.",
                     innerException: validationException.InnerException as Xeption);
-
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetDateTimeOffsetAsync())
-                    .ReturnsAsync(randomDateTimeOffset);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync())
@@ -50,10 +45,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             actualArchivingEventV2CoordinationDependencyValidationException.Should()
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyValidationException);
 
-            this.dateTimeBrokerMock.Verify(broker =>
-                broker.GetDateTimeOffsetAsync(),
-                    Times.Once);
-
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(),
                     Times.Once);
@@ -64,7 +55,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
@@ -75,16 +65,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             Xeption dependencyException)
         {
             // given
-            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
             var expectedArchivingEventV2CoordinationDependencyException =
                 new ArchivingEventV2CoordinationDependencyException(
                     message: "Archiving event dependency error occurred, contact support.",
                     innerException: dependencyException.InnerException as Xeption);
-
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetDateTimeOffsetAsync())
-                    .ReturnsAsync(randomDateTimeOffset);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync())
@@ -104,10 +89,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             actualArchivingEventV2CoordinationDependencyException.Should()
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyException);
 
-            this.dateTimeBrokerMock.Verify(broker =>
-                broker.GetDateTimeOffsetAsync(),
-                    Times.Once);
-
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(),
                     Times.Once);
@@ -118,7 +99,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
@@ -127,7 +107,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
         public async Task ShouldThrowServiceExceptionOnArchiveDeadEventV2sIfExceptionOccursAndLogItAsync()
         {
             // given
-            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "UnexpectedError" });
 
@@ -141,10 +120,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 new ArchivingEventV2CoordinationServiceException(
                     message: "Archiving event service error occurred, contact support.",
                     innerException: failedArchivingEventV2CoordinationServiceException);
-
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetDateTimeOffsetAsync())
-                    .ReturnsAsync(randomDateTimeOffset);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync())
@@ -164,10 +139,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             actualArchivingEventV2CoordinationServiceException.Should()
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationServiceException);
 
-            this.dateTimeBrokerMock.Verify(broker =>
-                broker.GetDateTimeOffsetAsync(),
-                    Times.Once);
-
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(),
                     Times.Once);
@@ -178,7 +149,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
