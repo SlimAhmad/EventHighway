@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Processings.EventAddresses.V2.Exceptions;
@@ -26,12 +27,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                     innerException: dependencyException.InnerException as Xeption);
 
             this.eventAddressV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventAddressV2sAsync())
+                service.RetrieveAllEventAddressV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dependencyException);
 
             // when
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             ValueTask<IQueryable<EventAddressV2>> retrieveAllTask =
-                this.eventAddressV2ProcessingService.RetrieveAllEventAddressV2sAsync();
+                this.eventAddressV2ProcessingService
+                    .RetrieveAllEventAddressV2sAsync(randomCancellationToken);
 
             EventAddressV2ProcessingDependencyException actualException =
                 await Assert.ThrowsAsync<EventAddressV2ProcessingDependencyException>(
@@ -42,7 +47,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                 .BeEquivalentTo(expectedEventAddressV2ProcessingDependencyException);
 
             this.eventAddressV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventAddressV2sAsync(),
+                service.RetrieveAllEventAddressV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

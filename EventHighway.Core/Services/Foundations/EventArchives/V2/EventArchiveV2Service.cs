@@ -41,18 +41,21 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             return await this.storageBroker.InsertEventArchiveV2Async(eventArchiveV2, cancellationToken);
         });
 
-        public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync() =>
+        public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            return await this.storageBroker.SelectAllEventArchiveV2sAsync();
+            return await this.storageBroker.SelectAllEventArchiveV2sAsync(cancellationToken);
         });
 
         public ValueTask<IQueryable<EventArchiveV2>>
-            RetrieveAllEventArchiveV2sWithEventListenerArchiveV2sAndListenerEventArchiveV2sAsync() =>
+            RetrieveAllEventArchiveV2sWithEventListenerArchiveV2sAndListenerEventArchiveV2sAsync(
+                CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             return await this.storageBroker
-                .SelectAllEventArchiveV2sWithEventListenerArchiveV2sAndListenerEventArchiveV2sAsync();
+                .SelectAllEventArchiveV2sWithEventListenerArchiveV2sAndListenerEventArchiveV2sAsync(
+                    cancellationToken);
         });
 
         public ValueTask<EventArchiveV2> RetrieveEventArchiveV2ByIdAsync(
@@ -90,7 +93,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
                 eventArchiveV2s.Select(eventArchiveV2 => eventArchiveV2.Id).ToList();
 
             IQueryable<EventArchiveV2> storedEventArchiveV2s =
-                await this.storageBroker.SelectAllEventArchiveV2sAsync();
+                await this.storageBroker.SelectAllEventArchiveV2sAsync(cancellationToken);
 
             List<EventArchiveV2> existingItems =
                 storedEventArchiveV2s

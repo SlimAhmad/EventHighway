@@ -38,12 +38,13 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
-            await this.eventV2ProcessingService.RetrieveAllEventV2sAsync());
+            await this.eventV2ProcessingService.RetrieveAllEventV2sAsync(cancellationToken));
 
         public ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
-            await this.eventAddressV2ProcessingService.RetrieveAllEventAddressV2sAsync());
+            await this.eventAddressV2ProcessingService
+                .RetrieveAllEventAddressV2sAsync(cancellationToken));
 
         public ValueTask<EventV2> SubmitEventV2Async(
             EventV2 eventV2,
@@ -71,7 +72,7 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         TryCatch(async () =>
         {
             return await this.eventV2ProcessingService
-                .RetrieveScheduledPendingEventV2sAsync();
+                .RetrieveScheduledPendingEventV2sAsync(cancellationToken);
         });
 
         public ValueTask<EventV2> MarkEventV2AsImmediateAsync(

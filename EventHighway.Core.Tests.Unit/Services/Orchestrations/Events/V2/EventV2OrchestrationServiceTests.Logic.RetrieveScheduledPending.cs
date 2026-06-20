@@ -28,7 +28,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                 .DeepClone();
 
             this.eventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveScheduledPendingEventV2sAsync())
+                service.RetrieveScheduledPendingEventV2sAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedEventV2s);
 
             // when
@@ -41,7 +41,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
             actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.RetrieveScheduledPendingEventV2sAsync(),
+                service.RetrieveScheduledPendingEventV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();

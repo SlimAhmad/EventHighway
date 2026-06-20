@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -18,6 +19,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldRetrieveBatchOfDeadEventV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
             BatchConfiguration retrievedBatchConfiguration = randomBatchConfiguration;
             int inputTake = retrievedBatchConfiguration.BatchSizeForBulkProcessing;
@@ -31,13 +35,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     .Returns(retrievedBatchConfiguration);
 
             this.eventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync())
+                service.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedEventV2s);
 
             // when
             IEnumerable<EventV2> actualEventV2s =
                 await this.archivingEventV2OrchestrationService
-                    .RetrieveBatchOfDeadEventV2sAsync();
+                    .RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken);
 
             // then
             actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
@@ -47,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     Times.Once);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                service.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken),
                     Times.Once);
 
             this.configurationBrokerMock.VerifyNoOtherCalls();
@@ -60,6 +64,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldRetrieveAllDeadEventV2sWhenBatchSizeIsZeroAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var batchConfiguration = new BatchConfiguration
             {
                 BatchSizeForBulkProcessing = 0
@@ -74,13 +81,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     .Returns(batchConfiguration);
 
             this.eventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync())
+                service.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedEventV2s);
 
             // when
             IEnumerable<EventV2> actualEventV2s =
                 await this.archivingEventV2OrchestrationService
-                    .RetrieveBatchOfDeadEventV2sAsync();
+                    .RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken);
 
             // then
             actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
@@ -90,7 +97,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     Times.Once);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                service.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken),
                     Times.Once);
 
             this.configurationBrokerMock.VerifyNoOtherCalls();

@@ -43,10 +43,11 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
                 cancellationToken);
         });
 
-        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync() =>
+        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
+            return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync(cancellationToken);
         });
 
         public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
@@ -60,7 +61,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
                 listenerEventArchiveV2s.Select(listenerEventArchiveV2 => listenerEventArchiveV2.Id).ToList();
 
             IQueryable<ListenerEventArchiveV2> storedListenerEventArchiveV2s =
-                await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
+                await this.storageBroker.SelectAllListenerEventArchiveV2sAsync(cancellationToken);
 
             List<ListenerEventArchiveV2> existingItems =
                 storedListenerEventArchiveV2s

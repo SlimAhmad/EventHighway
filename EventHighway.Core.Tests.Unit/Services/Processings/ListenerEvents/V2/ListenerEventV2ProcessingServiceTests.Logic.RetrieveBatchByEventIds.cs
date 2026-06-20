@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using FluentAssertions;
@@ -18,6 +19,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
         public async Task ShouldRetrieveBatchOfListenerEventV2sByEventIdsWithoutTakeAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<Guid> someEventIds =
                 Enumerable.Range(0, GetRandomNumber())
                     .Select(_ => Guid.NewGuid())
@@ -32,19 +36,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 retrievedListenerEventV2s.AsEnumerable();
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds))
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, randomCancellationToken))
                     .ReturnsAsync(retrievedListenerEventV2s);
 
             // when
             IEnumerable<ListenerEventV2> actualListenerEventV2s =
                 await this.listenerEventV2ProcessingService
-                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, inputTake);
+                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, inputTake, randomCancellationToken);
 
             // then
             actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds),
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, randomCancellationToken),
                     Times.Once);
 
             this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
@@ -55,6 +59,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
         public async Task ShouldRetrieveBatchOfListenerEventV2sByEventIdsWithTakeAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<Guid> someEventIds =
                 Enumerable.Range(0, GetRandomNumber())
                     .Select(_ => Guid.NewGuid())
@@ -70,19 +77,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 retrievedListenerEventV2s.Take(inputTake);
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds))
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, randomCancellationToken))
                     .ReturnsAsync(retrievedListenerEventV2s);
 
             // when
             IEnumerable<ListenerEventV2> actualListenerEventV2s =
                 await this.listenerEventV2ProcessingService
-                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, inputTake);
+                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, inputTake, randomCancellationToken);
 
             // then
             actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds),
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, randomCancellationToken),
                     Times.Once);
 
             this.listenerEventV2ServiceMock.VerifyNoOtherCalls();

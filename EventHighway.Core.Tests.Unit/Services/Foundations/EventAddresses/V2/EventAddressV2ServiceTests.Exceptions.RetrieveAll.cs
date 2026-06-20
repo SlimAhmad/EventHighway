@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2.Exceptions;
@@ -20,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnRetrieveAllIfSqlExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             SqlException sqlException = CreateSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
@@ -35,12 +39,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
                     innerException: failedStorageEventAddressV2Exception);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllEventAddressV2sAsync())
+                broker.SelectAllEventAddressV2sAsync(randomCancellationToken))
                     .ThrowsAsync(sqlException);
 
             // when
             ValueTask<IQueryable<EventAddressV2>> retrieveAllEventAddressV2sTask =
-                this.eventAddressV2Service.RetrieveAllEventAddressV2sAsync();
+                this.eventAddressV2Service
+                    .RetrieveAllEventAddressV2sAsync(randomCancellationToken);
 
             EventAddressV2DependencyException actualEventAddressV2DependencyException =
                 await Assert.ThrowsAsync<EventAddressV2DependencyException>(
@@ -51,7 +56,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
                 .BeEquivalentTo(expectedEventAddressV2DependencyException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllEventAddressV2sAsync(),
+                broker.SelectAllEventAddressV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -68,6 +73,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowServiceExceptionOnRetrieveAllIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
@@ -83,12 +91,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
                     innerException: failedEventAddressV2ServiceException);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllEventAddressV2sAsync())
+                broker.SelectAllEventAddressV2sAsync(randomCancellationToken))
                     .ThrowsAsync(serviceException);
 
             // when
             ValueTask<IQueryable<EventAddressV2>> retrieveAllEventAddressV2sTask =
-                this.eventAddressV2Service.RetrieveAllEventAddressV2sAsync();
+                this.eventAddressV2Service
+                    .RetrieveAllEventAddressV2sAsync(randomCancellationToken);
 
             EventAddressV2ServiceException actualEventAddressV2ServiceException =
                 await Assert.ThrowsAsync<EventAddressV2ServiceException>(
@@ -99,7 +108,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
                 .BeEquivalentTo(expectedEventAddressV2ServiceException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllEventAddressV2sAsync(),
+                broker.SelectAllEventAddressV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

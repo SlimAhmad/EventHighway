@@ -25,10 +25,11 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<IQueryable<EventListenerV2>> RetrieveAllEventListenerV2sAsync() =>
+        public ValueTask<IQueryable<EventListenerV2>> RetrieveAllEventListenerV2sAsync(
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            return await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync();
+            return await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync(cancellationToken);
         });
 
         public ValueTask<EventListenerV2> AddEventListenerV2Async(
@@ -50,7 +51,7 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             ValidateEventAddressId(eventAddressId);
 
             IQueryable<EventListenerV2> eventListenerV2s =
-                await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync();
+                await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync(cancellationToken);
 
             return eventListenerV2s.Where(eventListenerV2 =>
                 eventListenerV2.EventAddressId == eventAddressId);
@@ -76,7 +77,7 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             ValidateOnRetrieveOrRegisterEventListenerV2(eventListenerV2);
 
             IQueryable<EventListenerV2> allEventListenerV2s =
-                await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync();
+                await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync(cancellationToken);
 
             EventListenerV2 maybeEventListenerV2 =
                 allEventListenerV2s.FirstOrDefault(listener => listener.Id == eventListenerV2.Id);

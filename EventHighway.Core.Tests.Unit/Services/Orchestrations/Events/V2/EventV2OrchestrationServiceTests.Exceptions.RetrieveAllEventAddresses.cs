@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
@@ -25,14 +26,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                     message: "Event dependency error occurred, contact support.",
                     innerException: dependencyException.InnerException as Xeption);
 
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             this.eventAddressV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllEventAddressV2sAsync())
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken))
                     .ThrowsAsync(dependencyException);
 
             // when
             ValueTask<IQueryable<EventAddressV2>> retrieveAllTask =
                 this.eventV2OrchestrationService.RetrieveAllEventAddressV2sAsync(
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2OrchestrationDependencyException actualException =
                 await Assert.ThrowsAsync<EventV2OrchestrationDependencyException>(
@@ -43,7 +47,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                 .BeEquivalentTo(expectedEventV2OrchestrationDependencyException);
 
             this.eventAddressV2ProcessingServiceMock.Verify(service =>
-                service.RetrieveAllEventAddressV2sAsync(),
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

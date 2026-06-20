@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -18,6 +19,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldRetrieveAllDeadEventV2sWithListenersAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<EventV2> randomScheduledEventV2s =
                 CreateRandomEventV2s(
                     dates: GetRandomDateTimeOffset(),
@@ -55,19 +59,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                 randomDeadEventV2s.AsQueryable();
 
             this.eventV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventV2sAsync())
+                service.RetrieveAllEventV2sAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedEventV2s);
 
             // when
             IQueryable<EventV2> actualEventV2s =
                 await this.eventV2ProcessingService
-                    .RetrieveAllDeadEventV2sWithListenersAsync();
+                    .RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken);
 
             // then
             actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
 
             this.eventV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventV2sAsync(),
+                service.RetrieveAllEventV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.eventV2ServiceMock.VerifyNoOtherCalls();

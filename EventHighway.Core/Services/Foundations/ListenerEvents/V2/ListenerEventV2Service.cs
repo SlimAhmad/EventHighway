@@ -40,8 +40,9 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             return await storageBroker.InsertListenerEventV2Async(listenerEventV2, cancellationToken);
         });
 
-        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync() =>
-        TryCatch(async () => await this.storageBroker.SelectAllListenerEventV2sAsync());
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () => await this.storageBroker.SelectAllListenerEventV2sAsync(cancellationToken));
 
         public ValueTask<ListenerEventV2> ModifyListenerEventV2Async(
             ListenerEventV2 listenerEventV2,
@@ -88,13 +89,14 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
         });
 
         public ValueTask<IQueryable<ListenerEventV2>> RetrieveListenerEventV2sByEventIdsAsync(
-            IEnumerable<Guid> eventIds) =>
+            IEnumerable<Guid> eventIds,
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             ValidateEventIdsIsNotNull(eventIds);
 
             IQueryable<ListenerEventV2> listenerEventV2s =
-                await this.storageBroker.SelectAllListenerEventV2sAsync();
+                await this.storageBroker.SelectAllListenerEventV2sAsync(cancellationToken);
 
             return listenerEventV2s.Where(
                 listenerEvent => eventIds.Contains(listenerEvent.EventId));

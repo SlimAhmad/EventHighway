@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Processings.ListenerEvents.V2.Exceptions;
@@ -18,6 +19,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
         public async Task ShouldThrowValidationExceptionOnRetrieveBatchByEventIdsIfParametersAreInvalidAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<Guid> nullEventIds = null;
             int negativeTake = -1;
 
@@ -41,7 +45,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             // when
             ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchByEventIdsTask =
                 this.listenerEventV2ProcessingService
-                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(nullEventIds, negativeTake);
+                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(nullEventIds, negativeTake, randomCancellationToken);
 
             ListenerEventV2ProcessingValidationException
                 actualListenerEventV2ProcessingValidationException =

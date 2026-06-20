@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
@@ -23,6 +24,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                 Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
 
             var expectedArchivingEventV2OrchestrationDependencyValidationException =
@@ -35,13 +39,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     .Returns(randomBatchConfiguration);
 
             this.eventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync())
+                service.RetrieveAllDeadEventV2sWithListenersAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(validationException);
 
             // when
             ValueTask<IEnumerable<EventV2>> retrieveBatchOfDeadEventV2sTask =
                 this.archivingEventV2OrchestrationService
-                    .RetrieveBatchOfDeadEventV2sAsync();
+                    .RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2OrchestrationDependencyValidationException
                 actualArchivingEventV2OrchestrationDependencyValidationException =
@@ -57,7 +61,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     Times.Once);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                service.RetrieveAllDeadEventV2sWithListenersAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -77,6 +81,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
 
             var expectedArchivingEventV2OrchestrationDependencyException =
@@ -89,13 +96,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     .Returns(randomBatchConfiguration);
 
             this.eventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync())
+                service.RetrieveAllDeadEventV2sWithListenersAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dependencyException);
 
             // when
             ValueTask<IEnumerable<EventV2>> retrieveBatchOfDeadEventV2sTask =
                 this.archivingEventV2OrchestrationService
-                    .RetrieveBatchOfDeadEventV2sAsync();
+                    .RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2OrchestrationDependencyException
                 actualArchivingEventV2OrchestrationDependencyException =
@@ -111,7 +118,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     Times.Once);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                service.RetrieveAllDeadEventV2sWithListenersAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -129,6 +136,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldThrowServiceExceptionOnRetrieveBatchOfDeadIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
             var exception = new Exception();
             exception.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -149,13 +159,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     .Returns(randomBatchConfiguration);
 
             this.eventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync())
+                service.RetrieveAllDeadEventV2sWithListenersAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(exception);
 
             // when
             ValueTask<IEnumerable<EventV2>> retrieveBatchOfDeadEventV2sTask =
                 this.archivingEventV2OrchestrationService
-                    .RetrieveBatchOfDeadEventV2sAsync();
+                    .RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2OrchestrationServiceException
                 actualArchivingEventV2OrchestrationServiceException =
@@ -171,7 +181,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     Times.Once);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                service.RetrieveAllDeadEventV2sWithListenersAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

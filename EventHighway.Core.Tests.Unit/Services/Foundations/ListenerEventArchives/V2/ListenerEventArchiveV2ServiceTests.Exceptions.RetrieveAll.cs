@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
@@ -20,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowCriticalDependencyExceptionOnRetrieveAllIfSqlExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             SqlException sqlException = CreateSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
@@ -35,12 +39,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     innerException: failedStorageListenerEventArchiveV2Exception);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync())
+                broker.SelectAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(sqlException);
 
             // when
             ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveAllTask =
-                this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync();
+                this.listenerEventArchiveV2Service
+                    .RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken);
 
             ListenerEventArchiveV2DependencyException actualListenerEventArchiveV2DependencyException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2DependencyException>(
@@ -51,7 +56,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 .BeEquivalentTo(expectedListenerEventArchiveV2DependencyException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync(),
+                broker.SelectAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -68,6 +73,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowServiceExceptionOnRetrieveAllIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
@@ -83,12 +91,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     innerException: failedListenerEventArchiveV2ServiceException);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync())
+                broker.SelectAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(serviceException);
 
             // when
             ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveAllTask =
-                this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync();
+                this.listenerEventArchiveV2Service
+                    .RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken);
 
             ListenerEventArchiveV2ServiceException actualListenerEventArchiveV2ServiceException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2ServiceException>(
@@ -99,7 +108,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 .BeEquivalentTo(expectedListenerEventArchiveV2ServiceException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync(),
+                broker.SelectAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

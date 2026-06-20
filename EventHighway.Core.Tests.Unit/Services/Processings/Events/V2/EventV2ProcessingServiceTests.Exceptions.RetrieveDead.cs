@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
@@ -22,18 +23,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             Xeption eventV2DependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var expectedEventV2ProcessingDependencyException =
                 new EventV2ProcessingDependencyException(
                     message: "Event dependency error occurred, contact support.",
                     innerException: eventV2DependencyException.InnerException as Xeption);
 
             this.eventV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventV2sAsync())
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(eventV2DependencyException);
 
             // when
             ValueTask<IQueryable<EventV2>> retrieveAllDeadEventV2sWithListenersTask =
-                this.eventV2ProcessingService.RetrieveAllDeadEventV2sWithListenersAsync();
+                this.eventV2ProcessingService.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken);
 
             EventV2ProcessingDependencyException actualEventV2ProcessingDependencyException =
                 await Assert.ThrowsAsync<EventV2ProcessingDependencyException>(
@@ -44,7 +48,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                 .BeEquivalentTo(expectedEventV2ProcessingDependencyException);
 
             this.eventV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventV2sAsync(),
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -61,6 +65,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldThrowServiceExceptionOnRetrieveDeadEventsIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
@@ -76,12 +83,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                     innerException: failedEventV2ProcessingServiceException);
 
             this.eventV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventV2sAsync())
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(serviceException);
 
             // when
             ValueTask<IQueryable<EventV2>> retrieveAllDeadEventV2sWithListenersTask =
-                this.eventV2ProcessingService.RetrieveAllDeadEventV2sWithListenersAsync();
+                this.eventV2ProcessingService.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken);
 
             EventV2ProcessingServiceException actualEventV2ProcessingServiceException =
                 await Assert.ThrowsAsync<EventV2ProcessingServiceException>(
@@ -92,7 +99,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                 .BeEquivalentTo(expectedEventV2ProcessingServiceException);
 
             this.eventV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventV2sAsync(),
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

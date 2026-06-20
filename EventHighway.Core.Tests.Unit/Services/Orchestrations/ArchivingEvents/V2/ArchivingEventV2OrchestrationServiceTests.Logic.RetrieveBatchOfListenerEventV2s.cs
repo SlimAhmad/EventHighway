@@ -20,6 +20,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldRetrieveBatchOfListenerEventV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
             BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
             BatchConfiguration retrievedBatchConfiguration = randomBatchConfiguration;
             int inputTake = retrievedBatchConfiguration.BatchSizeForBulkProcessing;
@@ -40,7 +41,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.Setup(service =>
                 service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
                     inputEventV2Ids,
-                    inputTake))
+                    inputTake,
+                    randomCancellationToken))
                         .ReturnsAsync(retrievedListenerEventV2s);
 
             // when
@@ -48,7 +50,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                 await this.archivingEventV2OrchestrationService
                     .RetrieveBatchOfListenerEventV2sAsync(
                         inputEventV2Ids,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
@@ -60,7 +62,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
                 service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
                     inputEventV2Ids,
-                    inputTake),
+                    inputTake,
+                    randomCancellationToken),
                         Times.Once);
 
             this.configurationBrokerMock.VerifyNoOtherCalls();

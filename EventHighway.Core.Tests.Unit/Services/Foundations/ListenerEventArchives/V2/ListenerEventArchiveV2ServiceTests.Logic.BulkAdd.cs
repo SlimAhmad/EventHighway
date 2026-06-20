@@ -21,6 +21,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldBulkAddListenerEventArchiveV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
             DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
             IQueryable<ListenerEventArchiveV2> randomListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s();
@@ -32,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 inputListenerEventArchiveV2s.Select(item => item.DeepClone()).ToList();
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync())
+                broker.SelectAllListenerEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(new List<ListenerEventArchiveV2>().AsQueryable());
 
             this.dateTimeBrokerMock.Setup(broker =>
@@ -55,7 +56,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             IEnumerable<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
                 await this.listenerEventArchiveV2Service.BulkAddListenerEventArchiveV2sAsync(
                     inputListenerEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualListenerEventArchiveV2s.Should().BeEquivalentTo(expectedListenerEventArchiveV2s);
@@ -70,7 +71,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     Times.Exactly(inputListenerEventArchiveV2s.Count + 1));
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync(),
+                broker.SelectAllListenerEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
@@ -89,6 +90,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldBulkAddOnlyNonExistingListenerEventArchiveV2sAndReturnAllAsync()
         {
             // given
+            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
             DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
 
             List<ListenerEventArchiveV2> existingListenerEventArchiveV2s =
@@ -115,7 +117,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 existingListenerEventArchiveV2s.Concat(expectedItemsToBulkAdd).ToList();
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync())
+                broker.SelectAllListenerEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(storedListenerEventArchiveV2s);
 
             this.dateTimeBrokerMock.Setup(broker =>
@@ -133,13 +135,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             IEnumerable<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
                 await this.listenerEventArchiveV2Service.BulkAddListenerEventArchiveV2sAsync(
                     inputListenerEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualListenerEventArchiveV2s.Should().BeEquivalentTo(expectedListenerEventArchiveV2s);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync(),
+                broker.SelectAllListenerEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.dateTimeBrokerMock.Verify(broker =>
@@ -162,6 +164,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldBulkAddValidListenerEventArchiveV2sAndLogInvalidOnesAsync()
         {
             // given
+            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
             DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
 
             List<ListenerEventArchiveV2> validListenerEventArchiveV2s =
@@ -193,7 +196,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 value: "Required");
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync())
+                broker.SelectAllListenerEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(new List<ListenerEventArchiveV2>().AsQueryable());
 
             this.dateTimeBrokerMock.Setup(broker =>
@@ -211,7 +214,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             IEnumerable<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
                 await this.listenerEventArchiveV2Service.BulkAddListenerEventArchiveV2sAsync(
                     inputListenerEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualListenerEventArchiveV2s.Should().BeEquivalentTo(expectedListenerEventArchiveV2s);
@@ -226,7 +229,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllListenerEventArchiveV2sAsync(),
+                broker.SelectAllListenerEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.storageBrokerMock.Verify(broker =>

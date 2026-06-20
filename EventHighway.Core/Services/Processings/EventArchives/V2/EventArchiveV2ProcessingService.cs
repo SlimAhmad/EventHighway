@@ -26,10 +26,11 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync() =>
+        public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            return await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync();
+            return await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync(cancellationToken);
         });
 
         public ValueTask<IEnumerable<EventArchiveV2>> BulkAddEventArchiveV2sAsync(

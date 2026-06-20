@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Processings.EventListeners.V2.Exceptions;
@@ -20,18 +21,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var expectedEventListenerV2ProcessingDependencyException =
                 new EventListenerV2ProcessingDependencyException(
                     message: "Event listener dependency error occurred, contact support.",
                     innerException: dependencyException.InnerException as Xeption);
 
             this.eventListenerV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventListenerV2sAsync())
+                service.RetrieveAllEventListenerV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dependencyException);
 
             // when
             ValueTask<IQueryable<EventListenerV2>> retrieveAllTask =
-                this.eventListenerV2ProcessingService.RetrieveAllEventListenerV2sAsync();
+                this.eventListenerV2ProcessingService.RetrieveAllEventListenerV2sAsync(randomCancellationToken);
 
             EventListenerV2ProcessingDependencyException actualException =
                 await Assert.ThrowsAsync<EventListenerV2ProcessingDependencyException>(
@@ -42,7 +46,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
                 .BeEquivalentTo(expectedEventListenerV2ProcessingDependencyException);
 
             this.eventListenerV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventListenerV2sAsync(),
+                service.RetrieveAllEventListenerV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
