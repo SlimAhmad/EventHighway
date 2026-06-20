@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnAddIfSqlExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
             SqlException sqlException = CreateSqlException();
 
@@ -48,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             ValueTask<EventArchiveV2> addEventArchiveV2Task =
                 this.eventArchiveV2Service.AddEventArchiveV2Async(
                     someEventArchiveV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2DependencyException actualEventArchiveV2DependencyException =
                 await Assert.ThrowsAsync<EventArchiveV2DependencyException>(
