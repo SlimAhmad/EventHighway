@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,6 +55,93 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventV2OrchestrationDependencyException))),
                         Times.Once);
+
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveAllEventV2sIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventV2OrchestrationException =
+                new TimeoutEventV2OrchestrationException(
+                    message: "Failed event orchestration timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventV2OrchestrationDependencyException =
+                new EventV2OrchestrationDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutEventV2OrchestrationException);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IQueryable<EventV2>> retrieveAllEventV2sTask =
+                this.eventV2OrchestrationService.RetrieveAllEventV2sAsync(
+                    TestContext.Current.CancellationToken);
+
+            EventV2OrchestrationDependencyException actualEventV2OrchestrationDependencyException =
+                await Assert.ThrowsAsync<EventV2OrchestrationDependencyException>(
+                    retrieveAllEventV2sTask.AsTask);
+
+            // then
+            actualEventV2OrchestrationDependencyException.Should().BeEquivalentTo(
+                expectedEventV2OrchestrationDependencyException);
+
+            this.eventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveAllEventV2sAsync()
+        {
+            // given
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<IQueryable<EventV2>> retrieveAllEventV2sTask =
+                this.eventV2OrchestrationService.RetrieveAllEventV2sAsync(cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveAllEventV2sTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventV2OrchestrationDependencyException>();
+            actualException.Should().NotBeOfType<EventV2OrchestrationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
 
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
