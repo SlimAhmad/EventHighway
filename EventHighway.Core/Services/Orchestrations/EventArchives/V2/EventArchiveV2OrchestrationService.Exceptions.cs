@@ -72,6 +72,18 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventArchiveV2ProcessingDependencyValidationException);
             }
+            catch (ListenerEventArchiveV2ProcessingValidationException
+                listenerEventArchiveV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingValidationException);
+            }
+            catch (ListenerEventArchiveV2ProcessingDependencyValidationException
+                listenerEventArchiveV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingDependencyValidationException);
+            }
             catch (EventArchiveV2ProcessingDependencyException eventArchiveV2ProcessingDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingDependencyException);
@@ -79,6 +91,18 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             catch (EventArchiveV2ProcessingServiceException eventArchiveV2ProcessingServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingServiceException);
+            }
+            catch (ListenerEventArchiveV2ProcessingDependencyException
+                listenerEventArchiveV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2ProcessingDependencyException);
+            }
+            catch (ListenerEventArchiveV2ProcessingServiceException
+                listenerEventArchiveV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2ProcessingServiceException);
             }
             catch (Exception exception)
             {
