@@ -35,12 +35,15 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return await this.eventV2Service.RetrieveAllEventV2sAsync(cancellationToken);
         });
 
         public ValueTask<EventV2> AddEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2IsNotNull(eventV2);
 
             return await this.eventV2Service.AddEventV2Async(eventV2, cancellationToken);
@@ -50,6 +53,8 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             IQueryable<EventV2> eventV2s =
                 await this.eventV2Service.RetrieveAllEventV2sAsync(cancellationToken);
 
@@ -65,6 +70,8 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             IQueryable<EventV2> eventV2s =
                 await this.eventV2Service.RetrieveAllEventV2sAsync(cancellationToken);
 
@@ -79,6 +86,7 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2IsNotNull(eventV2);
 
             return await SetEventV2AsImmediateAsync(eventV2, cancellationToken);
@@ -88,6 +96,7 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             Guid eventV2Id, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2Id(eventV2Id);
 
             return await this.eventV2Service.RemoveEventV2ByIdAsync(
@@ -99,6 +108,7 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2sIsNotNull(eventV2s);
 
             await this.eventV2Service.BulkRemoveEventV2sAsync(eventV2s, cancellationToken);

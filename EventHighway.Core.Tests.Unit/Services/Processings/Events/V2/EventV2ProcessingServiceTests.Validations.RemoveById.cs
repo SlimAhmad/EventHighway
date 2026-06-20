@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfIdIsInvalidAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid invalidEventV2Id = Guid.Empty;
@@ -41,7 +41,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                 this.eventV2ProcessingService
                     .RemoveEventV2ByIdAsync(
                         invalidEventV2Id,
-                        cancellationToken);
+                        randomCancellationToken);
 
             EventV2ProcessingValidationException
                 actualEventV2ProcessingValidationException =

@@ -17,25 +17,28 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldBulkRemoveEventV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<EventV2> randomEventV2s = CreateRandomEventV2s();
             IEnumerable<EventV2> inputEventV2s = randomEventV2s;
 
             this.eventV2ServiceMock.Setup(service =>
                 service.BulkRemoveEventV2sAsync(
                     inputEventV2s,
-                    It.IsAny<CancellationToken>()))
+                    randomCancellationToken))
                         .Returns(ValueTask.CompletedTask);
 
             // when
             await this.eventV2ProcessingService.BulkRemoveEventV2sAsync(
                 inputEventV2s,
-                TestContext.Current.CancellationToken);
+                randomCancellationToken);
 
             // then
             this.eventV2ServiceMock.Verify(service =>
                 service.BulkRemoveEventV2sAsync(
                     inputEventV2s,
-                    It.IsAny<CancellationToken>()),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventV2ServiceMock.VerifyNoOtherCalls();

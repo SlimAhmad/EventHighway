@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldThrowValidationExceptionOnBulkRemoveIfEventV2sIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<EventV2> nullEventV2s = null;
 
             var nullEventV2ProcessingException =
@@ -31,7 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             ValueTask bulkRemoveEventV2sTask =
                 this.eventV2ProcessingService.BulkRemoveEventV2sAsync(
                     nullEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2ProcessingValidationException actualEventV2ProcessingValidationException =
                 await Assert.ThrowsAsync<EventV2ProcessingValidationException>(
@@ -49,7 +53,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.eventV2ServiceMock.Verify(service =>
                 service.BulkRemoveEventV2sAsync(
                     It.IsAny<IEnumerable<EventV2>>(),
-                    It.IsAny<System.Threading.CancellationToken>()),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2.Exceptions;
@@ -24,6 +25,31 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2ProcessingException =
+                    new TimeoutEventV2ProcessingException(
+                        message: "Failed event processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2ProcessingDependencyException =
+                    new EventV2ProcessingDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2ProcessingDependencyException);
+
+                throw eventV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventV2ProcessingException nullEventV2ProcessingException)
             {
@@ -63,6 +89,31 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             {
                 return await returningEventV2sFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2ProcessingException =
+                    new TimeoutEventV2ProcessingException(
+                        message: "Failed event processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2ProcessingDependencyException =
+                    new EventV2ProcessingDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2ProcessingDependencyException);
+
+                throw eventV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (EventV2DependencyException eventV2DependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventV2DependencyException);
@@ -88,6 +139,31 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             try
             {
                 return await returningEventV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2ProcessingException =
+                    new TimeoutEventV2ProcessingException(
+                        message: "Failed event processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2ProcessingDependencyException =
+                    new EventV2ProcessingDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2ProcessingDependencyException);
+
+                throw eventV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventV2ProcessingException nullEventV2ProcessingException)
             {
