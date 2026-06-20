@@ -1,10 +1,11 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -28,6 +29,24 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             try
             {
                 return await returningListenerEventArchiveV2sFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventArchiveV2Exception =
+                    new TimeoutListenerEventArchiveV2Exception(
+                        message: "Failed listener event archive timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutListenerEventArchiveV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (SqlException sqlException)
             {
@@ -59,6 +78,24 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             try
             {
                 return await returningListenerEventArchiveV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventArchiveV2Exception =
+                    new TimeoutListenerEventArchiveV2Exception(
+                        message: "Failed listener event archive timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutListenerEventArchiveV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullListenerEventArchiveV2Exception nullListenerEventArchiveV2Exception)
             {
@@ -145,6 +182,24 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             {
                 return await returningEnumrableListenerEventArchiveV2sFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventArchiveV2Exception =
+                    new TimeoutListenerEventArchiveV2Exception(
+                        message: "Failed listener event archive timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutListenerEventArchiveV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (NullListenerEventArchiveV2Exception nullListenerEventArchiveV2Exception)
             {
                 throw await CreateAndLogValidationExceptionAsync(
@@ -179,6 +234,24 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventArchiveV2Exception =
+                    new TimeoutListenerEventArchiveV2Exception(
+                        message: "Failed listener event archive timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutListenerEventArchiveV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullListenerEventArchiveV2Exception nullListenerEventArchiveV2Exception)
             {
