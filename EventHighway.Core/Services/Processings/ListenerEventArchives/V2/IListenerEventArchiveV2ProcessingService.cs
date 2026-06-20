@@ -13,7 +13,8 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
 {
     internal interface IListenerEventArchiveV2ProcessingService
     {
-        ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync();
+        ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default);
 
         ValueTask<ListenerEventArchiveV2> AddListenerEventArchiveV2Async(
             ListenerEventArchiveV2 listenerEventArchiveV2,

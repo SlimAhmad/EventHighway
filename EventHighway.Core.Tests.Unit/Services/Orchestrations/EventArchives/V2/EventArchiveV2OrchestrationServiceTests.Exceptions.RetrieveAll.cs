@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
@@ -27,7 +28,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     innerException: dependencyException.InnerException as Xeption);
 
             this.eventArchiveV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllEventArchiveV2sAsync())
+                service.RetrieveAllEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dependencyException);
 
             // when
@@ -44,7 +45,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 .BeEquivalentTo(expectedEventArchiveV2OrchestrationDependencyException);
 
             this.eventArchiveV2ProcessingServiceMock.Verify(service =>
-                service.RetrieveAllEventArchiveV2sAsync(),
+                service.RetrieveAllEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

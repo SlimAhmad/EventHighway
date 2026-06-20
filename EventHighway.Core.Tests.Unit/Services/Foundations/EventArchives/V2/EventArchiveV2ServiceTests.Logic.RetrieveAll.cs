@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using FluentAssertions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldRetrieveAllEventArchiveV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<EventArchiveV2> randomEventArchiveV2s =
                 CreateRandomEventArchiveV2s();
 
@@ -27,20 +31,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 randomEventArchiveV2s.DeepClone();
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllEventArchiveV2sAsync())
+                broker.SelectAllEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedEventArchiveV2s);
 
             // when
             IQueryable<EventArchiveV2> actualEventArchiveV2s =
                 await this.eventArchiveV2Service
-                    .RetrieveAllEventArchiveV2sAsync();
+                    .RetrieveAllEventArchiveV2sAsync(randomCancellationToken);
 
             // then
             actualEventArchiveV2s.Should().BeEquivalentTo(
                 expectedEventArchiveV2s);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllEventArchiveV2sAsync(),
+                broker.SelectAllEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();

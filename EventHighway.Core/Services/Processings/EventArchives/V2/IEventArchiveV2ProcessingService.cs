@@ -12,7 +12,8 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
 {
     public interface IEventArchiveV2ProcessingService
     {
-        ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync();
+        ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default);
 
         ValueTask<EventArchiveV2> AddEventArchiveV2Async(
             EventArchiveV2 eventArchiveV2,

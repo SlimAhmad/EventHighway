@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Processings.ListenerEventArchives.V2.Exceptions;
@@ -20,18 +21,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var expectedListenerEventArchiveV2ProcessingDependencyException =
                 new ListenerEventArchiveV2ProcessingDependencyException(
                     message: "Listener event archive dependency error occurred, contact support.",
                     innerException: dependencyException.InnerException as Xeption);
 
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync())
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dependencyException);
 
             // when
             ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveAllTask =
-                this.listenerEventArchiveV2ProcessingService.RetrieveAllListenerEventArchiveV2sAsync();
+                this.listenerEventArchiveV2ProcessingService
+                    .RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken);
 
             ListenerEventArchiveV2ProcessingDependencyException actualException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2ProcessingDependencyException>(
@@ -42,7 +47,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 .BeEquivalentTo(expectedListenerEventArchiveV2ProcessingDependencyException);
 
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(),
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

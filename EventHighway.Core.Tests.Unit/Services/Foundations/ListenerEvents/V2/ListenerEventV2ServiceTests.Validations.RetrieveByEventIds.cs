@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2.Exceptions;
@@ -19,6 +20,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowValidationExceptionOnRetrieveByEventIdsIfEventIdsIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<Guid> nullEventIds = null;
 
             var nullListenerEventV2Exception =
@@ -33,7 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             // when
             ValueTask<IQueryable<ListenerEventV2>> retrieveByEventIdsTask =
                 this.listenerEventV2Service
-                    .RetrieveListenerEventV2sByEventIdsAsync(nullEventIds);
+                    .RetrieveListenerEventV2sByEventIdsAsync(nullEventIds, randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(

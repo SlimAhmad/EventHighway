@@ -46,7 +46,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             do
             {
                 deadEventV2s = await this.archivingEventV2OrchestrationService
-                    .RetrieveBatchOfDeadEventV2sAsync();
+                    .RetrieveBatchOfDeadEventV2sAsync(cancellationToken);
 
                 IEnumerable<EventV2> pendingDeadEventV2s =
                     deadEventV2s.Where(eventV2 =>

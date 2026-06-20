@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2.Exceptions;
@@ -20,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnRetrieveAllIfSqlExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             SqlException sqlException = GetSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
 
@@ -35,12 +39,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
                     innerException: failedStorageEventListenerV2Exception);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllEventListenerV2sAsync())
+                broker.SelectAllEventListenerV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(sqlException);
 
             // when
             ValueTask<IQueryable<EventListenerV2>> retrieveAllEventListenerV2sTask =
-                this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync();
+                this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync(randomCancellationToken);
 
             EventListenerV2DependencyException actualEventListenerV2DependencyException =
                 await Assert.ThrowsAsync<EventListenerV2DependencyException>(
@@ -51,7 +55,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
                 .BeEquivalentTo(expectedEventListenerV2DependencyException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllEventListenerV2sAsync(),
+                broker.SelectAllEventListenerV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -67,6 +71,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldThrowServiceExceptionOnRetrieveAllIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
@@ -82,12 +89,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
                     innerException: failedEventListenerV2ServiceException);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllEventListenerV2sAsync())
+                broker.SelectAllEventListenerV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(serviceException);
 
             // when
             ValueTask<IQueryable<EventListenerV2>> retrieveAllEventListenerV2sTask =
-                this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync();
+                this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync(randomCancellationToken);
 
             EventListenerV2ServiceException actualEventListenerV2ServiceException =
                 await Assert.ThrowsAsync<EventListenerV2ServiceException>(
@@ -98,7 +105,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
                 .BeEquivalentTo(expectedEventListenerV2ServiceException);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllEventListenerV2sAsync(),
+                broker.SelectAllEventListenerV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

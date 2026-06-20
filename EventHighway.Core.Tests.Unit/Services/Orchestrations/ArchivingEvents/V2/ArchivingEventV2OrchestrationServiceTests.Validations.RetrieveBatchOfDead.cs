@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
@@ -18,6 +19,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldThrowValidationExceptionOnRetrieveBatchOfDeadIfTakeIsInvalidAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var invalidBatchConfiguration = new BatchConfiguration
             {
                 BatchSizeForBulkProcessing = -1 * GetRandomNumber()
@@ -43,7 +47,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             // when
             ValueTask<IEnumerable<EventV2>> retrieveBatchOfDeadEventV2sTask =
                 this.archivingEventV2OrchestrationService
-                    .RetrieveBatchOfDeadEventV2sAsync();
+                    .RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2OrchestrationValidationException
                 actualArchivingEventV2OrchestrationValidationException =

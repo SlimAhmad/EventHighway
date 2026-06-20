@@ -36,7 +36,8 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<IEnumerable<EventV2>> RetrieveBatchOfDeadEventV2sAsync() =>
+        public ValueTask<IEnumerable<EventV2>> RetrieveBatchOfDeadEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             BatchConfiguration batchConfiguration =
@@ -46,7 +47,7 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 
             IQueryable<EventV2> deadEventV2s =
                 await this.eventV2ProcessingService
-                    .RetrieveAllDeadEventV2sWithListenersAsync();
+                    .RetrieveAllDeadEventV2sWithListenersAsync(cancellationToken);
 
             int take = batchConfiguration.BatchSizeForBulkProcessing;
 
@@ -68,7 +69,7 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             int take = batchConfiguration.BatchSizeForBulkProcessing;
 
             return await this.listenerEventV2ProcessingService
-                .RetrieveBatchOfListenerEventV2sByEventIdsAsync(eventV2Ids, take);
+                .RetrieveBatchOfListenerEventV2sByEventIdsAsync(eventV2Ids, take, cancellationToken);
         });
 
         public ValueTask BulkRemoveListenerEventV2sAsync(

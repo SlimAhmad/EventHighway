@@ -34,7 +34,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
                 inputEventListenerV2.DeepClone();
 
             this.eventListenerV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventListenerV2sAsync())
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedEventListenerV2s);
 
             // when
@@ -49,7 +49,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
                 expectedEventListenerV2);
 
             this.eventListenerV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventListenerV2sAsync(),
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.eventListenerV2ServiceMock.VerifyNoOtherCalls();
@@ -79,7 +79,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
                 Enumerable.Empty<EventListenerV2>().AsQueryable();
 
             this.eventListenerV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventListenerV2sAsync())
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken))
                     .ReturnsAsync(emptyEventListenerV2s);
 
             this.eventListenerV2ServiceMock.Setup(service =>
@@ -100,7 +100,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
                 expectedEventListenerV2);
 
             this.eventListenerV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventListenerV2sAsync(),
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.eventListenerV2ServiceMock.Verify(service =>

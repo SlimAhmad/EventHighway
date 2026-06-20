@@ -31,9 +31,11 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync() =>
+        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default) =>
             TryCatch(async () =>
-                await this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync());
+                await this.listenerEventArchiveV2Service
+                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken));
 
         public ValueTask<ListenerEventArchiveV2> AddListenerEventArchiveV2Async(
             ListenerEventArchiveV2 listenerEventArchiveV2,
@@ -54,7 +56,8 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             ValidateOnRetrieveNextPurgeBatchOfArchivedEventV2s(olderThan, batchConfiguration);
 
             IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2 =
-                await this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync();
+                await this.listenerEventArchiveV2Service
+                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
 
             listenerEventArchiveV2 = FilterListenerEventArchiveV2sOlderThan(
                 olderThan, listenerEventArchiveV2);

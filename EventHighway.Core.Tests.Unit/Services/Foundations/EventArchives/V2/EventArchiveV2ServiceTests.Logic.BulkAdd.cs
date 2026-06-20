@@ -21,6 +21,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldBulkAddEventArchiveV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
             DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
             IQueryable<EventArchiveV2> randomEventArchiveV2s =
                 CreateRandomEventArchiveV2s();
@@ -32,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 inputEventArchiveV2s.Select(item => item.DeepClone()).ToList();
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllEventArchiveV2sAsync())
+                broker.SelectAllEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(new List<EventArchiveV2>().AsQueryable());
 
             this.dateTimeBrokerMock.Setup(broker =>
@@ -55,7 +56,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             IEnumerable<EventArchiveV2> actualEventArchiveV2s =
                 await this.eventArchiveV2Service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventArchiveV2s.Should().BeEquivalentTo(expectedEventArchiveV2s);
@@ -70,7 +71,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     Times.Exactly(inputEventArchiveV2s.Count + 1));
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllEventArchiveV2sAsync(),
+                broker.SelectAllEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
@@ -89,6 +90,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldBulkAddOnlyNonExistingEventArchiveV2sAndReturnAllAsync()
         {
             // given
+            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
             DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
 
             List<EventArchiveV2> existingEventArchiveV2s =
@@ -115,7 +117,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 existingEventArchiveV2s.Concat(expectedItemsToBulkAdd).ToList();
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllEventArchiveV2sAsync())
+                broker.SelectAllEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(storedEventArchiveV2s);
 
             this.dateTimeBrokerMock.Setup(broker =>
@@ -133,13 +135,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             IEnumerable<EventArchiveV2> actualEventArchiveV2s =
                 await this.eventArchiveV2Service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventArchiveV2s.Should().BeEquivalentTo(expectedEventArchiveV2s);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllEventArchiveV2sAsync(),
+                broker.SelectAllEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.dateTimeBrokerMock.Verify(broker =>
@@ -162,6 +164,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldBulkAddValidEventArchiveV2sAndLogInvalidOnesAsync()
         {
             // given
+            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
             DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
 
             List<EventArchiveV2> validEventArchiveV2s =
@@ -193,7 +196,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 value: "Required");
 
             this.storageBrokerMock.Setup(broker =>
-                broker.SelectAllEventArchiveV2sAsync())
+                broker.SelectAllEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(new List<EventArchiveV2>().AsQueryable());
 
             this.dateTimeBrokerMock.Setup(broker =>
@@ -211,7 +214,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             IEnumerable<EventArchiveV2> actualEventArchiveV2s =
                 await this.eventArchiveV2Service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventArchiveV2s.Should().BeEquivalentTo(expectedEventArchiveV2s);
@@ -226,7 +229,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.SelectAllEventArchiveV2sAsync(),
+                broker.SelectAllEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.storageBrokerMock.Verify(broker =>

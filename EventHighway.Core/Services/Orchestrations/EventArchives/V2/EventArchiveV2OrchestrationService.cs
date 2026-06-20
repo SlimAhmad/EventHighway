@@ -34,12 +34,14 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
-            await this.eventArchiveV2ProcessingService.RetrieveAllEventArchiveV2sAsync());
+            await this.eventArchiveV2ProcessingService
+                .RetrieveAllEventArchiveV2sAsync(cancellationToken));
 
         public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
-            await this.listenerEventArchiveV2ProcessingService.RetrieveAllListenerEventArchiveV2sAsync());
+            await this.listenerEventArchiveV2ProcessingService
+                .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken));
 
         public ValueTask AddEventArchiveV2WithListenerEventArchiveV2sAsync(
             EventArchiveV2 eventArchiveV2,

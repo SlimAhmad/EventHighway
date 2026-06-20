@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
@@ -41,7 +42,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.Setup(service =>
                 service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
                     It.IsAny<IEnumerable<Guid>>(),
-                    It.IsAny<int>()))
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(validationException);
 
             // when
@@ -67,7 +69,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
                 service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
                     It.IsAny<IEnumerable<Guid>>(),
-                    It.IsAny<int>()),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -105,7 +108,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.Setup(service =>
                 service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
                     It.IsAny<IEnumerable<Guid>>(),
-                    It.IsAny<int>()))
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(dependencyException);
 
             // when
@@ -131,7 +135,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
                 service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
                     It.IsAny<IEnumerable<Guid>>(),
-                    It.IsAny<int>()),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -175,7 +180,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.Setup(service =>
                 service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
                     It.IsAny<IEnumerable<Guid>>(),
-                    It.IsAny<int>()))
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(exception);
 
             // when
@@ -201,7 +207,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
                 service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
                     It.IsAny<IEnumerable<Guid>>(),
-                    It.IsAny<int>()),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

@@ -31,10 +31,11 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync() =>
+        public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            return await this.eventV2Service.RetrieveAllEventV2sAsync();
+            return await this.eventV2Service.RetrieveAllEventV2sAsync(cancellationToken);
         });
 
         public ValueTask<EventV2> AddEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
@@ -45,11 +46,12 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             return await this.eventV2Service.AddEventV2Async(eventV2, cancellationToken);
         });
 
-        public ValueTask<IQueryable<EventV2>> RetrieveScheduledPendingEventV2sAsync() =>
+        public ValueTask<IQueryable<EventV2>> RetrieveScheduledPendingEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             IQueryable<EventV2> eventV2s =
-                await this.eventV2Service.RetrieveAllEventV2sAsync();
+                await this.eventV2Service.RetrieveAllEventV2sAsync(cancellationToken);
 
             DateTimeOffset now =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();
@@ -59,11 +61,12 @@ namespace EventHighway.Core.Services.Processings.Events.V2
                 eventV2.ScheduledDate < now);
         });
 
-        public ValueTask<IQueryable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync() =>
+        public ValueTask<IQueryable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync(
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
             IQueryable<EventV2> eventV2s =
-                await this.eventV2Service.RetrieveAllEventV2sAsync();
+                await this.eventV2Service.RetrieveAllEventV2sAsync(cancellationToken);
 
             return eventV2s.Where(eventV2 =>
                 eventV2.Type == EventTypeV2.Immediate

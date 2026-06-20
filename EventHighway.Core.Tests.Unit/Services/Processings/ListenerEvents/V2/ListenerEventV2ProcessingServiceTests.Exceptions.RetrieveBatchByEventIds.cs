@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Processings.ListenerEvents.V2.Exceptions;
@@ -20,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
         public async Task ShouldThrowServiceExceptionOnRetrieveBatchByEventIdsIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<Guid> someEventIds =
                 Enumerable.Range(0, GetRandomNumber())
                     .Select(_ => Guid.NewGuid())
@@ -40,13 +44,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                     innerException: failedListenerEventV2ProcessingServiceException);
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds))
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, It.IsAny<CancellationToken>()))
                     .ThrowsAsync(serviceException);
 
             // when
             ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchByEventIdsTask =
                 this.listenerEventV2ProcessingService
-                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, someTake);
+                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, someTake, randomCancellationToken);
 
             ListenerEventV2ProcessingServiceException
                 actualListenerEventV2ProcessingServiceException =
@@ -58,7 +62,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 .BeEquivalentTo(expectedListenerEventV2ProcessingServiceException);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds),
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -76,6 +80,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             Xeption listenerEventV2DependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<Guid> someEventIds =
                 Enumerable.Range(0, GetRandomNumber())
                     .Select(_ => Guid.NewGuid())
@@ -89,13 +96,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                     innerException: listenerEventV2DependencyException.InnerException as Xeption);
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds))
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, It.IsAny<CancellationToken>()))
                     .ThrowsAsync(listenerEventV2DependencyException);
 
             // when
             ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchByEventIdsTask =
                 this.listenerEventV2ProcessingService
-                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, someTake);
+                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, someTake, randomCancellationToken);
 
             ListenerEventV2ProcessingDependencyException
                 actualListenerEventV2ProcessingDependencyException =
@@ -107,7 +114,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 .BeEquivalentTo(expectedListenerEventV2ProcessingDependencyException);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds),
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -125,6 +132,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             Xeption listenerEventV2ValidationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<Guid> someEventIds =
                 Enumerable.Range(0, GetRandomNumber())
                     .Select(_ => Guid.NewGuid())
@@ -138,13 +148,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                     innerException: listenerEventV2ValidationException.InnerException as Xeption);
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds))
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, It.IsAny<CancellationToken>()))
                     .ThrowsAsync(listenerEventV2ValidationException);
 
             // when
             ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchByEventIdsTask =
                 this.listenerEventV2ProcessingService
-                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, someTake);
+                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(someEventIds, someTake, randomCancellationToken);
 
             ListenerEventV2ProcessingDependencyValidationException
                 actualListenerEventV2ProcessingDependencyValidationException =
@@ -156,7 +166,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 .BeEquivalentTo(expectedListenerEventV2ProcessingDependencyValidationException);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds),
+                service.RetrieveListenerEventV2sByEventIdsAsync(someEventIds, It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

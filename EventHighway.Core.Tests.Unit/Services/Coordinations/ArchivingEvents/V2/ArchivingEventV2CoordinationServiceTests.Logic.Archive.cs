@@ -99,7 +99,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveBatchOfDeadEventV2sAsync())
+                    service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                         .ReturnsAsync((IEnumerable<EventV2>)retrievedEventV2s);
 
             // Step 3
@@ -160,7 +160,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 9
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveBatchOfDeadEventV2sAsync())
+                    service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Enumerable.Empty<EventV2>());
 
             // when
@@ -169,7 +169,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // then
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfDeadEventV2sAsync(),
+                service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Exactly(2));
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
@@ -346,7 +346,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveBatchOfDeadEventV2sAsync())
+                    service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                         .ReturnsAsync((IEnumerable<EventV2>)retrievedEventV2s);
 
             // Step 3
@@ -400,7 +400,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 9 (faulted event still dead -> returned again, now faulted -> outer breaks)
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveBatchOfDeadEventV2sAsync())
+                    service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                         .ReturnsAsync((IEnumerable<EventV2>)faultedDeadEventV2s);
 
             // when
@@ -409,7 +409,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // then
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfDeadEventV2sAsync(),
+                service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Exactly(2));
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
@@ -576,7 +576,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveBatchOfDeadEventV2sAsync())
+                    service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                         .ReturnsAsync((IEnumerable<EventV2>)retrievedEventV2s);
 
             // Step 3 (one event archive fails -> only clean one added)
@@ -630,7 +630,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 9 (faulted event still dead -> returned again, now faulted -> outer breaks)
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveBatchOfDeadEventV2sAsync())
+                    service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                         .ReturnsAsync((IEnumerable<EventV2>)new List<EventV2> { faultedEventV2 });
 
             // when
@@ -639,7 +639,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // then
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfDeadEventV2sAsync(),
+                service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Exactly(2));
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
@@ -783,7 +783,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveBatchOfDeadEventV2sAsync())
+                    service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                         .ReturnsAsync((IEnumerable<EventV2>)retrievedEventV2s);
 
             // Step 3
@@ -813,7 +813,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 6 (event still dead -> returned again, now faulted -> outer breaks)
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.RetrieveBatchOfDeadEventV2sAsync())
+                    service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                         .ReturnsAsync((IEnumerable<EventV2>)retrievedEventV2s);
 
             // when
@@ -822,7 +822,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // then
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfDeadEventV2sAsync(),
+                service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Exactly(2));
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>

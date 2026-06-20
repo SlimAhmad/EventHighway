@@ -17,7 +17,8 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             ListenerEventV2 listenerEventV2,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync();
+        ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
+            CancellationToken cancellationToken = default);
 
         ValueTask<ListenerEventV2> ModifyListenerEventV2Async(
             ListenerEventV2 listenerEventV2,
@@ -33,6 +34,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
 
         ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
             IEnumerable<Guid> eventIds,
-            int take);
+            int take,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -34,7 +34,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                     innerException: validationException.InnerException as Xeption);
 
             this.eventAddressV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventAddressV2sAsync())
+                service.RetrieveAllEventAddressV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(validationException);
 
             // when
@@ -53,7 +53,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                 expectedEventAddressV2ProcessingDependencyValidationException);
 
             this.eventAddressV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventAddressV2sAsync(),
+                service.RetrieveAllEventAddressV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -83,7 +83,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                     innerException: dependencyException.InnerException as Xeption);
 
             this.eventAddressV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventAddressV2sAsync())
+                service.RetrieveAllEventAddressV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dependencyException);
 
             // when
@@ -102,7 +102,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                 expectedEventAddressV2ProcessingDependencyException);
 
             this.eventAddressV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventAddressV2sAsync(),
+                service.RetrieveAllEventAddressV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -139,7 +139,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                     innerException: failedEventAddressV2ProcessingServiceException);
 
             this.eventAddressV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventAddressV2sAsync())
+                service.RetrieveAllEventAddressV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(serviceException);
 
             // when
@@ -158,7 +158,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                 expectedEventAddressV2ProcessingServiceException);
 
             this.eventAddressV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventAddressV2sAsync(),
+                service.RetrieveAllEventAddressV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
