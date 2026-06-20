@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
 using FluentAssertions;
 using Force.DeepCloner;
 using Moq;
@@ -63,6 +64,81 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
                     Times.Exactly(inputListenerEventArchiveV2s.Count + 1));
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.BulkInsertListenerEventArchiveV2sAsync(
+                    It.Is<List<ListenerEventArchiveV2>>(actual =>
+                        SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s, actual)),
+                            It.IsAny<CancellationToken>()),
+                                Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldBulkAddValidListenerEventArchiveV2sAndLogInvalidOnesAsync()
+        {
+            // given
+            DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
+
+            List<ListenerEventArchiveV2> validListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s().ToList();
+
+            ListenerEventArchiveV2 invalidListenerEventArchiveV2 =
+                CreateRandomListenerEventArchiveV2();
+
+            invalidListenerEventArchiveV2.Id = Guid.Empty;
+
+            List<ListenerEventArchiveV2> inputListenerEventArchiveV2s =
+                validListenerEventArchiveV2s
+                    .Append(invalidListenerEventArchiveV2).ToList();
+
+            List<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
+                validListenerEventArchiveV2s.Select(item => item.DeepClone()).ToList();
+
+            foreach (ListenerEventArchiveV2 item in expectedListenerEventArchiveV2s)
+            {
+                item.ArchivedDate = randomDateTime;
+            }
+
+            var invalidListenerEventArchiveV2Exception =
+                new InvalidListenerEventArchiveV2Exception(
+                    message: "Listener event archive is invalid, fix the errors and try again.");
+
+            invalidListenerEventArchiveV2Exception.UpsertDataList(
+                key: nameof(ListenerEventArchiveV2.Id),
+                value: "Required");
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTime);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.BulkInsertListenerEventArchiveV2sAsync(
+                    It.Is<List<ListenerEventArchiveV2>>(actual =>
+                        SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s, actual)),
+                            It.IsAny<CancellationToken>()))
+                                .Returns(ValueTask.CompletedTask);
+
+            // when
+            IEnumerable<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
+                await this.listenerEventArchiveV2Service.BulkAddListenerEventArchiveV2sAsync(
+                    inputListenerEventArchiveV2s,
+                        TestContext.Current.CancellationToken);
+
+            // then
+            actualListenerEventArchiveV2s.Should().BeEquivalentTo(expectedListenerEventArchiveV2s);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Exactly(inputListenerEventArchiveV2s.Count + 1));
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    invalidListenerEventArchiveV2Exception))),
+                        Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.BulkInsertListenerEventArchiveV2sAsync(
