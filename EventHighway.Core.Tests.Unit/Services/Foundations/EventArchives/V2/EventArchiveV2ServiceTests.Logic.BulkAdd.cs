@@ -128,7 +128,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 broker.BulkInsertEventArchiveV2sAsync(
                     It.Is<List<EventArchiveV2>>(actual =>
                         SameEventArchiveV2sAs(expectedItemsToBulkAdd, actual)),
-                            It.IsAny<CancellationToken>()))
+                            randomCancellationToken))
                                 .Returns(ValueTask.CompletedTask);
 
             // when
@@ -152,7 +152,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 broker.BulkInsertEventArchiveV2sAsync(
                     It.Is<List<EventArchiveV2>>(actual =>
                         SameEventArchiveV2sAs(expectedItemsToBulkAdd, actual)),
-                            It.IsAny<CancellationToken>()),
+                            randomCancellationToken),
                                 Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();
