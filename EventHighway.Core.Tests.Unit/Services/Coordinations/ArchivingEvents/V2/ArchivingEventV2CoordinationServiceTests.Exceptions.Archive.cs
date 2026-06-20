@@ -109,6 +109,41 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
         }
 
         [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnArchiveDeadEventV2sAsync()
+        {
+            // given
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask archiveDeadEventV2sTask =
+                this.archivingEventV2CoordinationService
+                    .ArchiveDeadEventV2sAsync(cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    archiveDeadEventV2sTask.AsTask);
+
+            actualException.Should().NotBeOfType<ArchivingEventV2CoordinationDependencyException>();
+            actualException.Should().NotBeOfType<ArchivingEventV2CoordinationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowDependencyExceptionOnArchiveDeadEventV2sIfTimeoutOccursAndLogItAsync()
         {
             // given
