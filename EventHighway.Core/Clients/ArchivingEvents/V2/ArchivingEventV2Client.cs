@@ -132,6 +132,12 @@ namespace EventHighway.Core.Clients.ArchivingEvents.V2
                 await this.archivingEventV2CoordinationService
                     .PurgeEventArchiveV2sAsync(olderThan, cancellationToken);
             }
+            catch (ArchivingEventV2CoordinationValidationException
+                archivingEventV2CoordinationValidationException)
+            {
+                throw CreateArchivingEventV2ClientValidationException(
+                    archivingEventV2CoordinationValidationException.InnerException as Xeption);
+            }
             catch (ArchivingEventV2CoordinationDependencyValidationException
                 archivingEventV2CoordinationDependencyValidationException)
             {
