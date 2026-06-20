@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfIdIsInvalidAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid invalidEventListenerV2Id = Guid.Empty;
 
             var invalidEventListenerV2Exception =
@@ -37,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             ValueTask<EventListenerV2> removeEventListenerV2ByIdTask =
                 this.eventListenerV2Service.RemoveEventListenerV2ByIdAsync(
                     invalidEventListenerV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventListenerV2ValidationException actualEventListenerV2ValidationException =
                 await Assert.ThrowsAsync<EventListenerV2ValidationException>(
