@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             Xeption eventArchiveV2ValidationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<EventArchiveV2> someEventArchiveV2s =
                 CreateRandomEventArchiveV2s().ToList();
 
@@ -33,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.Setup(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     someEventArchiveV2s,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ThrowsAsync(eventArchiveV2ValidationException);
 
             // when
@@ -41,7 +44,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                 this.eventArchiveV2ProcessingService
                     .BulkAddEventArchiveV2sAsync(
                         someEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             EventArchiveV2ProcessingDependencyValidationException
                 actualEventArchiveV2ProcessingDependencyValidationException =
@@ -55,7 +58,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.Verify(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     someEventArchiveV2s,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
