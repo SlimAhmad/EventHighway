@@ -43,6 +43,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
             await this.eventArchiveV2ProcessingService
@@ -52,20 +53,29 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
-            await this.eventArchiveV2ProcessingService
-                .RetrieveAllEventArchiveV2sAsync(cancellationToken));
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.eventArchiveV2ProcessingService
+                .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+        });
 
         public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
-            await this.listenerEventArchiveV2ProcessingService
-                .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken));
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventArchiveV2ProcessingService
+                .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+        });
 
         public ValueTask AddEventArchiveV2WithListenerEventArchiveV2sAsync(
             EventArchiveV2 eventArchiveV2,
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2(eventArchiveV2);
 
             await this.eventArchiveV2ProcessingService.AddEventArchiveV2Async(eventArchiveV2, cancellationToken);
@@ -82,6 +92,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
             return await this.eventArchiveV2ProcessingService
@@ -93,6 +104,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
 
             return await this.listenerEventArchiveV2ProcessingService

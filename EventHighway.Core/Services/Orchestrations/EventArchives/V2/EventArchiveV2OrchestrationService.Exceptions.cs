@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -29,6 +30,31 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             try
             {
                 return await returningEventArchiveV2sFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventArchiveV2OrchestrationException =
+                    new TimeoutEventArchiveV2OrchestrationException(
+                        message: "Failed event archive orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventArchiveV2OrchestrationDependencyException =
+                    new EventArchiveV2OrchestrationDependencyException(
+                        message: "Event archive dependency error occurred, contact support.",
+                        innerException: timeoutEventArchiveV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventArchiveV2OrchestrationDependencyException);
+
+                throw eventArchiveV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (EventArchiveV2ProcessingDependencyException eventArchiveV2ProcessingDependencyException)
             {
@@ -68,6 +94,31 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             try
             {
                 return await returningEventArchiveV2EnumerableFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventArchiveV2OrchestrationException =
+                    new TimeoutEventArchiveV2OrchestrationException(
+                        message: "Failed event archive orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventArchiveV2OrchestrationDependencyException =
+                    new EventArchiveV2OrchestrationDependencyException(
+                        message: "Event archive dependency error occurred, contact support.",
+                        innerException: timeoutEventArchiveV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventArchiveV2OrchestrationDependencyException);
+
+                throw eventArchiveV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventArchiveV2sOrchestrationException nullEventArchiveV2sOrchestrationException)
             {
@@ -135,6 +186,31 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             {
                 return await returningListenerEventArchiveV2sFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventArchiveV2OrchestrationException =
+                    new TimeoutEventArchiveV2OrchestrationException(
+                        message: "Failed event archive orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventArchiveV2OrchestrationDependencyException =
+                    new EventArchiveV2OrchestrationDependencyException(
+                        message: "Event archive dependency error occurred, contact support.",
+                        innerException: timeoutEventArchiveV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventArchiveV2OrchestrationDependencyException);
+
+                throw eventArchiveV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (EventArchiveV2ProcessingDependencyException eventArchiveV2ProcessingDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingDependencyException);
@@ -172,6 +248,31 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             try
             {
                 return await returningListenerEventArchiveV2EnumerableFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventArchiveV2OrchestrationException =
+                    new TimeoutEventArchiveV2OrchestrationException(
+                        message: "Failed event archive orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventArchiveV2OrchestrationDependencyException =
+                    new EventArchiveV2OrchestrationDependencyException(
+                        message: "Event archive dependency error occurred, contact support.",
+                        innerException: timeoutEventArchiveV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventArchiveV2OrchestrationDependencyException);
+
+                throw eventArchiveV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullListenerEventArchiveV2sOrchestrationException
                 nullListenerEventArchiveV2sOrchestrationException)
@@ -240,6 +341,31 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventArchiveV2OrchestrationException =
+                    new TimeoutEventArchiveV2OrchestrationException(
+                        message: "Failed event archive orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventArchiveV2OrchestrationDependencyException =
+                    new EventArchiveV2OrchestrationDependencyException(
+                        message: "Event archive dependency error occurred, contact support.",
+                        innerException: timeoutEventArchiveV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventArchiveV2OrchestrationDependencyException);
+
+                throw eventArchiveV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventArchiveV2sOrchestrationException
                 nullEventArchiveV2sOrchestrationException)
