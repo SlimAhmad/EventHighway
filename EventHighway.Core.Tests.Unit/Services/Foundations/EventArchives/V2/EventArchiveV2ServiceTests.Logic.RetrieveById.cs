@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldRetrieveEventArchiveV2ByIdAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid randomEventArchiveV2Id = GetRandomId();
@@ -36,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectEventArchiveV2ByIdAsync(
                     inputEventArchiveV2Id,
-                    cancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(selectedEventArchiveV2);
 
             // when
@@ -44,7 +44,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 await this.eventArchiveV2Service
                     .RetrieveEventArchiveV2ByIdAsync(
                         inputEventArchiveV2Id,
-                        cancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventArchiveV2.Should()
@@ -53,7 +53,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectEventArchiveV2ByIdAsync(
                     inputEventArchiveV2Id,
-                    cancellationToken),
+                    randomCancellationToken),
                         Times.Once());
 
             this.storageBrokerMock.VerifyNoOtherCalls();

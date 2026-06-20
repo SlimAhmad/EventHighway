@@ -17,6 +17,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldBulkRemoveEventArchiveV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<EventArchiveV2> randomEventArchiveV2s =
                 CreateRandomEventArchiveV2s();
 
@@ -26,19 +29,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             this.storageBrokerMock.Setup(broker =>
                 broker.BulkDeleteEventArchiveV2sAsync(
                     inputEventArchiveV2s,
-                        It.IsAny<CancellationToken>()))
+                        randomCancellationToken))
                             .Returns(ValueTask.CompletedTask);
 
             // when
             await this.eventArchiveV2Service.BulkRemoveEventArchiveV2sAsync(
                 inputEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             // then
             this.storageBrokerMock.Verify(broker =>
                 broker.BulkDeleteEventArchiveV2sAsync(
                     inputEventArchiveV2s,
-                        It.IsAny<CancellationToken>()),
+                        randomCancellationToken),
                             Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();

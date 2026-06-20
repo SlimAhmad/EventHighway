@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnAddIfEventArchiveV2IsNullAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             EventArchiveV2 nullEventArchiveV2 = null;
@@ -36,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             ValueTask<EventArchiveV2> addEventArchiveV2Task =
                 this.eventArchiveV2Service.AddEventArchiveV2Async(
                     nullEventArchiveV2,
-                    cancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2ValidationException actualEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<EventArchiveV2ValidationException>(
@@ -73,7 +73,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         private async Task ShouldThrowValidationExceptionOnAddIfEventArchiveV2IsInvalidAndLogItAsync(
             string invalidText)
         {
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             EventArchiveTypeV2 invalidType = GetInvalidEnum<EventArchiveTypeV2>();
@@ -131,7 +131,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             ValueTask<EventArchiveV2> addEventArchiveV2Task =
                 this.eventArchiveV2Service.AddEventArchiveV2Async(
                     invalidEventArchiveV2,
-                    cancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2ValidationException actualEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<EventArchiveV2ValidationException>(
@@ -168,7 +168,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             int minutesBeforeAndAfterNow)
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
@@ -200,7 +200,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             ValueTask<EventArchiveV2> addEventArchiveV2Task =
                 this.eventArchiveV2Service.AddEventArchiveV2Async(
                     invalidEventArchiveV2,
-                    cancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2ValidationException actualEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<EventArchiveV2ValidationException>(

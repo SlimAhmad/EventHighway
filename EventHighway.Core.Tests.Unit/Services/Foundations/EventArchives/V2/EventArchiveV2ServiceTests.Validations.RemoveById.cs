@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfIdIsInvalidAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid invalidEventArchiveV2Id = Guid.Empty;
@@ -40,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             ValueTask<EventArchiveV2> removeEventArchiveV2ByIdTask =
                 this.eventArchiveV2Service.RemoveEventArchiveV2ByIdAsync(
                     invalidEventArchiveV2Id,
-                    cancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2ValidationException actualEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<EventArchiveV2ValidationException>(
@@ -70,7 +70,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfEventArchiveV2IsNotFoundAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid someEventArchiveV2Id = GetRandomId();
@@ -88,14 +88,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectEventArchiveV2ByIdAsync(
                     someEventArchiveV2Id,
-                    cancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(noEventArchiveV2);
 
             // when
             ValueTask<EventArchiveV2> removeEventArchiveV2ByIdTask =
                 this.eventArchiveV2Service.RemoveEventArchiveV2ByIdAsync(
                     someEventArchiveV2Id,
-                    cancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2ValidationException actualEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<EventArchiveV2ValidationException>(
@@ -108,7 +108,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectEventArchiveV2ByIdAsync(
                     someEventArchiveV2Id,
-                    cancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

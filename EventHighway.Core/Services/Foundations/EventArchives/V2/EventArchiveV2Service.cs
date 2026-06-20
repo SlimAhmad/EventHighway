@@ -36,6 +36,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await ValidateEventArchiveV2OnAddAsync(eventArchiveV2);
 
             return await this.storageBroker.InsertEventArchiveV2Async(eventArchiveV2, cancellationToken);
@@ -45,6 +46,8 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return await this.storageBroker.SelectAllEventArchiveV2sAsync(cancellationToken);
         });
 
@@ -53,6 +56,8 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
                 CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return await this.storageBroker
                 .SelectAllEventArchiveV2sWithEventListenerArchiveV2sAndListenerEventArchiveV2sAsync(
                     cancellationToken);
@@ -63,6 +68,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2Id(eventArchiveV2Id);
 
             return await this.storageBroker.SelectEventArchiveV2ByIdAsync(eventArchiveV2Id, cancellationToken);
@@ -73,6 +79,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2Id(eventArchiveV2Id);
 
             EventArchiveV2 maybeEventArchiveV2 =
@@ -87,6 +94,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             IEnumerable<EventArchiveV2> eventArchiveV2s, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
             IEnumerable<Guid> incomingIds =
@@ -139,6 +147,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
             await this.storageBroker.BulkDeleteEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
