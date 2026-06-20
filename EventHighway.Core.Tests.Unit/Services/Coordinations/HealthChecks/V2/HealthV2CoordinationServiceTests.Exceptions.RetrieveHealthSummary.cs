@@ -16,6 +16,42 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 {
     public partial class HealthV2CoordinationServiceTests
     {
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveHealthSummaryAsync()
+        {
+            // given
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<IEnumerable<HealthCheckItemV2>> retrieveHealthSummaryTask =
+                this.healthV2CoordinationService
+                    .RetrieveHealthSummaryV2Async(cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveHealthSummaryTask.AsTask);
+
+            actualException.Should().NotBeOfType<HealthV2CoordinationDependencyException>();
+            actualException.Should().NotBeOfType<HealthV2CoordinationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(ValidationExceptions))]
         public async Task ShouldThrowDependencyValidationExceptionOnRetrieveHealthSummaryIfValidationExceptionOccursAndLogItAsync(
