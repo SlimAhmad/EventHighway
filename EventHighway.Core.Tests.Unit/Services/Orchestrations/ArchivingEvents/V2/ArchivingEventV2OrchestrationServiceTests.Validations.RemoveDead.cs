@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldThrowValidationExceptionOnRemoveDeadIfEventV2IsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventV2 nullEventV2 = null;
 
             var nullArchivingEventV2OrchestrationException =
@@ -33,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             ValueTask removeEventV2AndListenerEventV2sTask =
                 this.archivingEventV2OrchestrationService.RemoveEventV2AndListenerEventV2sAsync(
                     nullEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ArchivingEventV2OrchestrationValidationException
                 actualArchivingEventV2OrchestrationValidationException =
