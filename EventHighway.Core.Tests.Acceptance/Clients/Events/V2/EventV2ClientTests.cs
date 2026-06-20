@@ -3,13 +3,11 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Tests.Acceptance.Brokers;
 using EventHighway.EventHandlers;
 using Tynamix.ObjectFiller;
@@ -23,7 +21,6 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
         private readonly WireMockServer wireMockServer;
         private readonly ClientBroker clientBroker;
         private readonly DelegateEventHandler delegateEventHandler;
-        private readonly RestBearerEventHandler restBearerEventHandler;
 
         public EventV2ClientTests()
         {
@@ -31,7 +28,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
 
             this.delegateEventHandler = new DelegateEventHandler(
                 Guid.NewGuid(),
-                (content, _, cancellationToken) =>
+                (content, cancellationToken) =>
                 {
                     string[] parts = content.Split(',');
                     int sum = int.Parse(parts[0].Trim()) + int.Parse(parts[1].Trim());
@@ -45,13 +42,10 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
                     });
                 });
 
-            this.restBearerEventHandler = new RestBearerEventHandler(Guid.NewGuid());
-
             this.clientBroker = new ClientBroker();
 
             this.clientBroker
-                .RegisterEventHandler(this.delegateEventHandler)
-                .RegisterEventHandler(this.restBearerEventHandler);
+                .RegisterEventHandler(this.delegateEventHandler);
         }
 
         private static int GetRandomNumber() =>
@@ -125,34 +119,6 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
                 Description = GetRandomString(),
                 HandlerId = this.delegateEventHandler.Id,
                 HandlerName = this.delegateEventHandler.Name,
-                HandlerConfigurations = new List<HandlerConfiguration>(),
-                EventAddressId = eventAddressId,
-                CreatedDate = now,
-                UpdatedDate = now,
-            };
-        }
-
-        private EventListenerV2 CreateRestBearerHandlerListenerV2(Guid eventAddressId)
-        {
-            DateTimeOffset now = DateTimeOffset.UtcNow;
-            string wireMockUrl = this.wireMockServer.Url;
-
-            return new EventListenerV2
-            {
-                Id = Guid.NewGuid(),
-                Name = GetRandomString(),
-                Description = GetRandomString(),
-                HandlerId = this.restBearerEventHandler.Id,
-                HandlerName = this.restBearerEventHandler.Name,
-                HandlerConfigurations = new List<HandlerConfiguration>
-                {
-                    new() { Id = Guid.NewGuid(), Name = "Url", Value = $"{wireMockUrl}/events", CreatedDate = now, UpdatedDate = now },
-                    new() { Id = Guid.NewGuid(), Name = "TokenUrl", Value = $"{wireMockUrl}/token", CreatedDate = now, UpdatedDate = now },
-                    new() { Id = Guid.NewGuid(), Name = "ClientId", Value = "test-client", CreatedDate = now, UpdatedDate = now },
-                    new() { Id = Guid.NewGuid(), Name = "ClientSecret", Value = "test-secret", CreatedDate = now, UpdatedDate = now },
-                    new() { Id = Guid.NewGuid(), Name = "Scope", Value = "test-scope", CreatedDate = now, UpdatedDate = now },
-                    new() { Id = Guid.NewGuid(), Name = "GrantType", Value = "client_credentials", CreatedDate = now, UpdatedDate = now },
-                },
                 EventAddressId = eventAddressId,
                 CreatedDate = now,
                 UpdatedDate = now,

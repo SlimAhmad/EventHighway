@@ -33,14 +33,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(someEventCallV2.HandlerName);
 
-            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
-                .Returns(System.Array.Empty<string>());
-
             this.eventHandlerMock
                 .Setup(handler =>
                     handler.HandleAsync(
                         It.IsAny<string>(),
-                        It.IsAny<IReadOnlyDictionary<string, string>>(),
                         It.IsAny<CancellationToken>()))
                 .ThrowsAsync(criticalDependencyException);
 
@@ -78,13 +74,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -116,13 +108,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(someEventCallV2.HandlerName);
 
-            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
-                .Returns(System.Array.Empty<string>());
-
             this.eventHandlerMock.Setup(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(dependencyValidationException);
 
@@ -162,13 +150,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -200,14 +184,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(someEventCallV2.HandlerName);
 
-            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
-                .Returns(System.Array.Empty<string>());
-
             this.eventHandlerMock
                 .Setup(handler =>
                     handler.HandleAsync(
                         It.IsAny<string>(),
-                        It.IsAny<IReadOnlyDictionary<string, string>>(),
                         It.IsAny<CancellationToken>()))
                 .ThrowsAsync(serviceException);
 
@@ -245,13 +225,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -282,13 +258,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(someEventCallV2.HandlerName);
 
-            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
-                .Returns(System.Array.Empty<string>());
-
             this.eventHandlerMock
                 .Setup(handler => handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(serviceException);
 
@@ -326,13 +298,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 

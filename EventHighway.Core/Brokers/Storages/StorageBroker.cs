@@ -18,7 +18,6 @@ using EventHighway.Core.Models.Services.Foundations.Events.V1;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V1;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents;
@@ -59,7 +58,6 @@ namespace EventHighway.Core.Brokers.Storages
             ConfigureEventListenerV1s(modelBuilder.Entity<EventListenerV1>());
             ConfigureEventListenerV2s(modelBuilder.Entity<EventListenerV2>());
             ConfigureEventListeners(modelBuilder.Entity<EventListener>());
-            ConfigureHandlerConfigurations(modelBuilder.Entity<HandlerConfiguration>());
             ConfigureListenerEventV1s(modelBuilder.Entity<ListenerEventV1>());
             ConfigureListenerEventV2s(modelBuilder.Entity<ListenerEventV2>());
             ConfigureListenerEventArchiveV1s(modelBuilder.Entity<ListenerEventArchiveV1>());

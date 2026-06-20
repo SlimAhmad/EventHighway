@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.EventHandlers.Models.Foundations.Delegates.Exceptions;
@@ -40,12 +39,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
                 ResponseCode = GetRandomString(),
                 ResponseMessage = GetRandomString(),
                 IsSuccess = true
-            };
-
-        private static IReadOnlyDictionary<string, string> CreateRandomHandlerParams() =>
-            new Dictionary<string, string>
-            {
-                { GetRandomString(), GetRandomString() }
             };
 
         public static TheoryData<Xeption> DelegateValidationExceptions()

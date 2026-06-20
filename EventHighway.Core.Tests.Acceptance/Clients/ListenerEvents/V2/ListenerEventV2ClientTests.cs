@@ -10,7 +10,7 @@ using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
+
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Tests.Acceptance.Brokers;
 using EventHighway.EventHandlers;
@@ -32,7 +32,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
 
             this.delegateEventHandler = new DelegateEventHandler(
                 Guid.NewGuid(),
-                (_, _, _) => ValueTask.FromResult(new EventHandlerResult
+                (_, _) => ValueTask.FromResult(new EventHandlerResult
                 {
                     IsSuccess = true,
                     Response = "OK",
@@ -115,7 +115,6 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
                 Description = GetRandomString(),
                 HandlerId = this.delegateEventHandler.Id,
                 HandlerName = this.delegateEventHandler.Name,
-                HandlerConfigurations = new List<HandlerConfiguration>(),
                 EventAddressId = eventAddressId,
                 CreatedDate = now,
                 UpdatedDate = now,

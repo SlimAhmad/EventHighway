@@ -13,7 +13,6 @@ using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.EventHandlers;
 using WireMock.Server;
@@ -31,7 +30,7 @@ public partial class Program
 
         var delegateHandler1 = new DelegateEventHandler(
             Guid.NewGuid(),
-            (content, _, cancellationToken) =>
+            (content, cancellationToken) =>
             {
                 int sum = content.Split(',')
                     .Select(p => int.TryParse(p.Trim(), out int n) ? n : 0)
@@ -50,7 +49,7 @@ public partial class Program
 
         var delegateHandler2 = new DelegateEventHandler(
             Guid.NewGuid(),
-            (content, _, cancellationToken) =>
+            (content, cancellationToken) =>
             {
                 double[] scores = content.Split(',')
                     .Select(p => double.TryParse(p.Trim(), out double d) ? d : 0.0)
@@ -78,7 +77,7 @@ public partial class Program
 
         var delegateHandler3 = new DelegateEventHandler(
             Guid.NewGuid(),
-            async (content, _, cancellationToken) =>
+            async (content, cancellationToken) =>
             {
                 string baseUrl = wireMock.Url ?? string.Empty;
                 using var http = new HttpClient();
@@ -125,10 +124,8 @@ public partial class Program
 
         var delegateHandler4 = new DelegateEventHandler(
             Guid.NewGuid(),
-            (content, _, cancellationToken) =>
+            (content, cancellationToken) =>
                 PostWithBearerTokenAsync(content, wireMock.Url ?? string.Empty, cancellationToken));
-
-        var restBearerHandler = new RestBearerEventHandler(Guid.NewGuid());
 
         // =========================================================
         // 1) Initialise the client and broker
@@ -143,8 +140,7 @@ public partial class Program
             .RegisterEventHandler(delegateHandler1)
             .RegisterEventHandler(delegateHandler2)
             .RegisterEventHandler(delegateHandler3)
-            .RegisterEventHandler(delegateHandler4)
-            .RegisterEventHandler(restBearerHandler);
+            .RegisterEventHandler(delegateHandler4);
 
         // =========================================================
         // 3) Register Event Address 1: Student Enrolled
@@ -170,20 +166,6 @@ public partial class Program
             Description = "Parses comma-separated numbers from the event content and sums them.",
             HandlerId = delegateHandler1.Id,
             HandlerName = delegateHandler1.Name,
-            HandlerConfigurations = new List<HandlerConfiguration>(),
-            CreatedDate = now,
-            UpdatedDate = now
-        });
-
-        await broker.RegisterStudentEnrolledListenerAsync(new EventListenerV2
-        {
-            Id = Guid.NewGuid(),
-            Name = "REST Notification Listener",
-            Description = "Posts the event to an external REST endpoint using OAuth bearer auth.",
-            HandlerId = restBearerHandler.Id,
-            HandlerName = restBearerHandler.Name,
-            HandlerConfigurations =
-                CreateRestBearerConfigurations(wireMock.Url ?? string.Empty, scope: "enrollment", now),
             CreatedDate = now,
             UpdatedDate = now
         });
@@ -195,7 +177,6 @@ public partial class Program
             Description = "Replicates RestBearerEventHandler behaviour using a DelegateEventHandler.",
             HandlerId = delegateHandler3.Id,
             HandlerName = delegateHandler3.Name,
-            HandlerConfigurations = new List<HandlerConfiguration>(),
             CreatedDate = now,
             UpdatedDate = now
         });
@@ -227,24 +208,10 @@ public partial class Program
         await broker.RegisterCourseCompletedListenerAsync(new EventListenerV2
         {
             Id = Guid.NewGuid(),
-            Name = "Failing REST Listener",
-            Description = "Posts to a non-existent endpoint to demonstrate failure handling.",
-            HandlerId = restBearerHandler.Id,
-            HandlerName = restBearerHandler.Name,
-            HandlerConfigurations =
-                CreateRestBearerConfigurations("http://localhost:19999", scope: "courses", now),
-            CreatedDate = now,
-            UpdatedDate = now
-        });
-
-        await broker.RegisterCourseCompletedListenerAsync(new EventListenerV2
-        {
-            Id = Guid.NewGuid(),
             Name = "Grade Calculator Listener",
             Description = "Calculates the average score and letter grade from the event content.",
             HandlerId = delegateHandler2.Id,
             HandlerName = delegateHandler2.Name,
-            HandlerConfigurations = new List<HandlerConfiguration>(),
             CreatedDate = now,
             UpdatedDate = now
         });
@@ -256,7 +223,6 @@ public partial class Program
             Description = "Calls PostWithBearerTokenAsync on Program directly via a DelegateEventHandler.",
             HandlerId = delegateHandler4.Id,
             HandlerName = delegateHandler4.Name,
-            HandlerConfigurations = new List<HandlerConfiguration>(),
             CreatedDate = now,
             UpdatedDate = now
         });
@@ -402,24 +368,4 @@ public partial class Program
 
         return server;
     }
-
-    private static List<HandlerConfiguration> CreateRestBearerConfigurations(
-        string baseUrl,
-        string scope,
-        DateTimeOffset now) =>
-        new List<HandlerConfiguration>
-        {
-            new() { Id = Guid.NewGuid(), Name = "Url",
-                Value = $"{baseUrl}/events", CreatedDate = now, UpdatedDate = now },
-            new() { Id = Guid.NewGuid(), Name = "TokenUrl",
-                Value = $"{baseUrl}/token", CreatedDate = now, UpdatedDate = now },
-            new() { Id = Guid.NewGuid(), Name = "ClientId",
-                Value = "client", CreatedDate = now, UpdatedDate = now },
-            new() { Id = Guid.NewGuid(), Name = "ClientSecret",
-                Value = "secret", CreatedDate = now, UpdatedDate = now },
-            new() { Id = Guid.NewGuid(), Name = "Scope",
-                Value = scope, CreatedDate = now, UpdatedDate = now },
-            new() { Id = Guid.NewGuid(), Name = "GrantType",
-                Value = "client_credentials", CreatedDate = now, UpdatedDate = now },
-        };
 }

@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
     public partial class EventArchiveV2ProcessingServiceTests
     {
         [Theory]
-        [MemberData(nameof(ValidationExceptions))]
+        [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationExceptionOnBulkAddIfValidationErrorOccursAndLogItAsync(
             Xeption eventArchiveV2ValidationException)
         {

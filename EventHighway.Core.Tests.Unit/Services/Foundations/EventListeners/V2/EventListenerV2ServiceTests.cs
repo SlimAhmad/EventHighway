@@ -11,7 +11,6 @@ using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.EventListeners.V2;
 using Microsoft.Data.SqlClient;
@@ -67,9 +66,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         private static EventListenerV2 CreateRandomEventListenerV2(DateTimeOffset dates) =>
             CreateEventListenerV2Filler(dates).Create();
 
-        private static HandlerConfiguration CreateRandomHandlerConfiguration(DateTimeOffset dates) =>
-            CreateHandlerConfigurationFiller(dates).Create();
-
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
@@ -98,27 +94,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
                 .OnProperty(eventListenerV2 =>
                     eventListenerV2.ListenerEventV2s).IgnoreIt()
 
-                .OnProperty(eventListenerV2 =>
-                    eventListenerV2.HandlerConfigurations)
-                        .Use(Array.Empty<HandlerConfiguration>())
-
                 .OnType<EventAddressV2>().IgnoreIt()
                 .OnType<ListenerEventV2>().IgnoreIt();
 
             return filler;
         }
 
-        private static Filler<HandlerConfiguration> CreateHandlerConfigurationFiller(DateTimeOffset dates)
-        {
-            var filler = new Filler<HandlerConfiguration>();
-
-            filler.Setup()
-                .OnType<DateTimeOffset>().Use(dates)
-
-                .OnProperty(handlerConfiguration =>
-                    handlerConfiguration.EventListener).IgnoreIt();
-
-            return filler;
-        }
     }
 }

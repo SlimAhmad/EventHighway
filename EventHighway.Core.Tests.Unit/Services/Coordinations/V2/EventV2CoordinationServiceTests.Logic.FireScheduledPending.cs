@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using Force.DeepCloner;
 using Moq;
@@ -58,9 +57,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                             {
                                 HandlerId = retrievedEventListenerV2.HandlerId,
                                 HandlerName = retrievedEventListenerV2.HandlerName,
-                                HandlerConfigurations =
-                                    retrievedEventListenerV2.HandlerConfigurations?.ToList()
-                                        ?? new List<HandlerConfiguration>(),
                                 Content = eventV2.Content,
                                 RequiredPromotedProperties =
                                     SplitPromotedPropertyKeys(retrievedEventListenerV2.PromotedProperties),
@@ -245,9 +241,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                             {
                                 HandlerId = retrievedEventListenerV2.HandlerId,
                                 HandlerName = retrievedEventListenerV2.HandlerName,
-                                HandlerConfigurations =
-                                    retrievedEventListenerV2.HandlerConfigurations?.ToList()
-                                        ?? new List<HandlerConfiguration>(),
                                 Content = eventV2.Content,
                                 RequiredPromotedProperties =
                                     SplitPromotedPropertyKeys(retrievedEventListenerV2.PromotedProperties),

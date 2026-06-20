@@ -143,7 +143,6 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 Content = eventV2.Content,
                 HandlerId = eventListenerV2.HandlerId,
                 HandlerName = eventListenerV2.HandlerName,
-                HandlerConfigurations = eventListenerV2.HandlerConfigurations?.ToList() ?? [],
                 FilterCriteria = eventListenerV2.FilterCriteria,
                 RequiredPromotedProperties = SplitPromotedPropertyKeys(eventListenerV2.PromotedProperties),
                 Response = null

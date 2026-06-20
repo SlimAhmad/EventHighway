@@ -53,114 +53,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                     loggingBroker: this.loggingBrokerMock.Object);
         }
 
-        public static TheoryData<Xeption> EventCallV2ValidationExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
-
-            return new TheoryData<Xeption>
-            {
-                new EventCallV2ProcessingValidationException(
-                    someMessage,
-                    someInnerException),
-
-                new EventCallV2ProcessingDependencyValidationException(
-                    someMessage,
-                    someInnerException),
-            };
-        }
-
-        public static TheoryData<Xeption> EventCallV2DependencyExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
-
-            return new TheoryData<Xeption>
-            {
-                new EventCallV2ProcessingDependencyException(
-                    someMessage,
-                    someInnerException),
-
-                new EventCallV2ProcessingServiceException(
-                    someMessage,
-                    someInnerException),
-            };
-        }
-
-        public static TheoryData<Xeption> EventAddressV2ValidationExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
-
-            return new TheoryData<Xeption>
-            {
-                new EventAddressV2ProcessingValidationException(
-                    someMessage,
-                    someInnerException),
-
-                new EventAddressV2ProcessingDependencyValidationException(
-                    someMessage,
-                    someInnerException),
-            };
-        }
-
-        public static TheoryData<Xeption> EventAddressV2DependencyExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
-
-            return new TheoryData<Xeption>
-            {
-                new EventAddressV2ProcessingDependencyException(
-                    someMessage,
-                    someInnerException),
-
-                new EventAddressV2ProcessingServiceException(
-                    someMessage,
-                    someInnerException),
-            };
-        }
-
-        public static TheoryData<Xeption> EventV2ValidationExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
-
-            return new TheoryData<Xeption>
-            {
-                new EventV2ProcessingValidationException(
-                    someMessage,
-                    someInnerException),
-
-                new EventV2ProcessingDependencyValidationException(
-                    someMessage,
-                    someInnerException),
-            };
-        }
-
-        public static TheoryData<Xeption> EventV2DependencyExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
-
-            return new TheoryData<Xeption>
-            {
-                new EventV2ProcessingDependencyException(
-                    someMessage,
-                    someInnerException),
-
-                new EventV2ProcessingServiceException(
-                    someMessage,
-                    someInnerException),
-            };
-        }
-
         public static TheoryData<Xeption> DependencyValidationExceptions()
         {
             string someMessage = GetRandomString();
@@ -182,6 +74,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                     someInnerException),
 
                 new EventAddressV2ProcessingDependencyValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventCallV2ProcessingValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventCallV2ProcessingDependencyValidationException(
                     someMessage,
                     someInnerException),
             };
@@ -208,6 +108,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                     someInnerException),
 
                 new EventAddressV2ProcessingServiceException(
+                    someMessage,
+                    someInnerException),
+
+                new EventCallV2ProcessingDependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new EventCallV2ProcessingServiceException(
                     someMessage,
                     someInnerException),
             };

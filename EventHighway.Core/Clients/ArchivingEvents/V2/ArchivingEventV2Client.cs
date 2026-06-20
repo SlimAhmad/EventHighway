@@ -110,5 +110,56 @@ namespace EventHighway.Core.Clients.ArchivingEvents.V2
                 innerException: innerException,
                 data: innerException?.Data);
         }
+
+        /// <summary>
+        /// Purges archived events older than the specified date asynchronously. This operation
+        /// removes archived events that are older than the provided threshold date.
+        /// </summary>
+        /// <param name="olderThan">The date threshold. Events archived before this date will be
+        /// purged.</param>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
+        public async ValueTask PurgeEventArchiveV2sAsync(
+            DateTimeOffset olderThan,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await this.archivingEventV2CoordinationService
+                    .PurgeEventArchiveV2sAsync(olderThan, cancellationToken);
+            }
+            catch (ArchivingEventV2CoordinationValidationException
+                archivingEventV2CoordinationValidationException)
+            {
+                throw CreateArchivingEventV2ClientValidationException(
+                    archivingEventV2CoordinationValidationException.InnerException as Xeption);
+            }
+            catch (ArchivingEventV2CoordinationDependencyValidationException
+                archivingEventV2CoordinationDependencyValidationException)
+            {
+                throw CreateArchivingEventV2ClientValidationException(
+                    archivingEventV2CoordinationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (ArchivingEventV2CoordinationDependencyException
+                archivingEventV2CoordinationDependencyException)
+            {
+                throw CreateArchivingEventV2ClientDependencyException(
+                    archivingEventV2CoordinationDependencyException.InnerException as Xeption);
+            }
+            catch (ArchivingEventV2CoordinationServiceException
+                archivingEventV2CoordinationServiceException)
+            {
+                throw CreateArchivingEventV2ClientDependencyException(
+                    archivingEventV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateArchivingEventV2ClientServiceException(exception as Xeption);
+            }
+        }
     }
 }

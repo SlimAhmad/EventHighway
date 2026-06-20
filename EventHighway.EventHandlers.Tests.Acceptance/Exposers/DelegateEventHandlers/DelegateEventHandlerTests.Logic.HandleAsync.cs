@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using FluentAssertions;
@@ -18,20 +17,17 @@ namespace EventHighway.EventHandlers.Tests.Acceptance.Exposers.DelegateEventHand
         {
             // given
             string randomContent = GetRandomString();
-            IReadOnlyDictionary<string, string> randomHandlerParams = CreateRandomHandlerParams();
             EventHandlerResult randomEventHandlerResult = CreateRandomEventHandlerResult();
             EventHandlerResult expectedEventHandlerResult = randomEventHandlerResult.DeepClone();
 
             string actualInvokedContent = null;
-            IReadOnlyDictionary<string, string> actualInvokedHandlerParams = null;
             Guid identifier = Guid.NewGuid();
 
             var delegateEventHandler = new DelegateEventHandler(
                 Id: identifier,
-                handler: (content, handlerParams, cancellationToken) =>
+                handler: (content, cancellationToken) =>
                 {
                     actualInvokedContent = content;
-                    actualInvokedHandlerParams = handlerParams;
 
                     return new ValueTask<EventHandlerResult>(randomEventHandlerResult);
                 });
@@ -40,13 +36,11 @@ namespace EventHighway.EventHandlers.Tests.Acceptance.Exposers.DelegateEventHand
             EventHandlerResult actualEventHandlerResult =
                 await delegateEventHandler.HandleAsync(
                     content: randomContent,
-                    handlerParams: randomHandlerParams,
                     cancellationToken: TestContext.Current.CancellationToken);
 
             // then
             actualEventHandlerResult.Should().BeEquivalentTo(expectedEventHandlerResult);
             actualInvokedContent.Should().Be(randomContent);
-            actualInvokedHandlerParams.Should().BeEquivalentTo(randomHandlerParams);
         }
     }
 }
