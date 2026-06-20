@@ -78,6 +78,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            
             IQueryable<EventV2> eventV2s =
                 await this.eventV2OrchestrationService
                     .RetrieveScheduledPendingEventV2sAsync(cancellationToken);
