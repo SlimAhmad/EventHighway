@@ -15,6 +15,19 @@ namespace EventHighway.Core.Brokers.Storages
             model.ToTable("EventV2s");
             model.HasKey(eventV2 => eventV2.Id);
 
+            model.Property(eventV2 => eventV2.ContentHash)
+                .IsRequired(false)
+                .HasMaxLength(450);
+
+            model.HasIndex(eventV2 => new
+            {
+                eventV2.EventAddressId,
+                eventV2.EventName,
+                eventV2.ContentHash,
+                eventV2.CreatedDate
+            })
+            .HasDatabaseName("IX_EventV2s_LoopDetection");
+
             model.HasOne(eventV2 => eventV2.EventAddressV2)
                 .WithMany(eventAddressV2 => eventAddressV2.Events)
                 .HasForeignKey(eventV2 => eventV2.EventAddressId)

@@ -31,6 +31,11 @@ namespace EventHighway.Core.Models.Services.Foundations.Events.V2
         public string EventName { get; set; }
 
         /// <summary>
+        /// Gets or sets the hash of the content payload of this event.
+        /// </summary>
+        public string ContentHash { get; set; }
+
+        /// <summary>
         /// Gets or sets the type of this event, such as scheduled, immediate, or
         /// recurring.
         /// </summary>
