@@ -174,6 +174,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         public async Task ShouldThrowServiceExceptionOnFireScheduledPendingIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var serviceException = new Exception();
 
             var failedEventV2CoordinationServiceException =
@@ -188,13 +191,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ThrowsAsync(serviceException);
 
             // when
             ValueTask fireScheduledPendingEventV2sTask =
                 this.eventV2CoordinationService.FireScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2CoordinationServiceException actualEventV2CoordinationServiceException =
                 await Assert.ThrowsAsync<EventV2CoordinationServiceException>(
@@ -206,7 +209,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
