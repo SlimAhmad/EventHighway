@@ -109,6 +109,61 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
         }
 
         [Fact]
+        public async Task ShouldThrowDependencyExceptionOnArchiveDeadEventV2sIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutArchivingEventV2CoordinationException =
+                new TimeoutArchivingEventV2CoordinationException(
+                    message: "Failed archiving event coordination timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedArchivingEventV2CoordinationDependencyException =
+                new ArchivingEventV2CoordinationDependencyException(
+                    message: "Archiving event dependency error occurred, contact support.",
+                    innerException: timeoutArchivingEventV2CoordinationException);
+
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask archiveDeadEventV2sTask =
+                this.archivingEventV2CoordinationService
+                    .ArchiveDeadEventV2sAsync(randomCancellationToken);
+
+            ArchivingEventV2CoordinationDependencyException
+                actualArchivingEventV2CoordinationDependencyException =
+                    await Assert.ThrowsAsync<ArchivingEventV2CoordinationDependencyException>(
+                        archiveDeadEventV2sTask.AsTask);
+
+            // then
+            actualArchivingEventV2CoordinationDependencyException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyException);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedArchivingEventV2CoordinationDependencyException))),
+                        Times.Once);
+
+            this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowServiceExceptionOnArchiveDeadEventV2sIfExceptionOccursAndLogItAsync()
         {
             // given
