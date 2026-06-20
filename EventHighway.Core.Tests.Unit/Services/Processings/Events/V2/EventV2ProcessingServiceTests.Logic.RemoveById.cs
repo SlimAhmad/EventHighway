@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldRemoveEventV2ByIdAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid randomEventV2Id = GetRandomId();
@@ -32,7 +32,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.eventV2ServiceMock.Setup(service =>
                 service.RemoveEventV2ByIdAsync(
                     inputEventV2Id,
-                    cancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(removedEventV2);
 
             // when
@@ -40,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                 await this.eventV2ProcessingService
                     .RemoveEventV2ByIdAsync(
                         inputEventV2Id,
-                        cancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventV2.Should()
@@ -49,7 +49,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.eventV2ServiceMock.Verify(service =>
                 service.RemoveEventV2ByIdAsync(
                     inputEventV2Id,
-                    cancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventV2ServiceMock.VerifyNoOtherCalls();
