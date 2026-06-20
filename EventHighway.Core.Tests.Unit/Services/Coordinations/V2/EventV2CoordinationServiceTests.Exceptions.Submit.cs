@@ -103,6 +103,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventV2 someEventV2 = CreateRandomEventV2();
 
             var expectedEventV2CoordinationDependencyException =
@@ -118,7 +121,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             ValueTask<EventV2> submitEventV2Task =
                 this.eventV2CoordinationService.SubmitEventV2Async(
                     someEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2CoordinationDependencyException
                 actualEventV2CoordinationDependencyException =
