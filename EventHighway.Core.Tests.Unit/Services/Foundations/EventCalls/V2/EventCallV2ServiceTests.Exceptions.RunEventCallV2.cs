@@ -254,6 +254,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         public async Task ShouldThrowServiceExceptionOnRunIfUnexpectedExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -286,7 +289,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, randomCancellationToken);
 
             EventCallV2ServiceException actualEventCallV2ServiceException =
                 await Assert.ThrowsAsync<EventCallV2ServiceException>(
