@@ -82,6 +82,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldThrowDependencyValidationExceptionOnAddIfEventListenerV2AlreadyExistsAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             string randomMessage = GetRandomString();
             EventListenerV2 someEventListenerV2 = CreateRandomEventListenerV2();
             var duplicateKeyException = new DuplicateKeyException(randomMessage);
@@ -109,7 +112,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             ValueTask<EventListenerV2> addEventListenerV2Task =
                 this.eventListenerV2Service.AddEventListenerV2Async(
                     someEventListenerV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventListenerV2DependencyValidationException actualEventListenerV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventListenerV2DependencyValidationException>(
