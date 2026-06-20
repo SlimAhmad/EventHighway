@@ -63,6 +63,8 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             BatchConfiguration batchConfiguration =
                 this.configurationBroker.GetBatchConfiguration();
 
