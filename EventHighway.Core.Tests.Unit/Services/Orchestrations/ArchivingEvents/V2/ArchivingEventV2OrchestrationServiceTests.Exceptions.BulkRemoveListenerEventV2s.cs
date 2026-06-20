@@ -17,6 +17,71 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 {
     public partial class ArchivingEventV2OrchestrationServiceTests
     {
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnBulkRemoveListenerEventV2sIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            IEnumerable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutArchivingEventV2OrchestrationException =
+                new TimeoutArchivingEventV2OrchestrationException(
+                    message: "Failed archiving event orchestration timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedArchivingEventV2OrchestrationDependencyException =
+                new ArchivingEventV2OrchestrationDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutArchivingEventV2OrchestrationException);
+
+            this.listenerEventV2ProcessingServiceMock.Setup(service =>
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask bulkRemoveListenerEventV2sTask =
+                this.archivingEventV2OrchestrationService.BulkRemoveListenerEventV2sAsync(
+                    someListenerEventV2s,
+                    TestContext.Current.CancellationToken);
+
+            ArchivingEventV2OrchestrationDependencyException
+                actualArchivingEventV2OrchestrationDependencyException =
+                    await Assert.ThrowsAsync<ArchivingEventV2OrchestrationDependencyException>(
+                        bulkRemoveListenerEventV2sTask.AsTask);
+
+            // then
+            actualArchivingEventV2OrchestrationDependencyException.Should().BeEquivalentTo(
+                expectedArchivingEventV2OrchestrationDependencyException);
+
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedArchivingEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.eventV2ProcessingServiceMock.Verify(service =>
+                service.BulkRemoveEventV2sAsync(
+                    It.IsAny<IEnumerable<EventV2>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(DependencyValidationExceptions))]
         public async Task
