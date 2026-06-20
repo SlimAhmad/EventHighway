@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
-using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using Moq;
 
 namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
@@ -21,25 +20,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             IQueryable<EventArchiveV2> randomEventArchiveV2s = CreateRandomEventArchiveV2s();
             IEnumerable<EventArchiveV2> inputEventArchiveV2s = randomEventArchiveV2s;
 
-            IEnumerable<ListenerEventArchiveV2> inputListenerEventArchiveV2s =
-                inputEventArchiveV2s.SelectMany(eventArchiveV2 =>
-                    eventArchiveV2.ListenerEventArchiveV2s);
-
-            var mockSequence = new MockSequence();
-
-            this.eventArchiveV2ProcessingServiceMock
-                .InSequence(mockSequence).Setup(service =>
-                    service.BulkAddEventArchiveV2sAsync(
-                        inputEventArchiveV2s,
-                        It.IsAny<CancellationToken>()))
-                            .ReturnsAsync(inputEventArchiveV2s);
-
-            this.listenerEventArchiveV2ProcessingServiceMock
-                .InSequence(mockSequence).Setup(service =>
-                    service.BulkAddListenerEventArchiveV2sAsync(
-                        inputListenerEventArchiveV2s,
-                        It.IsAny<CancellationToken>()))
-                            .ReturnsAsync(inputListenerEventArchiveV2s);
+            this.eventArchiveV2ProcessingServiceMock.Setup(service =>
+                service.BulkAddEventArchiveV2sAsync(
+                    inputEventArchiveV2s,
+                    It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(inputEventArchiveV2s);
 
             // when
             await this.eventArchiveV2OrchestrationService.BulkAddEventArchiveV2sAsync(
@@ -50,12 +35,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             this.eventArchiveV2ProcessingServiceMock.Verify(service =>
                 service.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
-                    It.IsAny<CancellationToken>()),
-                        Times.Once);
-
-            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
-                service.BulkAddListenerEventArchiveV2sAsync(
-                    inputListenerEventArchiveV2s,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 

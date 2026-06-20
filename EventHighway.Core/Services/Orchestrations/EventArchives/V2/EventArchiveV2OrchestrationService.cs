@@ -66,13 +66,6 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
 
             await this.eventArchiveV2ProcessingService
                 .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
-
-            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s =
-                eventArchiveV2s.SelectMany(eventArchiveV2 =>
-                    eventArchiveV2.ListenerEventArchiveV2s);
-
-            await this.listenerEventArchiveV2ProcessingService
-                .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
         });
 
         public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
