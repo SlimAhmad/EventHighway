@@ -160,6 +160,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldThrowServiceExceptionOnRetrieveBatchOfListenerEventV2sIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
 
             IEnumerable<Guid> someEventV2Ids =
@@ -195,7 +198,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                 this.archivingEventV2OrchestrationService
                     .RetrieveBatchOfListenerEventV2sAsync(
                         someEventV2Ids,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             ArchivingEventV2OrchestrationServiceException
                 actualArchivingEventV2OrchestrationServiceException =
