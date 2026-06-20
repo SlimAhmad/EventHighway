@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             Xeption listenerEventArchiveV2ValidationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();
 
@@ -33,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     someListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken))
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(listenerEventArchiveV2ValidationException);
 
             // when
@@ -41,7 +44,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 this.listenerEventArchiveV2ProcessingService
                     .BulkAddListenerEventArchiveV2sAsync(
                         someListenerEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             ListenerEventArchiveV2ProcessingDependencyValidationException
                 actualListenerEventArchiveV2ProcessingDependencyValidationException =
@@ -55,7 +58,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     someListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -74,6 +77,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             Xeption listenerEventArchiveV2DependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();
 
@@ -85,7 +91,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     someListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken))
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(listenerEventArchiveV2DependencyException);
 
             // when
@@ -93,7 +99,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 this.listenerEventArchiveV2ProcessingService
                     .BulkAddListenerEventArchiveV2sAsync(
                         someListenerEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             ListenerEventArchiveV2ProcessingDependencyException
                 actualListenerEventArchiveV2ProcessingDependencyException =
@@ -107,7 +113,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     someListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -124,6 +130,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         public async Task ShouldThrowServiceExceptionOnBulkAddIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();
 
@@ -143,7 +152,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     someListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken))
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(serviceException);
 
             // when
@@ -151,7 +160,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 this.listenerEventArchiveV2ProcessingService
                     .BulkAddListenerEventArchiveV2sAsync(
                         someListenerEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             ListenerEventArchiveV2ProcessingServiceException
                 actualListenerEventArchiveV2ProcessingServiceException =
@@ -165,7 +174,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     someListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
