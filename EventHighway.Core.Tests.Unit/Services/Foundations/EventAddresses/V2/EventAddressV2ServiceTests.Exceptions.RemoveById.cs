@@ -21,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnRemoveByIdIfSqlErrorOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventAddressV2Id = GetRandomId();
             SqlException sqlException = CreateSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
@@ -43,7 +46,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> removeEventAddressV2ByIdTask =
                 this.eventAddressV2Service.RemoveEventAddressV2ByIdAsync(
-                    someEventAddressV2Id, TestContext.Current.CancellationToken);
+                    someEventAddressV2Id, randomCancellationToken);
 
             EventAddressV2DependencyException actualEventAddressV2DependencyException =
                 await Assert.ThrowsAsync<EventAddressV2DependencyException>(
