@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using FluentAssertions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
         public async Task ShouldRetrieveAllEventHandlerV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<IEventHandler> randomEventHandlers = CreateRandomEventHandlers();
             IEnumerable<IEventHandler> retrievedEventHandlers = randomEventHandlers;
             IEnumerable<IEventHandler> expectedEventHandlers = randomEventHandlers.DeepClone();
@@ -29,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
             IEnumerable<IEventHandler> actualEventHandlers =
                 await this.eventListenerV2OrchestrationService
                     .RetrieveAllEventHandlerV2sAsync(
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventHandlers.Should().BeEquivalentTo(expectedEventHandlers);
