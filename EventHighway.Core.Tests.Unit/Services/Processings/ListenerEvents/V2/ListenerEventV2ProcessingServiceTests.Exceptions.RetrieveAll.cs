@@ -111,5 +111,89 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveAllIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutListenerEventV2ProcessingException =
+                new TimeoutListenerEventV2ProcessingException(
+                    message: "Failed listener event processing timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedListenerEventV2ProcessingDependencyException =
+                new ListenerEventV2ProcessingDependencyException(
+                    message: "Listener event dependency error occurred, contact support.",
+                    innerException: timeoutListenerEventV2ProcessingException);
+
+            this.listenerEventV2ServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IQueryable<ListenerEventV2>> retrieveAllListenerEventV2sTask =
+                this.listenerEventV2ProcessingService.RetrieveAllListenerEventV2sAsync(
+                    TestContext.Current.CancellationToken);
+
+            ListenerEventV2ProcessingDependencyException
+                actualListenerEventV2ProcessingDependencyException =
+                    await Assert.ThrowsAsync<ListenerEventV2ProcessingDependencyException>(
+                        retrieveAllListenerEventV2sTask.AsTask);
+
+            // then
+            actualListenerEventV2ProcessingDependencyException.Should()
+                .BeEquivalentTo(expectedListenerEventV2ProcessingDependencyException);
+
+            this.listenerEventV2ServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveAllAsync()
+        {
+            // given
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<IQueryable<ListenerEventV2>> retrieveAllListenerEventV2sTask =
+                this.listenerEventV2ProcessingService.RetrieveAllListenerEventV2sAsync(cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveAllListenerEventV2sTask.AsTask);
+
+            actualException.Should().NotBeOfType<ListenerEventV2ProcessingDependencyException>();
+            actualException.Should().NotBeOfType<ListenerEventV2ProcessingServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
