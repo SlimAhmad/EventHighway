@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
@@ -23,6 +24,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 Xeption listenerEventArchiveV2ValidationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();
 
@@ -41,7 +45,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddListenerEventArchiveV2sAsync(
                     someListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2OrchestrationDependencyValidationException
                 actualEventArchiveV2OrchestrationDependencyValidationException =
@@ -75,6 +79,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 Xeption listenerEventArchiveV2DependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();
 
@@ -93,7 +100,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddListenerEventArchiveV2sAsync(
                     someListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2OrchestrationDependencyException
                 actualEventArchiveV2OrchestrationDependencyException =
@@ -125,6 +132,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             ShouldThrowServiceExceptionOnBulkAddListenerEventArchiveV2sIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();
 
@@ -151,7 +161,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddListenerEventArchiveV2sAsync(
                     someListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2OrchestrationServiceException
                 actualEventArchiveV2OrchestrationServiceException =
