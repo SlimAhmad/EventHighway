@@ -21,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventV2Id = GetRandomId();
 
             var expectedEventV2CoordinationDependencyValidationException =
@@ -38,7 +41,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2CoordinationService.RemoveEventV2ByIdAsync(
                     someEventV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2CoordinationDependencyValidationException
                 actualEventV2CoordinationDependencyValidationException =
