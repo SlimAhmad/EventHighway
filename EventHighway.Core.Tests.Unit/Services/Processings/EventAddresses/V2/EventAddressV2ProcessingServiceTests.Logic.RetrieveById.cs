@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using FluentAssertions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
         public async Task ShouldRetrieveEventAddressV2ByIdAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                randomCancellationToken;
+
             Guid randomEventAddressV2Id = GetRandomId();
             Guid inputEventAddressV2Id = randomEventAddressV2Id;
 
@@ -32,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             this.eventAddressV2ServiceMock.Setup(service =>
                 service.RetrieveEventAddressV2ByIdAsync(
                     inputEventAddressV2Id,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(retrievedEventAddressV2);
 
             // when
@@ -40,7 +44,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                 await this.eventAddressV2ProcessingService
                     .RetrieveEventAddressV2ByIdAsync(
                         inputEventAddressV2Id,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventAddressV2.Should()
@@ -49,7 +53,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             this.eventAddressV2ServiceMock.Verify(service =>
                 service.RetrieveEventAddressV2ByIdAsync(
                     inputEventAddressV2Id,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventAddressV2ServiceMock.VerifyNoOtherCalls();
