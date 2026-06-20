@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
     {
         [Theory]
         [MemberData(nameof(DependencyValidationExceptions))]
-        public async Task ShouldThrowDependencyValidationExceptionOnBulkAddIfValidationErrorOccursAndLogItAsync(
+        public async Task ShouldThrowDependencyValidationExceptionOnBulkRemoveIfValidationErrorOccursAndLogItAsync(
             Xeption eventArchiveV2ValidationException)
         {
             // given
@@ -31,29 +31,29 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                     innerException: eventArchiveV2ValidationException.InnerException as Xeption);
 
             this.eventArchiveV2ServiceMock.Setup(service =>
-                service.BulkAddEventArchiveV2sAsync(
+                service.BulkRemoveEventArchiveV2sAsync(
                     someEventArchiveV2s,
                     TestContext.Current.CancellationToken))
                         .ThrowsAsync(eventArchiveV2ValidationException);
 
             // when
-            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
+            ValueTask bulkRemoveEventArchiveV2sTask =
                 this.eventArchiveV2ProcessingService
-                    .BulkAddEventArchiveV2sAsync(
+                    .BulkRemoveEventArchiveV2sAsync(
                         someEventArchiveV2s,
                         TestContext.Current.CancellationToken);
 
             EventArchiveV2ProcessingDependencyValidationException
                 actualEventArchiveV2ProcessingDependencyValidationException =
                     await Assert.ThrowsAsync<EventArchiveV2ProcessingDependencyValidationException>(
-                        bulkAddEventArchiveV2sTask.AsTask);
+                        bulkRemoveEventArchiveV2sTask.AsTask);
 
             // then
             actualEventArchiveV2ProcessingDependencyValidationException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2ProcessingDependencyValidationException);
 
             this.eventArchiveV2ServiceMock.Verify(service =>
-                service.BulkAddEventArchiveV2sAsync(
+                service.BulkRemoveEventArchiveV2sAsync(
                     someEventArchiveV2s,
                     TestContext.Current.CancellationToken),
                         Times.Once);
@@ -66,10 +66,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
-
         [Theory]
         [MemberData(nameof(DependencyExceptions))]
-        public async Task ShouldThrowDependencyExceptionOnBulkAddIfDependencyErrorOccursAndLogItAsync(
+        public async Task ShouldThrowDependencyExceptionOnBulkRemoveIfDependencyErrorOccursAndLogItAsync(
             Xeption eventArchiveV2DependencyException)
         {
             // given
@@ -82,29 +81,29 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                     innerException: eventArchiveV2DependencyException.InnerException as Xeption);
 
             this.eventArchiveV2ServiceMock.Setup(service =>
-                service.BulkAddEventArchiveV2sAsync(
+                service.BulkRemoveEventArchiveV2sAsync(
                     someEventArchiveV2s,
                     TestContext.Current.CancellationToken))
                         .ThrowsAsync(eventArchiveV2DependencyException);
 
             // when
-            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
+            ValueTask bulkRemoveEventArchiveV2sTask =
                 this.eventArchiveV2ProcessingService
-                    .BulkAddEventArchiveV2sAsync(
+                    .BulkRemoveEventArchiveV2sAsync(
                         someEventArchiveV2s,
                         TestContext.Current.CancellationToken);
 
             EventArchiveV2ProcessingDependencyException
                 actualEventArchiveV2ProcessingDependencyException =
                     await Assert.ThrowsAsync<EventArchiveV2ProcessingDependencyException>(
-                        bulkAddEventArchiveV2sTask.AsTask);
+                        bulkRemoveEventArchiveV2sTask.AsTask);
 
             // then
             actualEventArchiveV2ProcessingDependencyException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2ProcessingDependencyException);
 
             this.eventArchiveV2ServiceMock.Verify(service =>
-                service.BulkAddEventArchiveV2sAsync(
+                service.BulkRemoveEventArchiveV2sAsync(
                     someEventArchiveV2s,
                     TestContext.Current.CancellationToken),
                         Times.Once);
@@ -117,9 +116,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
-
         [Fact]
-        public async Task ShouldThrowServiceExceptionOnBulkAddIfExceptionOccursAndLogItAsync()
+        public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
         {
             // given
             IEnumerable<EventArchiveV2> someEventArchiveV2s =
@@ -139,29 +137,29 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                     innerException: failedEventArchiveV2ProcessingServiceException);
 
             this.eventArchiveV2ServiceMock.Setup(service =>
-                service.BulkAddEventArchiveV2sAsync(
+                service.BulkRemoveEventArchiveV2sAsync(
                     someEventArchiveV2s,
                     TestContext.Current.CancellationToken))
                         .ThrowsAsync(serviceException);
 
             // when
-            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
+            ValueTask bulkRemoveEventArchiveV2sTask =
                 this.eventArchiveV2ProcessingService
-                    .BulkAddEventArchiveV2sAsync(
+                    .BulkRemoveEventArchiveV2sAsync(
                         someEventArchiveV2s,
                         TestContext.Current.CancellationToken);
 
             EventArchiveV2ProcessingServiceException
                 actualEventArchiveV2ProcessingServiceException =
                     await Assert.ThrowsAsync<EventArchiveV2ProcessingServiceException>(
-                        bulkAddEventArchiveV2sTask.AsTask);
+                        bulkRemoveEventArchiveV2sTask.AsTask);
 
             // then
             actualEventArchiveV2ProcessingServiceException.Should()
                 .BeEquivalentTo(expectedEventArchiveV2ProcessingServiceException);
 
             this.eventArchiveV2ServiceMock.Verify(service =>
-                service.BulkAddEventArchiveV2sAsync(
+                service.BulkRemoveEventArchiveV2sAsync(
                     someEventArchiveV2s,
                     TestContext.Current.CancellationToken),
                         Times.Once);
