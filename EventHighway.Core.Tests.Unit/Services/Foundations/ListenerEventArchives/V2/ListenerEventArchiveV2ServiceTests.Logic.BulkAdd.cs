@@ -207,7 +207,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 broker.BulkInsertListenerEventArchiveV2sAsync(
                     It.Is<List<ListenerEventArchiveV2>>(actual =>
                         SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s, actual)),
-                            It.IsAny<CancellationToken>()))
+                            randomCancellationToken))
                                 .Returns(ValueTask.CompletedTask);
 
             // when
@@ -236,7 +236,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 broker.BulkInsertListenerEventArchiveV2sAsync(
                     It.Is<List<ListenerEventArchiveV2>>(actual =>
                         SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s, actual)),
-                            It.IsAny<CancellationToken>()),
+                            randomCancellationToken),
                                 Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();
