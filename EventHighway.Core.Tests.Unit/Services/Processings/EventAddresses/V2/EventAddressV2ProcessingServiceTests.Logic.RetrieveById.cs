@@ -19,7 +19,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
         {
             // given
             CancellationToken randomCancellationToken =
-                randomCancellationToken;
+                TestContext.Current.CancellationToken;
 
             Guid randomEventAddressV2Id = GetRandomId();
             Guid inputEventAddressV2Id = randomEventAddressV2Id;
