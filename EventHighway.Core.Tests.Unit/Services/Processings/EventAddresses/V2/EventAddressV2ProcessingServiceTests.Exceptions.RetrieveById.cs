@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Processings.EventAddresses.V2.Exceptions;
@@ -21,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventAddressV2Id = GetRandomId();
 
             var expectedEventAddressV2ProcessingDependencyValidationException =
@@ -31,14 +35,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             this.eventAddressV2ServiceMock.Setup(service =>
                 service.RetrieveEventAddressV2ByIdAsync(
                     It.IsAny<Guid>(),
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ThrowsAsync(validationException);
 
             // when
             ValueTask<EventAddressV2> retrieveEventAddressV2ByIdTask =
                 this.eventAddressV2ProcessingService.RetrieveEventAddressV2ByIdAsync(
                     someEventAddressV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventAddressV2ProcessingDependencyValidationException
                 actualEventAddressV2ProcessingDependencyValidationException =
@@ -52,7 +56,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             this.eventAddressV2ServiceMock.Verify(service =>
                 service.RetrieveEventAddressV2ByIdAsync(
                     It.IsAny<Guid>(),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
