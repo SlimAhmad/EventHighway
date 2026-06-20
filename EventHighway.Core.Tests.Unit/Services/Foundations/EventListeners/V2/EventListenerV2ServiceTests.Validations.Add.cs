@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldThrowValidationExceptionOnAddIfEventListenerV2IsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventListenerV2 nullEventListenerV2 = null;
 
             var nullEventListenerV2Exception =
@@ -32,7 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             ValueTask<EventListenerV2> addEventListenerV2Task =
                 this.eventListenerV2Service.AddEventListenerV2Async(
                     nullEventListenerV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventListenerV2ValidationException actualEventListenerV2ValidationException =
                 await Assert.ThrowsAsync<EventListenerV2ValidationException>(
