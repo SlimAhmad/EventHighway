@@ -33,6 +33,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
         public ValueTask<EventV2> AddEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await ValidateEventV2OnAddAsync(eventV2);
 
             return await storageBroker.InsertEventV2Async(eventV2, cancellationToken);
@@ -40,11 +41,17 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
 
         public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
             CancellationToken cancellationToken = default) =>
-        TryCatch(async () => await this.storageBroker.SelectAllEventV2sAsync(cancellationToken));
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.storageBroker.SelectAllEventV2sAsync(cancellationToken);
+        });
 
         public ValueTask<EventV2> ModifyEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await ValidateEventV2OnModifyAsync(eventV2);
 
             EventV2 maybeEventV2 =
@@ -61,6 +68,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2Id(eventV2Id);
 
             EventV2 maybeEventV2 =
@@ -76,6 +84,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2sIsNotNull(eventV2s);
 
             await this.storageBroker.BulkDeleteEventV2sAsync(eventV2s, cancellationToken);
