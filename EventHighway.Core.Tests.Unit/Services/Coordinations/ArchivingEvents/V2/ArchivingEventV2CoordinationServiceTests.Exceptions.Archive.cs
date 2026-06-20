@@ -68,6 +68,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
 
             var expectedArchivingEventV2CoordinationDependencyException =
                 new ArchivingEventV2CoordinationDependencyException(
@@ -81,7 +83,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // when
             ValueTask archiveDeadEventV2sTask =
                 this.archivingEventV2CoordinationService
-                    .ArchiveDeadEventV2sAsync(TestContext.Current.CancellationToken);
+                    .ArchiveDeadEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2CoordinationDependencyException
                 actualArchivingEventV2CoordinationDependencyException =
