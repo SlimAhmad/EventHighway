@@ -79,6 +79,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowDependencyValidationExceptionOnAddIfEventAddressV2AlreadyExistsAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             string someMessage = GetRandomString();
             EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
             var duplicateKeyException = new DuplicateKeyException(someMessage);
@@ -102,7 +105,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    someEventAddressV2, TestContext.Current.CancellationToken);
+                    someEventAddressV2, randomCancellationToken);
 
             EventAddressV2DependencyValidationException actualEventAddressV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventAddressV2DependencyValidationException>(
