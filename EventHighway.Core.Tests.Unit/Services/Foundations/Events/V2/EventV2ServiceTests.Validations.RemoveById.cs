@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfIdIsInvalidAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid invalidEventV2Id = Guid.Empty;
 
             var invalidEventV2Exception =
@@ -36,7 +39,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2Service.RemoveEventV2ByIdAsync(
-                    invalidEventV2Id, TestContext.Current.CancellationToken);
+                    invalidEventV2Id, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -65,6 +68,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfEventV2IsNotFoundAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid nonExistingEventV2Id = GetRandomId();
             EventV2 nullEventV2 = null;
 
@@ -83,7 +89,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
-                this.eventV2Service.RemoveEventV2ByIdAsync(nonExistingEventV2Id, TestContext.Current.CancellationToken);
+                this.eventV2Service.RemoveEventV2ByIdAsync(nonExistingEventV2Id, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
