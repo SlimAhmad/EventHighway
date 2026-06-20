@@ -69,6 +69,43 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task
+            ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveByEventAddressIdAsync()
+        {
+            // given
+            Guid someEventAddressId = GetRandomId();
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<IQueryable<EventListenerV2>> retrieveEventListenerV2sByEventAddressIdTask =
+                this.eventListenerV2ProcessingService.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    someEventAddressId,
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveEventListenerV2sByEventAddressIdTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventListenerV2ProcessingDependencyException>();
+            actualException.Should().NotBeOfType<EventListenerV2ProcessingServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventListenerV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRetrieveByEventAddressIdIfDependencyErrorOccursAndLogItAsync(
