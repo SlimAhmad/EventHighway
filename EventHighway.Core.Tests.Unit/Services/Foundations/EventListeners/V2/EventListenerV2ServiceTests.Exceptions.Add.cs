@@ -277,6 +277,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventListenerV2 someEventListenerV2 = CreateRandomEventListenerV2();
             var serviceException = new Exception();
 
@@ -303,7 +306,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             ValueTask<EventListenerV2> addEventListenerV2Task =
                 this.eventListenerV2Service.AddEventListenerV2Async(
                     someEventListenerV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventListenerV2ServiceException actualEventListenerV2ServiceException =
                 await Assert.ThrowsAsync<EventListenerV2ServiceException>(
