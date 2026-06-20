@@ -53,6 +53,8 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             IQueryable<EventV2> eventV2s =
                 await this.eventV2Service.RetrieveAllEventV2sAsync(cancellationToken);
 
