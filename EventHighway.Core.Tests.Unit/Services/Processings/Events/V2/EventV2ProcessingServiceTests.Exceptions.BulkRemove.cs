@@ -77,6 +77,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             Xeption eventV2DependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<EventV2> someEventV2s = CreateRandomEventV2s();
             IEnumerable<EventV2> inputEventV2s = someEventV2s;
 
@@ -95,7 +98,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             ValueTask bulkRemoveEventV2sTask =
                 this.eventV2ProcessingService.BulkRemoveEventV2sAsync(
                     inputEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2ProcessingDependencyException actualEventV2ProcessingDependencyException =
                 await Assert.ThrowsAsync<EventV2ProcessingDependencyException>(
