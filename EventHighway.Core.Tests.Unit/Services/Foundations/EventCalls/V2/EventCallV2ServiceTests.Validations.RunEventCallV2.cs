@@ -113,6 +113,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         public async Task ShouldThrowValidationExceptionOnRunIfHandlerBrokerIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
 
             IEventCallV2Service serviceWithNullBroker = new EventCallV2Service(
@@ -130,7 +133,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                serviceWithNullBroker.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
+                serviceWithNullBroker.RunEventCallV2Async(someEventCallV2, randomCancellationToken);
 
             EventCallV2ValidationException actualEventCallV2ValidationException =
                 await Assert.ThrowsAsync<EventCallV2ValidationException>(
