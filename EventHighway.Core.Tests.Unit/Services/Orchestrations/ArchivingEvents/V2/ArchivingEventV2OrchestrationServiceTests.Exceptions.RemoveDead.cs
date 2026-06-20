@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventV2 someEventV2 = CreateRandomEventV2();
 
             var expectedArchivingEventV2OrchestrationDependencyValidationException =
@@ -39,7 +42,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             ValueTask removeEventV2AndListenerEventV2sTask =
                 this.archivingEventV2OrchestrationService.RemoveEventV2AndListenerEventV2sAsync(
                     someEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ArchivingEventV2OrchestrationDependencyValidationException
                 actualArchivingEventV2OrchestrationDependencyValidationException =
