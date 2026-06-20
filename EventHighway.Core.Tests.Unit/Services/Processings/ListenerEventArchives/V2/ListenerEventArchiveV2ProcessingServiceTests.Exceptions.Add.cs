@@ -74,7 +74,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             Xeption dependencyException)
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             ListenerEventArchiveV2 someListenerEventArchiveV2 = CreateRandomListenerEventArchiveV2();
@@ -94,7 +94,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             ValueTask<ListenerEventArchiveV2> addListenerEventArchiveV2Task =
                 this.listenerEventArchiveV2ProcessingService.AddListenerEventArchiveV2Async(
                     someListenerEventArchiveV2,
-                    cancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2ProcessingDependencyException
                 actualListenerEventArchiveV2ProcessingDependencyException =
