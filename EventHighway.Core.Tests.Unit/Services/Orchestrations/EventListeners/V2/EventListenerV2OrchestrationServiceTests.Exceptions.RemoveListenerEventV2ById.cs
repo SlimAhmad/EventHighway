@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
     public partial class EventListenerV2OrchestrationServiceTests
     {
         [Theory]
-        [MemberData(nameof(ListenerEventV2ValidationExceptions))]
+        [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationOnRemoveListenerEventV2ByIdIfValidationErrorAndLogItAsync(
             Xeption listenerEventV2ValidationException)
         {
@@ -71,7 +71,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
         }
 
         [Theory]
-        [MemberData(nameof(ListenerEventV2DependencyExceptions))]
+        [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRemoveListenerEventV2ByIdIfDependencyErrorOccursAndLogItAsync(
             Xeption listenerEventV2DependencyException)
         {
