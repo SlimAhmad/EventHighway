@@ -1,0 +1,69 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Processings.EventArchives.V2.Exceptions;
+using FluentAssertions;
+using Moq;
+using Xeptions;
+
+namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
+{
+    public partial class EventArchiveV2ProcessingServiceTests
+    {
+        [Theory]
+        [MemberData(nameof(DependencyValidationExceptions))]
+        public async Task ShouldThrowDependencyValidationExceptionOnBulkRemoveIfValidationErrorOccursAndLogItAsync(
+            Xeption eventArchiveV2ValidationException)
+        {
+            // given
+            IEnumerable<EventArchiveV2> someEventArchiveV2s =
+                CreateRandomEventArchiveV2s().ToList();
+
+            var expectedEventArchiveV2ProcessingDependencyValidationException =
+                new EventArchiveV2ProcessingDependencyValidationException(
+                    message: "Event archive validation error occurred, fix the errors and try again.",
+                    innerException: eventArchiveV2ValidationException.InnerException as Xeption);
+
+            this.eventArchiveV2ServiceMock.Setup(service =>
+                service.BulkRemoveEventArchiveV2sAsync(
+                    someEventArchiveV2s,
+                    TestContext.Current.CancellationToken))
+                        .ThrowsAsync(eventArchiveV2ValidationException);
+
+            // when
+            ValueTask bulkRemoveEventArchiveV2sTask =
+                this.eventArchiveV2ProcessingService
+                    .BulkRemoveEventArchiveV2sAsync(
+                        someEventArchiveV2s,
+                        TestContext.Current.CancellationToken);
+
+            EventArchiveV2ProcessingDependencyValidationException
+                actualEventArchiveV2ProcessingDependencyValidationException =
+                    await Assert.ThrowsAsync<EventArchiveV2ProcessingDependencyValidationException>(
+                        bulkRemoveEventArchiveV2sTask.AsTask);
+
+            // then
+            actualEventArchiveV2ProcessingDependencyValidationException.Should()
+                .BeEquivalentTo(expectedEventArchiveV2ProcessingDependencyValidationException);
+
+            this.eventArchiveV2ServiceMock.Verify(service =>
+                service.BulkRemoveEventArchiveV2sAsync(
+                    someEventArchiveV2s,
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventArchiveV2ProcessingDependencyValidationException))),
+                        Times.Once);
+
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+    }
+}
