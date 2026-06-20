@@ -17,6 +17,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldRemoveEventV2AndListenerEventV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventV2 randomEventV2 = CreateRandomEventV2();
 
             var randomListenerEventV2s =
@@ -28,7 +31,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             await this.archivingEventV2OrchestrationService
                 .RemoveEventV2AndListenerEventV2sAsync(
                     inputEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             // then
             foreach (ListenerEventV2 listenerEventV2 in randomListenerEventV2s)
@@ -36,14 +39,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                 this.listenerEventV2ProcessingServiceMock.Verify(service =>
                     service.RemoveListenerEventV2ByIdAsync(
                         listenerEventV2.Id,
-                        It.IsAny<CancellationToken>()),
+                        randomCancellationToken),
                             Times.Once);
             }
 
             this.eventV2ProcessingServiceMock.Verify(service =>
                 service.RemoveEventV2ByIdAsync(
                     inputEventV2.Id,
-                    It.IsAny<CancellationToken>()),
+                    randomCancellationToken),
                         Times.Once);
 
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();

@@ -19,6 +19,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             ShouldThrowValidationExceptionOnBulkRemoveListenerEventV2sIfListenerEventV2sIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<ListenerEventV2> nullListenerEventV2s = null;
 
             var nullArchivingListenerEventV2sOrchestrationException =
@@ -34,7 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             ValueTask bulkRemoveListenerEventV2sTask =
                 this.archivingEventV2OrchestrationService.BulkRemoveListenerEventV2sAsync(
                     nullListenerEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ArchivingEventV2OrchestrationValidationException
                 actualArchivingEventV2OrchestrationValidationException =
