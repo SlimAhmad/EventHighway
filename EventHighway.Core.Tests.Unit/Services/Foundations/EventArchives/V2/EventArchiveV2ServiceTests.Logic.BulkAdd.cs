@@ -31,6 +31,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             List<EventArchiveV2> expectedEventArchiveV2s =
                 inputEventArchiveV2s.Select(item => item.DeepClone()).ToList();
 
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllEventArchiveV2sAsync())
+                    .ReturnsAsync(new List<EventArchiveV2>().AsQueryable());
+
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
                     .ReturnsAsync(randomDateTime);
@@ -64,6 +68,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
                     Times.Exactly(inputEventArchiveV2s.Count + 1));
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllEventArchiveV2sAsync(),
+                    Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.BulkInsertEventArchiveV2sAsync(
@@ -184,6 +192,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 key: nameof(EventArchiveV2.Id),
                 value: "Required");
 
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllEventArchiveV2sAsync())
+                    .ReturnsAsync(new List<EventArchiveV2>().AsQueryable());
+
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
                     .ReturnsAsync(randomDateTime);
@@ -212,6 +224,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     invalidEventArchiveV2Exception))),
                         Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllEventArchiveV2sAsync(),
+                    Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.BulkInsertEventArchiveV2sAsync(
