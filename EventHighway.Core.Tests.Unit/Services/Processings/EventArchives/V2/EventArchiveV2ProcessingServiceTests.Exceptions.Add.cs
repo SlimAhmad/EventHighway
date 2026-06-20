@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
 
             var expectedEventArchiveV2ProcessingDependencyValidationException =
@@ -39,7 +42,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             ValueTask<EventArchiveV2> addEventArchiveV2Task =
                 this.eventArchiveV2ProcessingService.AddEventArchiveV2Async(
                     someEventArchiveV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2ProcessingDependencyValidationException
                 actualEventArchiveV2ProcessingDependencyValidationException =
