@@ -85,6 +85,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                 Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
 
             var expectedArchivingEventV2OrchestrationDependencyException =
@@ -102,7 +105,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             ValueTask bulkRemoveListenerEventV2sTask =
                 this.archivingEventV2OrchestrationService.BulkRemoveListenerEventV2sAsync(
                     someListenerEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ArchivingEventV2OrchestrationDependencyException
                 actualArchivingEventV2OrchestrationDependencyException =
