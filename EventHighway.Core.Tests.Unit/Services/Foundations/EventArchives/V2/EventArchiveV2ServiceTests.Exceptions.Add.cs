@@ -336,5 +336,63 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnAddIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventArchiveV2Exception =
+                new TimeoutEventArchiveV2Exception(
+                    message: "Failed event archive timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventArchiveV2DependencyException =
+                new EventArchiveV2DependencyException(
+                    message: "Event archive dependency error occurred, contact support.",
+                    innerException: timeoutEventArchiveV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventArchiveV2> addEventArchiveV2Task =
+                this.eventArchiveV2Service.AddEventArchiveV2Async(
+                    someEventArchiveV2, TestContext.Current.CancellationToken);
+
+            EventArchiveV2DependencyException actualEventArchiveV2DependencyException =
+                await Assert.ThrowsAsync<EventArchiveV2DependencyException>(
+                    addEventArchiveV2Task.AsTask);
+
+            // then
+            actualEventArchiveV2DependencyException.Should().BeEquivalentTo(
+                expectedEventArchiveV2DependencyException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventArchiveV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventArchiveV2Async(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
