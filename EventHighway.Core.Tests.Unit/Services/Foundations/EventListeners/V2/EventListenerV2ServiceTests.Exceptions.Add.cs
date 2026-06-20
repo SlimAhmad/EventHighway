@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnAddIfSqlExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventListenerV2 someEventListenerV2 = CreateRandomEventListenerV2();
             SqlException sqlException = GetSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
@@ -45,7 +48,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             ValueTask<EventListenerV2> addEventListenerV2Task =
                 this.eventListenerV2Service.AddEventListenerV2Async(
                     someEventListenerV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventListenerV2DependencyException actualEventListenerV2DependencyException =
                 await Assert.ThrowsAsync<EventListenerV2DependencyException>(
