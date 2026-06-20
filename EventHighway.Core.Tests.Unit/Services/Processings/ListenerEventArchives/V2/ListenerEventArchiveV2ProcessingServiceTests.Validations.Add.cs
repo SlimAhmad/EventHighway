@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         public async Task ShouldThrowValidationExceptionOnAddIfListenerEventArchiveV2IsNullAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             ListenerEventArchiveV2 nullListenerEventArchiveV2 = null;
@@ -35,7 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             ValueTask<ListenerEventArchiveV2> addListenerEventArchiveV2Task =
                 this.listenerEventArchiveV2ProcessingService.AddListenerEventArchiveV2Async(
                     nullListenerEventArchiveV2,
-                    cancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2ProcessingValidationException
                 actualListenerEventArchiveV2ProcessingValidationException =
