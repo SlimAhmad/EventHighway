@@ -31,6 +31,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventV2IsNotNull(listenerEventV2);
 
             return await this.listenerEventV2Service
@@ -39,13 +40,19 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
 
         public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
             CancellationToken cancellationToken = default) =>
-        TryCatch(async () => await this.listenerEventV2Service.RetrieveAllListenerEventV2sAsync(cancellationToken));
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventV2Service.RetrieveAllListenerEventV2sAsync(cancellationToken);
+        });
 
         public ValueTask<ListenerEventV2> ModifyListenerEventV2Async(
             ListenerEventV2 listenerEventV2,
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventV2IsNotNull(listenerEventV2);
 
             return await this.listenerEventV2Service
@@ -57,6 +64,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventV2Id(listenerEventV2Id);
 
             return await this.listenerEventV2Service
@@ -68,6 +76,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventV2sIsNotNull(listenerEventV2s);
 
             await this.listenerEventV2Service
@@ -80,6 +89,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateOnRetrieveBatchOfListenerEventV2sByEventIds(eventIds, take);
 
             IQueryable<ListenerEventV2> listenerEventV2s =

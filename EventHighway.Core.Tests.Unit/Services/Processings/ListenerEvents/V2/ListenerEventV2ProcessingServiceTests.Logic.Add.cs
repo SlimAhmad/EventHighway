@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
         public async Task ShouldAddListenerEventV2Async()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             ListenerEventV2 randomListenerEventV2 =
@@ -35,7 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             this.listenerEventV2ServiceMock.Setup(broker =>
                 broker.AddListenerEventV2Async(
                     inputListenerEventV2,
-                    cancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(addedListenerEventV2);
 
             // when
@@ -43,7 +43,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 await this.listenerEventV2ProcessingService
                     .AddListenerEventV2Async(
                         inputListenerEventV2,
-                        cancellationToken);
+                        randomCancellationToken);
 
             // then
             actualListenerEventV2.Should().BeEquivalentTo(
@@ -52,7 +52,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             this.listenerEventV2ServiceMock.Verify(broker =>
                 broker.AddListenerEventV2Async(
                     inputListenerEventV2,
-                    cancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.listenerEventV2ServiceMock.VerifyNoOtherCalls();

@@ -22,7 +22,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             Xeption listenerEventV2ValidationException)
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid someListenerEventV2Id = GetRandomId();
@@ -42,7 +42,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             ValueTask<ListenerEventV2> removeListenerEventV2ByIdTask =
                 this.listenerEventV2ProcessingService.RemoveListenerEventV2ByIdAsync(
                     someListenerEventV2Id,
-                    cancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ProcessingDependencyValidationException
                 actualListenerEventV2ProcessingDependencyValidationException =
@@ -74,7 +74,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             Xeption listenerEventV2DependencyException)
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid someListenerEventV2Id = GetRandomId();
@@ -94,7 +94,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             ValueTask<ListenerEventV2> removeListenerEventV2ByIdTask =
                 this.listenerEventV2ProcessingService.RemoveListenerEventV2ByIdAsync(
                     someListenerEventV2Id,
-                    cancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ProcessingDependencyException
                 actualListenerEventV2ProcessingDependencyException =
@@ -124,7 +124,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
         public async Task ShouldThrowServiceExceptionOnRemoveByIdIfExceptionOccursAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid someListenerEventV2Id = GetRandomId();
@@ -152,7 +152,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             ValueTask<ListenerEventV2> removeListenerEventV2ByIdTask =
                 this.listenerEventV2ProcessingService.RemoveListenerEventV2ByIdAsync(
                     someListenerEventV2Id,
-                    cancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ProcessingServiceException
                 actualListenerEventV2ProcessingServiceException =
@@ -173,6 +173,99 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedListenerEventV2ProcessingServiceException))),
                         Times.Once);
+
+            this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRemoveByIdIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            Guid someListenerEventV2Id = GetRandomId();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutListenerEventV2ProcessingException =
+                new TimeoutListenerEventV2ProcessingException(
+                    message: "Failed listener event processing timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedListenerEventV2ProcessingDependencyException =
+                new ListenerEventV2ProcessingDependencyException(
+                    message: "Listener event dependency error occurred, contact support.",
+                    innerException: timeoutListenerEventV2ProcessingException);
+
+            this.listenerEventV2ServiceMock.Setup(service =>
+                service.RemoveListenerEventV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<ListenerEventV2> removeListenerEventV2ByIdTask =
+                this.listenerEventV2ProcessingService.RemoveListenerEventV2ByIdAsync(
+                    someListenerEventV2Id,
+                    TestContext.Current.CancellationToken);
+
+            ListenerEventV2ProcessingDependencyException
+                actualListenerEventV2ProcessingDependencyException =
+                    await Assert.ThrowsAsync<ListenerEventV2ProcessingDependencyException>(
+                        removeListenerEventV2ByIdTask.AsTask);
+
+            // then
+            actualListenerEventV2ProcessingDependencyException.Should()
+                .BeEquivalentTo(expectedListenerEventV2ProcessingDependencyException);
+
+            this.listenerEventV2ServiceMock.Verify(service =>
+                service.RemoveListenerEventV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRemoveByIdAsync()
+        {
+            // given
+            Guid someListenerEventV2Id = GetRandomId();
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<ListenerEventV2> removeListenerEventV2ByIdTask =
+                this.listenerEventV2ProcessingService.RemoveListenerEventV2ByIdAsync(
+                    someListenerEventV2Id,
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    removeListenerEventV2ByIdTask.AsTask);
+
+            actualException.Should().NotBeOfType<ListenerEventV2ProcessingDependencyException>();
+            actualException.Should().NotBeOfType<ListenerEventV2ProcessingServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
 
             this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
