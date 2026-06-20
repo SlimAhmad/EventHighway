@@ -23,6 +23,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                 Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<EventV2> someEventV2s = CreateRandomEventV2List();
 
             var expectedArchivingEventV2OrchestrationDependencyValidationException =
@@ -40,7 +43,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             ValueTask bulkRemoveEventV2sTask =
                 this.archivingEventV2OrchestrationService.BulkRemoveEventV2sAsync(
                     someEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ArchivingEventV2OrchestrationDependencyValidationException
                 actualArchivingEventV2OrchestrationDependencyValidationException =
