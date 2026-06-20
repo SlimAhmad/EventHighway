@@ -122,6 +122,43 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         }
 
         [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRemoveByIdAsync()
+        {
+            // given
+            Guid someEventV2Id = GetRandomId();
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventV2> removeEventV2ByIdTask =
+                this.eventV2CoordinationService.RemoveEventV2ByIdAsync(
+                    someEventV2Id,
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    removeEventV2ByIdTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventV2CoordinationDependencyException>();
+            actualException.Should().NotBeOfType<EventV2CoordinationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowDependencyExceptionOnRemoveByIdIfTimeoutOccursAndLogItAsync()
         {
             // given
