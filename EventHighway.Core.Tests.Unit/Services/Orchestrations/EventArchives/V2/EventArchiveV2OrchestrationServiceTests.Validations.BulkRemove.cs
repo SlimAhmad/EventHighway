@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnBulkRemoveIfEventArchiveV2sIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<EventArchiveV2> nullEventArchiveV2s = null;
 
             var nullEventArchiveV2sOrchestrationException =
@@ -32,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             ValueTask bulkRemoveEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkRemoveEventArchiveV2sAsync(
                     nullEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2OrchestrationValidationException
                 actualEventArchiveV2OrchestrationValidationException =
