@@ -78,7 +78,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
         }
 
         [Theory]
-        [MemberData(nameof(EventListenerV2DependencyExceptions))]
+        [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRetrieveByEventAddressIdIfDependencyErrorOccursAndLogItAsync(
             Xeption eventListenerV2DependencyException)
         {
