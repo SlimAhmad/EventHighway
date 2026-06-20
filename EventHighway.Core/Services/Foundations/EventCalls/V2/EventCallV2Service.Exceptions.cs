@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -20,6 +21,24 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             try
             {
                 return await returningEventCallV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventCallV2Exception =
+                    new TimeoutEventCallV2Exception(
+                        message: "Failed event call timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventCallV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventCallV2Exception nullEventCallV2Exception)
             {

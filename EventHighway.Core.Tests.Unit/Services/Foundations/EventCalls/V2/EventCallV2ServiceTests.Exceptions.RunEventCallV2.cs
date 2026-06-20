@@ -10,6 +10,7 @@ using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
 using FluentAssertions;
 using Moq;
+using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 {
@@ -21,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             Exception criticalDependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
             criticalDependencyException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
@@ -53,7 +57,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, randomCancellationToken);
 
             EventCallV2DependencyException actualEventCallV2DependencyException =
                 await Assert.ThrowsAsync<EventCallV2DependencyException>(
@@ -96,6 +100,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             Exception dependencyValidationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
             dependencyValidationException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
@@ -129,7 +136,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, randomCancellationToken);
 
             EventCallV2DependencyValidationException actualEventCallV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventCallV2DependencyValidationException>(
@@ -172,6 +179,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             Exception serviceException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
@@ -204,7 +214,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, randomCancellationToken);
 
             EventCallV2DependencyException actualEventCallV2DependencyException =
                 await Assert.ThrowsAsync<EventCallV2DependencyException>(
@@ -242,9 +252,98 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         }
 
         [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRunAsync()
+        {
+            // given
+            EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventCallV2> runEventCallV2Task =
+                this.eventCallV2Service.RunEventCallV2Async(
+                    someEventCallV2, cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    runEventCallV2Task.AsTask);
+
+            actualException.Should().NotBeOfType<EventCallV2DependencyException>();
+            actualException.Should().NotBeOfType<EventCallV2ServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRunIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventCallV2Exception =
+                new TimeoutEventCallV2Exception(
+                    message: "Failed event call timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventCallV2DependencyException =
+                new EventCallV2DependencyException(
+                    message: "Event call dependency error occurred, contact support.",
+                    innerException: timeoutEventCallV2Exception);
+
+            this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
+                .Throws(operationCanceledException);
+
+            // when
+            ValueTask<EventCallV2> runEventCallV2Task =
+                this.eventCallV2Service.RunEventCallV2Async(
+                    someEventCallV2, TestContext.Current.CancellationToken);
+
+            EventCallV2DependencyException actualEventCallV2DependencyException =
+                await Assert.ThrowsAsync<EventCallV2DependencyException>(
+                    runEventCallV2Task.AsTask);
+
+            // then
+            actualEventCallV2DependencyException.Should()
+                .BeEquivalentTo(expectedEventCallV2DependencyException);
+
+            this.eventHandlerBrokerMock.Verify(broker => broker.GetAll(),
+                Times.Once);
+
+            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventCallV2DependencyException))),
+                        Times.Once);
+
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowServiceExceptionOnRunIfUnexpectedExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -277,7 +376,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
+                this.eventCallV2Service.RunEventCallV2Async(someEventCallV2, randomCancellationToken);
 
             EventCallV2ServiceException actualEventCallV2ServiceException =
                 await Assert.ThrowsAsync<EventCallV2ServiceException>(
