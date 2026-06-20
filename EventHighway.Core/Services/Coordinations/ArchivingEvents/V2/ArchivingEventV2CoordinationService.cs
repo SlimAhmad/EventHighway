@@ -48,11 +48,8 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            BatchConfiguration batchConfiguration =
-                this.configurationBroker.GetBatchConfiguration();
-
+            BatchConfiguration batchConfiguration = this.configurationBroker.GetBatchConfiguration();
             int take = batchConfiguration.BatchSizeForBulkProcessing;
-
             IEnumerable<EventArchiveV2> batch;
 
             do
