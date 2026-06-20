@@ -1,10 +1,11 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
@@ -27,6 +28,31 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             try
             {
                 return await returningListenerEventArchiveV2sFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventArchiveV2ProcessingException =
+                    new TimeoutListenerEventArchiveV2ProcessingException(
+                        message: "Failed listener event archive processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var listenerEventArchiveV2ProcessingDependencyException =
+                    new ListenerEventArchiveV2ProcessingDependencyException(
+                        message: "Listener event archive dependency error occurred, contact support.",
+                        innerException: timeoutListenerEventArchiveV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(listenerEventArchiveV2ProcessingDependencyException);
+
+                throw listenerEventArchiveV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (InvalidListenerEventArchiveV2ProcessingException invalidListenerEventArchiveV2ProcessingException)
             {
@@ -59,6 +85,31 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             try
             {
                 return await returningListenerEventArchiveV2EnumerableFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventArchiveV2ProcessingException =
+                    new TimeoutListenerEventArchiveV2ProcessingException(
+                        message: "Failed listener event archive processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var listenerEventArchiveV2ProcessingDependencyException =
+                    new ListenerEventArchiveV2ProcessingDependencyException(
+                        message: "Listener event archive dependency error occurred, contact support.",
+                        innerException: timeoutListenerEventArchiveV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(listenerEventArchiveV2ProcessingDependencyException);
+
+                throw listenerEventArchiveV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullListenerEventArchiveV2ProcessingException
                 nullListenerEventArchiveV2ProcessingException)
@@ -110,6 +161,31 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             {
                 return await returningListenerEventArchiveV2ListsFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventArchiveV2ProcessingException =
+                    new TimeoutListenerEventArchiveV2ProcessingException(
+                        message: "Failed listener event archive processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var listenerEventArchiveV2ProcessingDependencyException =
+                    new ListenerEventArchiveV2ProcessingDependencyException(
+                        message: "Listener event archive dependency error occurred, contact support.",
+                        innerException: timeoutListenerEventArchiveV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(listenerEventArchiveV2ProcessingDependencyException);
+
+                throw listenerEventArchiveV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (InvalidListenerEventArchiveV2ProcessingException invalidListenerEventArchiveV2ProcessingException)
             {
                 throw await CreateAndLogValidationExceptionAsync(invalidListenerEventArchiveV2ProcessingException);
@@ -141,6 +217,31 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             try
             {
                 return await returningListenerEventArchiveV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventArchiveV2ProcessingException =
+                    new TimeoutListenerEventArchiveV2ProcessingException(
+                        message: "Failed listener event archive processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var listenerEventArchiveV2ProcessingDependencyException =
+                    new ListenerEventArchiveV2ProcessingDependencyException(
+                        message: "Listener event archive dependency error occurred, contact support.",
+                        innerException: timeoutListenerEventArchiveV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(listenerEventArchiveV2ProcessingDependencyException);
+
+                throw listenerEventArchiveV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullListenerEventArchiveV2ProcessingException nullListenerEventArchiveV2ProcessingException)
             {
@@ -182,6 +283,31 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventArchiveV2ProcessingException =
+                    new TimeoutListenerEventArchiveV2ProcessingException(
+                        message: "Failed listener event archive processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var listenerEventArchiveV2ProcessingDependencyException =
+                    new ListenerEventArchiveV2ProcessingDependencyException(
+                        message: "Listener event archive dependency error occurred, contact support.",
+                        innerException: timeoutListenerEventArchiveV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(listenerEventArchiveV2ProcessingDependencyException);
+
+                throw listenerEventArchiveV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (ListenerEventArchiveV2ValidationException listenerEventArchiveV2ValidationException)
             {

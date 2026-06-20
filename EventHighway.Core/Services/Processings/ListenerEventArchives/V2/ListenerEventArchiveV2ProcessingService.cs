@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -34,13 +34,18 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
         public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
             TryCatch(async () =>
-                await this.listenerEventArchiveV2Service
-                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken));
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                return await this.listenerEventArchiveV2Service
+                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+            });
 
         public ValueTask<ListenerEventArchiveV2> AddListenerEventArchiveV2Async(
             ListenerEventArchiveV2 listenerEventArchiveV2,
             CancellationToken cancellationToken = default) => TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventArchiveV2(listenerEventArchiveV2);
 
             return await this.listenerEventArchiveV2Service
@@ -52,6 +57,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             CancellationToken cancellationToken) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             BatchConfiguration batchConfiguration = this.configurationBroker.GetBatchConfiguration();
             ValidateOnRetrieveNextPurgeBatchOfArchivedEventV2s(olderThan, batchConfiguration);
 
@@ -74,6 +80,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
 
             return await this.listenerEventArchiveV2Service
@@ -85,6 +92,8 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             await this.listenerEventArchiveV2Service.BulkRemoveListenerEventArchiveV2sAsync(
                 listenerEventArchiveV2s, cancellationToken);
         });

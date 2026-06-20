@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using FluentAssertions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         public async Task ShouldBulkAddListenerEventArchiveV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventArchiveV2> randomListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();
 
@@ -32,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     inputListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(returnedListenerEventArchiveV2s);
 
             // when
@@ -40,7 +44,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 await this.listenerEventArchiveV2ProcessingService
                     .BulkAddListenerEventArchiveV2sAsync(
                         inputListenerEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualListenerEventArchiveV2s.Should()
@@ -49,7 +53,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
                 service.BulkAddListenerEventArchiveV2sAsync(
                     inputListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
