@@ -30,6 +30,8 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync(cancellationToken);
         });
 
@@ -38,6 +40,7 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
             return await this.eventArchiveV2Service
@@ -67,6 +70,7 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
             await this.eventArchiveV2Service
@@ -78,6 +82,7 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventArchiveV2IsNotNull(eventArchiveV2);
 
             return await this.eventArchiveV2Service.AddEventArchiveV2Async(
