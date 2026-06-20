@@ -194,6 +194,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -216,7 +219,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    someEventAddressV2, TestContext.Current.CancellationToken);
+                    someEventAddressV2, randomCancellationToken);
 
             EventAddressV2ServiceException actualEventAddressV2ServiceException =
                 await Assert.ThrowsAsync<EventAddressV2ServiceException>(
