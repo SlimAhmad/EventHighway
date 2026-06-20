@@ -43,6 +43,11 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
                 .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
         });
 
+        public ValueTask BulkRemoveEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+            this.eventArchiveV2Service.BulkRemoveEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
+
         public ValueTask<EventArchiveV2> AddEventArchiveV2Async(
             EventArchiveV2 eventArchiveV2,
             CancellationToken cancellationToken = default) =>
