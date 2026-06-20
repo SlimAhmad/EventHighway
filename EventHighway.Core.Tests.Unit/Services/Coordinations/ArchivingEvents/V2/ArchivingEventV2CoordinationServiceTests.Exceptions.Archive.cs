@@ -112,6 +112,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
         public async Task ShouldThrowServiceExceptionOnArchiveDeadEventV2sIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "UnexpectedError" });
 
@@ -133,7 +136,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // when
             ValueTask archiveDeadEventV2sTask =
                 this.archivingEventV2CoordinationService
-                    .ArchiveDeadEventV2sAsync(TestContext.Current.CancellationToken);
+                    .ArchiveDeadEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2CoordinationServiceException
                 actualArchivingEventV2CoordinationServiceException =
