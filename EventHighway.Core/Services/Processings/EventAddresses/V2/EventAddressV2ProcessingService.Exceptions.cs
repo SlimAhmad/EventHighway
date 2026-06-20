@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2.Exceptions;
@@ -23,6 +24,30 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             try
             {
                 return await returningEventAddressV2sFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventAddressV2ProcessingException =
+                    new TimeoutEventAddressV2ProcessingException(
+                        message: "Failed event address processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventAddressV2ProcessingDependencyException =
+                    new EventAddressV2ProcessingDependencyException(
+                        message: "Event address dependency error occurred, contact support.",
+                        innerException: timeoutEventAddressV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(eventAddressV2ProcessingDependencyException);
+                throw eventAddressV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (EventAddressV2DependencyException eventAddressV2DependencyException)
             {
@@ -51,6 +76,30 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             try
             {
                 return await returningEventAddressV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventAddressV2ProcessingException =
+                    new TimeoutEventAddressV2ProcessingException(
+                        message: "Failed event address processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventAddressV2ProcessingDependencyException =
+                    new EventAddressV2ProcessingDependencyException(
+                        message: "Event address dependency error occurred, contact support.",
+                        innerException: timeoutEventAddressV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(eventAddressV2ProcessingDependencyException);
+                throw eventAddressV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventAddressV2ProcessingException
                 nullEventAddressV2ProcessingException)
