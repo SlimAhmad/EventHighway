@@ -19,6 +19,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfEventV2IsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventV2 nullEventV2 = null;
 
             var nullEventV2Exception =
@@ -31,7 +34,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> modifyEventV2Task =
-                this.eventV2Service.ModifyEventV2Async(nullEventV2, TestContext.Current.CancellationToken);
+                this.eventV2Service.ModifyEventV2Async(nullEventV2, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -70,6 +73,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         private async Task ShouldThrowValidationExceptionOnModifyIfEventV2IsInvalidAndLogItAsync(
             string invalidText)
         {
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventTypeV2 invalidEventV2Type = GetInvalidEnum<EventTypeV2>();
 
             var invalidEventV2 = new EventV2
@@ -125,7 +131,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> modifyEventV2Task =
-                this.eventV2Service.ModifyEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
+                this.eventV2Service.ModifyEventV2Async(invalidEventV2, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -161,6 +167,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfUpdatedDateIsSameAsCreatedDateAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             EventV2 randomEventV2 = CreateRandomEventV2(randomDateTimeOffset);
             EventV2 invalidEventV2 = randomEventV2;
@@ -184,7 +193,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> modifyEventV2Task =
-                this.eventV2Service.ModifyEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
+                this.eventV2Service.ModifyEventV2Async(invalidEventV2, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -220,6 +229,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfEventV2HasInvalidLengthPropertyAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             int randomDaysAgo = GetRandomNegativeNumber();
             EventV2 invalidEventV2 = CreateRandomEventV2(dates: randomDateTimeOffset);
@@ -245,7 +257,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> modifyEventV2Task =
-                this.eventV2Service.ModifyEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
+                this.eventV2Service.ModifyEventV2Async(invalidEventV2, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -284,6 +296,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             int minutesBeforeOrAfter)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             EventV2 randomEventV2 = CreateRandomEventV2(randomDateTimeOffset);
             EventV2 invalidEventV2 = randomEventV2;
@@ -310,7 +325,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> modifyEventV2Task =
-                this.eventV2Service.ModifyEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
+                this.eventV2Service.ModifyEventV2Async(invalidEventV2, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -346,6 +361,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfEventV2DoesNotExistAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
             int randomDaysAgo = GetRandomNegativeNumber();
             EventV2 randomEventV2 = CreateRandomEventV2(randomDateTime);
@@ -372,7 +390,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> modifyEventV2Task =
-                this.eventV2Service.ModifyEventV2Async(nonExistingEventV2, TestContext.Current.CancellationToken);
+                this.eventV2Service.ModifyEventV2Async(nonExistingEventV2, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -408,6 +426,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowValidationErrorOnModifyIfStorageCreatedDateNotSameAsCreatedDateAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             int randomDaysAgo = GetRandomNegativeNumber();
             DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
             EventV2 randomEventV2 = CreateRandomEventV2(randomDateTime);
@@ -440,7 +461,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> modifyEventV2Task =
-                this.eventV2Service.ModifyEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
+                this.eventV2Service.ModifyEventV2Async(invalidEventV2, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
@@ -472,6 +493,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfUpdatedDateIsEarlierThanStorageAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             int randomTimeAgo = GetRandomNegativeNumber();
             DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
             DateTimeOffset earlierDateTime = randomDateTime.AddDays(randomTimeAgo);
@@ -505,7 +529,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> modifyEventV2Task =
-                this.eventV2Service.ModifyEventV2Async(invalidEventV2, TestContext.Current.CancellationToken);
+                this.eventV2Service.ModifyEventV2Async(invalidEventV2, randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(modifyEventV2Task.AsTask);
