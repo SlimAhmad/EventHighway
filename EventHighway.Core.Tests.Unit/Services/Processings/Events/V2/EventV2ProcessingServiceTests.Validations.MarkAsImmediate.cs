@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldThrowValidationExceptionOnMarkAsImmediateIfEventV2IsNullAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             EventV2 nullEventV2 = null;
@@ -32,7 +32,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
 
             // when
             ValueTask<EventV2> markEventV2AsImmediateTask =
-                this.eventV2ProcessingService.MarkEventV2AsImmediateAsync(nullEventV2, cancellationToken);
+                this.eventV2ProcessingService.MarkEventV2AsImmediateAsync(nullEventV2, randomCancellationToken);
 
             EventV2ProcessingValidationException
                 actualEventV2ProcessingValidationException =
