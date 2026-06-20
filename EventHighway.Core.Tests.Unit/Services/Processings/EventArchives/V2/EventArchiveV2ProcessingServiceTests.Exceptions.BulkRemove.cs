@@ -126,6 +126,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
         public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<EventArchiveV2> someEventArchiveV2s =
                 CreateRandomEventArchiveV2s().ToList();
 
@@ -145,7 +148,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.Setup(service =>
                 service.BulkRemoveEventArchiveV2sAsync(
                     someEventArchiveV2s,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ThrowsAsync(serviceException);
 
             // when
@@ -153,7 +156,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                 this.eventArchiveV2ProcessingService
                     .BulkRemoveEventArchiveV2sAsync(
                         someEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             EventArchiveV2ProcessingServiceException
                 actualEventArchiveV2ProcessingServiceException =
@@ -167,7 +170,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.Verify(service =>
                 service.BulkRemoveEventArchiveV2sAsync(
                     someEventArchiveV2s,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
