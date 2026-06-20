@@ -345,6 +345,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             ListenerEventArchiveV2 someListenerEventArchiveV2 = CreateRandomListenerEventArchiveV2();
             var serviceException = new Exception();
 
@@ -371,7 +374,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ValueTask<ListenerEventArchiveV2> addListenerEventArchiveV2Task =
                 this.listenerEventArchiveV2Service.AddListenerEventArchiveV2Async(
                     someListenerEventArchiveV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2ServiceException actualListenerEventArchiveV2ServiceException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2ServiceException>(
