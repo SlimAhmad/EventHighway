@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowValidationExceptionOnBulkRemoveIfListenerEventArchiveV2sIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<ListenerEventArchiveV2> nullListenerEventArchiveV2s = null;
 
             var nullListenerEventArchiveV2Exception =
@@ -32,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ValueTask bulkAddListenerEventArchiveV2sTask =
                 this.listenerEventArchiveV2Service.BulkRemoveListenerEventArchiveV2sAsync(
                     nullListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2ValidationException actualListenerEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2ValidationException>(

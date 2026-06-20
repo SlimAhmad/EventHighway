@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -36,6 +36,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await ValidateListenerEventArchiveV2OnAddAsync(listenerEventArchiveV2);
 
             return await this.storageBroker.InsertListenerEventArchiveV2Async(
@@ -47,6 +48,8 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return await this.storageBroker.SelectAllListenerEventArchiveV2sAsync(cancellationToken);
         });
 
@@ -55,6 +58,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
 
             IEnumerable<Guid> incomingIds =
@@ -108,6 +112,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
 
             await this.storageBroker.BulkDeleteListenerEventArchiveV2sAsync(

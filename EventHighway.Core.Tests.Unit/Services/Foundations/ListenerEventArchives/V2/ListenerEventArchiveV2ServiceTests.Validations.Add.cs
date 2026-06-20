@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowValidationExceptionOnAddIfListenerEventArchiveV2IsNullAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             ListenerEventArchiveV2 nullListenerEventArchiveV2 = null;
@@ -36,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ValueTask<ListenerEventArchiveV2> addListenerEventArchiveV2Task =
                 this.listenerEventArchiveV2Service.AddListenerEventArchiveV2Async(
                     nullListenerEventArchiveV2,
-                    cancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2ValidationException actualListenerEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2ValidationException>(
@@ -70,7 +70,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowValidationExceptionOnAddIfListenerEventArchiveV2IsInvalidAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             ListenerEventArchiveStatusV2 invalidStatus =
@@ -130,7 +130,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ValueTask<ListenerEventArchiveV2> addListenerEventArchiveV2Task =
                 this.listenerEventArchiveV2Service.AddListenerEventArchiveV2Async(
                     invalidListenerEventArchiveV2,
-                    cancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2ValidationException actualListenerEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2ValidationException>(
@@ -167,7 +167,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             int secondsBeforeAndAfterNow)
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
@@ -199,7 +199,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ValueTask<ListenerEventArchiveV2> addListenerEventArchiveV2Task =
                 this.listenerEventArchiveV2Service.AddListenerEventArchiveV2Async(
                     invalidListenerEventArchiveV2,
-                    cancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2ValidationException actualListenerEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2ValidationException>(
