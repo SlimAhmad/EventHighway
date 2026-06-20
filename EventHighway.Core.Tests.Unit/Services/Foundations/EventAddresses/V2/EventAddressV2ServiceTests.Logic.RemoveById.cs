@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         private async Task ShouldRemoveEventAddressV2ByIdAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid randomEventAddressV2Id = GetRandomId();
             Guid inputEventAddressV2Id = randomEventAddressV2Id;
 
@@ -35,19 +38,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectEventAddressV2ByIdAsync(
-                    inputEventAddressV2Id, It.IsAny<CancellationToken>()))
+                    inputEventAddressV2Id, randomCancellationToken))
                         .ReturnsAsync(retrievedEventAddressV2);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.DeleteEventAddressV2Async(
-                    retrievedEventAddressV2, It.IsAny<CancellationToken>()))
+                    retrievedEventAddressV2, randomCancellationToken))
                         .ReturnsAsync(deletedEventAddressV2);
 
             // when
             EventAddressV2 actualEventAddressV2 =
                 await this.eventAddressV2Service
                     .RemoveEventAddressV2ByIdAsync(
-                        inputEventAddressV2Id, TestContext.Current.CancellationToken);
+                        inputEventAddressV2Id, randomCancellationToken);
 
             // then
             actualEventAddressV2.Should().BeEquivalentTo(
@@ -55,12 +58,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectEventAddressV2ByIdAsync(
-                    inputEventAddressV2Id, It.IsAny<CancellationToken>()),
+                    inputEventAddressV2Id, randomCancellationToken),
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.DeleteEventAddressV2Async(
-                    retrievedEventAddressV2, It.IsAny<CancellationToken>()),
+                    retrievedEventAddressV2, randomCancellationToken),
                         Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();
