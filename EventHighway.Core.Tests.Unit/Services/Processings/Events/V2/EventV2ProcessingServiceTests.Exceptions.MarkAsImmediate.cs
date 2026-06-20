@@ -22,7 +22,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             Xeption validationException)
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             EventV2 someEventV2 = CreateRandomEventV2();
@@ -38,7 +38,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
 
             // when
             ValueTask<EventV2> markEventV2AsImmediateTask =
-                this.eventV2ProcessingService.MarkEventV2AsImmediateAsync(someEventV2, cancellationToken);
+                this.eventV2ProcessingService.MarkEventV2AsImmediateAsync(someEventV2, randomCancellationToken);
 
             EventV2ProcessingDependencyValidationException
                 actualEventV2ProcessingDependencyValidationException =
