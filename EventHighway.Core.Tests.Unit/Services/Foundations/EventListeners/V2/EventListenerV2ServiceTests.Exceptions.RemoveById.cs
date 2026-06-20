@@ -138,6 +138,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldThrowDependencyValidationExceptionOnRemoveByIdDatabaseUpdateErrorOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventListenerV2Id = GetRandomId();
             var dbUpdateException = new DbUpdateException();
 
@@ -166,7 +169,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             ValueTask<EventListenerV2> removeEventListenerV2ByIdTask =
                 this.eventListenerV2Service.RemoveEventListenerV2ByIdAsync(
                     someEventListenerV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventListenerV2DependencyException actualEventListenerV2DependencyException =
                 await Assert.ThrowsAsync<EventListenerV2DependencyException>(
