@@ -74,6 +74,42 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnMarkImmediateAsync()
+        {
+            // given
+            EventV2 someEventV2 = CreateRandomEventV2();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventV2> markEventV2AsImmediateTask =
+                this.eventV2ProcessingService.MarkEventV2AsImmediateAsync(someEventV2, cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    markEventV2AsImmediateTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventV2ProcessingDependencyException>();
+            actualException.Should().NotBeOfType<EventV2ProcessingServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationErrorOnMarkImmediateIfDependencyValidationOccursAndLogItAsync(
