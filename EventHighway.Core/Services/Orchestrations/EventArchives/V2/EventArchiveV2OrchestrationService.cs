@@ -34,7 +34,9 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         public ValueTask<IEnumerable<EventArchiveV2>> RetrieveBatchOfEventArchiveV2sOlderThanAsync(
             DateTimeOffset olderThan,
             int take) =>
-                throw new NotImplementedException();
+        TryCatch(async () =>
+            await this.eventArchiveV2ProcessingService
+                .RetrieveBatchOfEventArchiveV2sOlderThanAsync(olderThan, take));
 
         public ValueTask BulkRemoveEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
