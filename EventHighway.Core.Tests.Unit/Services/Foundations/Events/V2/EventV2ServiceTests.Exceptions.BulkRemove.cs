@@ -21,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnBulkRemoveIfSqlExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<EventV2> someEventV2s = CreateRandomEventV2s();
             IEnumerable<EventV2> inputEventV2s = someEventV2s;
             SqlException sqlException = GetSqlException();
@@ -47,7 +50,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             ValueTask bulkRemoveEventV2sTask =
                 this.eventV2Service.BulkRemoveEventV2sAsync(
                     inputEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2DependencyException actualEventV2DependencyException =
                 await Assert.ThrowsAsync<EventV2DependencyException>(
@@ -77,6 +80,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<EventV2> someEventV2s = CreateRandomEventV2s();
             IEnumerable<EventV2> inputEventV2s = someEventV2s;
             var serviceException = new Exception();
@@ -103,7 +109,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             ValueTask bulkRemoveEventV2sTask =
                 this.eventV2Service.BulkRemoveEventV2sAsync(
                     inputEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2ServiceException actualEventV2ServiceException =
                 await Assert.ThrowsAsync<EventV2ServiceException>(
