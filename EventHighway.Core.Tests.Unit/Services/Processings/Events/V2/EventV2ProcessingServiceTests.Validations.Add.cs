@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldThrowValidationExceptionOnAddIfEventV2IsNullAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             EventV2 nullEventV2 = null;
@@ -32,7 +32,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
 
             // when
             ValueTask<EventV2> addEventV2Task =
-                this.eventV2ProcessingService.AddEventV2Async(nullEventV2, cancellationToken);
+                this.eventV2ProcessingService.AddEventV2Async(nullEventV2, randomCancellationToken);
 
             EventV2ProcessingValidationException
                 actualEventV2ProcessingValidationException =
