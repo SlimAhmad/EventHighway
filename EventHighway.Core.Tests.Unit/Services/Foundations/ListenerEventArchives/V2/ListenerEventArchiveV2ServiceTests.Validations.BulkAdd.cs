@@ -17,6 +17,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowValidationExceptionOnBulkAddIfListenerEventArchiveV2sIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<ListenerEventArchiveV2> nullListenerEventArchiveV2s = null;
 
             var nullListenerEventArchiveV2Exception =
@@ -32,7 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
                 this.listenerEventArchiveV2Service.BulkAddListenerEventArchiveV2sAsync(
                     nullListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2ValidationException actualListenerEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2ValidationException>(
