@@ -72,6 +72,40 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveScheduledPendingAsync()
+        {
+            // given
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<IQueryable<EventV2>> retrieveScheduledPendingEventV2sTask =
+                this.eventV2ProcessingService.RetrieveScheduledPendingEventV2sAsync(cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveScheduledPendingEventV2sTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventV2ProcessingDependencyException>();
+            actualException.Should().NotBeOfType<EventV2ProcessingServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRetrieveScheduledPendingIfEventV2DependencyAndLogItAsync(
