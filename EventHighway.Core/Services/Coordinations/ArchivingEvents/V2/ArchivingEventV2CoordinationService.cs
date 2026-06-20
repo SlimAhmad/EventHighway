@@ -38,6 +38,11 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             this.loggingBroker = loggingBroker;
         }
 
+        public ValueTask PurgeEventArchiveV2sAsync(
+            DateTimeOffset olderThan,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         public ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
