@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnAddIfSqlExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
             SqlException sqlException = GetSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
@@ -45,7 +48,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> addListenerEventV2Task =
                 this.listenerEventV2Service.AddListenerEventV2Async(
                     someListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2DependencyException actualListenerEventV2DependencyException =
                 await Assert.ThrowsAsync<ListenerEventV2DependencyException>(
@@ -79,6 +82,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowDependencyValidationExceptionOnAddIfListenerEventV2AlreadyExistsAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             string randomMessage = GetRandomString();
             ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
             var duplicateKeyException = new DuplicateKeyException(randomMessage);
@@ -106,7 +112,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> addListenerEventV2Task =
                 this.listenerEventV2Service.AddListenerEventV2Async(
                     someListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2DependencyValidationException actualListenerEventV2DependencyValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2DependencyValidationException>(
@@ -140,6 +146,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowDependencyValidationExceptionOnAddIfReferenceErrorOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
             string someMessage = GetRandomString();
 
@@ -169,7 +178,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> addListenerEventV2Task =
                 this.listenerEventV2Service.AddListenerEventV2Async(
                     someListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2DependencyValidationException actualListenerEventV2DependencyValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2DependencyValidationException>(
@@ -203,6 +212,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowDependencyExceptionOnAddIfDbUpdateExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
             var dbUpdateException = new DbUpdateException();
 
@@ -229,7 +241,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> addListenerEventV2Task =
                 this.listenerEventV2Service.AddListenerEventV2Async(
                     someListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2DependencyException actualListenerEventV2DependencyException =
                 await Assert.ThrowsAsync<ListenerEventV2DependencyException>(
@@ -263,6 +275,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -286,7 +301,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> addListenerEventV2Task =
                 this.listenerEventV2Service.AddListenerEventV2Async(
                     someListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ServiceException actualListenerEventV2ServiceException =
                 await Assert.ThrowsAsync<ListenerEventV2ServiceException>(
