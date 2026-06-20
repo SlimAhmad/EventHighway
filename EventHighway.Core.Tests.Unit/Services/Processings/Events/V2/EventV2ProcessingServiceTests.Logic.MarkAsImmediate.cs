@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldMarkEventV2AsImmediateAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             DateTimeOffset randomDateTimeOffset =
@@ -46,7 +46,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.eventV2ServiceMock.Setup(broker =>
                 broker.ModifyEventV2Async(
                     inputEventV2,
-                    cancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(modifiedEventV2);
 
             // when
@@ -54,7 +54,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                 await this.eventV2ProcessingService
                     .MarkEventV2AsImmediateAsync(
                         inputEventV2,
-                        cancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(
@@ -67,7 +67,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.eventV2ServiceMock.Verify(broker =>
                 broker.ModifyEventV2Async(
                     inputEventV2,
-                    cancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventV2ServiceMock
