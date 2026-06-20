@@ -180,5 +180,100 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnAddIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
+
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventArchiveV2ProcessingException =
+                new TimeoutEventArchiveV2ProcessingException(
+                    message: "Failed event archive processing timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventArchiveV2ProcessingDependencyException =
+                new EventArchiveV2ProcessingDependencyException(
+                    message: "Event archive dependency error occurred, contact support.",
+                    innerException: timeoutEventArchiveV2ProcessingException);
+
+            this.eventArchiveV2ServiceMock.Setup(service =>
+                service.AddEventArchiveV2Async(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventArchiveV2> addEventArchiveV2Task =
+                this.eventArchiveV2ProcessingService.AddEventArchiveV2Async(
+                    someEventArchiveV2,
+                    TestContext.Current.CancellationToken);
+
+            EventArchiveV2ProcessingDependencyException
+                actualEventArchiveV2ProcessingDependencyException =
+                    await Assert.ThrowsAsync<EventArchiveV2ProcessingDependencyException>(
+                        addEventArchiveV2Task.AsTask);
+
+            // then
+            actualEventArchiveV2ProcessingDependencyException.Should().BeEquivalentTo(
+                expectedEventArchiveV2ProcessingDependencyException);
+
+            this.eventArchiveV2ServiceMock.Verify(service =>
+                service.AddEventArchiveV2Async(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventArchiveV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnAddAsync()
+        {
+            // given
+            EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventArchiveV2> addEventArchiveV2Task =
+                this.eventArchiveV2ProcessingService.AddEventArchiveV2Async(
+                    someEventArchiveV2,
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    addEventArchiveV2Task.AsTask);
+
+            actualException.Should().NotBeOfType<EventArchiveV2ProcessingDependencyException>();
+            actualException.Should().NotBeOfType<EventArchiveV2ProcessingServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
