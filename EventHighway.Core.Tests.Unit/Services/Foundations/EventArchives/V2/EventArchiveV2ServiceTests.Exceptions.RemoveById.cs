@@ -82,6 +82,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowDependencyValidationErrorOnRemoveByIdIfDbUpdateConcurrencyErrorAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventArchiveV2Id = GetRandomId();
             var dbUpdateConcurrencyException = new DbUpdateConcurrencyException();
 
@@ -110,7 +113,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             ValueTask<EventArchiveV2> removeEventArchiveV2ByIdTask =
                 this.eventArchiveV2Service.RemoveEventArchiveV2ByIdAsync(
                     someEventArchiveV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2DependencyValidationException actualEventArchiveV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventArchiveV2DependencyValidationException>(
