@@ -12,6 +12,7 @@ using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2.Exceptions
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Moq;
+using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 {
@@ -129,6 +130,103 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedListenerEventV2ServiceException))),
                         Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnBulkRemoveIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            IQueryable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
+            IEnumerable<ListenerEventV2> inputListenerEventV2s = someListenerEventV2s;
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutListenerEventV2Exception =
+                new TimeoutListenerEventV2Exception(
+                    message: "Failed listener event timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedListenerEventV2DependencyException =
+                new ListenerEventV2DependencyException(
+                    message: "Listener event dependency error occurred, contact support.",
+                    innerException: timeoutListenerEventV2Exception);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.BulkDeleteListenerEventV2sAsync(
+                    inputListenerEventV2s,
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask bulkRemoveListenerEventV2sTask =
+                this.listenerEventV2Service.BulkRemoveListenerEventV2sAsync(
+                    inputListenerEventV2s,
+                    TestContext.Current.CancellationToken);
+
+            ListenerEventV2DependencyException actualListenerEventV2DependencyException =
+                await Assert.ThrowsAsync<ListenerEventV2DependencyException>(
+                    bulkRemoveListenerEventV2sTask.AsTask);
+
+            // then
+            actualListenerEventV2DependencyException.Should().BeEquivalentTo(
+                expectedListenerEventV2DependencyException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.BulkDeleteListenerEventV2sAsync(
+                    inputListenerEventV2s,
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnBulkRemoveAsync()
+        {
+            // given
+            IQueryable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
+            IEnumerable<ListenerEventV2> inputListenerEventV2s = someListenerEventV2s;
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask bulkRemoveListenerEventV2sTask =
+                this.listenerEventV2Service.BulkRemoveListenerEventV2sAsync(
+                    inputListenerEventV2s,
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    bulkRemoveListenerEventV2sTask.AsTask);
+
+            actualException.Should().NotBeOfType<ListenerEventV2DependencyException>();
+            actualException.Should().NotBeOfType<ListenerEventV2ServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
 
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
