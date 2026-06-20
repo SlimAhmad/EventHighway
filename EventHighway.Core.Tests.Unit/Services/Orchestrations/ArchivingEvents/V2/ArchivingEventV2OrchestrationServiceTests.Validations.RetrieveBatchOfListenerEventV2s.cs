@@ -21,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldThrowValidationExceptionOnRetrieveBatchOfListenerEventV2sIfEventV2IdsIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<Guid> nullEventV2Ids = null;
             BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
 
@@ -46,7 +49,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                 this.archivingEventV2OrchestrationService
                     .RetrieveBatchOfListenerEventV2sAsync(
                         nullEventV2Ids,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             ArchivingEventV2OrchestrationValidationException
                 actualArchivingEventV2OrchestrationValidationException =
