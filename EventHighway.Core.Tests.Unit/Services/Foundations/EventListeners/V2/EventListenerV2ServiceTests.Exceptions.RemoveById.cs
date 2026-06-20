@@ -198,6 +198,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
         public async Task ShouldThrowServiceExceptionOnRemoveByIdIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventListenerV2Id = GetRandomId();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -223,7 +226,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             ValueTask<EventListenerV2> removeEventListenerV2ByIdTask =
                 this.eventListenerV2Service.RemoveEventListenerV2ByIdAsync(
                     someEventListenerV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventListenerV2ServiceException actualEventListenerV2ServiceException =
                 await Assert.ThrowsAsync<EventListenerV2ServiceException>(
