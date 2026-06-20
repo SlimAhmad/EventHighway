@@ -20,6 +20,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         public async Task ShouldThrowValidationExceptionOnRunIfEventCallV2IsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventCallV2 nullEventCallV2 = null;
 
             var nullEventCallV2Exception =
@@ -32,7 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(nullEventCallV2, TestContext.Current.CancellationToken);
+                this.eventCallV2Service.RunEventCallV2Async(nullEventCallV2, randomCancellationToken);
 
             EventCallV2ValidationException actualEventCallV2ValidationException =
                 await Assert.ThrowsAsync<EventCallV2ValidationException>(
