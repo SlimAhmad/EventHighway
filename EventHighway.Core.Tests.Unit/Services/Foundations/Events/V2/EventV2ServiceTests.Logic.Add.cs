@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldAddEventV2Async()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset =
                 GetRandomDateTimeOffset();
 
@@ -36,13 +39,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     .ReturnsAsync(randomDateTimeOffset);
 
             this.storageBrokerMock.Setup(broker =>
-                broker.InsertEventV2Async(inputEventV2, It.IsAny<CancellationToken>()))
+                broker.InsertEventV2Async(inputEventV2, randomCancellationToken))
                     .ReturnsAsync(insertedEventV2);
 
             // when
             EventV2 actualEventV2 =
                 await this.eventV2Service
-                    .AddEventV2Async(inputEventV2, TestContext.Current.CancellationToken);
+                    .AddEventV2Async(inputEventV2, randomCancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(
@@ -53,7 +56,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
-                broker.InsertEventV2Async(inputEventV2, It.IsAny<CancellationToken>()),
+                broker.InsertEventV2Async(inputEventV2, randomCancellationToken),
                     Times.Once);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
