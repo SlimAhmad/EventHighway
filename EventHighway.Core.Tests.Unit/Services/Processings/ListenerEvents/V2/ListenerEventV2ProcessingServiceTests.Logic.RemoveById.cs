@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
         public async Task ShouldRemoveListenerEventV2ByIdAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid randomListenerEventId = GetRandomId();
@@ -36,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             this.listenerEventV2ServiceMock.Setup(service =>
                 service.RemoveListenerEventV2ByIdAsync(
                     inputListenerEventId,
-                    cancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(removedListenerEventV2);
 
             // when
@@ -44,7 +44,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 await this.listenerEventV2ProcessingService
                     .RemoveListenerEventV2ByIdAsync(
                         inputListenerEventId,
-                        cancellationToken);
+                        randomCancellationToken);
 
             // then
             actualListenerEventV2.Should()
