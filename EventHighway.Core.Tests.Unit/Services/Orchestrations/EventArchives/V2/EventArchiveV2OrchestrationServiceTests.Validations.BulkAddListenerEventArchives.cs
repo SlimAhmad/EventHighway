@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
@@ -18,6 +19,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             ShouldThrowValidationExceptionOnBulkAddListenerEventArchiveV2sIfListenerEventArchiveV2sIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventArchiveV2> nullListenerEventArchiveV2s = null;
 
             var nullListenerEventArchiveV2sOrchestrationException =
@@ -33,7 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             ValueTask<IEnumerable<ListenerEventArchiveV2>> bulkAddListenerEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddListenerEventArchiveV2sAsync(
                     nullListenerEventArchiveV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2OrchestrationValidationException
                 actualEventArchiveV2OrchestrationValidationException =
