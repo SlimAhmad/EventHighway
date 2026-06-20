@@ -12,6 +12,7 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 {
@@ -21,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnRemoveByIdIfSqlErrorOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventV2Id = GetRandomId();
             SqlException sqlException = GetSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
@@ -43,7 +47,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2Service.RemoveEventV2ByIdAsync(
-                    someEventV2Id, TestContext.Current.CancellationToken);
+                    someEventV2Id, randomCancellationToken);
 
             EventV2DependencyException actualEventV2DependencyException =
                 await Assert.ThrowsAsync<EventV2DependencyException>(
@@ -71,6 +75,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowDependencyValidationErrorOnRemoveByIdIfDbUpdateConcurrencyErrorAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventV2Id = GetRandomId();
             var dbUpdateConcurrencyException = new DbUpdateConcurrencyException();
             dbUpdateConcurrencyException.Data.Add("ErrorCode", new List<string> { "DbUpdateConcurrencyError" });
@@ -93,7 +100,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2Service.RemoveEventV2ByIdAsync(
-                    someEventV2Id, TestContext.Current.CancellationToken);
+                    someEventV2Id, randomCancellationToken);
 
             EventV2DependencyValidationException actualEventV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventV2DependencyValidationException>(
@@ -122,6 +129,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowDependencyValidationExceptionOnRemoveByIdDatabaseUpdateErrorOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventV2Id = GetRandomId();
             var dbUpdateException = new DbUpdateException();
             dbUpdateException.Data.Add("ErrorCode", new List<string> { "DatabaseUpdateError" });
@@ -143,7 +153,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
-                this.eventV2Service.RemoveEventV2ByIdAsync(someEventV2Id, TestContext.Current.CancellationToken);
+                this.eventV2Service.RemoveEventV2ByIdAsync(someEventV2Id, randomCancellationToken);
 
             EventV2DependencyException actualEventV2DependencyException =
                 await Assert.ThrowsAsync<EventV2DependencyException>(
@@ -169,9 +179,100 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         }
 
         [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRemoveByIdIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            Guid someEventV2Id = GetRandomId();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventV2Exception =
+                new TimeoutEventV2Exception(
+                    message: "Failed event timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventV2DependencyException =
+                new EventV2DependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutEventV2Exception);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventV2> removeEventV2ByIdTask =
+                this.eventV2Service.RemoveEventV2ByIdAsync(
+                    someEventV2Id, TestContext.Current.CancellationToken);
+
+            EventV2DependencyException actualEventV2DependencyException =
+                await Assert.ThrowsAsync<EventV2DependencyException>(
+                    removeEventV2ByIdTask.AsTask);
+
+            // then
+            actualEventV2DependencyException.Should().BeEquivalentTo(
+                expectedEventV2DependencyException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRemoveByIdAsync()
+        {
+            // given
+            Guid someEventV2Id = GetRandomId();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventV2> removeEventV2ByIdTask =
+                this.eventV2Service.RemoveEventV2ByIdAsync(someEventV2Id, cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    removeEventV2ByIdTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventV2DependencyException>();
+            actualException.Should().NotBeOfType<EventV2ServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowServiceExceptionOnRemoveByIdIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventV2Id = GetRandomId();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -194,7 +295,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2Service.RemoveEventV2ByIdAsync(
-                    someEventV2Id, TestContext.Current.CancellationToken);
+                    someEventV2Id, randomCancellationToken);
 
             EventV2ServiceException actualEventV2ServiceException =
                 await Assert.ThrowsAsync<EventV2ServiceException>(

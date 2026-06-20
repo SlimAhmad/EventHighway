@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -25,6 +26,24 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2Exception =
+                    new TimeoutEventV2Exception(
+                        message: "Failed event timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventV2Exception nullEventV2Exception)
             {
@@ -57,6 +76,24 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             try
             {
                 return await returningEventV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2Exception =
+                    new TimeoutEventV2Exception(
+                        message: "Failed event timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventV2Exception nullEventV2Exception)
             {
@@ -139,6 +176,24 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             try
             {
                 return await returningEventV2sFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2Exception =
+                    new TimeoutEventV2Exception(
+                        message: "Failed event timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (SqlException sqlException)
             {

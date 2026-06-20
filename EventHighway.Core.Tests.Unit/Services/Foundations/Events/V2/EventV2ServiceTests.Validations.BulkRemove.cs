@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2.Exceptions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         public async Task ShouldThrowValidationExceptionOnBulkRemoveIfEventV2sIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             List<EventV2> nullEventV2s = null;
 
             var nullEventV2Exception =
@@ -32,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             ValueTask bulkRemoveEventV2sTask =
                 this.eventV2Service.BulkRemoveEventV2sAsync(
                     nullEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2ValidationException actualEventV2ValidationException =
                 await Assert.ThrowsAsync<EventV2ValidationException>(
