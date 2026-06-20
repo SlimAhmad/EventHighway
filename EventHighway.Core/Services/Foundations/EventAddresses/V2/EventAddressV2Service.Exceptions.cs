@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
@@ -25,6 +26,24 @@ namespace EventHighway.Core.Services.Foundations.EventAddresses.V2
             try
             {
                 return await returningEventAddressV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventAddressV2Exception =
+                    new TimeoutEventAddressV2Exception(
+                        message: "Failed event address timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventAddressV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventAddressV2Exception nullEventAddressV2Exception)
             {
@@ -102,6 +121,24 @@ namespace EventHighway.Core.Services.Foundations.EventAddresses.V2
             try
             {
                 return await returningEventAddressV2sFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventAddressV2Exception =
+                    new TimeoutEventAddressV2Exception(
+                        message: "Failed event address timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventAddressV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (SqlException sqlException)
             {
