@@ -16,26 +16,29 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         public async Task ShouldBulkRemoveListenerEventV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<ListenerEventV2> randomListenerEventV2s = CreateRandomListenerEventV2s();
             IEnumerable<ListenerEventV2> inputListenerEventV2s = randomListenerEventV2s;
 
             this.listenerEventV2ProcessingServiceMock.Setup(service =>
                 service.BulkRemoveListenerEventV2sAsync(
                     inputListenerEventV2s,
-                    It.IsAny<CancellationToken>()))
+                    randomCancellationToken))
                         .Returns(ValueTask.CompletedTask);
 
             // when
             await this.archivingEventV2OrchestrationService
                 .BulkRemoveListenerEventV2sAsync(
                     inputListenerEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             // then
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
                 service.BulkRemoveListenerEventV2sAsync(
                     inputListenerEventV2s,
-                    It.IsAny<CancellationToken>()),
+                    randomCancellationToken),
                         Times.Once);
 
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
