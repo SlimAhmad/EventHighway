@@ -171,6 +171,42 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         }
 
         [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnFireScheduledPendingAsync()
+        {
+            // given
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask fireScheduledPendingEventV2sTask =
+                this.eventV2CoordinationService.FireScheduledPendingEventV2sAsync(
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    fireScheduledPendingEventV2sTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventV2CoordinationDependencyException>();
+            actualException.Should().NotBeOfType<EventV2CoordinationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowDependencyExceptionOnFireScheduledPendingIfTimeoutOccursAndLogItAsync()
         {
             // given
