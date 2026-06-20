@@ -53,7 +53,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             this.listenerEventV2ServiceMock.Verify(service =>
                 service.RemoveListenerEventV2ByIdAsync(
                     inputListenerEventId,
-                    cancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.listenerEventV2ServiceMock

@@ -52,7 +52,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             this.listenerEventV2ServiceMock.Verify(broker =>
                 broker.AddListenerEventV2Async(
                     inputListenerEventV2,
-                    cancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
