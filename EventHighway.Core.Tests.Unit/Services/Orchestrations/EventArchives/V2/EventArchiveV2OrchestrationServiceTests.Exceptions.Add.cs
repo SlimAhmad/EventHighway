@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -23,6 +23,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
 
             var expectedEventArchiveV2OrchestrationDependencyValidationException =
@@ -41,7 +44,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 this.eventArchiveV2OrchestrationService
                     .AddEventArchiveV2WithListenerEventArchiveV2sAsync(
                         someEventArchiveV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             EventArchiveV2OrchestrationDependencyValidationException
                 actualEventArchiveV2OrchestrationDependencyValidationException =
@@ -80,6 +83,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
 
             var expectedEventArchiveV2OrchestrationDependencyException =
@@ -98,7 +104,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 this.eventArchiveV2OrchestrationService
                     .AddEventArchiveV2WithListenerEventArchiveV2sAsync(
                         someEventArchiveV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             EventArchiveV2OrchestrationDependencyException
                 actualEventArchiveV2OrchestrationDependencyException =
@@ -135,6 +141,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
             var exception = new Exception();
             exception.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -161,7 +170,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 this.eventArchiveV2OrchestrationService
                     .AddEventArchiveV2WithListenerEventArchiveV2sAsync(
                         someEventArchiveV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             EventArchiveV2OrchestrationServiceException
                 actualEventArchiveV2OrchestrationServiceException =
