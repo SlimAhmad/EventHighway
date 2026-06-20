@@ -143,6 +143,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowDependencyValidationExceptionOnRemoveByIdIfDbUpdateExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventArchiveV2Id = GetRandomId();
             var dbUpdateException = new DbUpdateException();
 
@@ -171,7 +174,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             ValueTask<EventArchiveV2> removeEventArchiveV2ByIdTask =
                 this.eventArchiveV2Service.RemoveEventArchiveV2ByIdAsync(
                     someEventArchiveV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2DependencyException actualEventArchiveV2DependencyException =
                 await Assert.ThrowsAsync<EventArchiveV2DependencyException>(
