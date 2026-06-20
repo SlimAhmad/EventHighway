@@ -88,6 +88,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<ListenerEventArchiveV2> randomListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s();
 
@@ -121,7 +124,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ValueTask bulkAddListenerEventArchiveV2sTask =
                 this.listenerEventArchiveV2Service.BulkRemoveListenerEventArchiveV2sAsync(
                     inputListenerEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             ListenerEventArchiveV2ServiceException actualListenerEventArchiveV2ServiceException =
                 await Assert.ThrowsAsync<ListenerEventArchiveV2ServiceException>(
