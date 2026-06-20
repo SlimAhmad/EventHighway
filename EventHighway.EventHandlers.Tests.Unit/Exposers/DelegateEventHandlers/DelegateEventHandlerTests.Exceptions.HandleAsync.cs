@@ -22,7 +22,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
         {
             // given
             string randomContent = GetRandomString();
-            var randomHandlerParams = CreateRandomHandlerParams();
 
             var expectedDelegateEventHandlerValidationException =
                 new DelegateEventHandlerValidationException(
@@ -33,7 +32,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             this.delegateServiceMock.Setup(service =>
                 service.InvokeAsync(
                     randomContent,
-                    randomHandlerParams,
                     TestContext.Current.CancellationToken))
                         .ThrowsAsync(validationException);
 
@@ -41,7 +39,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             ValueTask<EventHandlerResult> handleTask =
                 this.delegateEventHandler.HandleAsync(
                     content: randomContent,
-                    handlerParams: randomHandlerParams,
                     cancellationToken: TestContext.Current.CancellationToken);
 
             DelegateEventHandlerValidationException
@@ -56,7 +53,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             this.delegateServiceMock.Verify(service =>
                 service.InvokeAsync(
                     randomContent,
-                    randomHandlerParams,
                     TestContext.Current.CancellationToken),
                         Times.Once);
 
@@ -70,7 +66,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
         {
             // given
             string randomContent = GetRandomString();
-            var randomHandlerParams = CreateRandomHandlerParams();
 
             var expectedDelegateEventHandlerDependencyException =
                 new DelegateEventHandlerDependencyException(
@@ -81,7 +76,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             this.delegateServiceMock.Setup(service =>
                 service.InvokeAsync(
                     randomContent,
-                    randomHandlerParams,
                     TestContext.Current.CancellationToken))
                         .ThrowsAsync(dependencyException);
 
@@ -89,7 +83,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             ValueTask<EventHandlerResult> handleTask =
                 this.delegateEventHandler.HandleAsync(
                     content: randomContent,
-                    handlerParams: randomHandlerParams,
                     cancellationToken: TestContext.Current.CancellationToken);
 
             DelegateEventHandlerDependencyException
@@ -104,7 +97,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             this.delegateServiceMock.Verify(service =>
                 service.InvokeAsync(
                     randomContent,
-                    randomHandlerParams,
                     TestContext.Current.CancellationToken),
                         Times.Once);
 
@@ -116,7 +108,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
         {
             // given
             string randomContent = GetRandomString();
-            var randomHandlerParams = CreateRandomHandlerParams();
 
             var someInnerXeption = new Xeption(message: GetRandomString());
             someInnerXeption.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -131,7 +122,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             this.delegateServiceMock.Setup(service =>
                 service.InvokeAsync(
                     randomContent,
-                    randomHandlerParams,
                     TestContext.Current.CancellationToken))
                         .ThrowsAsync(serviceException);
 
@@ -139,7 +129,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             ValueTask<EventHandlerResult> handleTask =
                 this.delegateEventHandler.HandleAsync(
                     content: randomContent,
-                    handlerParams: randomHandlerParams,
                     cancellationToken: TestContext.Current.CancellationToken);
 
             DelegateEventHandlerServiceException
@@ -154,7 +143,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             this.delegateServiceMock.Verify(service =>
                 service.InvokeAsync(
                     randomContent,
-                    randomHandlerParams,
                     TestContext.Current.CancellationToken),
                         Times.Once);
 

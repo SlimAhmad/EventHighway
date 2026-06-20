@@ -3,11 +3,9 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2.Exceptions;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 
 namespace EventHighway.Core.Services.Foundations.EventListeners.V2
 {
@@ -35,9 +33,6 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V2
                 (Rule: IsInvalid(eventListenerV2.HandlerName),
                 Parameter: nameof(EventListenerV2.HandlerName)),
 
-                (Rule: IsInvalid(eventListenerV2.HandlerConfigurations),
-                Parameter: nameof(EventListenerV2.HandlerConfigurations)),
-
                 (Rule: IsInvalid(eventListenerV2.EventAddressId),
                 Parameter: nameof(EventListenerV2.EventAddressId)),
 
@@ -56,53 +51,6 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V2
 
                 (Rule: await IsNotRecentAsync(eventListenerV2.CreatedDate),
                 Parameter: nameof(EventListenerV2.CreatedDate)));
-
-            var handlerConfigurations = new List<HandlerConfiguration>(eventListenerV2.HandlerConfigurations);
-            List<(dynamic Rule, string Parameter)> handlerValidations = new();
-
-            for (int index = 0; index < handlerConfigurations.Count; index++)
-            {
-                var handlerConfiguration = handlerConfigurations[index];
-
-                handlerValidations.Add(
-                    (Rule: IsInvalid(handlerConfiguration.Id),
-                    Parameter: $"HandlerConfiguration[{index}].{nameof(HandlerConfiguration.Id)}"));
-
-                handlerValidations.Add(
-                    (Rule: IsInvalid(handlerConfiguration.Name),
-                    Parameter: $"HandlerConfiguration[{index}].{nameof(HandlerConfiguration.Name)}"));
-
-                handlerValidations.Add(
-                    (Rule: IsExceedingLengthOf(handlerConfiguration.Name, 450),
-                    Parameter: $"HandlerConfiguration[{index}].{nameof(HandlerConfiguration.Name)}"));
-
-                handlerValidations.Add(
-                    (Rule: IsInvalid(handlerConfiguration.Value),
-                    Parameter: $"HandlerConfiguration[{index}].{nameof(HandlerConfiguration.Value)}"));
-
-                handlerValidations.Add(
-                    (Rule: IsInvalid(handlerConfiguration.CreatedDate),
-                    Parameter: $"HandlerConfiguration[{index}].{nameof(HandlerConfiguration.CreatedDate)}"));
-
-                handlerValidations.Add(
-                    (Rule: IsInvalid(handlerConfiguration.UpdatedDate),
-                    Parameter: $"HandlerConfiguration[{index}].{nameof(HandlerConfiguration.UpdatedDate)}"));
-
-                handlerValidations.Add(
-                    (Rule: IsNotSameAs(
-                        firstDate: handlerConfiguration.CreatedDate,
-                        secondDate: handlerConfiguration.UpdatedDate,
-                        secondDateName: nameof(HandlerConfiguration.UpdatedDate)),
-                    Parameter: $"HandlerConfiguration[{index}].{nameof(HandlerConfiguration.CreatedDate)}"));
-
-                handlerValidations.Add(
-                    (Rule: await IsNotRecentAsync(handlerConfiguration.CreatedDate),
-                    Parameter: $"HandlerConfiguration[{index}].{nameof(HandlerConfiguration.CreatedDate)}"));
-            }
-
-            Validate(
-                message: $"Event listener  handler configuration is invalid, fix the errors and try again.",
-                validations: handlerValidations.ToArray());
         }
 
         private static void ValidateEventListenerV2Id(Guid eventListenerV2Id)
@@ -156,14 +104,6 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V2
 
         private static bool IsExceedingLength(string text, int maxLength) =>
             (text ?? string.Empty).Length > maxLength;
-
-        private static dynamic IsInvalid(System.Collections.Generic.IEnumerable<
-            EventHighway.Core.Models.Services.Foundations.HandlerConfigurations.HandlerConfiguration>
-            handlerConfigurations) => new
-            {
-                Condition = handlerConfigurations is null,
-                Message = "Required"
-            };
 
         private static dynamic IsInvalid(DateTimeOffset date) => new
         {

@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
@@ -28,7 +27,7 @@ namespace EventHighway.EventHandlers
         /// an <see cref="EventHandlerResult"/>.</param>
         public DelegateEventHandler(
             Guid Id,
-            Func<string, IReadOnlyDictionary<string, string>, CancellationToken, ValueTask<EventHandlerResult>> handler)
+            Func<string, CancellationToken, ValueTask<EventHandlerResult>> handler)
         {
             this.Id = Id;
             this.delegateService = new DelegateService(handler);
@@ -50,37 +49,13 @@ namespace EventHighway.EventHandlers
         /// </summary>
         public string Name => nameof(DelegateEventHandler);
 
-        /// <summary>
-        /// Gets a collection of required parameters for this event handler.
-        /// </summary>
-        public IEnumerable<string> RequiredParams => Array.Empty<string>();
-
-
-        /// <summary>
-        /// Handles an event asynchronously by invoking the registered event handler delegate with the
-        /// provided content and parameters.
-        /// </summary>
-        /// <param name="content">The event content to be processed by the handler.</param>
-        /// <param name="handlerParams">A read-only dictionary of parameters to be passed to the
-        /// handler.</param>
-        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
-        /// asynchronous operation. The default value is <see cref="CancellationToken.None"/>.</param>
-        /// <returns>A <see cref="ValueTask{EventHandlerResult}"/> representing the asynchronous
-        /// operation that returns the result of handling the event.</returns>
-        /// <exception cref="DelegateEventHandlerValidationException">Thrown when the delegate
-        /// service encounters validation errors during event handling.</exception>
-        /// <exception cref="DelegateEventHandlerDependencyException">Thrown when the delegate
-        /// service encounters dependency-related errors during event handling.</exception>
-        /// <exception cref="DelegateEventHandlerServiceException">Thrown when an unexpected error
-        /// occurs during event handling.</exception>
         public async ValueTask<EventHandlerResult> HandleAsync(
             string content,
-            IReadOnlyDictionary<string, string> handlerParams,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                return await this.delegateService.InvokeAsync(content, handlerParams, cancellationToken);
+                return await this.delegateService.InvokeAsync(content, cancellationToken);
             }
             catch (DelegateServiceValidationException delegateServiceValidationException)
             {

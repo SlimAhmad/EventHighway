@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using FluentAssertions;
 using Force.DeepCloner;
@@ -22,21 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         {
             // given
             string randomHandlerName = GetRandomString();
-            string randomConfigName = GetRandomString();
-            string randomConfigValue = GetRandomString();
 
             EventCallV2 randomEventCallV2 = CreateRandomEventCallV2();
             randomEventCallV2.HandlerName = randomHandlerName;
-
-            randomEventCallV2.HandlerConfigurations =
-                new List<HandlerConfiguration>
-                {
-                    new HandlerConfiguration
-                    {
-                        Name = randomConfigName,
-                        Value = randomConfigValue
-                    }
-                };
 
             EventCallV2 inputEventCallV2 = randomEventCallV2;
 
@@ -70,15 +57,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(randomHandlerName);
 
-            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
-                .Returns(new[] { randomConfigName });
-
             this.eventHandlerMock
                 .Setup(handler =>
                     handler.HandleAsync(
                         inputEventCallV2.Content,
-                        It.Is<IReadOnlyDictionary<string, string>>(d =>
-                            d[randomConfigName] == randomConfigValue),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(returnedEventHandlerResult);
 
@@ -101,14 +83,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     inputEventCallV2.Content,
-                    It.Is<IReadOnlyDictionary<string, string>>(d =>
-                        d[randomConfigName] == randomConfigValue),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
 
@@ -121,8 +98,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         {
             // given
             string randomHandlerName = GetRandomString();
-            string randomConfigName = GetRandomString();
-            string randomConfigValue = GetRandomString();
             string promotedPropertyName = "OrderType";
             string promotedPropertyValue = "Standard";
 
@@ -138,16 +113,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
                     {
                         Name = promotedPropertyName,
                         Value = promotedPropertyValue
-                    }
-                };
-
-            randomEventCallV2.HandlerConfigurations =
-                new List<HandlerConfiguration>
-                {
-                    new HandlerConfiguration
-                    {
-                        Name = randomConfigName,
-                        Value = randomConfigValue
                     }
                 };
 
@@ -168,14 +133,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(randomHandlerName);
 
-            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
-                .Returns(new[] { randomConfigName });
-
             this.eventHandlerMock
                 .Setup(handler =>
                     handler.HandleAsync(
                         It.IsAny<string>(),
-                        It.IsAny<IReadOnlyDictionary<string, string>>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(CreateRandomEventHandlerResult());
 
@@ -198,13 +159,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                 Times.Never);
 
@@ -217,24 +174,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         {
             // given
             string randomHandlerName = GetRandomString();
-            string randomConfigName = GetRandomString();
-            string randomConfigValue = GetRandomString();
 
             EventCallV2 randomEventCallV2 = CreateRandomEventCallV2();
             randomEventCallV2.HandlerName = randomHandlerName;
             randomEventCallV2.FilterCriteria = "this is not a valid expression !!!";
             randomEventCallV2.RequiredPromotedProperties = System.Array.Empty<string>();
             randomEventCallV2.PromotedProperties = new List<PromotedProperty>();
-
-            randomEventCallV2.HandlerConfigurations =
-                new List<HandlerConfiguration>
-                {
-                    new HandlerConfiguration
-                    {
-                        Name = randomConfigName,
-                        Value = randomConfigValue
-                    }
-                };
 
             EventCallV2 inputEventCallV2 = randomEventCallV2;
 
@@ -257,14 +202,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(randomHandlerName);
 
-            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
-                .Returns(new[] { randomConfigName });
-
             this.eventHandlerMock
                 .Setup(handler =>
                     handler.HandleAsync(
                         It.IsAny<string>(),
-                        It.IsAny<IReadOnlyDictionary<string, string>>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(CreateRandomEventHandlerResult());
 
@@ -290,13 +231,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                 Times.Never);
 
@@ -309,8 +246,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         {
             // given
             string randomHandlerName = GetRandomString();
-            string randomConfigName = GetRandomString();
-            string randomConfigValue = GetRandomString();
             string requiredPropertyName = "OrderType";
 
             EventCallV2 randomEventCallV2 = CreateRandomEventCallV2();
@@ -318,16 +253,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             randomEventCallV2.FilterCriteria = null;
             randomEventCallV2.RequiredPromotedProperties = new[] { requiredPropertyName };
             randomEventCallV2.PromotedProperties = new List<PromotedProperty>();
-
-            randomEventCallV2.HandlerConfigurations =
-                new List<HandlerConfiguration>
-                {
-                    new HandlerConfiguration
-                    {
-                        Name = randomConfigName,
-                        Value = randomConfigValue
-                    }
-                };
 
             EventCallV2 inputEventCallV2 = randomEventCallV2;
 
@@ -348,14 +273,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Name)
                 .Returns(randomHandlerName);
 
-            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
-                .Returns(new[] { randomConfigName });
-
             this.eventHandlerMock
                 .Setup(handler =>
                     handler.HandleAsync(
                         It.IsAny<string>(),
-                        It.IsAny<IReadOnlyDictionary<string, string>>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(CreateRandomEventHandlerResult());
 
@@ -381,13 +302,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                 Times.Never);
 

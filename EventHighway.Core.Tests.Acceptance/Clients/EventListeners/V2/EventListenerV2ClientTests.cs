@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
+
 using EventHighway.Core.Tests.Acceptance.Brokers;
 using Tynamix.ObjectFiller;
 using WireMock.Server;
@@ -90,9 +90,6 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventListeners.V2
 
                 .OnProperty(eventListenerV2 =>
                     eventListenerV2.EventAddressV2).IgnoreIt()
-
-                .OnProperty(eventListenerV2 =>
-                    eventListenerV2.HandlerConfigurations).Use(new List<HandlerConfiguration>())
 
                 .OnProperty(eventListenerV2 =>
                     eventListenerV2.ListenerEventV2s).IgnoreIt()

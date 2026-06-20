@@ -13,7 +13,6 @@ using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
@@ -323,14 +322,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     eventListenerV2.EventAddressV2).IgnoreIt()
 
                 .OnProperty(eventListenerV2 =>
-                    eventListenerV2.HandlerConfigurations).IgnoreIt()
-
-                .OnProperty(eventListenerV2 =>
                     eventListenerV2.ListenerEventV2s).IgnoreIt()
 
                 .OnType<EventAddressV2>().IgnoreIt()
-                .OnType<EventV2>().IgnoreIt()
-                .OnType<HandlerConfiguration>().IgnoreIt();
+                .OnType<EventV2>().IgnoreIt();
 
             return filler;
         }

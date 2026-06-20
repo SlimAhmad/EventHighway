@@ -110,5 +110,22 @@ namespace EventHighway.Core.Clients.ArchivingEvents.V2
                 innerException: innerException,
                 data: innerException.Data);
         }
+
+        /// <summary>
+        /// Purges archived events older than the specified date asynchronously. This operation
+        /// removes archived events that are older than the provided threshold date.
+        /// </summary>
+        /// <param name="olderThan">The date threshold. Events archived before this date will be
+        /// purged.</param>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
+        public ValueTask PurgeEventArchiveV2sAsync(
+            DateTimeOffset olderThan,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
     }
 }

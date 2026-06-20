@@ -20,10 +20,9 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Delegates
         {
             // given
             string randomContent = GetRandomString();
-            IReadOnlyDictionary<string, string> inputHandlerParams = CreateHandlerParams();
 
             var serviceException = new Exception();
-            serviceException.Data.Add("ErrorCode", new System.Collections.Generic.List<string> { "ServiceError" });
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
 
             var failedDelegateServiceException =
                 new FailedDelegateServiceException(
@@ -37,16 +36,13 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Delegates
                     innerException: failedDelegateServiceException);
 
             this.delegateServiceMock
-                .Setup(service => service.ValidateInvokeParams(
-                    It.IsAny<string>(),
-                    It.IsAny<Func<string, IReadOnlyDictionary<string, string>, CancellationToken, ValueTask<EventHandlerResult>>>()))
+                .Setup(service => service.ValidateInvokeParams(It.IsAny<string>()))
                 .Throws(serviceException);
 
             // when
             ValueTask<EventHandlerResult> invokeTask =
                 this.delegateService.InvokeAsync(
                     content: randomContent,
-                    handlerParams: inputHandlerParams,
                     cancellationToken: TestContext.Current.CancellationToken);
 
             DelegateServiceException actualDelegateServiceException =
@@ -58,15 +54,12 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Delegates
                 .BeEquivalentTo(expectedDelegateServiceException);
 
             this.delegateServiceMock.Verify(service =>
-                service.ValidateInvokeParams(
-                    It.IsAny<string>(),
-                    It.IsAny<Func<string, IReadOnlyDictionary<string, string>, CancellationToken, ValueTask<EventHandlerResult>>>()),
+                service.ValidateInvokeParams(It.IsAny<string>()),
                 Times.Once);
 
             this.handlerFuncMock.Verify(handler =>
                 handler(
                     It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
                     It.IsAny<CancellationToken>()),
                 Times.Never);
 

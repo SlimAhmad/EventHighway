@@ -40,8 +40,6 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 this.eventHandlerBroker.GetAll()
                     .Single(h => h.Id == eventCallV2.HandlerId);
 
-            ValidateHandlerConfigurations(handler, eventCallV2.HandlerConfigurations);
-
             if (HasMissingPromotedProperties(
                 eventCallV2.RequiredPromotedProperties,
                 eventCallV2.PromotedProperties))
@@ -88,16 +86,9 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 }
             }
 
-            IReadOnlyDictionary<string, string> handlerParams =
-                eventCallV2.HandlerConfigurations.ToDictionary(
-                    handlerConfiguration => handlerConfiguration.Name,
-                    handlerConfiguration => handlerConfiguration.Value,
-                    StringComparer.OrdinalIgnoreCase);
-
             EventHandlerResult result =
                 await handler.HandleAsync(
                     content: eventCallV2.Content,
-                    handlerParams: handlerParams,
                     cancellationToken: cancellationToken);
 
             eventCallV2.IsSuccess = result.IsSuccess;

@@ -20,8 +20,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Delegates
             string invalidContent)
         {
             // given
-            var inputHandlerParams = CreateHandlerParams();
-
             var invalidDelegateServiceException =
                 new InvalidDelegateServiceException(
                     message: "Delegate service params are invalid, fix the errors and try again.");
@@ -39,7 +37,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Delegates
             ValueTask<EventHandlerResult> invokeTask =
                 this.delegateService.InvokeAsync(
                     content: invalidContent,
-                    handlerParams: inputHandlerParams,
                     cancellationToken: TestContext.Current.CancellationToken);
 
             DelegateServiceValidationException actualDelegateServiceValidationException =
@@ -53,7 +50,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Delegates
             this.handlerFuncMock.Verify(handler =>
                 handler(
                     It.IsAny<string>(),
-                    It.IsAny<System.Collections.Generic.IReadOnlyDictionary<string, string>>(),
                     It.IsAny<System.Threading.CancellationToken>()),
                 Times.Never);
 

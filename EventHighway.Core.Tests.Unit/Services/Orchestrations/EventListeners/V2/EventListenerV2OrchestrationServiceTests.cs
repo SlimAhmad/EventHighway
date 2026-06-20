@@ -163,7 +163,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                 var mock = new Mock<IEventHandler>();
                 mock.SetupGet(h => h.Id).Returns(Guid.NewGuid());
                 mock.SetupGet(h => h.Name).Returns(GetRandomString());
-                mock.SetupGet(h => h.RequiredParams).Returns(System.Array.Empty<string>());
                 handlers.Add(mock.Object);
             }
 
@@ -212,9 +211,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                     .IgnoreIt()
 
                 .OnProperty(eventListenerV2 => eventListenerV2.ListenerEventV2s)
-                    .IgnoreIt()
-
-                .OnProperty(eventListenerV2 => eventListenerV2.HandlerConfigurations)
                     .IgnoreIt();
 
             return filler;
