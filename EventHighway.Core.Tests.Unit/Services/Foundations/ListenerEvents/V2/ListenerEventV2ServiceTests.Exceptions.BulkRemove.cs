@@ -21,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnBulkRemoveIfSqlExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
             IEnumerable<ListenerEventV2> inputListenerEventV2s = someListenerEventV2s;
             SqlException sqlException = GetSqlException();
@@ -47,7 +50,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask bulkRemoveListenerEventV2sTask =
                 this.listenerEventV2Service.BulkRemoveListenerEventV2sAsync(
                     inputListenerEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2DependencyException actualListenerEventV2DependencyException =
                 await Assert.ThrowsAsync<ListenerEventV2DependencyException>(
@@ -77,6 +80,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
             IEnumerable<ListenerEventV2> inputListenerEventV2s = someListenerEventV2s;
             var serviceException = new Exception();
@@ -103,7 +109,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask bulkRemoveListenerEventV2sTask =
                 this.listenerEventV2Service.BulkRemoveListenerEventV2sAsync(
                     inputListenerEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ServiceException actualListenerEventV2ServiceException =
                 await Assert.ThrowsAsync<ListenerEventV2ServiceException>(
