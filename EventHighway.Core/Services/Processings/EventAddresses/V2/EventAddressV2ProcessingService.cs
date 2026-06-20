@@ -29,6 +29,8 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return await this.eventAddressV2Service.RetrieveAllEventAddressV2sAsync(cancellationToken);
         });
 
@@ -37,6 +39,7 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventAddressV2Id(eventAddressV2Id);
 
             return await this.eventAddressV2Service.RetrieveEventAddressV2ByIdAsync(
@@ -49,6 +52,7 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateOnRemoveEventAddressV2ById(eventAddressV2Id);
 
             return await this.eventAddressV2Service.RemoveEventAddressV2ByIdAsync(
@@ -61,6 +65,7 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateOnRegisterEventAddressV2(eventAddressV2);
 
             return await this.eventAddressV2Service.AddEventAddressV2Async(
@@ -73,6 +78,7 @@ namespace EventHighway.Core.Services.Processings.EventAddresses.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateOnRetrieveOrRegisterEventAddressV2(eventAddressV2);
 
             IQueryable<EventAddressV2> allEventAddressV2s =

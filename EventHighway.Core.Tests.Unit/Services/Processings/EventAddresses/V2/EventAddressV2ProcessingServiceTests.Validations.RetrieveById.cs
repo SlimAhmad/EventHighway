@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Processings.EventAddresses.V2.Exceptions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
         public async Task ShouldThrowValidationExceptionOnRetrieveByIdIfIdIsInvalidAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid invalidEventAddressV2Id = Guid.Empty;
 
             var invalidEventAddressV2ProcessingException =
@@ -36,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             ValueTask<EventAddressV2> retrieveEventAddressV2ByIdTask =
                 this.eventAddressV2ProcessingService.RetrieveEventAddressV2ByIdAsync(
                     invalidEventAddressV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventAddressV2ProcessingValidationException
                 actualEventAddressV2ProcessingValidationException =
@@ -55,7 +59,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             this.eventAddressV2ServiceMock.Verify(broker =>
                 broker.RetrieveEventAddressV2ByIdAsync(
                     It.IsAny<Guid>(),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
