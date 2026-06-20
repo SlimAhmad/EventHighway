@@ -115,5 +115,61 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            IEnumerable<EventArchiveV2> someEventArchiveV2s =
+                CreateRandomEventArchiveV2s().ToList();
+
+            var serviceException = new Exception();
+
+            var failedEventArchiveV2ProcessingServiceException =
+                new FailedEventArchiveV2ProcessingServiceException(
+                    message: "Failed event archive service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedEventArchiveV2ProcessingServiceException =
+                new EventArchiveV2ProcessingServiceException(
+                    message: "Event archive service error occurred, contact support.",
+                    innerException: failedEventArchiveV2ProcessingServiceException);
+
+            this.eventArchiveV2ServiceMock.Setup(service =>
+                service.BulkRemoveEventArchiveV2sAsync(
+                    someEventArchiveV2s,
+                    TestContext.Current.CancellationToken))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask bulkRemoveEventArchiveV2sTask =
+                this.eventArchiveV2ProcessingService
+                    .BulkRemoveEventArchiveV2sAsync(
+                        someEventArchiveV2s,
+                        TestContext.Current.CancellationToken);
+
+            EventArchiveV2ProcessingServiceException
+                actualEventArchiveV2ProcessingServiceException =
+                    await Assert.ThrowsAsync<EventArchiveV2ProcessingServiceException>(
+                        bulkRemoveEventArchiveV2sTask.AsTask);
+
+            // then
+            actualEventArchiveV2ProcessingServiceException.Should()
+                .BeEquivalentTo(expectedEventArchiveV2ProcessingServiceException);
+
+            this.eventArchiveV2ServiceMock.Verify(service =>
+                service.BulkRemoveEventArchiveV2sAsync(
+                    someEventArchiveV2s,
+                    TestContext.Current.CancellationToken),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventArchiveV2ProcessingServiceException))),
+                        Times.Once);
+
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
