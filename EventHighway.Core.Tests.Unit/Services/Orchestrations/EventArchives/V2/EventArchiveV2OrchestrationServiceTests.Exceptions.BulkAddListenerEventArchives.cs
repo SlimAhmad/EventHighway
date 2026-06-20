@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
     public partial class EventArchiveV2OrchestrationServiceTests
     {
         [Theory]
-        [MemberData(nameof(ListenerEventArchiveV2ValidationExceptions))]
+        [MemberData(nameof(DependencyValidationExceptions))]
         public async Task
             ShouldThrowDependencyValidationExceptionOnBulkAddListenerEventArchiveV2sIfValidationExceptionOccursAndLogItAsync(
                 Xeption listenerEventArchiveV2ValidationException)
@@ -69,7 +69,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         }
 
         [Theory]
-        [MemberData(nameof(ListenerEventArchiveV2DependencyExceptions))]
+        [MemberData(nameof(DependencyExceptions))]
         public async Task
             ShouldThrowDependencyExceptionOnBulkAddListenerEventArchiveV2sIfDependencyExceptionOccursAndLogItAsync(
                 Xeption listenerEventArchiveV2DependencyException)

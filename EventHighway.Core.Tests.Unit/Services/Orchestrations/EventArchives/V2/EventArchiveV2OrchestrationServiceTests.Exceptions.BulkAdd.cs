@@ -75,7 +75,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
         [Theory]
-        [MemberData(nameof(EventArchiveV2DependencyExceptions))]
+        [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnBulkAddIfDependencyExceptionOccursAndLogItAsync(
             Xeption dependencyException)
         {
