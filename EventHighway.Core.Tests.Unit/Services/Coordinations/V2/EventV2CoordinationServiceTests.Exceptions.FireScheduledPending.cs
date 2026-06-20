@@ -171,6 +171,89 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         }
 
         [Fact]
+        public async Task ShouldThrowDependencyExceptionOnFireScheduledPendingIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventV2CoordinationException =
+                new TimeoutEventV2CoordinationException(
+                    message: "Failed event coordination timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventV2CoordinationDependencyException =
+                new EventV2CoordinationDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutEventV2CoordinationException);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask fireScheduledPendingEventV2sTask =
+                this.eventV2CoordinationService.FireScheduledPendingEventV2sAsync(
+                    TestContext.Current.CancellationToken);
+
+            EventV2CoordinationDependencyException
+                actualEventV2CoordinationDependencyException =
+                    await Assert.ThrowsAsync<EventV2CoordinationDependencyException>(
+                        fireScheduledPendingEventV2sTask.AsTask);
+
+            // then
+            actualEventV2CoordinationDependencyException.Should()
+                .BeEquivalentTo(expectedEventV2CoordinationDependencyException);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2CoordinationDependencyException))),
+                        Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Never);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.AddListenerEventV2Async(
+                    It.IsAny<ListenerEventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RunEventCallV2Async(
+                    It.IsAny<EventCallV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.ModifyListenerEventV2Async(
+                    It.IsAny<ListenerEventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowServiceExceptionOnFireScheduledPendingIfExceptionOccursAndLogItAsync()
         {
             // given
