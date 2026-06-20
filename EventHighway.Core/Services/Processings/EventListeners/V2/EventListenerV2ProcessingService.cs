@@ -29,6 +29,8 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             return await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync(cancellationToken);
         });
 
@@ -37,6 +39,7 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventListenerV2IsNotNull(eventListenerV2);
 
             return await this.eventListenerV2Service.AddEventListenerV2Async(
@@ -48,6 +51,7 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             Guid eventAddressId,
             CancellationToken cancellationToken = default) => TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventAddressId(eventAddressId);
 
             IQueryable<EventListenerV2> eventListenerV2s =
@@ -62,6 +66,7 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventListenerV2Id(eventListenerV2Id);
 
             return await this.eventListenerV2Service.RemoveEventListenerV2ByIdAsync(
@@ -74,6 +79,7 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateOnRetrieveOrRegisterEventListenerV2(eventListenerV2);
 
             IQueryable<EventListenerV2> allEventListenerV2s =
