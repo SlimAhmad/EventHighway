@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -22,6 +23,30 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             try
             {
                 return await returningEventV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2CoordinationException =
+                    new TimeoutEventV2CoordinationException(
+                        message: "Failed event coordination timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2CoordinationDependencyException =
+                    new EventV2CoordinationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2CoordinationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2CoordinationDependencyException);
+                throw eventV2CoordinationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventV2CoordinationException nullEventV2CoordinationException)
             {
@@ -95,6 +120,30 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2CoordinationException =
+                    new TimeoutEventV2CoordinationException(
+                        message: "Failed event coordination timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2CoordinationDependencyException =
+                    new EventV2CoordinationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2CoordinationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2CoordinationDependencyException);
+                throw eventV2CoordinationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (EventV2OrchestrationValidationException eventV2OrchestrationValidationException)
             {
