@@ -45,6 +45,8 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var allEvents =
                 await this.eventV2OrchestrationService
                     .RetrieveAllEventV2sAsync(cancellationToken);

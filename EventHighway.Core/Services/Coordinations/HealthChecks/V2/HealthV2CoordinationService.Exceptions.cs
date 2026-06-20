@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2.Exceptions;
@@ -24,6 +25,31 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             try
             {
                 return await returningHealthCheckItemsFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutHealthV2CoordinationException =
+                    new TimeoutHealthV2CoordinationException(
+                        message: "Failed health coordination timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var healthV2CoordinationDependencyException =
+                    new HealthV2CoordinationDependencyException(
+                        message: "Health dependency error occurred, contact support.",
+                        innerException: timeoutHealthV2CoordinationException);
+
+                await this.loggingBroker.LogErrorAsync(healthV2CoordinationDependencyException);
+
+                throw healthV2CoordinationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (EventV2OrchestrationValidationException
                 eventV2OrchestrationValidationException)
