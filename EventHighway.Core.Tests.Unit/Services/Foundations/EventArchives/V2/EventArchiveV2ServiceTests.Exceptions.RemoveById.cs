@@ -204,6 +204,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowServiceExceptionOnRemoveByIdIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventArchiveV2Id = GetRandomId();
             var serviceException = new Exception();
 
@@ -232,7 +235,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             ValueTask<EventArchiveV2> removeEventArchiveV2ByIdTask =
                 this.eventArchiveV2Service.RemoveEventArchiveV2ByIdAsync(
                     someEventArchiveV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2ServiceException actualEventArchiveV2ServiceException =
                 await Assert.ThrowsAsync<EventArchiveV2ServiceException>(
