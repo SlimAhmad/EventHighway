@@ -75,6 +75,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowDependencyValidationErrorOnRemoveByIdIfDbUpdateConcurrencyErrorAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventAddressV2Id = GetRandomId();
             var dbUpdateConcurrencyException = new DbUpdateConcurrencyException();
             dbUpdateConcurrencyException.Data.Add("ErrorCode", new List<string> { "DbUpdateConcurrencyError" });
@@ -97,7 +100,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> removeEventAddressV2ByIdTask =
                 this.eventAddressV2Service.RemoveEventAddressV2ByIdAsync(
-                    someEventAddressV2Id, TestContext.Current.CancellationToken);
+                    someEventAddressV2Id, randomCancellationToken);
 
             EventAddressV2DependencyValidationException actualEventAddressV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventAddressV2DependencyValidationException>(
