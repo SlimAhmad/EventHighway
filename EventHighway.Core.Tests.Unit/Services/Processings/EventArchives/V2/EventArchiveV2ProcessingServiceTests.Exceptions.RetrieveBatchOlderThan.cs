@@ -61,5 +61,51 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+        [Theory]
+        [MemberData(nameof(DependencyExceptions))]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveBatchOlderThanIfDependencyErrorOccursAndLogItAsync(
+            Xeption eventArchiveV2DependencyException)
+        {
+            // given
+            DateTimeOffset someOlderThan = GetRandomDateTimeOffset();
+            int someTake = 0;
+
+            var expectedEventArchiveV2ProcessingDependencyException =
+                new EventArchiveV2ProcessingDependencyException(
+                    message: "Event archive dependency error occurred, contact support.",
+                    innerException: eventArchiveV2DependencyException.InnerException as Xeption);
+
+            this.eventArchiveV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sAsync())
+                    .ThrowsAsync(eventArchiveV2DependencyException);
+
+            // when
+            ValueTask<IEnumerable<EventArchiveV2>> retrieveBatchOlderThanTask =
+                this.eventArchiveV2ProcessingService
+                    .RetrieveBatchOfEventArchiveV2sOlderThanAsync(
+                        someOlderThan,
+                        someTake);
+
+            EventArchiveV2ProcessingDependencyException
+                actualEventArchiveV2ProcessingDependencyException =
+                    await Assert.ThrowsAsync<EventArchiveV2ProcessingDependencyException>(
+                        retrieveBatchOlderThanTask.AsTask);
+
+            // then
+            actualEventArchiveV2ProcessingDependencyException.Should()
+                .BeEquivalentTo(expectedEventArchiveV2ProcessingDependencyException);
+
+            this.eventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventArchiveV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
