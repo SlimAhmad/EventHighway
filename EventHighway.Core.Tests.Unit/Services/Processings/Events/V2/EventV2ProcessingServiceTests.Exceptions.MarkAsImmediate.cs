@@ -16,6 +16,64 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
 {
     public partial class EventV2ProcessingServiceTests
     {
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnMarkImmediateIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            EventV2 someEventV2 = CreateRandomEventV2();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventV2ProcessingException =
+                new TimeoutEventV2ProcessingException(
+                    message: "Failed event processing timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventV2ProcessingDependencyException =
+                new EventV2ProcessingDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutEventV2ProcessingException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventV2> markEventV2AsImmediateTask =
+                this.eventV2ProcessingService.MarkEventV2AsImmediateAsync(
+                    someEventV2,
+                    TestContext.Current.CancellationToken);
+
+            EventV2ProcessingDependencyException actualEventV2ProcessingDependencyException =
+                await Assert.ThrowsAsync<EventV2ProcessingDependencyException>(
+                    markEventV2AsImmediateTask.AsTask);
+
+            // then
+            actualEventV2ProcessingDependencyException.Should().BeEquivalentTo(
+                expectedEventV2ProcessingDependencyException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.ModifyEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationErrorOnMarkImmediateIfDependencyValidationOccursAndLogItAsync(
