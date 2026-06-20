@@ -20,7 +20,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             // given
             var invalidBatchConfiguration = new BatchConfiguration
             {
-                BatchSizeForBulkProcessing = 0
+                BatchSizeForBulkProcessing = -1 * GetRandomNumber()
             };
 
             var invalidArchivingEventV2OrchestrationException =
@@ -29,7 +29,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             invalidArchivingEventV2OrchestrationException.AddData(
                 key: nameof(BatchConfiguration.BatchSizeForBulkProcessing),
-                values: "Value must be greater than 0");
+                values: "Value must be greater than or equal to 0");
 
             var expectedArchivingEventV2OrchestrationValidationException =
                 new ArchivingEventV2OrchestrationValidationException(

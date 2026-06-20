@@ -98,8 +98,10 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
                     await ValidateEventArchiveV2OnAddAsync(item);
                     validItems.Add(item);
                 }
-                catch (Exception)
-                { }
+                catch (Exception exception)
+                {
+                    await this.loggingBroker.LogErrorAsync(exception);
+                }
             }
 
             await this.storageBroker.BulkInsertEventArchiveV2sAsync(validItems, cancellationToken);

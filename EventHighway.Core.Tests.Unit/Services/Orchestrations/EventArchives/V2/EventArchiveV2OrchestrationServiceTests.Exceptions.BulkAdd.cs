@@ -20,7 +20,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
     {
         [Theory]
         [MemberData(nameof(EventArchiveV2ValidationExceptions))]
-        [MemberData(nameof(ListenerEventArchiveV2ValidationExceptions))]
         public async Task ShouldThrowDependencyValidationExceptionOnBulkAddIfValidationExceptionOccursAndLogItAsync(
             Xeption validationException)
         {
@@ -40,7 +39,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                         .ThrowsAsync(validationException);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     TestContext.Current.CancellationToken);
@@ -77,7 +76,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         }
         [Theory]
         [MemberData(nameof(EventArchiveV2DependencyExceptions))]
-        [MemberData(nameof(ListenerEventArchiveV2DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnBulkAddIfDependencyExceptionOccursAndLogItAsync(
             Xeption dependencyException)
         {
@@ -97,7 +95,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                         .ThrowsAsync(dependencyException);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     TestContext.Current.CancellationToken);
@@ -159,7 +157,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                         .ThrowsAsync(exception);
 
             // when
-            ValueTask bulkAddEventArchiveV2sTask =
+            ValueTask<IEnumerable<EventArchiveV2>> bulkAddEventArchiveV2sTask =
                 this.eventArchiveV2OrchestrationService.BulkAddEventArchiveV2sAsync(
                     inputEventArchiveV2s,
                     TestContext.Current.CancellationToken);

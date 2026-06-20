@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -40,32 +41,146 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         public ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            IEnumerable<EventV2> eventV2s =
-                await this.archivingEventV2OrchestrationService
-                    .RetrieveAllDeadEventV2sWithListenersAsync();
-
-            foreach (EventV2 eventV2 in eventV2s)
-            {
-                EventArchiveV2 eventArchiveV2 =
-                    await MapToEventArchiveV2Async(eventV2);
-
-                await this.eventArchiveV2OrchestrationService
-                    .AddEventArchiveV2WithListenerEventArchiveV2sAsync(
-                        eventArchiveV2,
-                        cancellationToken);
-
-                await this.archivingEventV2OrchestrationService
-                    .RemoveEventV2AndListenerEventV2sAsync(
-                        eventV2,
-                        cancellationToken);
-            }
-        });
-
-        private async ValueTask<EventArchiveV2> MapToEventArchiveV2Async(EventV2 eventV2)
-        {
             DateTimeOffset currentDateTime =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();
 
+            var faultedEventV2Ids = new HashSet<Guid>();
+            var failedEventV2Ids = new List<Guid>();
+            var failedListenerEventV2Ids = new List<Guid>();
+
+            IEnumerable<EventV2> deadEventV2s;
+
+            do
+            {
+                deadEventV2s = await this.archivingEventV2OrchestrationService
+                    .RetrieveBatchOfDeadEventV2sAsync();
+
+                IEnumerable<EventV2> pendingDeadEventV2s =
+                    deadEventV2s.Where(eventV2 =>
+                        !faultedEventV2Ids.Contains(eventV2.Id)).ToList();
+
+                if (!pendingDeadEventV2s.Any())
+                    break;
+
+                IEnumerable<EventArchiveV2> eventArchiveV2s =
+                    pendingDeadEventV2s.Select(eventV2 =>
+                        MapToEventArchiveV2(eventV2, currentDateTime)).ToList();
+
+                IEnumerable<EventArchiveV2> addedEventArchiveV2s =
+                    await this.eventArchiveV2OrchestrationService
+                        .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
+
+                IEnumerable<Guid> archivedEventV2Ids =
+                    addedEventArchiveV2s.Select(eventArchiveV2 => eventArchiveV2.Id).ToList();
+
+                foreach (EventV2 unarchivedEventV2 in pendingDeadEventV2s
+                    .Where(eventV2 => !archivedEventV2Ids.Contains(eventV2.Id)))
+                {
+                    if (faultedEventV2Ids.Add(unarchivedEventV2.Id))
+                        failedEventV2Ids.Add(unarchivedEventV2.Id);
+                }
+
+                IEnumerable<Guid> pendingEventV2Ids = archivedEventV2Ids.ToList();
+
+                IEnumerable<ListenerEventV2> listenerEventV2s;
+
+                do
+                {
+                    listenerEventV2s = await this.archivingEventV2OrchestrationService
+                        .RetrieveBatchOfListenerEventV2sAsync(pendingEventV2Ids, cancellationToken);
+
+                    if (!listenerEventV2s.Any())
+                        break;
+
+                    IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s =
+                        listenerEventV2s.Select(listenerEventV2 =>
+                            MapToListenerEventArchiveV2(listenerEventV2, currentDateTime)).ToList();
+
+                    IEnumerable<ListenerEventArchiveV2> addedListenerEventArchiveV2s =
+                        await this.eventArchiveV2OrchestrationService
+                            .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
+
+                    IEnumerable<Guid> addedListenerEventArchiveIds =
+                        addedListenerEventArchiveV2s.Select(listenerEventArchiveV2 =>
+                            listenerEventArchiveV2.Id).ToList();
+
+                    IEnumerable<ListenerEventV2> addedListenerEventV2s =
+                        listenerEventV2s
+                            .Where(listenerEventV2 =>
+                                addedListenerEventArchiveIds.Contains(listenerEventV2.Id)).ToList();
+
+                    if (addedListenerEventV2s.Any())
+                    {
+                        await this.archivingEventV2OrchestrationService
+                            .BulkRemoveListenerEventV2sAsync(addedListenerEventV2s, cancellationToken);
+                    }
+
+                    foreach (ListenerEventV2 unarchivedListenerEventV2 in listenerEventV2s
+                        .Where(listenerEventV2 =>
+                            !addedListenerEventArchiveIds.Contains(listenerEventV2.Id)))
+                    {
+                        failedListenerEventV2Ids.Add(unarchivedListenerEventV2.Id);
+                        faultedEventV2Ids.Add(unarchivedListenerEventV2.EventId);
+                    }
+
+                    pendingEventV2Ids =
+                        pendingEventV2Ids.Where(eventV2Id =>
+                            !faultedEventV2Ids.Contains(eventV2Id)).ToList();
+
+                    if (!pendingEventV2Ids.Any())
+                        break;
+                }
+                while (true);
+
+                IEnumerable<EventV2> removableEventV2s =
+                    pendingDeadEventV2s.Where(eventV2 =>
+                        archivedEventV2Ids.Contains(eventV2.Id)
+                            && !faultedEventV2Ids.Contains(eventV2.Id)).ToList();
+
+                if (removableEventV2s.Any())
+                {
+                    await this.archivingEventV2OrchestrationService
+                        .BulkRemoveEventV2sAsync(removableEventV2s, cancellationToken);
+                }
+            }
+            while (true);
+
+            if (failedEventV2Ids.Any() || failedListenerEventV2Ids.Any())
+            {
+                await LogFailedArchivingEventV2sAsync(failedEventV2Ids, failedListenerEventV2Ids);
+            }
+        });
+
+        private async ValueTask LogFailedArchivingEventV2sAsync(
+            IEnumerable<Guid> failedEventV2Ids,
+            IEnumerable<Guid> failedListenerEventV2Ids)
+        {
+            var failedArchivingEventV2CoordinationException =
+                new FailedArchivingEventV2CoordinationException(
+                    message: "Some dead events could not be fully archived " +
+                        "and were retained for the next run.");
+
+            if (failedEventV2Ids.Any())
+            {
+                failedArchivingEventV2CoordinationException.AddData(
+                    key: "failedEventV2Ids",
+                    values: failedEventV2Ids.Select(id => id.ToString()).ToArray());
+            }
+
+            if (failedListenerEventV2Ids.Any())
+            {
+                failedArchivingEventV2CoordinationException.AddData(
+                    key: "failedListenerEventV2Ids",
+                    values: failedListenerEventV2Ids.Select(id => id.ToString()).ToArray());
+            }
+
+            await this.loggingBroker.LogErrorAsync(failedArchivingEventV2CoordinationException);
+        }
+
+        private static EventArchiveV2 MapToEventArchiveV2(
+            EventV2 eventV2,
+            DateTimeOffset currentDateTime)
+        {
             return new EventArchiveV2
             {
                 Id = eventV2.Id,
@@ -77,14 +192,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                 ScheduledDate = eventV2.ScheduledDate,
                 RemainingRetryAttempts = eventV2.RemainingRetryAttempts,
                 ArchivedDate = currentDateTime,
-                EventAddressId = eventV2.EventAddressId,
-
-                ListenerEventArchiveV2s = eventV2.ListenerEventV2s
-                    ?.Select(listenerEventV2 =>
-                        MapToListenerEventArchiveV2(
-                            listenerEventV2,
-                            currentDateTime))
-                                .ToList()
+                EventAddressId = eventV2.EventAddressId
             };
         }
 

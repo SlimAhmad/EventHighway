@@ -35,6 +35,8 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             DateTimeOffset olderThan,
             BatchConfiguration batchConfiguration)
         {
+            int batchSize = batchConfiguration?.BatchSizeForBulkProcessing ?? 0;
+
             Validate(
                 message: "Listener event archive is invalid, fix the errors and try again.",
 
@@ -42,13 +44,22 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 Parameter: nameof(olderThan)),
 
                 (Rule: IsInvalid(batchConfiguration),
-                Parameter: nameof(BatchConfiguration)));
+                Parameter: nameof(BatchConfiguration)),
+
+                (Rule: IsInvalid(batchSize),
+                Parameter: nameof(BatchConfiguration.BatchSizeForBulkProcessing)));
         }
 
         private static dynamic IsInvalid(DateTimeOffset date) => new
         {
             Condition = date == default,
             Message = "Required."
+        };
+
+        private static dynamic IsInvalid(int value) => new
+        {
+            Condition = value < 0,
+            Message = "Value must be greater than or equal to 0"
         };
 
         private static dynamic IsInvalid(object @object) => new

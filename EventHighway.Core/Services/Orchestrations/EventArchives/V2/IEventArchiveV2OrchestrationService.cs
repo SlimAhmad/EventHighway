@@ -23,7 +23,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             EventArchiveV2 eventArchiveV2,
             CancellationToken cancellationToken = default);
 
-        ValueTask BulkAddEventArchiveV2sAsync(
+        ValueTask<IEnumerable<EventArchiveV2>> BulkAddEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default);
 
