@@ -86,6 +86,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ShouldThrowDependencyValidationExceptionOnAddIfListenerEventArchiveV2AlreadyExistsAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             string randomMessage = GetRandomString();
             ListenerEventArchiveV2 someListenerEventArchiveV2 = CreateRandomListenerEventArchiveV2();
             var duplicateKeyException = new DuplicateKeyException(randomMessage);
@@ -113,7 +116,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ValueTask<ListenerEventArchiveV2> addListenerEventArchiveV2Task =
                 this.listenerEventArchiveV2Service.AddListenerEventArchiveV2Async(
                     someListenerEventArchiveV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2DependencyValidationException
                 actualListenerEventArchiveV2DependencyValidationException =
