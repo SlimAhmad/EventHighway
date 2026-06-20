@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -28,6 +29,30 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             try
             {
                 return await returningEventV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2OrchestrationException =
+                    new TimeoutEventV2OrchestrationException(
+                        message: "Failed event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2OrchestrationDependencyException =
+                    new EventV2OrchestrationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
+                throw eventV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (InvalidEventV2OrchestrationException
                 invalidEventV2OrchestrationException)
@@ -139,6 +164,30 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             {
                 return await returningEventV2sFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2OrchestrationException =
+                    new TimeoutEventV2OrchestrationException(
+                        message: "Failed event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2OrchestrationDependencyException =
+                    new EventV2OrchestrationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
+                throw eventV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (EventV2ProcessingValidationException
                 eventV2ProcessingValidationException)
             {
@@ -222,6 +271,30 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             {
                 return await returningEventAddressV2sFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2OrchestrationException =
+                    new TimeoutEventV2OrchestrationException(
+                        message: "Failed event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2OrchestrationDependencyException =
+                    new EventV2OrchestrationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
+                throw eventV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (EventV2ProcessingValidationException
                 eventV2ProcessingValidationException)
             {
@@ -304,6 +377,30 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             try
             {
                 return await returningEventCallV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2OrchestrationException =
+                    new TimeoutEventV2OrchestrationException(
+                        message: "Failed event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2OrchestrationDependencyException =
+                    new EventV2OrchestrationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
+                throw eventV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullEventCallV2OrchestrationException
                 nullEventCallV2OrchestrationException)
