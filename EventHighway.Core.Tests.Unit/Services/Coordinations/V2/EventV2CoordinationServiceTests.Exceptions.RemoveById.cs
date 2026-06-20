@@ -21,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventV2Id = GetRandomId();
 
             var expectedEventV2CoordinationDependencyValidationException =
@@ -38,7 +41,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2CoordinationService.RemoveEventV2ByIdAsync(
                     someEventV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2CoordinationDependencyValidationException
                 actualEventV2CoordinationDependencyValidationException =
@@ -71,6 +74,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventV2Id = GetRandomId();
 
             var expectedEventV2CoordinationDependencyException =
@@ -83,6 +89,101 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()))
                         .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask<EventV2> removeEventV2ByIdTask =
+                this.eventV2CoordinationService.RemoveEventV2ByIdAsync(
+                    someEventV2Id,
+                    randomCancellationToken);
+
+            EventV2CoordinationDependencyException
+                actualEventV2CoordinationDependencyException =
+                    await Assert.ThrowsAsync<EventV2CoordinationDependencyException>(
+                        removeEventV2ByIdTask.AsTask);
+
+            // then
+            actualEventV2CoordinationDependencyException.Should()
+                .BeEquivalentTo(expectedEventV2CoordinationDependencyException);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RemoveEventV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2CoordinationDependencyException))),
+                        Times.Once);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRemoveByIdAsync()
+        {
+            // given
+            Guid someEventV2Id = GetRandomId();
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventV2> removeEventV2ByIdTask =
+                this.eventV2CoordinationService.RemoveEventV2ByIdAsync(
+                    someEventV2Id,
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    removeEventV2ByIdTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventV2CoordinationDependencyException>();
+            actualException.Should().NotBeOfType<EventV2CoordinationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRemoveByIdIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            Guid someEventV2Id = GetRandomId();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventV2CoordinationException =
+                new TimeoutEventV2CoordinationException(
+                    message: "Failed event coordination timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventV2CoordinationDependencyException =
+                new EventV2CoordinationDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutEventV2CoordinationException);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RemoveEventV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
 
             // when
             ValueTask<EventV2> removeEventV2ByIdTask =
@@ -119,6 +220,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         public async Task ShouldThrowServiceExceptionOnRemoveByIdIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventV2Id = GetRandomId();
             var serviceException = new Exception();
 
@@ -142,7 +246,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2CoordinationService.RemoveEventV2ByIdAsync(
                     someEventV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2CoordinationServiceException
                 actualEventV2CoordinationServiceException =

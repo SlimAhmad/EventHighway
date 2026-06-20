@@ -47,6 +47,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2IsNotNull(eventV2);
 
             DateTimeOffset now =
@@ -76,6 +77,8 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            
             IQueryable<EventV2> eventV2s =
                 await this.eventV2OrchestrationService
                     .RetrieveScheduledPendingEventV2sAsync(cancellationToken);
@@ -94,6 +97,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2Id(eventV2Id);
 
             return await this.eventV2OrchestrationService

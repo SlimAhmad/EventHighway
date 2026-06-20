@@ -25,6 +25,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         public async Task ShouldSubmitScheduleEventV2WhenScheduledDateIsInFutureAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             int randomDays = GetRandomNumber();
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             DateTimeOffset retrievedDateTimeOffset = randomDateTimeOffset;
@@ -46,7 +49,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Setup(service =>
                 service.SubmitEventV2Async(
                     inputScheduledEventV2,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(submittedEventV2);
 
             // when
@@ -54,7 +57,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 await this.eventV2CoordinationService
                     .SubmitEventV2Async(
                         inputEventV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(expectedEventV2);
@@ -66,7 +69,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.SubmitEventV2Async(
                     inputScheduledEventV2,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
@@ -107,6 +110,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             DateTimeOffset? scheduledDate)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var mockSequence = new MockSequence();
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
@@ -169,14 +175,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.SubmitEventV2Async(
                         inputImmediateEventV2,
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(submittedEventV2);
 
             this.eventListenerV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
                         inputImmediateEventV2.EventAddressId,
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(retrievedEventListenerV2s);
 
             for (int index = 0; index < inputListenerEventV2s.Count; index++)
@@ -189,7 +195,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     .InSequence(mockSequence).Setup(service =>
                         service.AddListenerEventV2Async(
                             It.Is(SameListenerEventAs(inputListenerEventV2s[index])),
-                            TestContext.Current.CancellationToken))
+                            randomCancellationToken))
                                 .ReturnsAsync(addedListenerEventV2s[index]);
 
                 var ranEventCall = new EventCallV2
@@ -206,7 +212,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     .InSequence(mockSequence).Setup(service =>
                         service.RunEventCallV2Async(
                             It.Is(SameEventCallAs(expectedInputCallEventV2s[index])),
-                            TestContext.Current.CancellationToken))
+                            randomCancellationToken))
                                 .ReturnsAsync(ranEventCall);
 
                 ranEventCallV2s.Add(item: ranEventCall);
@@ -225,7 +231,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     .InSequence(mockSequence).Setup(service =>
                         service.ModifyListenerEventV2Async(
                             It.Is(SameListenerEventAs(addedListenerEventV2s[index])),
-                            TestContext.Current.CancellationToken))
+                            randomCancellationToken))
                                 .ReturnsAsync(modifiedListenerEventV2s[index]);
             }
 
@@ -234,7 +240,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 await this.eventV2CoordinationService
                     .SubmitEventV2Async(
                         inputEventV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(expectedEventV2);
@@ -246,13 +252,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.SubmitEventV2Async(
                     inputImmediateEventV2,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveEventListenerV2sByEventAddressIdAsync(
                     inputImmediateEventV2.EventAddressId,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             for (int index = 0; index < inputListenerEventV2s.Count; index++)
@@ -260,19 +266,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                     service.AddListenerEventV2Async(
                         It.Is(SameListenerEventAs(inputListenerEventV2s[index])),
-                        TestContext.Current.CancellationToken),
+                        randomCancellationToken),
                             Times.Once);
 
                 this.eventV2OrchestrationServiceMock.Verify(service =>
                     service.RunEventCallV2Async(
                         It.Is(SameEventCallAs(expectedInputCallEventV2s[index])),
-                        TestContext.Current.CancellationToken),
+                        randomCancellationToken),
                             Times.Once);
 
                 this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                     service.ModifyListenerEventV2Async(
                         It.Is(SameListenerEventAs(addedListenerEventV2s[index])),
-                        TestContext.Current.CancellationToken),
+                        randomCancellationToken),
                             Times.Once);
             }
 
@@ -290,6 +296,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             DateTimeOffset? scheduledDate)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var mockSequence = new MockSequence();
             string promotedPropertyKey1 = GetRandomString();
             string promotedPropertyKey2 = GetRandomString();
@@ -366,14 +375,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.SubmitEventV2Async(
                         inputImmediateEventV2,
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(submittedEventV2);
 
             this.eventListenerV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
                         inputImmediateEventV2.EventAddressId,
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(retrievedEventListenerV2s);
 
             this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
@@ -384,7 +393,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.AddListenerEventV2Async(
                         It.Is(SameListenerEventAs(inputListenerEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(addedListenerEventV2);
 
             this.jsonSerializationBrokerMock.Setup(broker =>
@@ -415,7 +424,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.RunEventCallV2Async(
                         It.Is(SameEventCallAs(expectedInputCallEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(ranEventCall);
 
             this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
@@ -432,7 +441,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.ModifyListenerEventV2Async(
                         It.Is(SameListenerEventAs(addedListenerEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(addedListenerEventV2);
 
             // when
@@ -440,7 +449,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 await this.eventV2CoordinationService
                     .SubmitEventV2Async(
                         inputEventV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(expectedEventV2);
@@ -452,19 +461,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.SubmitEventV2Async(
                     inputImmediateEventV2,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveEventListenerV2sByEventAddressIdAsync(
                     inputImmediateEventV2.EventAddressId,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.AddListenerEventV2Async(
                     It.Is(SameListenerEventAs(inputListenerEventV2)),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.jsonSerializationBrokerMock.Verify(broker =>
@@ -494,13 +503,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RunEventCallV2Async(
                     It.Is(SameEventCallAs(expectedInputCallEventV2)),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.ModifyListenerEventV2Async(
                     It.Is(SameListenerEventAs(addedListenerEventV2)),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -516,6 +525,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             DateTimeOffset? scheduledDate)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var mockSequence = new MockSequence();
             string promotedPropertyKey1 = GetRandomString();
             string promotedPropertyKey2 = GetRandomString();
@@ -590,14 +602,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.SubmitEventV2Async(
                         inputImmediateEventV2,
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(submittedEventV2);
 
             this.eventListenerV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
                         inputImmediateEventV2.EventAddressId,
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(retrievedEventListenerV2s);
 
             this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
@@ -608,7 +620,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.AddListenerEventV2Async(
                         It.Is(SameListenerEventAs(inputListenerEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(addedListenerEventV2);
 
             this.jsonSerializationBrokerMock.Setup(broker =>
@@ -633,7 +645,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.RunEventCallV2Async(
                         It.Is(SameEventCallAs(expectedInputCallEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(ranEventCall);
 
             this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
@@ -650,7 +662,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.ModifyListenerEventV2Async(
                         It.Is(SameListenerEventAs(addedListenerEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(addedListenerEventV2);
 
             // when
@@ -658,7 +670,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 await this.eventV2CoordinationService
                     .SubmitEventV2Async(
                         inputEventV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(expectedEventV2);
@@ -670,19 +682,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.SubmitEventV2Async(
                     inputImmediateEventV2,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveEventListenerV2sByEventAddressIdAsync(
                     inputImmediateEventV2.EventAddressId,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.AddListenerEventV2Async(
                     It.Is(SameListenerEventAs(inputListenerEventV2)),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.jsonSerializationBrokerMock.Verify(broker =>
@@ -706,13 +718,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RunEventCallV2Async(
                     It.Is(SameEventCallAs(expectedInputCallEventV2)),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.ModifyListenerEventV2Async(
                     It.Is(SameListenerEventAs(addedListenerEventV2)),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
@@ -730,6 +742,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             string invalidContent)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var mockSequence = new MockSequence();
             string promotedPropertyKey = GetRandomString();
             string promotedPropertiesCsv = promotedPropertyKey;
@@ -798,14 +813,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.SubmitEventV2Async(
                         inputImmediateEventV2,
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(submittedEventV2);
 
             this.eventListenerV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
                         inputImmediateEventV2.EventAddressId,
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(retrievedEventListenerV2s);
 
             this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
@@ -816,7 +831,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.AddListenerEventV2Async(
                         It.Is(SameListenerEventAs(inputListenerEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(addedListenerEventV2);
 
             if (invalidContent != null)
@@ -830,7 +845,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.RunEventCallV2Async(
                         It.Is(SameEventCallAs(expectedInputCallEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(ranEventCall);
 
             this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
@@ -847,7 +862,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 .InSequence(mockSequence).Setup(service =>
                     service.ModifyListenerEventV2Async(
                         It.Is(SameListenerEventAs(addedListenerEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(addedListenerEventV2);
 
             // when
@@ -855,7 +870,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 await this.eventV2CoordinationService
                     .SubmitEventV2Async(
                         inputEventV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(expectedEventV2);
@@ -867,31 +882,31 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.SubmitEventV2Async(
                     inputImmediateEventV2,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveEventListenerV2sByEventAddressIdAsync(
                     inputImmediateEventV2.EventAddressId,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.AddListenerEventV2Async(
                     It.Is(SameListenerEventAs(inputListenerEventV2)),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RunEventCallV2Async(
                     It.Is(SameEventCallAs(expectedInputCallEventV2)),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.ModifyListenerEventV2Async(
                     It.Is(SameListenerEventAs(addedListenerEventV2)),
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             if (invalidContent != null)
