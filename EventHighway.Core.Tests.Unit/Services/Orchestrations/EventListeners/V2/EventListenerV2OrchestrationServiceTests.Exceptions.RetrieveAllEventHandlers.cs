@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
@@ -20,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var expectedEventListenerV2OrchestrationDependencyException =
                 new EventListenerV2OrchestrationDependencyException(
                     message: "Event listener dependency error occurred, contact support.",
@@ -32,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
             // when
             ValueTask<IEnumerable<IEventHandler>> retrieveAllTask =
                 this.eventListenerV2OrchestrationService.RetrieveAllEventHandlerV2sAsync(
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventListenerV2OrchestrationDependencyException actualException =
                 await Assert.ThrowsAsync<EventListenerV2OrchestrationDependencyException>(
