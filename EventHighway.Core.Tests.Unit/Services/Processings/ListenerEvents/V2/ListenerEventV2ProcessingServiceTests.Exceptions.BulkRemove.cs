@@ -23,6 +23,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             Xeption listenerEventV2ValidationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
             IEnumerable<ListenerEventV2> inputListenerEventV2s = someListenerEventV2s;
 
@@ -41,7 +44,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             ValueTask bulkRemoveListenerEventV2sTask =
                 this.listenerEventV2ProcessingService.BulkRemoveListenerEventV2sAsync(
                     inputListenerEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ProcessingDependencyValidationException
                 actualListenerEventV2ProcessingDependencyValidationException =
