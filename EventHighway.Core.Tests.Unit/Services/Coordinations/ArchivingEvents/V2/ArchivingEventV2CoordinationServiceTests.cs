@@ -8,7 +8,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
-using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
@@ -31,7 +30,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
     {
         private readonly Mock<IArchivingEventV2OrchestrationService> archivingEventV2OrchestrationServiceMock;
         private readonly Mock<IEventArchiveV2OrchestrationService> eventArchiveV2OrchestrationServiceMock;
-        private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly ICompareLogic compareLogic;
         private readonly IArchivingEventV2CoordinationService archivingEventV2CoordinationService;
@@ -46,9 +44,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 new Mock<IEventArchiveV2OrchestrationService>(
                     behavior: MockBehavior.Strict);
 
-            this.dateTimeBrokerMock = new Mock<IDateTimeBroker>(
-                behavior: MockBehavior.Strict);
-
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
             var compareConfiguration = new ComparisonConfig();
             this.compareLogic = new CompareLogic(compareConfiguration);
@@ -59,7 +54,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         this.archivingEventV2OrchestrationServiceMock.Object,
                     eventArchiveV2OrchestrationService:
                         this.eventArchiveV2OrchestrationServiceMock.Object,
-                    dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }
 
