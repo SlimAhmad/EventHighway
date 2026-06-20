@@ -11,6 +11,7 @@ using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
 {
@@ -86,9 +87,13 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
                     await ValidateListenerEventArchiveV2OnAddAsync(item);
                     itemsToBulkAdd.Add(item);
                 }
-                catch (Exception exception)
+                catch (NullListenerEventArchiveV2Exception nullListenerEventArchiveV2Exception)
                 {
-                    await this.loggingBroker.LogErrorAsync(exception);
+                    await this.loggingBroker.LogErrorAsync(nullListenerEventArchiveV2Exception);
+                }
+                catch (InvalidListenerEventArchiveV2Exception invalidListenerEventArchiveV2Exception)
+                {
+                    await this.loggingBroker.LogErrorAsync(invalidListenerEventArchiveV2Exception);
                 }
             }
 
