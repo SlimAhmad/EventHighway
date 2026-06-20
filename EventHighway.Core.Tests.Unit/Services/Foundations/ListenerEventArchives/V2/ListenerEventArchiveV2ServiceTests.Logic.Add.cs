@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldAddListenerEventArchiveV2Async()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             DateTimeOffset randomDateTimeOffset =
@@ -43,7 +43,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             this.storageBrokerMock.Setup(broker =>
                 broker.InsertListenerEventArchiveV2Async(
                     inputListenerEventArchiveV2,
-                    cancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(insertedListenerEventArchiveV2);
 
             // when
@@ -51,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                 await this.listenerEventArchiveV2Service
                     .AddListenerEventArchiveV2Async(
                         inputListenerEventArchiveV2,
-                        cancellationToken);
+                        randomCancellationToken);
 
             // then
             actualListenerEventArchiveV2.Should().BeEquivalentTo(
@@ -64,7 +64,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             this.storageBrokerMock.Verify(broker =>
                 broker.InsertListenerEventArchiveV2Async(
                     inputListenerEventArchiveV2,
-                    cancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
