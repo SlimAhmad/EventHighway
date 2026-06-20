@@ -48,6 +48,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             BatchConfiguration batchConfiguration = this.configurationBroker.GetBatchConfiguration();
             int take = batchConfiguration.BatchSizeForBulkProcessing;
             IEnumerable<EventArchiveV2> batch;
@@ -69,6 +70,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         public ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var faultedEventV2Ids = new HashSet<Guid>();
             var failedEventV2Ids = new List<Guid>();
             var failedListenerEventV2Ids = new List<Guid>();

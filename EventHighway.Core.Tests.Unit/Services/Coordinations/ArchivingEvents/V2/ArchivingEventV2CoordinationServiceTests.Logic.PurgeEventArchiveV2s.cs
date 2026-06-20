@@ -27,9 +27,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 BatchSizeForBulkProcessing = randomBatchSize
             };
 
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             System.DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             System.DateTimeOffset inputOlderThan = randomDateTimeOffset;
-            CancellationToken inputCancellationToken = TestContext.Current.CancellationToken;
 
             IEnumerable<EventArchiveV2> randomEventArchiveV2s = CreateRandomEventArchiveV2s();
             IEnumerable<EventArchiveV2> retrievedEventArchiveV2s = randomEventArchiveV2s;
@@ -50,7 +52,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 .Setup(service =>
                     service.BulkRemoveEventArchiveV2sAsync(
                         retrievedEventArchiveV2s,
-                        inputCancellationToken))
+                        randomCancellationToken))
                             .Returns(ValueTask.CompletedTask);
 
             this.eventArchiveV2OrchestrationServiceMock.InSequence(mockSequence)
@@ -62,7 +64,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // when
             await this.archivingEventV2CoordinationService
-                .PurgeEventArchiveV2sAsync(inputOlderThan, inputCancellationToken);
+                .PurgeEventArchiveV2sAsync(inputOlderThan, randomCancellationToken);
 
             // then
             this.configurationBrokerMock.Verify(broker =>
@@ -78,7 +80,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.BulkRemoveEventArchiveV2sAsync(
                     retrievedEventArchiveV2s,
-                    inputCancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();

@@ -15,14 +15,128 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 {
     public partial class ArchivingEventV2CoordinationServiceTests
     {
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnPurgeEventArchiveV2sAsync()
+        {
+            // given
+            DateTimeOffset someOlderThan = GetRandomDateTimeOffset();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask purgeEventArchiveV2sTask =
+                this.archivingEventV2CoordinationService
+                    .PurgeEventArchiveV2sAsync(someOlderThan, cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    purgeEventArchiveV2sTask.AsTask);
+
+            actualException.Should().NotBeOfType<ArchivingEventV2CoordinationDependencyException>();
+            actualException.Should().NotBeOfType<ArchivingEventV2CoordinationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnPurgeEventArchiveV2sIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            DateTimeOffset someOlderThan = GetRandomDateTimeOffset();
+
+            var batchConfiguration = new BatchConfiguration();
+
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutArchivingEventV2CoordinationException =
+                new TimeoutArchivingEventV2CoordinationException(
+                    message: "Failed archiving event coordination timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedArchivingEventV2CoordinationDependencyException =
+                new ArchivingEventV2CoordinationDependencyException(
+                    message: "Archiving event dependency error occurred, contact support.",
+                    innerException: timeoutArchivingEventV2CoordinationException);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(batchConfiguration);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<int>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask purgeEventArchiveV2sTask =
+                this.archivingEventV2CoordinationService
+                    .PurgeEventArchiveV2sAsync(someOlderThan, randomCancellationToken);
+
+            ArchivingEventV2CoordinationDependencyException
+                actualArchivingEventV2CoordinationDependencyException =
+                    await Assert.ThrowsAsync<ArchivingEventV2CoordinationDependencyException>(
+                        purgeEventArchiveV2sTask.AsTask);
+
+            // then
+            actualArchivingEventV2CoordinationDependencyException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyException);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<int>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedArchivingEventV2CoordinationDependencyException))),
+                        Times.Once);
+
+            this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationExceptionOnPurgeIfDependencyValidationErrorOccursAndLogItAsync(
             Xeption dependencyValidationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset someOlderThan = GetRandomDateTimeOffset();
-            CancellationToken someCancellationToken = TestContext.Current.CancellationToken;
 
             var batchConfiguration = new BatchConfiguration();
 
@@ -44,7 +158,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // when
             ValueTask purgeEventArchiveV2sTask =
                 this.archivingEventV2CoordinationService
-                    .PurgeEventArchiveV2sAsync(someOlderThan, someCancellationToken);
+                    .PurgeEventArchiveV2sAsync(someOlderThan, randomCancellationToken);
 
             ArchivingEventV2CoordinationDependencyValidationException
                 actualArchivingEventV2CoordinationDependencyValidationException =
@@ -83,8 +197,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset someOlderThan = GetRandomDateTimeOffset();
-            CancellationToken someCancellationToken = TestContext.Current.CancellationToken;
 
             var batchConfiguration = new BatchConfiguration();
 
@@ -106,7 +222,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // when
             ValueTask purgeEventArchiveV2sTask =
                 this.archivingEventV2CoordinationService
-                    .PurgeEventArchiveV2sAsync(someOlderThan, someCancellationToken);
+                    .PurgeEventArchiveV2sAsync(someOlderThan, randomCancellationToken);
 
             ArchivingEventV2CoordinationDependencyException
                 actualArchivingEventV2CoordinationDependencyException =
@@ -143,8 +259,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
         public async Task ShouldThrowServiceExceptionOnPurgeIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset someOlderThan = GetRandomDateTimeOffset();
-            CancellationToken someCancellationToken = TestContext.Current.CancellationToken;
             var serviceException = new Exception();
 
             var batchConfiguration = new BatchConfiguration();
@@ -173,7 +291,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // when
             ValueTask purgeEventArchiveV2sTask =
                 this.archivingEventV2CoordinationService
-                    .PurgeEventArchiveV2sAsync(someOlderThan, someCancellationToken);
+                    .PurgeEventArchiveV2sAsync(someOlderThan, randomCancellationToken);
 
             ArchivingEventV2CoordinationServiceException
                 actualArchivingEventV2CoordinationServiceException =

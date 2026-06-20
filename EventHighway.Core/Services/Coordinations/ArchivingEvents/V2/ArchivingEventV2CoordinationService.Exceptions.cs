@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
@@ -20,6 +21,30 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutArchivingEventV2CoordinationException =
+                    new TimeoutArchivingEventV2CoordinationException(
+                        message: "Failed archiving event coordination timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var archivingEventV2CoordinationDependencyException =
+                    new ArchivingEventV2CoordinationDependencyException(
+                        message: "Archiving event dependency error occurred, contact support.",
+                        innerException: timeoutArchivingEventV2CoordinationException);
+
+                await this.loggingBroker.LogErrorAsync(archivingEventV2CoordinationDependencyException);
+                throw archivingEventV2CoordinationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (ArchivingEventV2OrchestrationValidationException
                 archivingEventV2OrchestrationValidationException)
