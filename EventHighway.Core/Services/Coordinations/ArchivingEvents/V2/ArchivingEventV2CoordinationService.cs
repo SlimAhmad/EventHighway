@@ -46,7 +46,28 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         public ValueTask PurgeEventArchiveV2sAsync(
             DateTimeOffset olderThan,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            BatchConfiguration batchConfiguration =
+                this.configurationBroker.GetBatchConfiguration();
+
+            int take = batchConfiguration.BatchSizeForBulkProcessing;
+
+            IEnumerable<EventArchiveV2> batch;
+
+            do
+            {
+                batch = await this.eventArchiveV2OrchestrationService
+                    .RetrieveBatchOfEventArchiveV2sOlderThanAsync(olderThan, take);
+
+                if (!batch.Any())
+                    break;
+
+                await this.eventArchiveV2OrchestrationService
+                    .BulkRemoveEventArchiveV2sAsync(batch, cancellationToken);
+            }
+            while (true);
+        });
 
         public ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
