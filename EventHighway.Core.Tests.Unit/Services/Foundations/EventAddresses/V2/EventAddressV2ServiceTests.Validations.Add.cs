@@ -69,6 +69,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         private async Task ShouldThrowValidationExceptionOnAddIfEventAddressV2IsInvalidAndLogItAsync(
             string invalidText)
         {
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var invalidEventAddressV2 = new EventAddressV2
             {
                 Id = Guid.Empty,
@@ -108,7 +111,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    invalidEventAddressV2, TestContext.Current.CancellationToken);
+                    invalidEventAddressV2, randomCancellationToken);
 
             EventAddressV2ValidationException actualEventAddressV2ValidationException =
                 await Assert.ThrowsAsync<EventAddressV2ValidationException>(
