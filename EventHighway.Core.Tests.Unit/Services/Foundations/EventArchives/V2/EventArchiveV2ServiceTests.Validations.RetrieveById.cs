@@ -18,7 +18,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnRetrieveByIdIfIdIsInvalidAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid invalidEventArchiveV2Id = Guid.Empty;
@@ -40,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
             ValueTask<EventArchiveV2> retrieveEventArchiveV2ByIdTask =
                 this.eventArchiveV2Service.RetrieveEventArchiveV2ByIdAsync(
                     invalidEventArchiveV2Id,
-                    cancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2ValidationException actualEventArchiveV2ValidationException =
                 await Assert.ThrowsAsync<EventArchiveV2ValidationException>(
