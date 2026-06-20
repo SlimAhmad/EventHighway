@@ -41,9 +41,6 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
         public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync() =>
         TryCatch(async () => await this.storageBroker.SelectAllEventV2sAsync());
 
-        public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sWithListenerEventV2sAsync() =>
-        TryCatch(async () => await this.storageBroker.SelectAllEventV2sWithListenerEventV2sAsync());
-
         public ValueTask<EventV2> ModifyEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
