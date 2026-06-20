@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -30,6 +31,25 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(
                     nullListenerEventV2Exception);
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventV2Exception =
+                    new TimeoutListenerEventV2Exception(
+                        message: "Failed listener event timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(
+                    timeoutListenerEventV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (SqlException sqlException)
             {
@@ -79,6 +99,25 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(
                     notFoundListenerEventV2Exception);
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventV2Exception =
+                    new TimeoutListenerEventV2Exception(
+                        message: "Failed listener event timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(
+                    timeoutListenerEventV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (SqlException sqlException)
             {
@@ -160,6 +199,25 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(
                     nullListenerEventV2Exception);
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventV2Exception =
+                    new TimeoutListenerEventV2Exception(
+                        message: "Failed listener event timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(
+                    timeoutListenerEventV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (SqlException sqlException)
             {

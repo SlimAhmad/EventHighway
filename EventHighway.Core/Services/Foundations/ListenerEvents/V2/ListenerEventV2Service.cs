@@ -35,6 +35,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await ValidateListenerEventV2OnAddAsync(listenerEventV2);
 
             return await storageBroker.InsertListenerEventV2Async(listenerEventV2, cancellationToken);
@@ -42,13 +43,19 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
 
         public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
             CancellationToken cancellationToken = default) =>
-        TryCatch(async () => await this.storageBroker.SelectAllListenerEventV2sAsync(cancellationToken));
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.storageBroker.SelectAllListenerEventV2sAsync(cancellationToken);
+        });
 
         public ValueTask<ListenerEventV2> ModifyListenerEventV2Async(
             ListenerEventV2 listenerEventV2,
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await ValidateListenerEventV2OnModifyAsync(listenerEventV2);
 
             ListenerEventV2 maybeListenerEventV2 =
@@ -66,6 +73,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventV2Id(listenerEventV2Id);
 
             ListenerEventV2 maybeListenerEventV2 =
@@ -83,6 +91,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateListenerEventV2sIsNotNull(listenerEventV2s);
 
             await this.storageBroker.BulkDeleteListenerEventV2sAsync(listenerEventV2s, cancellationToken);
@@ -93,6 +102,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventIdsIsNotNull(eventIds);
 
             IQueryable<ListenerEventV2> listenerEventV2s =
