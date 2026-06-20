@@ -13,6 +13,7 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 {
@@ -325,6 +326,103 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                     It.IsAny<ListenerEventV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnAddIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutListenerEventV2Exception =
+                new TimeoutListenerEventV2Exception(
+                    message: "Failed listener event timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedListenerEventV2DependencyException =
+                new ListenerEventV2DependencyException(
+                    message: "Listener event dependency error occurred, contact support.",
+                    innerException: timeoutListenerEventV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<ListenerEventV2> addListenerEventV2Task =
+                this.listenerEventV2Service.AddListenerEventV2Async(
+                    someListenerEventV2,
+                    TestContext.Current.CancellationToken);
+
+            ListenerEventV2DependencyException actualListenerEventV2DependencyException =
+                await Assert.ThrowsAsync<ListenerEventV2DependencyException>(
+                    addListenerEventV2Task.AsTask);
+
+            // then
+            actualListenerEventV2DependencyException.Should().BeEquivalentTo(
+                expectedListenerEventV2DependencyException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertListenerEventV2Async(
+                    It.IsAny<ListenerEventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnAddAsync()
+        {
+            // given
+            ListenerEventV2 someListenerEventV2 = CreateRandomListenerEventV2();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<ListenerEventV2> addListenerEventV2Task =
+                this.listenerEventV2Service.AddListenerEventV2Async(
+                    someListenerEventV2,
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    addListenerEventV2Task.AsTask);
+
+            actualException.Should().NotBeOfType<ListenerEventV2DependencyException>();
+            actualException.Should().NotBeOfType<ListenerEventV2ServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
