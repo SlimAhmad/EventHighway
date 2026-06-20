@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2.Exceptions;
@@ -25,6 +26,30 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventV2ProcessingException =
+                    new TimeoutListenerEventV2ProcessingException(
+                        message: "Failed listener event processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var listenerEventV2ProcessingDependencyException =
+                    new ListenerEventV2ProcessingDependencyException(
+                        message: "Listener event dependency error occurred, contact support.",
+                        innerException: timeoutListenerEventV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(listenerEventV2ProcessingDependencyException);
+                throw listenerEventV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullListenerEventV2ProcessingException
                 nullListenerEventV2ProcessingException)
@@ -75,6 +100,30 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             try
             {
                 return await returningListenerEventV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventV2ProcessingException =
+                    new TimeoutListenerEventV2ProcessingException(
+                        message: "Failed listener event processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var listenerEventV2ProcessingDependencyException =
+                    new ListenerEventV2ProcessingDependencyException(
+                        message: "Listener event dependency error occurred, contact support.",
+                        innerException: timeoutListenerEventV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(listenerEventV2ProcessingDependencyException);
+                throw listenerEventV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullListenerEventV2ProcessingException
                 nullListenerEventV2ProcessingException)
@@ -132,6 +181,30 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             {
                 return await returningListenerEventV2sFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventV2ProcessingException =
+                    new TimeoutListenerEventV2ProcessingException(
+                        message: "Failed listener event processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var listenerEventV2ProcessingDependencyException =
+                    new ListenerEventV2ProcessingDependencyException(
+                        message: "Listener event dependency error occurred, contact support.",
+                        innerException: timeoutListenerEventV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(listenerEventV2ProcessingDependencyException);
+                throw listenerEventV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (ListenerEventV2DependencyException
                 listenerEventV2DependencyException)
             {
@@ -163,6 +236,30 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             try
             {
                 return await returningListenerEventV2EnumerableFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventV2ProcessingException =
+                    new TimeoutListenerEventV2ProcessingException(
+                        message: "Failed listener event processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var listenerEventV2ProcessingDependencyException =
+                    new ListenerEventV2ProcessingDependencyException(
+                        message: "Listener event dependency error occurred, contact support.",
+                        innerException: timeoutListenerEventV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(listenerEventV2ProcessingDependencyException);
+                throw listenerEventV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (InvalidListenerEventV2ProcessingException
                 invalidListenerEventV2ProcessingException)
