@@ -17,6 +17,58 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
 {
     public partial class EventListenerV2ProcessingServiceTests
     {
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveByEventAddressIdIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            Guid someEventAddressId = GetRandomId();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventListenerV2ProcessingException =
+                new TimeoutEventListenerV2ProcessingException(
+                    message: "Failed event listener processing timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventListenerV2ProcessingDependencyException =
+                new EventListenerV2ProcessingDependencyException(
+                    message: "Event listener dependency error occurred, contact support.",
+                    innerException: timeoutEventListenerV2ProcessingException);
+
+            this.eventListenerV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventListenerV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IQueryable<EventListenerV2>> retrieveEventListenerV2sByEventAddressIdTask =
+                this.eventListenerV2ProcessingService.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    someEventAddressId,
+                    TestContext.Current.CancellationToken);
+
+            EventListenerV2ProcessingDependencyException actualEventListenerV2ProcessingDependencyException =
+                await Assert.ThrowsAsync<EventListenerV2ProcessingDependencyException>(
+                    retrieveEventListenerV2sByEventAddressIdTask.AsTask);
+
+            // then
+            actualEventListenerV2ProcessingDependencyException.Should().BeEquivalentTo(
+                expectedEventListenerV2ProcessingDependencyException);
+
+            this.eventListenerV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventListenerV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventListenerV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventListenerV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRetrieveByEventAddressIdIfDependencyErrorOccursAndLogItAsync(
