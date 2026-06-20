@@ -159,6 +159,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             int matchingHandlerCount)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             string randomHandlerName = GetRandomString();
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
             someEventCallV2.HandlerName = randomHandlerName;
@@ -208,7 +211,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                localService.RunEventCallV2Async(someEventCallV2, TestContext.Current.CancellationToken);
+                localService.RunEventCallV2Async(someEventCallV2, randomCancellationToken);
 
             EventCallV2ValidationException actualEventCallV2ValidationException =
                 await Assert.ThrowsAsync<EventCallV2ValidationException>(
