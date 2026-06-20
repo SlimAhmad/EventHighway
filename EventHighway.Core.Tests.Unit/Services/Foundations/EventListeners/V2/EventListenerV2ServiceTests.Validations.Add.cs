@@ -290,6 +290,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             int minutesBeforeAndAfter)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
             EventListenerV2 randomEventListenerV2 =
@@ -319,7 +322,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
             ValueTask<EventListenerV2> addEventListenerV2Task =
                 this.eventListenerV2Service.AddEventListenerV2Async(
                     invalidEventListenerV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventListenerV2ValidationException actualEventListenerV2ValidationException =
                 await Assert.ThrowsAsync<EventListenerV2ValidationException>(
