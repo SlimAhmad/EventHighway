@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var expectedEventV2CoordinationDependencyValidationException =
                 new EventV2CoordinationDependencyValidationException(
                     message: "Event validation error occurred, fix the errors and try again.",
@@ -29,13 +32,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ThrowsAsync(validationException);
 
             // when
             ValueTask fireScheduledPendingEventV2sTask =
                 this.eventV2CoordinationService.FireScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2CoordinationDependencyValidationException
                 actualEventV2CoordinationDependencyValidationException =
@@ -48,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
