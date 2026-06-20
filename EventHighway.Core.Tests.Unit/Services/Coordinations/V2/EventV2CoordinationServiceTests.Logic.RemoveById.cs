@@ -17,6 +17,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         public async Task ShouldRemoveEventV2ByIdAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid randomEventV2Id = GetRandomId();
             Guid inputEventV2Id = randomEventV2Id;
             EventV2 randomEventV2 = CreateRandomEventV2();
@@ -28,7 +31,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Setup(service =>
                 service.RemoveEventV2ByIdAsync(
                     inputEventV2Id,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(removedEventV2);
 
             // when
@@ -36,7 +39,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 await this.eventV2CoordinationService
                     .RemoveEventV2ByIdAsync(
                         inputEventV2Id,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventV2.Should()
@@ -45,7 +48,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RemoveEventV2ByIdAsync(
                     inputEventV2Id,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventV2OrchestrationServiceMock
