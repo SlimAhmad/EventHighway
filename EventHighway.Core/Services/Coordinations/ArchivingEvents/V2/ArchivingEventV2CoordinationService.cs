@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
@@ -22,17 +25,46 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
     {
         private readonly IArchivingEventV2OrchestrationService archivingEventV2OrchestrationService;
         private readonly IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService;
+        private readonly IConfigurationBroker configurationBroker;
+        private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public ArchivingEventV2CoordinationService(
             IArchivingEventV2OrchestrationService archivingEventV2OrchestrationService,
             IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService,
+            IConfigurationBroker configurationBroker,
+            IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.archivingEventV2OrchestrationService = archivingEventV2OrchestrationService;
             this.eventArchiveV2OrchestrationService = eventArchiveV2OrchestrationService;
+            this.configurationBroker = configurationBroker;
+            this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
         }
+
+        public ValueTask PurgeEventArchiveV2sAsync(
+            DateTimeOffset olderThan,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            BatchConfiguration batchConfiguration = this.configurationBroker.GetBatchConfiguration();
+            int take = batchConfiguration.BatchSizeForBulkProcessing;
+            IEnumerable<EventArchiveV2> batch;
+
+            do
+            {
+                batch = await this.eventArchiveV2OrchestrationService
+                    .RetrieveBatchOfEventArchiveV2sOlderThanAsync(olderThan, take);
+
+                if (!batch.Any())
+                    break;
+
+                await this.eventArchiveV2OrchestrationService
+                    .BulkRemoveEventArchiveV2sAsync(batch, cancellationToken);
+            }
+            while (true);
+        });
 
         public ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default) =>
         TryCatch(async () =>

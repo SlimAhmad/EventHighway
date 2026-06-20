@@ -17,7 +17,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
         {
             // given
             string randomContent = GetRandomString();
-            var randomHandlerParams = CreateRandomHandlerParams();
 
             EventHandlerResult randomEventHandlerResult =
                 CreateRandomEventHandlerResult();
@@ -28,7 +27,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             this.delegateServiceMock.Setup(service =>
                 service.InvokeAsync(
                     randomContent,
-                    randomHandlerParams,
                     TestContext.Current.CancellationToken))
                         .ReturnsAsync(randomEventHandlerResult);
 
@@ -36,7 +34,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             EventHandlerResult actualEventHandlerResult =
                 await this.delegateEventHandler.HandleAsync(
                     content: randomContent,
-                    handlerParams: randomHandlerParams,
                     cancellationToken: TestContext.Current.CancellationToken);
 
             // then
@@ -45,7 +42,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Exposers.DelegateEventHandlers
             this.delegateServiceMock.Verify(service =>
                 service.InvokeAsync(
                     randomContent,
-                    randomHandlerParams,
                     TestContext.Current.CancellationToken),
                         Times.Once);
 

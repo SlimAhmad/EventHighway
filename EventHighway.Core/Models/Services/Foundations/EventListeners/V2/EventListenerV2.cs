@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 
 namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
@@ -41,12 +40,6 @@ namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
         /// Gets or sets the name of the event handler associated with this listener.
         /// </summary>
         public string HandlerName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of handler configurations that define how the handler
-        /// processes events.
-        /// </summary>
-        public IEnumerable<HandlerConfiguration> HandlerConfigurations { get; set; }
 
         /// <summary>
         /// Gets or sets the promoted properties as a serialized string, which are properties

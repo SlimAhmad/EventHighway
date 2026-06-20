@@ -8,7 +8,6 @@ using System.Linq;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 
 namespace EventHighway.Core.Services.Foundations.EventCalls.V2
 {
@@ -25,10 +24,6 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 (Rule: IsInvalid(eventCallV2.HandlerName),
                 Parameter: nameof(EventCallV2.HandlerName),
                 Message: "Text required"),
-
-                (Rule: IsInvalid(eventCallV2.HandlerConfigurations),
-                Parameter: nameof(EventCallV2.HandlerConfigurations),
-                Message: "Configuration required"),
 
                 (Rule: IsInvalid(eventCallV2.Content),
                 Parameter: nameof(EventCallV2.Content),
@@ -55,36 +50,6 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             }
         }
 
-        private static void ValidateHandlerConfigurations(
-            IEventHandler handler,
-            List<HandlerConfiguration> handlerConfigurations)
-        {
-            var validations = new List<(bool Rule, string Parameter, string Message)>();
-
-            foreach (string requiredParam in handler.RequiredParams)
-            {
-                HandlerConfiguration matchingConfig =
-                    handlerConfigurations.FirstOrDefault(
-                        config => config.Name.Equals(
-                            requiredParam,
-                            StringComparison.OrdinalIgnoreCase));
-
-                validations.Add(
-                    (Rule: matchingConfig is null,
-                    Parameter: $"HandlerConfiguration['{requiredParam}']",
-                    Message: "Config item required"));
-
-                validations.Add(
-                    (Rule: matchingConfig is not null && IsInvalid(matchingConfig.Value),
-                    Parameter: $"HandlerConfiguration['{requiredParam}']",
-                    Message: "Value required"));
-            }
-
-            Validate(
-                message: "Event call handler configuration is invalid, fix the errors and try again.",
-                validations: validations.ToArray());
-        }
-
         private void ValidateHandlerCount(string handlerName)
         {
             int count =
@@ -107,9 +72,6 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
 
         private static bool IsInvalid(string text) =>
             string.IsNullOrWhiteSpace(text);
-
-        private static bool IsInvalid(List<HandlerConfiguration> configurations) =>
-            configurations is null;
 
         private static void Validate(
             string message,

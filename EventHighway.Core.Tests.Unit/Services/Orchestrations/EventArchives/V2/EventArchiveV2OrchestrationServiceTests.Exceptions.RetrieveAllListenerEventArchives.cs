@@ -16,7 +16,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
     public partial class EventArchiveV2OrchestrationServiceTests
     {
         [Theory]
-        [MemberData(nameof(ListenerEventArchiveV2DependencyExceptions))]
+        [MemberData(nameof(DependencyExceptions))]
         public async Task
             ShouldThrowDependencyExceptionOnRetrieveAllListenerEventArchivesIfDependencyExceptionOccursAndLogItAsync(
                 Xeption dependencyException)

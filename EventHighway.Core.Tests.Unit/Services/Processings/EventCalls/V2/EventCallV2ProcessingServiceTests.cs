@@ -78,9 +78,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
         {
             var filler = new Filler<EventCallV2>();
 
-            filler.Setup()
-                .OnProperty(call => call.HandlerConfigurations)
-                .IgnoreIt();
+            filler.Setup();
 
             return filler;
         }

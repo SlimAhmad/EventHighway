@@ -38,7 +38,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventHandlers.V2
             var mock = new Mock<IEventHandler>();
             mock.SetupGet(h => h.Id).Returns(Guid.NewGuid());
             mock.SetupGet(h => h.Name).Returns(new MnemonicString(1).GetValue());
-            mock.SetupGet(h => h.RequiredParams).Returns(Array.Empty<string>());
             return mock.Object;
         }
 

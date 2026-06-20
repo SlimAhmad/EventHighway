@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,14 +16,14 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Delegates
 {
     public partial class DelegateServiceTests
     {
-        private readonly Mock<Func<string, IReadOnlyDictionary<string, string>, CancellationToken, ValueTask<EventHandlerResult>>> handlerFuncMock;
+        private readonly Mock<Func<string, CancellationToken, ValueTask<EventHandlerResult>>> handlerFuncMock;
         private readonly Mock<DelegateService> delegateServiceMock;
         private readonly IDelegateService delegateService;
 
         public DelegateServiceTests()
         {
             this.handlerFuncMock =
-                new Mock<Func<string, IReadOnlyDictionary<string, string>, CancellationToken, ValueTask<EventHandlerResult>>>();
+                new Mock<Func<string, CancellationToken, ValueTask<EventHandlerResult>>>();
 
             this.delegateServiceMock =
                 new Mock<DelegateService>(this.handlerFuncMock.Object) { CallBase = true };
@@ -42,12 +41,6 @@ namespace EventHighway.EventHandlers.Tests.Unit.Services.Delegates
                 ResponseCode = GetRandomString(),
                 ResponseMessage = GetRandomString(),
                 IsSuccess = true
-            };
-
-        private static IReadOnlyDictionary<string, string> CreateHandlerParams() =>
-            new Dictionary<string, string>
-            {
-                { GetRandomString(), GetRandomString() }
             };
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>

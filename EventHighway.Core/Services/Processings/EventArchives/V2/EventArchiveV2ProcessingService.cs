@@ -44,6 +44,35 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
                 .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
         });
 
+        public ValueTask<IEnumerable<EventArchiveV2>> RetrieveBatchOfEventArchiveV2sOlderThanAsync(
+            DateTimeOffset olderThan,
+            int take) =>
+        TryCatch(async () =>
+        {
+            ValidateOnRetrieveBatchOfEventArchiveV2sOlderThan(olderThan, take);
+
+            IQueryable<EventArchiveV2> allEventArchiveV2s =
+                await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync();
+
+            IQueryable<EventArchiveV2> filteredEventArchiveV2s =
+                allEventArchiveV2s.Where(archive => archive.ArchivedDate < olderThan);
+
+            return take == 0
+                ? filteredEventArchiveV2s.AsEnumerable()
+                : filteredEventArchiveV2s.Take(take).AsEnumerable();
+        });
+
+        public ValueTask BulkRemoveEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
+
+            await this.eventArchiveV2Service
+                .BulkRemoveEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
+        });
+
         public ValueTask<EventArchiveV2> AddEventArchiveV2Async(
             EventArchiveV2 eventArchiveV2,
             CancellationToken cancellationToken = default) =>

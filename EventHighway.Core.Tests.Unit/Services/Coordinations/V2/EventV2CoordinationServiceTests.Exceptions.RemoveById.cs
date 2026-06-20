@@ -16,7 +16,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
     public partial class EventV2CoordinationServiceTests
     {
         [Theory]
-        [MemberData(nameof(EventV2ValidationExceptions))]
+        [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationOnRemoveByIdIfDependencyValidationErrorOccursAndLogItAsync(
             Xeption validationException)
         {
@@ -66,7 +66,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         }
 
         [Theory]
-        [MemberData(nameof(EventV2DependencyExceptions))]
+        [MemberData(nameof(DependencyExceptions))]
         public async Task ShouldThrowDependencyExceptionOnRemoveByIdIfDependencyExceptionOccursAndLogItAsync(
             Xeption dependencyException)
         {

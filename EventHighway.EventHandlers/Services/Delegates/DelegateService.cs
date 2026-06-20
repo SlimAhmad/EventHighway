@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
@@ -14,25 +13,23 @@ namespace EventHighway.EventHandlers.Services.Delegates
     {
         private readonly Func<
             string,
-            IReadOnlyDictionary<string, string>,
             CancellationToken,
             ValueTask<EventHandlerResult>> handler;
 
         public DelegateService(
-            Func<string, IReadOnlyDictionary<string, string>, CancellationToken, ValueTask<EventHandlerResult>> handler)
+            Func<string, CancellationToken, ValueTask<EventHandlerResult>> handler)
         {
             this.handler = handler;
         }
 
         public virtual ValueTask<EventHandlerResult> InvokeAsync(
             string content,
-            IReadOnlyDictionary<string, string> handlerParams,
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            ValidateInvokeParams(content, this.handler);
+            ValidateInvokeParams(content);
 
-            return await this.handler(content, handlerParams, cancellationToken);
+            return await this.handler(content, cancellationToken);
         });
     }
 }

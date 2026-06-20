@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,19 +38,9 @@ namespace EventHighway.Abstractions.EventHandlers
         string Name { get; }
 
         /// <summary>
-        /// Gets the set of parameter keys that must be present in <c>handlerParams</c>
-        /// when <see cref="HandleAsync"/> is called.
-        /// </summary>
-        IEnumerable<string> RequiredParams { get; }
-
-        /// <summary>
         /// Processes the given event content and returns a result.
         /// </summary>
         /// <param name="content">The raw event payload to process.</param>
-        /// <param name="handlerParams">
-        /// A read-only dictionary of named parameters supplied by the caller.
-        /// All keys listed in <see cref="RequiredParams"/> must be present.
-        /// </param>
         /// <param name="cancellationToken">
         /// A token that can be used to cancel the asynchronous operation.
         /// </param>
@@ -60,8 +49,7 @@ namespace EventHighway.Abstractions.EventHandlers
         /// <see cref="EventHandlerResult"/> describing the outcome of the event handling.
         /// </returns>
         /// <exception cref="Exceptions.IEventHandlerValidationException">
-        /// Thrown when <paramref name="content"/> or <paramref name="handlerParams"/> are
-        /// invalid or missing required values.
+        /// Thrown when <paramref name="content"/> is invalid or missing required values.
         /// </exception>
         /// <exception cref="Exceptions.IEventHandlerDependencyException">
         /// Thrown when an external dependency (e.g. a downstream service or database) fails.
@@ -71,7 +59,6 @@ namespace EventHighway.Abstractions.EventHandlers
         /// </exception>
         ValueTask<EventHandlerResult> HandleAsync(
             string content,
-            IReadOnlyDictionary<string, string> handlerParams,
             CancellationToken cancellationToken = default);
     }
 }

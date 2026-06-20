@@ -365,36 +365,6 @@ namespace EventHighway.Core.Migrations
                     b.ToTable("EventArchiveV2s", (string)null);
                 });
 
-            modelBuilder.Entity("EventHighway.Core.Models.Services.Foundations.HandlerConfigurations.HandlerConfiguration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("EventListenerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTimeOffset>("UpdatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventListenerId", "Name")
-                        .IsUnique()
-                        .HasFilter("[Name] IS NOT NULL");
-
-                    b.ToTable("HandlerConfigurations", (string)null);
-                });
-
             modelBuilder.Entity("EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1.ListenerEventArchiveV1", b =>
                 {
                     b.Property<Guid>("Id")
@@ -673,17 +643,6 @@ namespace EventHighway.Core.Migrations
                     b.Navigation("EventAddressV2");
                 });
 
-            modelBuilder.Entity("EventHighway.Core.Models.Services.Foundations.HandlerConfigurations.HandlerConfiguration", b =>
-                {
-                    b.HasOne("EventHighway.Core.Models.Services.Foundations.EventListeners.V2.EventListenerV2", "EventListener")
-                        .WithMany("HandlerConfigurations")
-                        .HasForeignKey("EventListenerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EventListener");
-                });
-
             modelBuilder.Entity("EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V1.ListenerEventArchiveV1", b =>
                 {
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventsArchives.V1.EventArchiveV1", null)
@@ -820,8 +779,6 @@ namespace EventHighway.Core.Migrations
 
             modelBuilder.Entity("EventHighway.Core.Models.Services.Foundations.EventListeners.V2.EventListenerV2", b =>
                 {
-                    b.Navigation("HandlerConfigurations");
-
                     b.Navigation("ListenerEventV2s");
                 });
 

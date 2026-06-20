@@ -52,7 +52,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                     loggingBroker: this.loggingBrokerMock.Object);
         }
 
-        public static TheoryData<Xeption> EventListenerV2ValidationExceptions()
+        public static TheoryData<Xeption> DependencyValidationExceptions()
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
@@ -67,10 +67,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                 new EventListenerV2ProcessingDependencyValidationException(
                     someMessage,
                     someInnerException),
+
+                new ListenerEventV2ProcessingValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new ListenerEventV2ProcessingDependencyValidationException(
+                    someMessage,
+                    someInnerException),
             };
         }
 
-        public static TheoryData<Xeption> EventListenerV2DependencyExceptions()
+        public static TheoryData<Xeption> DependencyExceptions()
         {
             string someMessage = GetRandomString();
             var someInnerException = new Xeption();
@@ -85,35 +93,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                 new EventListenerV2ProcessingServiceException(
                     someMessage,
                     someInnerException),
-            };
-        }
 
-        public static TheoryData<Xeption> ListenerEventV2ValidationExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
-
-            return new TheoryData<Xeption>
-            {
-                new ListenerEventV2ProcessingValidationException(
-                    someMessage,
-                    someInnerException),
-
-                new ListenerEventV2ProcessingDependencyValidationException(
-                    someMessage,
-                    someInnerException),
-            };
-        }
-
-        public static TheoryData<Xeption> ListenerEventV2DependencyExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
-
-            return new TheoryData<Xeption>
-            {
                 new ListenerEventV2ProcessingDependencyException(
                     someMessage,
                     someInnerException),
@@ -121,17 +101,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                 new ListenerEventV2ProcessingServiceException(
                     someMessage,
                     someInnerException),
-            };
-        }
 
-        public static TheoryData<Xeption> EventHandlerV2DependencyExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
-
-            return new TheoryData<Xeption>
-            {
                 new EventHandlerV2ServiceException(
                     someMessage,
                     someInnerException),
@@ -163,7 +133,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                 var mock = new Mock<IEventHandler>();
                 mock.SetupGet(h => h.Id).Returns(Guid.NewGuid());
                 mock.SetupGet(h => h.Name).Returns(GetRandomString());
-                mock.SetupGet(h => h.RequiredParams).Returns(System.Array.Empty<string>());
                 handlers.Add(mock.Object);
             }
 
@@ -212,9 +181,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                     .IgnoreIt()
 
                 .OnProperty(eventListenerV2 => eventListenerV2.ListenerEventV2s)
-                    .IgnoreIt()
-
-                .OnProperty(eventListenerV2 => eventListenerV2.HandlerConfigurations)
                     .IgnoreIt();
 
             return filler;

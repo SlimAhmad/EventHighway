@@ -2,14 +2,12 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
-using EventHighway.Core.Models.Services.Foundations.HandlerConfigurations;
 using EventHighway.Core.Services.Foundations.EventCalls.V2;
 using FluentAssertions;
 using Moq;
@@ -64,7 +62,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             var invalidEventCallV2 = new EventCallV2
             {
                 HandlerName = invalidText,
-                HandlerConfigurations = null,
                 Content = invalidText
             };
 
@@ -75,10 +72,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             invalidEventCallV2Exception.AddData(
                 key: nameof(EventCallV2.HandlerName),
                 values: "Text required");
-
-            invalidEventCallV2Exception.AddData(
-                key: nameof(EventCallV2.HandlerConfigurations),
-                values: "Configuration required");
 
             invalidEventCallV2Exception.AddData(
                 key: nameof(EventCallV2.Content),
@@ -224,95 +217,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             localBrokerMock.Verify(b => b.GetAll(), Times.AtLeastOnce);
             localBrokerMock.VerifyNoOtherCalls();
             this.eventHandlerBrokerMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData(" ")]
-        public async Task ShouldThrowValidationExceptionOnRunIfRequiredHandlerConfigurationIsInvalidAndLogItAsync(
-            string invalidValue)
-        {
-            // given
-            string randomHandlerName = GetRandomString();
-            string requiredParam = GetRandomString();
-
-            EventCallV2 inputEventCallV2 = CreateRandomEventCallV2();
-            inputEventCallV2.HandlerName = randomHandlerName;
-
-            inputEventCallV2.HandlerConfigurations = invalidValue is null
-                ? new List<HandlerConfiguration>()
-                : new List<HandlerConfiguration>
-                {
-                    new HandlerConfiguration { Name = requiredParam, Value = invalidValue }
-                };
-
-            this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
-                .Returns(new[] { this.eventHandlerMock.Object });
-
-            this.eventHandlerMock.SetupGet(handler => handler.Id)
-                .Returns(inputEventCallV2.HandlerId);
-
-            this.eventHandlerMock.SetupGet(handler => handler.Name)
-                .Returns(randomHandlerName);
-
-            this.eventHandlerMock.SetupGet(handler => handler.RequiredParams)
-                .Returns(new[] { requiredParam });
-
-            var invalidEventCallV2Exception =
-                new InvalidEventCallV2Exception(
-                    message: "Event call handler configuration is invalid, fix the errors and try again.");
-
-            invalidEventCallV2Exception.AddData(
-                key: $"HandlerConfiguration['{requiredParam}']",
-                values: invalidValue is null ? "Config item required" : "Value required");
-
-            var expectedEventCallV2ValidationException =
-                new EventCallV2ValidationException(
-                    message: "Event call validation error occurred, fix the errors and try again.",
-                    innerException: invalidEventCallV2Exception);
-
-            // when
-            ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(inputEventCallV2, TestContext.Current.CancellationToken);
-
-            EventCallV2ValidationException actualEventCallV2ValidationException =
-                await Assert.ThrowsAsync<EventCallV2ValidationException>(
-                    runEventCallV2Task.AsTask);
-
-            // then
-            actualEventCallV2ValidationException.Should().BeEquivalentTo(
-                expectedEventCallV2ValidationException);
-
-            this.eventHandlerBrokerMock.Verify(broker => broker.GetAll(),
-                Times.AtLeastOnce);
-
-            this.eventHandlerBrokerMock.VerifyNoOtherCalls();
-
-            this.eventHandlerMock.VerifyGet(handler => handler.Id,
-                Times.AtLeastOnce);
-
-            this.eventHandlerMock.VerifyGet(handler => handler.Name,
-                Times.AtLeastOnce);
-
-            this.eventHandlerMock.VerifyGet(handler => handler.RequiredParams,
-                Times.AtLeastOnce);
-
-            this.eventHandlerMock.Verify(handler =>
-                handler.HandleAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<IReadOnlyDictionary<string, string>>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
-            this.eventHandlerMock.VerifyNoOtherCalls();
-
-            this.loggingBrokerMock.Verify(broker =>
-                broker.LogErrorAsync(It.Is(SameExceptionAs(
-                    expectedEventCallV2ValidationException))),
-                        Times.Once);
-
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
