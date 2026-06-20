@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
         public async Task ShouldAddEventArchiveV2Async()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             EventArchiveV2 randomEventArchiveV2 =
@@ -35,7 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.Setup(service =>
                 service.AddEventArchiveV2Async(
                     inputEventArchiveV2,
-                    cancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(addedEventArchiveV2);
 
             // when
@@ -43,7 +43,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                 await this.eventArchiveV2ProcessingService
                     .AddEventArchiveV2Async(
                         inputEventArchiveV2,
-                        cancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventArchiveV2.Should().BeEquivalentTo(
@@ -52,7 +52,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.Verify(service =>
                 service.AddEventArchiveV2Async(
                     inputEventArchiveV2,
-                    cancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();

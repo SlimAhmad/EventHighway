@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Processings.EventArchives.V2.Exceptions;
@@ -17,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnBulkAddIfEventArchiveV2sIsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IEnumerable<EventArchiveV2> nullEventArchiveV2s = null;
 
             var nullEventArchiveV2ProcessingException =
@@ -33,7 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                 this.eventArchiveV2ProcessingService
                     .BulkAddEventArchiveV2sAsync(
                         nullEventArchiveV2s,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             EventArchiveV2ProcessingValidationException
                 actualEventArchiveV2ProcessingValidationException =

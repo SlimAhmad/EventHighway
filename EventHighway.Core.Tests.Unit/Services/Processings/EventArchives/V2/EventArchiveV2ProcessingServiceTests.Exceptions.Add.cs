@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             Xeption validationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
 
             var expectedEventArchiveV2ProcessingDependencyValidationException =
@@ -39,7 +42,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             ValueTask<EventArchiveV2> addEventArchiveV2Task =
                 this.eventArchiveV2ProcessingService.AddEventArchiveV2Async(
                     someEventArchiveV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2ProcessingDependencyValidationException
                 actualEventArchiveV2ProcessingDependencyValidationException =
@@ -71,6 +74,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
 
             var expectedEventArchiveV2ProcessingDependencyException =
@@ -83,6 +89,125 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                     It.IsAny<EventArchiveV2>(),
                     It.IsAny<CancellationToken>()))
                         .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask<EventArchiveV2> addEventArchiveV2Task =
+                this.eventArchiveV2ProcessingService.AddEventArchiveV2Async(
+                    someEventArchiveV2,
+                    randomCancellationToken);
+
+            EventArchiveV2ProcessingDependencyException
+                actualEventArchiveV2ProcessingDependencyException =
+                    await Assert.ThrowsAsync<EventArchiveV2ProcessingDependencyException>(
+                        addEventArchiveV2Task.AsTask);
+
+            // then
+            actualEventArchiveV2ProcessingDependencyException.Should().BeEquivalentTo(
+                expectedEventArchiveV2ProcessingDependencyException);
+
+            this.eventArchiveV2ServiceMock.Verify(service =>
+                service.AddEventArchiveV2Async(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventArchiveV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
+            var serviceException = new Exception();
+
+            serviceException.Data.Add(
+                key: GetRandomString(),
+                value: new List<string> { GetRandomString() });
+
+            var failedEventArchiveV2ProcessingServiceException =
+                new FailedEventArchiveV2ProcessingServiceException(
+                    message: "Failed event archive service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedEventArchiveV2ProcessingServiceException =
+                new EventArchiveV2ProcessingServiceException(
+                    message: "Event archive service error occurred, contact support.",
+                    innerException: failedEventArchiveV2ProcessingServiceException);
+
+            this.eventArchiveV2ServiceMock.Setup(service =>
+                service.AddEventArchiveV2Async(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<EventArchiveV2> addEventArchiveV2Task =
+                this.eventArchiveV2ProcessingService.AddEventArchiveV2Async(
+                    someEventArchiveV2,
+                    randomCancellationToken);
+
+            EventArchiveV2ProcessingServiceException
+                actualEventArchiveV2ProcessingServiceException =
+                    await Assert.ThrowsAsync<EventArchiveV2ProcessingServiceException>(
+                        addEventArchiveV2Task.AsTask);
+
+            // then
+            actualEventArchiveV2ProcessingServiceException.Should().BeEquivalentTo(
+                expectedEventArchiveV2ProcessingServiceException);
+
+            this.eventArchiveV2ServiceMock.Verify(service =>
+                service.AddEventArchiveV2Async(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventArchiveV2ProcessingServiceException))),
+                        Times.Once);
+
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnAddIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
+
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventArchiveV2ProcessingException =
+                new TimeoutEventArchiveV2ProcessingException(
+                    message: "Failed event archive processing timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventArchiveV2ProcessingDependencyException =
+                new EventArchiveV2ProcessingDependencyException(
+                    message: "Event archive dependency error occurred, contact support.",
+                    innerException: timeoutEventArchiveV2ProcessingException);
+
+            this.eventArchiveV2ServiceMock.Setup(service =>
+                service.AddEventArchiveV2Async(
+                    It.IsAny<EventArchiveV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
 
             // when
             ValueTask<EventArchiveV2> addEventArchiveV2Task =
@@ -115,58 +240,37 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
         }
 
         [Fact]
-        public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnAddAsync()
         {
             // given
             EventArchiveV2 someEventArchiveV2 = CreateRandomEventArchiveV2();
-            var serviceException = new Exception();
 
-            serviceException.Data.Add(
-                key: GetRandomString(),
-                value: new List<string> { GetRandomString() });
-
-            var failedEventArchiveV2ProcessingServiceException =
-                new FailedEventArchiveV2ProcessingServiceException(
-                    message: "Failed event archive service error occurred, contact support.",
-                    innerException: serviceException,
-                    data: serviceException.Data);
-
-            var expectedEventArchiveV2ProcessingServiceException =
-                new EventArchiveV2ProcessingServiceException(
-                    message: "Event archive service error occurred, contact support.",
-                    innerException: failedEventArchiveV2ProcessingServiceException);
-
-            this.eventArchiveV2ServiceMock.Setup(service =>
-                service.AddEventArchiveV2Async(
-                    It.IsAny<EventArchiveV2>(),
-                    It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(serviceException);
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
 
             // when
             ValueTask<EventArchiveV2> addEventArchiveV2Task =
                 this.eventArchiveV2ProcessingService.AddEventArchiveV2Async(
                     someEventArchiveV2,
-                    TestContext.Current.CancellationToken);
-
-            EventArchiveV2ProcessingServiceException
-                actualEventArchiveV2ProcessingServiceException =
-                    await Assert.ThrowsAsync<EventArchiveV2ProcessingServiceException>(
-                        addEventArchiveV2Task.AsTask);
+                    cancelledToken);
 
             // then
-            actualEventArchiveV2ProcessingServiceException.Should().BeEquivalentTo(
-                expectedEventArchiveV2ProcessingServiceException);
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    addEventArchiveV2Task.AsTask);
 
-            this.eventArchiveV2ServiceMock.Verify(service =>
-                service.AddEventArchiveV2Async(
-                    It.IsAny<EventArchiveV2>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Once);
+            actualException.Should().NotBeOfType<EventArchiveV2ProcessingDependencyException>();
+            actualException.Should().NotBeOfType<EventArchiveV2ProcessingServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
 
             this.loggingBrokerMock.Verify(broker =>
-                broker.LogErrorAsync(It.Is(SameExceptionAs(
-                    expectedEventArchiveV2ProcessingServiceException))),
-                        Times.Once);
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
 
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
