@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnAddIfEventArchiveV2IsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventArchiveV2 nullEventArchiveV2 = null;
 
             var nullEventArchiveV2OrchestrationException =
@@ -34,7 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 this.eventArchiveV2OrchestrationService
                     .AddEventArchiveV2WithListenerEventArchiveV2sAsync(
                         nullEventArchiveV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             EventArchiveV2OrchestrationValidationException
                 actualEventArchiveV2OrchestrationValidationException =
@@ -71,6 +74,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         public async Task ShouldThrowValidationExceptionOnAddIfListenerEventArchiveV2sAreNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var invalidEventArchiveV2 = new EventArchiveV2();
             invalidEventArchiveV2.ListenerEventArchiveV2s = null;
 
@@ -88,7 +94,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 this.eventArchiveV2OrchestrationService
                     .AddEventArchiveV2WithListenerEventArchiveV2sAsync(
                         invalidEventArchiveV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             EventArchiveV2OrchestrationValidationException
                 actualEventArchiveV2OrchestrationValidationException =
