@@ -17,6 +17,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldBulkRemoveListenerEventV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<ListenerEventV2> randomListenerEventV2s =
                 CreateRandomListenerEventV2s();
 
@@ -26,19 +29,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.storageBrokerMock.Setup(broker =>
                 broker.BulkDeleteListenerEventV2sAsync(
                     inputListenerEventV2s,
-                    It.IsAny<CancellationToken>()))
+                    randomCancellationToken))
                         .Returns(ValueTask.CompletedTask);
 
             // when
             await this.listenerEventV2Service.BulkRemoveListenerEventV2sAsync(
                 inputListenerEventV2s,
-                TestContext.Current.CancellationToken);
+                randomCancellationToken);
 
             // then
             this.storageBrokerMock.Verify(broker =>
                 broker.BulkDeleteListenerEventV2sAsync(
                     inputListenerEventV2s,
-                    It.IsAny<CancellationToken>()),
+                    randomCancellationToken),
                         Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();

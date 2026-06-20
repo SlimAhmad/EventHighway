@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfIdIsInvalidAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid invalidListenerEventV2Id = Guid.Empty;
 
             var invalidListenerEventV2Exception =
@@ -37,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> removeListenerEventV2ByIdTask =
                 this.listenerEventV2Service.RemoveListenerEventV2ByIdAsync(
                     invalidListenerEventV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -67,6 +70,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfListenerEventV2IsNotFoundAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid nonExistingListenerEventV2Id = GetRandomId();
             ListenerEventV2 nullListenerEventV2 = null;
 
@@ -89,7 +95,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> removeListenerEventV2ByIdTask =
                 this.listenerEventV2Service.RemoveListenerEventV2ByIdAsync(
                     nonExistingListenerEventV2Id,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(

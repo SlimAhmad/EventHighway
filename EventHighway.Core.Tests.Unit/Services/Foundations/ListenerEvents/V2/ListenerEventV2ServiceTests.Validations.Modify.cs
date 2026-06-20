@@ -19,6 +19,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfListenerEventV2IsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             ListenerEventV2 nullListenerEventV2 = null;
 
             var nullListenerEventV2Exception =
@@ -33,7 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
                 this.listenerEventV2Service.ModifyListenerEventV2Async(
                     nullListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -76,6 +79,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         private async Task ShouldThrowValidationExceptionOnModifyIfListenerEventV2IsInvalidAndLogItAsync(
             string invalidText)
         {
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             ListenerEventStatusV2 invalidListenerEventV2Status =
                 GetInvalidEnum<ListenerEventStatusV2>();
 
@@ -139,7 +145,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
                 this.listenerEventV2Service.ModifyListenerEventV2Async(
                     invalidListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -179,6 +185,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfUpdatedDateIsSameAsCreatedDateAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             ListenerEventV2 randomListenerEventV2 = CreateRandomListenerEventV2(dates: randomDateTimeOffset);
             ListenerEventV2 invalidListenerEventV2 = randomListenerEventV2;
@@ -204,7 +213,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
                 this.listenerEventV2Service.ModifyListenerEventV2Async(
                     invalidListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -247,6 +256,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             int minutesBeforeOrAfter)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
             ListenerEventV2 randomListenerEventV2 =
@@ -278,7 +290,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
                 this.listenerEventV2Service.ModifyListenerEventV2Async(
                     invalidListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -318,6 +330,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfListenerEventV2DoesNotExistAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             int randomDaysAgo = GetRandomNegativeNumber();
             ListenerEventV2 randomListenerEventV2 = CreateRandomListenerEventV2(dates: randomDateTimeOffset);
@@ -342,14 +357,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
                     nonExistListenerEventV2Id,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(nullListenerEventV2);
 
             // when
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
                 this.listenerEventV2Service.ModifyListenerEventV2Async(
                     nonExistListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -366,7 +381,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
                     nonExistListenerEventV2Id,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -389,6 +404,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfStorageCreatedDateNotSameAsCreatedDateAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             int randomDaysAgo = GetRandomNegativeNumber();
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             ListenerEventV2 randomListenerEventV2 = CreateRandomListenerEventV2(dates: randomDateTimeOffset);
@@ -419,14 +437,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
                     invalidListenerEventV2Id,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(storageListenerEventV2);
 
             // when
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
                 this.listenerEventV2Service.ModifyListenerEventV2Async(
                     invalidListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -443,7 +461,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
                     invalidListenerEventV2Id,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -460,6 +478,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
         public async Task ShouldThrowValidationExceptionOnModifyIfUpdatedDateIsEarlierThanStorageAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             int randomTimeAgo = GetRandomNegativeNumber();
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             DateTimeOffset earlierDateTime = randomDateTimeOffset.AddDays(days: randomTimeAgo);
@@ -491,14 +512,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
                     invalidListenerEventV2Id,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(storageListenerEventV2);
 
             // when
             ValueTask<ListenerEventV2> modifyListenerEventV2Task =
                 this.listenerEventV2Service.ModifyListenerEventV2Async(
                     invalidListenerEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ValidationException actualListenerEventV2ValidationException =
                 await Assert.ThrowsAsync<ListenerEventV2ValidationException>(
@@ -515,7 +536,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectListenerEventV2ByIdAsync(
                     invalidListenerEventV2Id,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
