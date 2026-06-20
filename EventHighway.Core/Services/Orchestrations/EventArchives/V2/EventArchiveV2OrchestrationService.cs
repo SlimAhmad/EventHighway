@@ -31,6 +31,11 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             this.loggingBroker = loggingBroker;
         }
 
+        public ValueTask BulkRemoveEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
