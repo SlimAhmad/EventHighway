@@ -34,6 +34,7 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await ValidateEventListenerV2OnAddAsync(eventListenerV2);
 
             return await this.storageBroker.InsertEventListenerV2Async(eventListenerV2, cancellationToken);
