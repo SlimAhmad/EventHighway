@@ -60,6 +60,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventListenerV2IsNotNull(eventListenerV2);
 
             return await this.eventListenerV2ProcessingService.AddEventListenerV2Async(
