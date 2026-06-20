@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,42 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 {
     public partial class HealthV2CoordinationServiceTests
     {
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveHealthSummaryAsync()
+        {
+            // given
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<IEnumerable<HealthCheckItemV2>> retrieveHealthSummaryTask =
+                this.healthV2CoordinationService
+                    .RetrieveHealthSummaryV2Async(cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveHealthSummaryTask.AsTask);
+
+            actualException.Should().NotBeOfType<HealthV2CoordinationDependencyException>();
+            actualException.Should().NotBeOfType<HealthV2CoordinationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(ValidationExceptions))]
         public async Task ShouldThrowDependencyValidationExceptionOnRetrieveHealthSummaryIfValidationExceptionOccursAndLogItAsync(
@@ -53,6 +90,58 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedHealthV2CoordinationDependencyValidationException))),
+                        Times.Once);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveHealthSummaryIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutHealthV2CoordinationException =
+                new TimeoutHealthV2CoordinationException(
+                    message: "Failed health coordination timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedHealthV2CoordinationDependencyException =
+                new HealthV2CoordinationDependencyException(
+                    message: "Health dependency error occurred, contact support.",
+                    innerException: timeoutHealthV2CoordinationException);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IEnumerable<HealthCheckItemV2>> retrieveHealthSummaryTask =
+                this.healthV2CoordinationService
+                    .RetrieveHealthSummaryV2Async(TestContext.Current.CancellationToken);
+
+            HealthV2CoordinationDependencyException actualHealthV2CoordinationDependencyException =
+                await Assert.ThrowsAsync<HealthV2CoordinationDependencyException>(
+                    retrieveHealthSummaryTask.AsTask);
+
+            // then
+            actualHealthV2CoordinationDependencyException.Should().BeEquivalentTo(
+                expectedHealthV2CoordinationDependencyException);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedHealthV2CoordinationDependencyException))),
                         Times.Once);
 
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
