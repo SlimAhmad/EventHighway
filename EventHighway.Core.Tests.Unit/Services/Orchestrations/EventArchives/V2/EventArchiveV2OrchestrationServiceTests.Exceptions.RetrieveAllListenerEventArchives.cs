@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var expectedEventArchiveV2OrchestrationDependencyException =
                 new EventArchiveV2OrchestrationDependencyException(
                     message: "Event archive dependency error occurred, contact support.",
@@ -34,7 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             // when
             ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveAllTask =
                 this.eventArchiveV2OrchestrationService.RetrieveAllListenerEventArchiveV2sAsync(
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventArchiveV2OrchestrationDependencyException actualException =
                 await Assert.ThrowsAsync<EventArchiveV2OrchestrationDependencyException>(
