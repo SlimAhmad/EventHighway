@@ -137,6 +137,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowDependencyExceptionOnAddIfDbUpdateExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
             var dbUpdateException = new DbUpdateException();
             dbUpdateException.Data.Add("ErrorCode", new List<string> { "DbUpdateError" });
@@ -159,7 +162,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    someEventAddressV2, TestContext.Current.CancellationToken);
+                    someEventAddressV2, randomCancellationToken);
 
             EventAddressV2DependencyException actualEventAddressV2DependencyException =
                 await Assert.ThrowsAsync<EventAddressV2DependencyException>(
