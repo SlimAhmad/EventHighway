@@ -266,6 +266,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             int minutesBeforeAndAfterNow)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
             EventAddressV2 randomEventAddressV2 =
@@ -294,7 +297,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    invalidEventAddressV2, TestContext.Current.CancellationToken);
+                    invalidEventAddressV2, randomCancellationToken);
 
             EventAddressV2ValidationException actualEventAddressV2ValidationException =
                 await Assert.ThrowsAsync<EventAddressV2ValidationException>(
