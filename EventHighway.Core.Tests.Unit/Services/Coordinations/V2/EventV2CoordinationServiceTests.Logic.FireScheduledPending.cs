@@ -208,6 +208,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         public async Task ShouldRecordFailuresOnFireScheduledPendingEventV2sAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<EventV2> randomEventV2s = CreateRandomEventV2s();
             IQueryable<EventV2> retrievedEventV2s = randomEventV2s;
 
@@ -261,7 +264,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(retrievedEventV2s);
 
             foreach (EventV2 eventV2 in retrievedEventV2s)
@@ -269,7 +272,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 this.eventListenerV2OrchestrationServiceMock.Setup(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
                         eventV2.EventAddressId,
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(retrievedEventListenerV2s);
             }
 
@@ -282,7 +285,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 this.eventListenerV2OrchestrationServiceMock.Setup(service =>
                     service.AddListenerEventV2Async(
                         It.Is(SameListenerEventAs(expectedListenerEventV2)),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(expectedListenerEventV2.DeepClone());
             }
 
@@ -298,7 +301,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 this.eventV2OrchestrationServiceMock.Setup(service =>
                     service.RunEventCallV2Async(
                         It.Is(SameEventCallAs(expectedCallEventV2s[index])),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ThrowsAsync(eventCallExceptions[index]);
 
                 ranEventCallV2s.Add(item: ranEventCall);
@@ -312,25 +315,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
                 this.eventV2OrchestrationServiceMock.Setup(service =>
                     service.RetrieveScheduledPendingEventV2sAsync(
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(retrievedEventV2s);
 
                 this.eventListenerV2OrchestrationServiceMock.Setup(service =>
                     service.ModifyListenerEventV2Async(
                         It.Is(SameListenerEventAs(expectedListenerEventV2sOnModify[index])),
-                        TestContext.Current.CancellationToken))
+                        randomCancellationToken))
                             .ReturnsAsync(expectedListenerEventV2sOnModify[index]);
             }
 
             // when
             await this.eventV2CoordinationService
                 .FireScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             // then
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveScheduledPendingEventV2sAsync(
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             foreach (EventV2 eventV2 in retrievedEventV2s)
@@ -338,7 +341,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
                         eventV2.EventAddressId,
-                        TestContext.Current.CancellationToken),
+                        randomCancellationToken),
                             Times.Once);
             }
 
@@ -351,7 +354,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                     service.AddListenerEventV2Async(
                         It.Is(SameListenerEventAs(expectedListenerEventV2)),
-                        TestContext.Current.CancellationToken),
+                        randomCancellationToken),
                             Times.Once);
             }
 
@@ -360,7 +363,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 this.eventV2OrchestrationServiceMock.Verify(service =>
                     service.RunEventCallV2Async(
                         It.Is(SameEventCallAs(expectedCallEventV2)),
-                        TestContext.Current.CancellationToken),
+                        randomCancellationToken),
                             Times.Once);
             }
 
@@ -369,7 +372,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                     service.ModifyListenerEventV2Async(
                         It.Is(SameListenerEventAs(expectedListenerEventV2)),
-                        TestContext.Current.CancellationToken),
+                        randomCancellationToken),
                             Times.Once);
             }
 
@@ -378,7 +381,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 this.eventV2OrchestrationServiceMock.Verify(service =>
                     service.MarkEventV2AsImmediateAsync(
                         retreivedEventV2,
-                        TestContext.Current.CancellationToken),
+                        randomCancellationToken),
                             Times.Once);
             }
 
