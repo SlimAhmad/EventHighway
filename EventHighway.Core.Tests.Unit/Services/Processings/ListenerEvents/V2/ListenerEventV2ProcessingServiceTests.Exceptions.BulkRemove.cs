@@ -127,6 +127,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
         public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
             IEnumerable<ListenerEventV2> inputListenerEventV2s = someListenerEventV2s;
             var serviceException = new Exception();
@@ -153,7 +156,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             ValueTask bulkRemoveListenerEventV2sTask =
                 this.listenerEventV2ProcessingService.BulkRemoveListenerEventV2sAsync(
                     inputListenerEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventV2ProcessingServiceException
                 actualListenerEventV2ProcessingServiceException =
