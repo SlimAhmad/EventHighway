@@ -179,6 +179,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
         public async Task ShouldReturnBadFilterCriteriaWhenFilterExpressionIsInvalidAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             string randomHandlerName = GetRandomString();
 
             EventCallV2 randomEventCallV2 = CreateRandomEventCallV2();
@@ -212,13 +215,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
                 .Setup(handler =>
                     handler.HandleAsync(
                         It.IsAny<string>(),
-                        It.IsAny<CancellationToken>()))
+                        randomCancellationToken))
                 .ReturnsAsync(CreateRandomEventHandlerResult());
 
             // when
             EventCallV2 actualEventCallV2 =
                 await this.eventCallV2Service
-                    .RunEventCallV2Async(inputEventCallV2, TestContext.Current.CancellationToken);
+                    .RunEventCallV2Async(inputEventCallV2, randomCancellationToken);
 
             // then
             actualEventCallV2.Should().BeEquivalentTo(expectedEventCallV2,
@@ -240,7 +243,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()),
+                    randomCancellationToken),
                 Times.Never);
 
             this.eventHandlerMock.VerifyNoOtherCalls();
