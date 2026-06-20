@@ -21,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             Xeption dependencyException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var expectedEventAddressV2ProcessingDependencyException =
                 new EventAddressV2ProcessingDependencyException(
                     message: "Event address dependency error occurred, contact support.",
@@ -31,9 +34,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                     .ThrowsAsync(dependencyException);
 
             // when
-            CancellationToken randomCancellationToken =
-                TestContext.Current.CancellationToken;
-
             ValueTask<IQueryable<EventAddressV2>> retrieveAllTask =
                 this.eventAddressV2ProcessingService
                     .RetrieveAllEventAddressV2sAsync(randomCancellationToken);
