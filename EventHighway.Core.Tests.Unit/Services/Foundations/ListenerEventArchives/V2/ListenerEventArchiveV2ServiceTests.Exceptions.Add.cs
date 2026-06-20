@@ -151,6 +151,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
         public async Task ShouldThrowDependencyValidationExceptionOnAddIfReferenceErrorOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             ListenerEventArchiveV2 someListenerEventArchiveV2 = CreateRandomListenerEventArchiveV2();
             string someMessage = GetRandomString();
 
@@ -180,7 +183,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             ValueTask<ListenerEventArchiveV2> addListenerEventArchiveV2Task =
                 this.listenerEventArchiveV2Service.AddListenerEventArchiveV2Async(
                     someListenerEventArchiveV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             ListenerEventArchiveV2DependencyValidationException
                 actualListenerEventArchiveV2DependencyValidationException =
