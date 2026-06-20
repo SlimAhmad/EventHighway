@@ -74,7 +74,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             Xeption dependencyException)
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             Guid someEventV2Id = GetRandomId();
@@ -94,7 +94,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             ValueTask<EventV2> removeEventV2ByIdTask =
                 this.eventV2ProcessingService.RemoveEventV2ByIdAsync(
                     someEventV2Id,
-                    cancellationToken);
+                    randomCancellationToken);
 
             EventV2ProcessingDependencyException
                 actualEventV2ProcessingDependencyException =
