@@ -20,6 +20,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         public async Task ShouldThrowValidationExceptionOnSubmitIfEventV2IsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventV2 nullEventV2 = null;
 
             var nullEventV2CoordinationException =
@@ -34,7 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             ValueTask<EventV2> submitEventV2Task =
                 this.eventV2CoordinationService.SubmitEventV2Async(
                     nullEventV2,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2CoordinationValidationException
                 actualEventV2CoordinationValidationException =
