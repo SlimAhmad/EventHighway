@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldRetrieveEventAddressV2ByIdAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid randomEventAddressV2Id = GetRandomId();
             Guid inputEventAddressV2Id = randomEventAddressV2Id;
 
@@ -32,14 +35,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectEventAddressV2ByIdAsync(
-                    inputEventAddressV2Id, It.IsAny<CancellationToken>()))
+                    inputEventAddressV2Id, randomCancellationToken))
                         .ReturnsAsync(selectedEventAddressV2);
 
             // when
             EventAddressV2 actualEventAddressV2 =
                 await this.eventAddressV2Service
                     .RetrieveEventAddressV2ByIdAsync(
-                        inputEventAddressV2Id, TestContext.Current.CancellationToken);
+                        inputEventAddressV2Id, randomCancellationToken);
 
             // then
             actualEventAddressV2.Should()
@@ -47,7 +50,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
 
             this.storageBrokerMock.Verify(broker =>
                 broker.SelectEventAddressV2ByIdAsync(
-                    inputEventAddressV2Id, It.IsAny<CancellationToken>()),
+                    inputEventAddressV2Id, randomCancellationToken),
                         Times.Once());
 
             this.storageBrokerMock.VerifyNoOtherCalls();

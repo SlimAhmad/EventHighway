@@ -34,6 +34,7 @@ namespace EventHighway.Core.Services.Foundations.EventAddresses.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await ValidateEventAddressV2OnAddAsync(eventAddressV2);
 
             return await this.storageBroker.InsertEventAddressV2Async(eventAddressV2, cancellationToken);
@@ -41,13 +42,19 @@ namespace EventHighway.Core.Services.Foundations.EventAddresses.V2
 
         public ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync(
             CancellationToken cancellationToken = default) =>
-        TryCatch(async () => await this.storageBroker.SelectAllEventAddressV2sAsync(cancellationToken));
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.storageBroker.SelectAllEventAddressV2sAsync(cancellationToken);
+        });
 
         public ValueTask<EventAddressV2> RetrieveEventAddressV2ByIdAsync(
             Guid eventAddressV2Id,
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventAddressV2Id(eventAddressV2Id);
 
             return await this.storageBroker.SelectEventAddressV2ByIdAsync(eventAddressV2Id, cancellationToken);
@@ -58,6 +65,7 @@ namespace EventHighway.Core.Services.Foundations.EventAddresses.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventAddressV2Id(eventAddressV2Id);
 
             EventAddressV2 maybeEventAddressV2 =

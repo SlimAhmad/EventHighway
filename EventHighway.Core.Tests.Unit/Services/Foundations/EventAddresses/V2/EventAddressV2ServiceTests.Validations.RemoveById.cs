@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfIdIsInvalidAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid invalidEventAddressV2Id = Guid.Empty;
 
             var invalidEventAddressV2Exception =
@@ -36,7 +39,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> removeEventAddressV2ByIdTask =
                 this.eventAddressV2Service.RemoveEventAddressV2ByIdAsync(
-                    invalidEventAddressV2Id, TestContext.Current.CancellationToken);
+                    invalidEventAddressV2Id, randomCancellationToken);
 
             EventAddressV2ValidationException actualEventAddressV2ValidationException =
                 await Assert.ThrowsAsync<EventAddressV2ValidationException>(
@@ -65,6 +68,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowValidationExceptionOnRemoveByIdIfEventAddressV2IsNotFoundAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid nonExistingEventAddressV2Id = GetRandomId();
             EventAddressV2 nullEventAddressV2 = null;
 
@@ -84,7 +90,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> removeEventAddressV2ByIdTask =
                 this.eventAddressV2Service.RemoveEventAddressV2ByIdAsync(
-                    nonExistingEventAddressV2Id, TestContext.Current.CancellationToken);
+                    nonExistingEventAddressV2Id, randomCancellationToken);
 
             EventAddressV2ValidationException actualEventAddressV2ValidationException =
                 await Assert.ThrowsAsync<EventAddressV2ValidationException>(

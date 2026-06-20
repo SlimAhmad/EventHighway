@@ -18,6 +18,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowValidationExceptionOnAddIfEventAddressV2IsNullAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventAddressV2 nullEventAddressV2 = null;
 
             var nullEventAddressV2Exception =
@@ -31,7 +34,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    nullEventAddressV2, TestContext.Current.CancellationToken);
+                    nullEventAddressV2, randomCancellationToken);
 
             EventAddressV2ValidationException actualEventAddressV2ValidationException =
                 await Assert.ThrowsAsync<EventAddressV2ValidationException>(
@@ -66,6 +69,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         private async Task ShouldThrowValidationExceptionOnAddIfEventAddressV2IsInvalidAndLogItAsync(
             string invalidText)
         {
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var invalidEventAddressV2 = new EventAddressV2
             {
                 Id = Guid.Empty,
@@ -105,7 +111,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    invalidEventAddressV2, TestContext.Current.CancellationToken);
+                    invalidEventAddressV2, randomCancellationToken);
 
             EventAddressV2ValidationException actualEventAddressV2ValidationException =
                 await Assert.ThrowsAsync<EventAddressV2ValidationException>(
@@ -137,6 +143,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowValidationExceptionOnAddIfCreatedDateIsNotSameAsUpdatedDateAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             DateTimeOffset anotherRandomDateTimeOffset = GetRandomDateTimeOffset();
             EventAddressV2 randomEventAddressV2 = CreateRandomEventAddressV2(dates: randomDateTimeOffset);
@@ -163,7 +172,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    invalidEventAddressV2, TestContext.Current.CancellationToken);
+                    invalidEventAddressV2, randomCancellationToken);
 
             EventAddressV2ValidationException actualEventAddressV2ValidationException =
                 await Assert.ThrowsAsync<EventAddressV2ValidationException>(
@@ -195,6 +204,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowValidationExceptionOnAddIfEventAddressV2HasInvalidLengthPropertyAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             EventAddressV2 invalidEventAddressV2 = CreateRandomEventAddressV2(dates: randomDateTimeOffset);
             invalidEventAddressV2.Name = GetRandomStringWithLengthOf(451);
@@ -219,7 +231,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    invalidEventAddressV2, TestContext.Current.CancellationToken);
+                    invalidEventAddressV2, randomCancellationToken);
 
             EventAddressV2ValidationException actualEventAddressV2ValidationException =
                 await Assert.ThrowsAsync<EventAddressV2ValidationException>(
@@ -254,6 +266,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             int minutesBeforeAndAfterNow)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
             EventAddressV2 randomEventAddressV2 =
@@ -282,7 +297,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    invalidEventAddressV2, TestContext.Current.CancellationToken);
+                    invalidEventAddressV2, randomCancellationToken);
 
             EventAddressV2ValidationException actualEventAddressV2ValidationException =
                 await Assert.ThrowsAsync<EventAddressV2ValidationException>(

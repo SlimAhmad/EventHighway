@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowCriticalDependencyExceptionOnAddIfSqlExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
             SqlException sqlException = CreateSqlException();
             sqlException.Data.Add("ErrorCode", new List<string> { "SqlError" });
@@ -44,7 +47,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    someEventAddressV2, TestContext.Current.CancellationToken);
+                    someEventAddressV2, randomCancellationToken);
 
             EventAddressV2DependencyException actualEventAddressV2DependencyException =
                 await Assert.ThrowsAsync<EventAddressV2DependencyException>(
@@ -76,6 +79,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowDependencyValidationExceptionOnAddIfEventAddressV2AlreadyExistsAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             string someMessage = GetRandomString();
             EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
             var duplicateKeyException = new DuplicateKeyException(someMessage);
@@ -99,7 +105,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    someEventAddressV2, TestContext.Current.CancellationToken);
+                    someEventAddressV2, randomCancellationToken);
 
             EventAddressV2DependencyValidationException actualEventAddressV2DependencyValidationException =
                 await Assert.ThrowsAsync<EventAddressV2DependencyValidationException>(
@@ -131,6 +137,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowDependencyExceptionOnAddIfDbUpdateExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
             var dbUpdateException = new DbUpdateException();
             dbUpdateException.Data.Add("ErrorCode", new List<string> { "DbUpdateError" });
@@ -153,7 +162,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    someEventAddressV2, TestContext.Current.CancellationToken);
+                    someEventAddressV2, randomCancellationToken);
 
             EventAddressV2DependencyException actualEventAddressV2DependencyException =
                 await Assert.ThrowsAsync<EventAddressV2DependencyException>(
@@ -185,6 +194,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -207,7 +219,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> addEventAddressV2Task =
                 this.eventAddressV2Service.AddEventAddressV2Async(
-                    someEventAddressV2, TestContext.Current.CancellationToken);
+                    someEventAddressV2, randomCancellationToken);
 
             EventAddressV2ServiceException actualEventAddressV2ServiceException =
                 await Assert.ThrowsAsync<EventAddressV2ServiceException>(
@@ -233,6 +245,98 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnAddIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventAddressV2Exception =
+                new TimeoutEventAddressV2Exception(
+                    message: "Failed event address timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventAddressV2DependencyException =
+                new EventAddressV2DependencyException(
+                    message: "Event address dependency error occurred, contact support.",
+                    innerException: timeoutEventAddressV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventAddressV2> addEventAddressV2Task =
+                this.eventAddressV2Service.AddEventAddressV2Async(
+                    someEventAddressV2, TestContext.Current.CancellationToken);
+
+            EventAddressV2DependencyException actualEventAddressV2DependencyException =
+                await Assert.ThrowsAsync<EventAddressV2DependencyException>(
+                    addEventAddressV2Task.AsTask);
+
+            // then
+            actualEventAddressV2DependencyException.Should().BeEquivalentTo(
+                expectedEventAddressV2DependencyException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventAddressV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventAddressV2Async(It.IsAny<EventAddressV2>(), It.IsAny<CancellationToken>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnAddAsync()
+        {
+            // given
+            EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventAddressV2> addEventAddressV2Task =
+                this.eventAddressV2Service.AddEventAddressV2Async(
+                    someEventAddressV2, cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    addEventAddressV2Task.AsTask);
+
+            actualException.Should().NotBeOfType<EventAddressV2DependencyException>();
+            actualException.Should().NotBeOfType<EventAddressV2ServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeptions.Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeptions.Xeption>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
 }
