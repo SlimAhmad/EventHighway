@@ -21,8 +21,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             Xeption dependencyValidationException)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             DateTimeOffset someOlderThan = GetRandomDateTimeOffset();
-            CancellationToken someCancellationToken = TestContext.Current.CancellationToken;
 
             var batchConfiguration = new BatchConfiguration();
 
@@ -44,7 +46,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // when
             ValueTask purgeEventArchiveV2sTask =
                 this.archivingEventV2CoordinationService
-                    .PurgeEventArchiveV2sAsync(someOlderThan, someCancellationToken);
+                    .PurgeEventArchiveV2sAsync(someOlderThan, randomCancellationToken);
 
             ArchivingEventV2CoordinationDependencyValidationException
                 actualArchivingEventV2CoordinationDependencyValidationException =
