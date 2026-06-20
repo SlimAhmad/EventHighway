@@ -23,7 +23,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             Xeption validationException)
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             IQueryable<ListenerEventArchiveV2> someListenerEventArchiveV2s =
@@ -45,7 +45,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 this.listenerEventArchiveV2ProcessingService
                     .BulkRemoveListenerEventArchiveV2sAsync(
                         someListenerEventArchiveV2s,
-                        cancellationToken);
+                        randomCancellationToken);
 
             var actualException =
                 await Assert.ThrowsAsync<
