@@ -12,6 +12,7 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 {
@@ -302,6 +303,42 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventListenerV2DependencyException))),
                         Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRemoveByIdAsync()
+        {
+            // given
+            Guid someEventListenerV2Id = GetRandomId();
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventListenerV2> removeEventListenerV2ByIdTask =
+                this.eventListenerV2Service.RemoveEventListenerV2ByIdAsync(
+                    someEventListenerV2Id,
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    removeEventListenerV2ByIdTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventListenerV2DependencyException>();
+            actualException.Should().NotBeOfType<EventListenerV2ServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
 
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
