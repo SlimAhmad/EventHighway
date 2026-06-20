@@ -128,6 +128,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldThrowServiceExceptionOnBulkRemoveIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<EventV2> someEventV2s = CreateRandomEventV2s();
             IEnumerable<EventV2> inputEventV2s = someEventV2s;
             var serviceException = new Exception();
@@ -154,7 +157,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             ValueTask bulkRemoveEventV2sTask =
                 this.eventV2ProcessingService.BulkRemoveEventV2sAsync(
                     inputEventV2s,
-                    TestContext.Current.CancellationToken);
+                    randomCancellationToken);
 
             EventV2ProcessingServiceException actualEventV2ProcessingServiceException =
                 await Assert.ThrowsAsync<EventV2ProcessingServiceException>(
