@@ -246,5 +246,97 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnAddIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventAddressV2Exception =
+                new TimeoutEventAddressV2Exception(
+                    message: "Failed event address timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventAddressV2DependencyException =
+                new EventAddressV2DependencyException(
+                    message: "Event address dependency error occurred, contact support.",
+                    innerException: timeoutEventAddressV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventAddressV2> addEventAddressV2Task =
+                this.eventAddressV2Service.AddEventAddressV2Async(
+                    someEventAddressV2, TestContext.Current.CancellationToken);
+
+            EventAddressV2DependencyException actualEventAddressV2DependencyException =
+                await Assert.ThrowsAsync<EventAddressV2DependencyException>(
+                    addEventAddressV2Task.AsTask);
+
+            // then
+            actualEventAddressV2DependencyException.Should().BeEquivalentTo(
+                expectedEventAddressV2DependencyException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventAddressV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventAddressV2Async(It.IsAny<EventAddressV2>(), It.IsAny<CancellationToken>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnAddAsync()
+        {
+            // given
+            EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventAddressV2> addEventAddressV2Task =
+                this.eventAddressV2Service.AddEventAddressV2Async(
+                    someEventAddressV2, cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    addEventAddressV2Task.AsTask);
+
+            actualException.Should().NotBeOfType<EventAddressV2DependencyException>();
+            actualException.Should().NotBeOfType<EventAddressV2ServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeptions.Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeptions.Xeption>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
