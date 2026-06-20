@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
@@ -31,6 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
     {
         private readonly Mock<IArchivingEventV2OrchestrationService> archivingEventV2OrchestrationServiceMock;
         private readonly Mock<IEventArchiveV2OrchestrationService> eventArchiveV2OrchestrationServiceMock;
+        private readonly Mock<IConfigurationBroker> configurationBrokerMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly ICompareLogic compareLogic;
@@ -46,6 +49,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 new Mock<IEventArchiveV2OrchestrationService>(
                     behavior: MockBehavior.Strict);
 
+            this.configurationBrokerMock = new Mock<IConfigurationBroker>(
+                behavior: MockBehavior.Strict);
+
             this.dateTimeBrokerMock = new Mock<IDateTimeBroker>(
                 behavior: MockBehavior.Strict);
 
@@ -59,6 +65,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         this.archivingEventV2OrchestrationServiceMock.Object,
                     eventArchiveV2OrchestrationService:
                         this.eventArchiveV2OrchestrationServiceMock.Object,
+                    configurationBroker: this.configurationBrokerMock.Object,
                     dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }
@@ -378,6 +385,27 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             return CreateEventV2Filler()
                 .Create(count: GetRandomNumber())
                     .AsQueryable();
+        }
+
+        private static IEnumerable<EventArchiveV2> CreateRandomEventArchiveV2s()
+        {
+            return CreateEventArchiveV2Filler()
+                .Create(count: GetRandomNumber())
+                    .ToList();
+        }
+
+        private static Filler<EventArchiveV2> CreateEventArchiveV2Filler()
+        {
+            var filler = new Filler<EventArchiveV2>();
+
+            filler.Setup()
+                .OnType<DateTimeOffset>()
+                    .Use(GetRandomDateTimeOffset)
+
+                .OnType<DateTimeOffset?>()
+                    .Use(GetRandomDateTimeOffset());
+
+            return filler;
         }
 
         private static async IAsyncEnumerable<EventV2> CreateAsyncEnumerable(
