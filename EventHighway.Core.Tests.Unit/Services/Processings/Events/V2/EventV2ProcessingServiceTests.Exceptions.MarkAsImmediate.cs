@@ -124,7 +124,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public async Task ShouldThrowServiceExceptionOnMarkImmediateIfExceptionOccursAndLogItAsync()
         {
             // given
-            CancellationToken cancellationToken =
+            CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             EventV2 someEventV2 = CreateRandomEventV2();
@@ -150,7 +150,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             ValueTask<EventV2> markEventV2AsImmediateTask =
                 this.eventV2ProcessingService.MarkEventV2AsImmediateAsync(
                     someEventV2,
-                    cancellationToken);
+                    randomCancellationToken);
 
             EventV2ProcessingServiceException
                 actualEventV2ProcessingServiceException =
