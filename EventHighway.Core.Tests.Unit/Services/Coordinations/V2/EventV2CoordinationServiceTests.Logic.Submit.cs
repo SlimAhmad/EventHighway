@@ -25,6 +25,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         public async Task ShouldSubmitScheduleEventV2WhenScheduledDateIsInFutureAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             int randomDays = GetRandomNumber();
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             DateTimeOffset retrievedDateTimeOffset = randomDateTimeOffset;
@@ -46,7 +49,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Setup(service =>
                 service.SubmitEventV2Async(
                     inputScheduledEventV2,
-                    TestContext.Current.CancellationToken))
+                    randomCancellationToken))
                         .ReturnsAsync(submittedEventV2);
 
             // when
@@ -54,7 +57,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 await this.eventV2CoordinationService
                     .SubmitEventV2Async(
                         inputEventV2,
-                        TestContext.Current.CancellationToken);
+                        randomCancellationToken);
 
             // then
             actualEventV2.Should().BeEquivalentTo(expectedEventV2);
@@ -66,7 +69,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.SubmitEventV2Async(
                     inputScheduledEventV2,
-                    TestContext.Current.CancellationToken),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
