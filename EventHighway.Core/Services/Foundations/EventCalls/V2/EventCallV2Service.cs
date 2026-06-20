@@ -34,6 +34,7 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventCallV2OnRun(eventCallV2);
 
             IEventHandler handler =
