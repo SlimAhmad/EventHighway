@@ -82,7 +82,6 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-
             ValidateListenerEventV2sIsNotNull(listenerEventV2s);
 
             await this.listenerEventV2ProcessingService
@@ -95,7 +94,6 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-
             ValidateEventV2sIsNotNull(eventV2s);
 
             await this.eventV2ProcessingService
@@ -108,7 +106,6 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-
             ValidateEventV2IsNotNull(eventV2);
 
             foreach (ListenerEventV2 listenerEventV2 in eventV2.ListenerEventV2s)
