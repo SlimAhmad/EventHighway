@@ -17,6 +17,64 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
 {
     public partial class EventV2ProcessingServiceTests
     {
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnBulkRemoveIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            IQueryable<EventV2> someEventV2s = CreateRandomEventV2s();
+            IEnumerable<EventV2> inputEventV2s = someEventV2s;
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventV2ProcessingException =
+                new TimeoutEventV2ProcessingException(
+                    message: "Failed event processing timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventV2ProcessingDependencyException =
+                new EventV2ProcessingDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutEventV2ProcessingException);
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.BulkRemoveEventV2sAsync(
+                    inputEventV2s,
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask bulkRemoveEventV2sTask =
+                this.eventV2ProcessingService.BulkRemoveEventV2sAsync(
+                    inputEventV2s,
+                    TestContext.Current.CancellationToken);
+
+            EventV2ProcessingDependencyException actualEventV2ProcessingDependencyException =
+                await Assert.ThrowsAsync<EventV2ProcessingDependencyException>(
+                    bulkRemoveEventV2sTask.AsTask);
+
+            // then
+            actualEventV2ProcessingDependencyException.Should().BeEquivalentTo(
+                expectedEventV2ProcessingDependencyException);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.BulkRemoveEventV2sAsync(
+                    inputEventV2s,
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [MemberData(nameof(DependencyValidationExceptions))]
         public async Task ShouldThrowDependencyValidationOnBulkRemoveIfDependencyValidationErrorOccursAndLogItAsync(
