@@ -54,19 +54,37 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
         TryCatch(async () =>
         {
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
-            List<ListenerEventArchiveV2> validItems = new List<ListenerEventArchiveV2>();
+
+            IEnumerable<Guid> incomingIds =
+                listenerEventArchiveV2s.Select(listenerEventArchiveV2 => listenerEventArchiveV2.Id).ToList();
+
+            IQueryable<ListenerEventArchiveV2> storedListenerEventArchiveV2s =
+                await this.storageBroker.SelectAllListenerEventArchiveV2sAsync();
+
+            List<ListenerEventArchiveV2> existingItems =
+                storedListenerEventArchiveV2s
+                    .Where(storedListenerEventArchiveV2 =>
+                        incomingIds.Contains(storedListenerEventArchiveV2.Id))
+                            .ToList();
+
+            var existingIds = existingItems
+                .Select(existingItem => existingItem.Id)
+                    .ToHashSet();
 
             DateTimeOffset archivedDate =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();
 
-            foreach (ListenerEventArchiveV2 item in listenerEventArchiveV2s)
+            List<ListenerEventArchiveV2> itemsToBulkAdd = new List<ListenerEventArchiveV2>();
+
+            foreach (ListenerEventArchiveV2 item in listenerEventArchiveV2s
+                .Where(listenerEventArchiveV2 => !existingIds.Contains(listenerEventArchiveV2.Id)))
             {
                 item.ArchivedDate = archivedDate;
 
                 try
                 {
                     await ValidateListenerEventArchiveV2OnAddAsync(item);
-                    validItems.Add(item);
+                    itemsToBulkAdd.Add(item);
                 }
                 catch (Exception exception)
                 {
@@ -74,9 +92,9 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
                 }
             }
 
-            await this.storageBroker.BulkInsertListenerEventArchiveV2sAsync(validItems, cancellationToken);
+            await this.storageBroker.BulkInsertListenerEventArchiveV2sAsync(itemsToBulkAdd, cancellationToken);
 
-            return validItems;
+            return existingItems.Concat(itemsToBulkAdd).ToList();
         });
 
         public ValueTask BulkRemoveListenerEventArchiveV2sAsync(

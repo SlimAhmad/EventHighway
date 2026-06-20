@@ -47,6 +47,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     message: "Listener event archive dependency error occurred, contact support.",
                     innerException: failedStorageListenerEventArchiveV2Exception);
 
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllListenerEventArchiveV2sAsync())
+                    .ReturnsAsync(new List<ListenerEventArchiveV2>().AsQueryable());
+
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
                     .ReturnsAsync(randomDateTime);
@@ -70,6 +74,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
 
             actualListenerEventArchiveV2DependencyException.Should()
                 .BeEquivalentTo(expectedListenerEventArchiveV2DependencyException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllListenerEventArchiveV2sAsync(),
+                    Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.BulkInsertListenerEventArchiveV2sAsync(
@@ -120,6 +128,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
                     message: "Listener event archive service error occurred, contact support.",
                     innerException: failedListenerEventArchiveV2ServiceException);
 
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllListenerEventArchiveV2sAsync())
+                    .ReturnsAsync(new List<ListenerEventArchiveV2>().AsQueryable());
+
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
                     .ReturnsAsync(randomDateTime);
@@ -143,6 +155,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
 
             actualListenerEventArchiveV2ServiceException.Should()
                 .BeEquivalentTo(expectedListenerEventArchiveV2ServiceException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllListenerEventArchiveV2sAsync(),
+                    Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.BulkInsertListenerEventArchiveV2sAsync(
