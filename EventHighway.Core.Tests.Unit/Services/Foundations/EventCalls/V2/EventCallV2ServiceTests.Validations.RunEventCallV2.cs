@@ -62,6 +62,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             string invalidText)
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var invalidEventCallV2 = new EventCallV2
             {
                 HandlerName = invalidText,
@@ -87,7 +90,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             // when
             ValueTask<EventCallV2> runEventCallV2Task =
-                this.eventCallV2Service.RunEventCallV2Async(invalidEventCallV2, TestContext.Current.CancellationToken);
+                this.eventCallV2Service.RunEventCallV2Async(invalidEventCallV2, randomCancellationToken);
 
             EventCallV2ValidationException actualEventCallV2ValidationException =
                 await Assert.ThrowsAsync<EventCallV2ValidationException>(
