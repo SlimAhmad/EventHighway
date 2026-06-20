@@ -183,6 +183,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
         public async Task ShouldThrowServiceExceptionOnRemoveByIdIfExceptionOccursAndLogItAsync()
         {
             // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             Guid someEventAddressV2Id = GetRandomId();
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -205,7 +208,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> removeEventAddressV2ByIdTask =
                 this.eventAddressV2Service.RemoveEventAddressV2ByIdAsync(
-                    someEventAddressV2Id, TestContext.Current.CancellationToken);
+                    someEventAddressV2Id, randomCancellationToken);
 
             EventAddressV2ServiceException actualEventAddressV2ServiceException =
                 await Assert.ThrowsAsync<EventAddressV2ServiceException>(
