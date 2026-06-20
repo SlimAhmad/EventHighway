@@ -69,25 +69,6 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
                 .RetrieveBatchOfListenerEventV2sByEventIdsAsync(eventV2Ids, take);
         });
 
-        public ValueTask<IEnumerable<EventV2>> RetrieveAllDeadEventV2sWithListenersAsync() =>
-        TryCatch(async () =>
-        {
-            BatchConfiguration batchConfiguration =
-                this.configurationBroker.GetBatchConfiguration();
-
-            ValidateOnRetrieveAllDeadEventV2sWithListeners(batchConfiguration);
-
-            IQueryable<EventV2> deadEventV2s =
-                await this.eventV2ProcessingService
-                    .RetrieveAllDeadEventV2sWithListenersAsync();
-
-            int take = batchConfiguration.BatchSizeForBulkProcessing;
-
-            return take == 0
-                ? deadEventV2s.AsEnumerable()
-                : deadEventV2s.Take(take).AsEnumerable();
-        });
-
         public ValueTask BulkRemoveListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default) =>
@@ -105,23 +86,6 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         TryCatch(async () =>
         {
             ValidateEventV2sIsNotNull(eventV2s);
-
-            await this.eventV2ProcessingService
-                .BulkRemoveEventV2sAsync(eventV2s, cancellationToken);
-        });
-
-        public ValueTask BulkRemoveEventV2AndListenerEventV2sAsync(
-            IEnumerable<EventV2> eventV2s,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            ValidateEventV2sIsNotNull(eventV2s);
-
-            IEnumerable<ListenerEventV2> listenerEventV2s =
-                eventV2s.SelectMany(eventV2 => eventV2.ListenerEventV2s);
-
-            await this.listenerEventV2ProcessingService
-                .BulkRemoveListenerEventV2sAsync(listenerEventV2s, cancellationToken);
 
             await this.eventV2ProcessingService
                 .BulkRemoveEventV2sAsync(eventV2s, cancellationToken);
