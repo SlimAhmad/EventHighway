@@ -55,5 +55,48 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldRetrieveAllDeadEventV2sWhenBatchSizeIsZeroAsync()
+        {
+            // given
+            var batchConfiguration = new BatchConfiguration
+            {
+                BatchSizeForBulkProcessing = 0
+            };
+
+            List<EventV2> randomEventV2s = CreateRandomEventV2List();
+            IQueryable<EventV2> retrievedEventV2s = randomEventV2s.AsQueryable();
+            IEnumerable<EventV2> expectedEventV2s = retrievedEventV2s.AsEnumerable();
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(batchConfiguration);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllDeadEventV2sWithListenersAsync())
+                    .ReturnsAsync(retrievedEventV2s);
+
+            // when
+            IEnumerable<EventV2> actualEventV2s =
+                await this.archivingEventV2OrchestrationService
+                    .RetrieveBatchOfDeadEventV2sAsync();
+
+            // then
+            actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
+            this.eventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllDeadEventV2sWithListenersAsync(),
+                    Times.Once);
+
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }

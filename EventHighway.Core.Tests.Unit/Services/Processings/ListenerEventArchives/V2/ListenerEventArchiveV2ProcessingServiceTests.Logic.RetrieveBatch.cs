@@ -80,5 +80,66 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldRetrieveAllPurgeArchivedEventV2sWhenBatchSizeIsZeroAsync()
+        {
+            // given
+            DateTimeOffset olderThan = GetRandomDateTimeOffset();
+
+            var batchConfiguration = new BatchConfiguration
+            {
+                BatchSizeForBulkProcessing = 0
+            };
+
+            IQueryable<ListenerEventArchiveV2> randomListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s();
+
+            List<ListenerEventArchiveV2> archives =
+                randomListenerEventArchiveV2s.ToList();
+
+            for (int index = 0; index < archives.Count; index++)
+            {
+                archives[index].ArchivedDate = olderThan.AddDays(-1);
+            }
+
+            IQueryable<ListenerEventArchiveV2> retrievedListenerEventArchiveV2s =
+                archives.AsQueryable();
+
+            IQueryable<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
+                retrievedListenerEventArchiveV2s
+                    .Where(item => item.ArchivedDate < olderThan);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(batchConfiguration);
+
+            this.listenerEventArchiveV2ServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync())
+                    .ReturnsAsync(retrievedListenerEventArchiveV2s);
+
+            // when
+            List<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
+                await this.listenerEventArchiveV2ProcessingService
+                    .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
+                        olderThan,
+                        CancellationToken.None);
+
+            // then
+            actualListenerEventArchiveV2s.Should()
+                .BeEquivalentTo(expectedListenerEventArchiveV2s);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(),
+                    Times.Once);
+
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }

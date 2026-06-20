@@ -50,7 +50,9 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 
             int take = batchConfiguration.BatchSizeForBulkProcessing;
 
-            return deadEventV2s.Take(take).AsEnumerable();
+            return take == 0
+                ? deadEventV2s.AsEnumerable()
+                : deadEventV2s.Take(take).AsEnumerable();
         });
 
         public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sAsync(

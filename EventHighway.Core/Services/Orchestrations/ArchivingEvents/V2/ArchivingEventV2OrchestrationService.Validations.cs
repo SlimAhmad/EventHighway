@@ -33,7 +33,7 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             Validate(
                 message: "Event is invalid, fix the errors and try again.",
 
-                (Rule: IsInvalidBatchSize(batchConfiguration.BatchSizeForBulkProcessing),
+                (Rule: IsInvalid(batchConfiguration.BatchSizeForBulkProcessing),
                 Parameter: nameof(BatchConfiguration.BatchSizeForBulkProcessing)));
         }
 
@@ -41,12 +41,6 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         {
             Condition = value is null,
             Message = "Value is required"
-        };
-
-        private static dynamic IsInvalidBatchSize(int value) => new
-        {
-            Condition = value <= 0,
-            Message = "Value must be greater than 0"
         };
 
         private static dynamic IsInvalid(int value) => new

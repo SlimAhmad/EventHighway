@@ -57,10 +57,13 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 await this.listenerEventArchiveV2Service.RetrieveAllListenerEventArchiveV2sAsync();
 
             listenerEventArchiveV2 = FilterListenerEventArchiveV2sOlderThan(
-                olderThan, listenerEventArchiveV2)
-                    .Take(batchConfiguration.BatchSizeForBulkProcessing);
+                olderThan, listenerEventArchiveV2);
 
-            return listenerEventArchiveV2.ToList();
+            int take = batchConfiguration.BatchSizeForBulkProcessing;
+
+            return take == 0
+                ? listenerEventArchiveV2.ToList()
+                : listenerEventArchiveV2.Take(take).ToList();
         });
 
         public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
