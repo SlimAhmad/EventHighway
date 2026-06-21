@@ -12,7 +12,6 @@ namespace EventHighway.Core.Brokers.Jsons
         bool CheckIfPropertyExist(string json, string propertyName);
 
         bool IsValidJson(string content);
-        string Canonicalize(string json);
         string RemoveNode(string json, string path);
     }
 }

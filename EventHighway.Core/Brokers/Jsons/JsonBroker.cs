@@ -3,8 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -49,42 +47,7 @@ namespace EventHighway.Core.Brokers.Jsons
             }
         }
 
-        public string Canonicalize(string json)
-        {
-            JsonNode node = JsonNode.Parse(json);
-            JsonNode sorted = SortNode(node);
-            return sorted.ToJsonString();
-        }
-
         public string RemoveNode(string json, string path) =>
             throw new NotImplementedException();
-
-        private static JsonNode SortNode(JsonNode node)
-        {
-            if (node is JsonObject obj)
-            {
-                var sorted = new JsonObject();
-
-                foreach (KeyValuePair<string, JsonNode> property in
-                    obj.OrderBy(p => p.Key, StringComparer.Ordinal))
-                {
-                    sorted[property.Key] = SortNode(property.Value?.DeepClone());
-                }
-
-                return sorted;
-            }
-
-            if (node is JsonArray array)
-            {
-                var sortedArray = new JsonArray();
-
-                foreach (JsonNode element in array)
-                    sortedArray.Add(SortNode(element?.DeepClone()));
-
-                return sortedArray;
-            }
-
-            return node?.DeepClone();
-        }
     }
 }
