@@ -26,6 +26,10 @@ namespace EventHighway.Core.Models.Configurations
         /// </summary>
         public BatchConfiguration BatchProcessing { get; set; } = new BatchConfiguration();
 
+        /// <summary>
+        /// Gets or sets the loop detection configuration for identifying and managing recursive event patterns.
+        /// Defaults to a <see cref="LoopDetection"/> with standard thresholds.
+        /// </summary>
         public LoopDetection LoopDetection { get; set; } = new LoopDetection();
     }
 }
