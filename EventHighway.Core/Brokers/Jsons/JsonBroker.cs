@@ -2,11 +2,12 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Text.Json;
 
-namespace EventHighway.Core.Brokers.Serializations.Jsons
+namespace EventHighway.Core.Brokers.Jsons
 {
-    internal class JsonSerializationBroker : IJsonSerializationBroker
+    internal class JsonBroker : IJsonBroker
     {
         public string Serialize<T>(T value) =>
             JsonSerializer.Serialize(value);
@@ -28,5 +29,14 @@ namespace EventHighway.Core.Brokers.Serializations.Jsons
             using JsonDocument document = JsonDocument.Parse(json);
             return document.RootElement.TryGetProperty(propertyName, out _);
         }
+
+        public bool IsValidJson(string content) =>
+            throw new NotImplementedException();
+
+        public string Canonicalize(string json) =>
+            throw new NotImplementedException();
+
+        public string RemoveNode(string json, string path) =>
+            throw new NotImplementedException();
     }
 }
