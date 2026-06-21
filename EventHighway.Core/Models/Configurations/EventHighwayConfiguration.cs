@@ -4,6 +4,7 @@
 
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Configurations.Healths;
+using EventHighway.Core.Models.Configurations.LoopDetections;
 
 namespace EventHighway.Core.Models.Configurations
 {
@@ -24,5 +25,11 @@ namespace EventHighway.Core.Models.Configurations
         /// Defaults to a <see cref="BatchConfiguration"/> with system defaults.
         /// </summary>
         public BatchConfiguration BatchProcessing { get; set; } = new BatchConfiguration();
+
+        /// <summary>
+        /// Gets or sets the loop detection configuration for identifying and managing recursive event patterns.
+        /// Defaults to a <see cref="LoopDetection"/> with standard thresholds.
+        /// </summary>
+        public LoopDetection LoopDetection { get; set; } = new LoopDetection();
     }
 }
