@@ -22,5 +22,20 @@ namespace EventHighway.Core.Tests.Unit.Brokers.Hashings
             // then
             firstHash.Should().Be(secondHash);
         }
+
+        [Fact]
+        public void ShouldGenerateDifferentHashForDifferentContent()
+        {
+            // given
+            string firstContent = GetRandomString();
+            string secondContent = GetRandomString();
+
+            // when
+            string firstHash = this.hashBroker.GenerateSha256Hash(firstContent);
+            string secondHash = this.hashBroker.GenerateSha256Hash(secondContent);
+
+            // then
+            firstHash.Should().NotBe(secondHash);
+        }
     }
 }
