@@ -4,6 +4,7 @@
 
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Configurations.Healths;
+using EventHighway.Core.Models.Configurations.LoopDetections;
 
 namespace EventHighway.Core.Models.Configurations
 {
@@ -24,5 +25,7 @@ namespace EventHighway.Core.Models.Configurations
         /// Defaults to a <see cref="BatchConfiguration"/> with system defaults.
         /// </summary>
         public BatchConfiguration BatchProcessing { get; set; } = new BatchConfiguration();
+
+        public LoopDetection LoopDetection { get; set; } = new LoopDetection();
     }
 }
