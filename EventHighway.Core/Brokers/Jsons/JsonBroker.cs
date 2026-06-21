@@ -47,7 +47,11 @@ namespace EventHighway.Core.Brokers.Jsons
             }
         }
 
-        public string RemoveNode(string json, string path) =>
-            throw new NotImplementedException();
+        public string RemoveNode(string json, string path)
+        {
+            JsonObject obj = JsonNode.Parse(json).AsObject();
+            obj.Remove(path);
+            return obj.ToJsonString();
+        }
     }
 }

@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using FluentAssertions;
-using System.Text.Json;
 
 namespace EventHighway.Core.Tests.Unit.Brokers.Jsons
 {
@@ -21,8 +20,7 @@ namespace EventHighway.Core.Tests.Unit.Brokers.Jsons
             string actualJson = this.jsonBroker.RemoveNode(inputJson, pathToRemove);
 
             // then
-            JsonDocument.Parse(actualJson).RootElement
-                .Should().BeEquivalentTo(JsonDocument.Parse(expectedJson).RootElement);
+            actualJson.Should().Be(expectedJson);
         }
 
         [Fact]
@@ -36,8 +34,7 @@ namespace EventHighway.Core.Tests.Unit.Brokers.Jsons
             string actualJson = this.jsonBroker.RemoveNode(inputJson, absentPath);
 
             // then
-            JsonDocument.Parse(actualJson).RootElement
-                .Should().BeEquivalentTo(JsonDocument.Parse(inputJson).RootElement);
+            actualJson.Should().Be(inputJson);
         }
     }
 }
