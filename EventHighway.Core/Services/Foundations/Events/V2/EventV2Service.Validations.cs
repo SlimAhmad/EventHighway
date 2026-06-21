@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Configurations.LoopDetections;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2.Exceptions;
 
@@ -105,6 +106,25 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 Parameter: nameof(EventV2.Id)));
         }
 
+        private static void ValidateOnRemoveVolatilePaths(EventV2 eventV2)
+        {
+            ValidateEventV2IsNotNull(eventV2);
+        }
+
+        private static void ValidateOnRemoveVolatilePathsWithConfig(
+            EventV2 eventV2,
+            string[] volatileContentPaths)
+        {
+            Validate(
+                message: "Event is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(eventV2.EventAddressId),
+                Parameter: nameof(EventV2.EventAddressId)),
+
+                (Rule: IsInvalid(volatileContentPaths),
+                Parameter: nameof(VolatilePaths.VolatileContentPaths)));
+        }
+
         private static void ValidateEventV2IsNotNull(EventV2 eventV2)
         {
             if (eventV2 is null)
@@ -193,6 +213,12 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
         private static dynamic IsInvalid(string text) => new
         {
             Condition = string.IsNullOrWhiteSpace(text),
+            Message = "Required"
+        };
+
+        private static dynamic IsInvalid(string[] array) => new
+        {
+            Condition = array is null,
             Message = "Required"
         };
 

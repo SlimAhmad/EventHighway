@@ -22,5 +22,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
         ValueTask BulkRemoveEventV2sAsync(
             IEnumerable<EventV2> eventV2s,
             CancellationToken cancellationToken = default);
+
+        ValueTask<string> RemoveVolatilePathsAsync(EventV2 eventV2, CancellationToken cancellationToken = default);
     }
 }
