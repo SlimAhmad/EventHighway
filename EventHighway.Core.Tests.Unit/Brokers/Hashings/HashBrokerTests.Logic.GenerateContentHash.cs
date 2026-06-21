@@ -37,5 +37,19 @@ namespace EventHighway.Core.Tests.Unit.Brokers.Hashings
             // then
             firstHash.Should().NotBe(secondHash);
         }
+
+        [Fact]
+        public void ShouldGenerateKnownSha256HashForKnownInput()
+        {
+            // given
+            string knownInput = "hello";
+            string expectedHash = "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824";
+
+            // when
+            string actualHash = this.hashBroker.GenerateSha256Hash(knownInput);
+
+            // then
+            actualHash.Should().Be(expectedHash);
+        }
     }
 }
