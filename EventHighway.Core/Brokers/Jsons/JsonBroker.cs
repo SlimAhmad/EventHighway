@@ -30,8 +30,21 @@ namespace EventHighway.Core.Brokers.Jsons
             return document.RootElement.TryGetProperty(propertyName, out _);
         }
 
-        public bool IsValidJson(string content) =>
-            throw new NotImplementedException();
+        public bool IsValidJson(string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+                return false;
+
+            try
+            {
+                JsonDocument.Parse(content);
+                return true;
+            }
+            catch (JsonException)
+            {
+                return false;
+            }
+        }
 
         public string Canonicalize(string json) =>
             throw new NotImplementedException();
