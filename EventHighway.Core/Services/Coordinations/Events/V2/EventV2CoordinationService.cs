@@ -100,6 +100,9 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
 
             foreach (EventV2 eventV2 in eventV2s)
             {
+                if (eventV2.Status == EventStatusV2.Quarantined)
+                    continue;
+
                 await ProcessEventListenerV2sAsync(eventV2, cancellationToken);
 
                 await this.eventV2OrchestrationService

@@ -231,7 +231,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     eventV2.ListenerEventV2s).IgnoreIt()
 
                 .OnType<EventAddressV2>().IgnoreIt()
-                .OnType<ListenerEventV2>().IgnoreIt();
+                .OnType<ListenerEventV2>().IgnoreIt()
+
+                .OnProperty(eventV2 =>
+                    eventV2.Status).Use(EventStatusV2.Active);
 
             return filler;
         }
