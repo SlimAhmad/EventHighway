@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -106,6 +107,64 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             // then
             actualEventV2ProcessingDependencyException.Should()
                 .BeEquivalentTo(expectedEventV2ProcessingDependencyException);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.ModifyEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnModifyEventV2IfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            EventV2 someEventV2 = CreateRandomEventV2();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventV2ProcessingException =
+                new TimeoutEventV2ProcessingException(
+                    message: "Failed event processing timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventV2ProcessingDependencyException =
+                new EventV2ProcessingDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutEventV2ProcessingException);
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.ModifyEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventV2> modifyEventV2Task =
+                this.eventV2ProcessingService.ModifyEventV2Async(
+                    someEventV2,
+                    TestContext.Current.CancellationToken);
+
+            EventV2ProcessingDependencyException actualEventV2ProcessingDependencyException =
+                await Assert.ThrowsAsync<EventV2ProcessingDependencyException>(
+                    modifyEventV2Task.AsTask);
+
+            // then
+            actualEventV2ProcessingDependencyException.Should().BeEquivalentTo(
+                expectedEventV2ProcessingDependencyException);
 
             this.eventV2ServiceMock.Verify(service =>
                 service.ModifyEventV2Async(
