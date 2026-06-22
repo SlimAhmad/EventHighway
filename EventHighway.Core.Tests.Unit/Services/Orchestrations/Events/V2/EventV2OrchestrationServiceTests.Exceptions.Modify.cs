@@ -70,5 +70,60 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
             this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.hashBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(DependencyExceptions))]
+        public async Task ShouldThrowDependencyExceptionOnModifyIfDependencyExceptionOccursAndLogItAsync(
+            Xeption dependencyException)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventV2 someEventV2 = CreateRandomEventV2();
+
+            var expectedEventV2OrchestrationDependencyException =
+                new EventV2OrchestrationDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: dependencyException.InnerException as Xeption);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.ModifyEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask<EventV2> modifyEventV2Task =
+                this.eventV2OrchestrationService.ModifyEventV2Async(
+                    someEventV2,
+                    randomCancellationToken);
+
+            EventV2OrchestrationDependencyException
+                actualEventV2OrchestrationDependencyException =
+                    await Assert.ThrowsAsync<EventV2OrchestrationDependencyException>(
+                        modifyEventV2Task.AsTask);
+
+            // then
+            actualEventV2OrchestrationDependencyException.Should()
+                .BeEquivalentTo(expectedEventV2OrchestrationDependencyException);
+
+            this.eventV2ProcessingServiceMock.Verify(broker =>
+                broker.ModifyEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.hashBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
