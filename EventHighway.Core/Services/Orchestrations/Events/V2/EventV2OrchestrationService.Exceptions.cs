@@ -520,6 +520,10 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
                 throw eventV2OrchestrationDependencyException;
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (NullEventV2OrchestrationException
                 nullEventV2OrchestrationException)
             {
