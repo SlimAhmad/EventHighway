@@ -23,6 +23,7 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
         private delegate ValueTask<IQueryable<EventAddressV2>> ReturningEventAddressV2sFunction();
         private delegate ValueTask<EventCallV2> ReturningEventCallV2Function();
+        private delegate ValueTask<bool> ReturningBoolFunction();
 
         private async ValueTask<EventV2> TryCatch(ReturningEventV2Function returningEventV2Function)
         {
@@ -490,6 +491,20 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
 
                 throw await CreateAndLogServiceExceptionAsync(
                     failedEventV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<bool> TryCatch(ReturningBoolFunction returningBoolFunction)
+        {
+            try
+            {
+                return await returningBoolFunction();
+            }
+            catch (NullEventV2OrchestrationException
+                nullEventV2OrchestrationException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(
+                    nullEventV2OrchestrationException);
             }
         }
 
