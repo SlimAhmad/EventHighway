@@ -116,6 +116,9 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                     ?.FirstOrDefault(vp => vp.EventAddressId == eventV2.EventAddressId)
                     ?.VolatileContentPaths;
 
+            if (volatilePaths is null)
+                return eventV2.Content;
+
             ValidateOnRemoveVolatilePathsWithConfig(eventV2, volatilePaths);
 
             string content = eventV2.Content;
