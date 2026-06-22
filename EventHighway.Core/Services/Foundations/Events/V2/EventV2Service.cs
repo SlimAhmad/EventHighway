@@ -123,8 +123,11 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             if (!this.jsonBroker.IsValidJson(content))
                 return content;
 
-            foreach (string path in volatilePaths)
-                content = this.jsonBroker.RemoveNode(content, path);
+            if (volatilePaths is not null)
+            {
+                foreach (string path in volatilePaths)
+                    content = this.jsonBroker.RemoveNode(content, path);
+            }
 
             return Canonicalize(content);
         });

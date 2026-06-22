@@ -15,10 +15,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
     public partial class EventV2OrchestrationServiceTests
     {
         [Fact]
-        public async Task ShouldSubmitEventV2Async()
+        public async Task ShouldStampContentHashOnSubmitEventV2Async()
         {
             // given
-            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var mockSequence = new MockSequence();
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
@@ -83,8 +85,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                     Times.Once);
 
             this.eventV2ProcessingServiceMock.Verify(service =>
-                service.AddEventV2Async(inputEventV2, randomCancellationToken),
-                    Times.Once);
+                service.AddEventV2Async(
+                    inputEventV2,
+                    randomCancellationToken),
+                        Times.Once);
 
             this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();

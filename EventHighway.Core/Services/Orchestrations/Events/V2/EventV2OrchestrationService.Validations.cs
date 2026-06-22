@@ -50,9 +50,24 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 Parameter: nameof(EventV2.Id)));
         }
 
+        private static void ValidateCleanedContent(string cleanedContent)
+        {
+            Validate(
+                message: "Event is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(cleanedContent),
+                Parameter: nameof(cleanedContent)));
+        }
+
         private static dynamic IsInvalid(Guid id) => new
         {
             Condition = id == Guid.Empty,
+            Message = "Required"
+        };
+
+        private static dynamic IsInvalid(string text) => new
+        {
+            Condition = string.IsNullOrWhiteSpace(text),
             Message = "Required"
         };
 

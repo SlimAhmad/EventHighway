@@ -6,6 +6,7 @@ using System;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.EventHandlers;
+using EventHighway.Core.Brokers.Hashings;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Jsons;
 using EventHighway.Core.Brokers.Storages;
@@ -170,6 +171,7 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<ILoggingBroker, LoggingBroker>();
             services.AddTransient<IJsonBroker, JsonBroker>();
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
+            services.AddTransient<IHashBroker, HashBroker>();
 
             services.AddTransient<
                 IStorageBroker,

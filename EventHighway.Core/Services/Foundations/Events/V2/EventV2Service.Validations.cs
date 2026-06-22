@@ -148,10 +148,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 message: "Event is invalid, fix the errors and try again.",
 
                 (Rule: IsInvalid(eventV2.EventAddressId),
-                Parameter: nameof(EventV2.EventAddressId)),
-
-                (Rule: IsInvalid(volatileContentPaths),
-                Parameter: nameof(VolatilePaths.VolatileContentPaths)));
+                Parameter: nameof(EventV2.EventAddressId)));
         }
 
         private static void ValidateEventV2IsNotNull(EventV2 eventV2)
