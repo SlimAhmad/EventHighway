@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Configurations.LoopDetections;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.Events.V2;
@@ -144,7 +145,23 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         public ValueTask<bool> IsLoopDetectedAsync(
             EventV2 eventV2,
             CancellationToken cancellationToken = default) =>
-                throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventV2IsNotNull(eventV2);
+
+            LoopDetection config =
+                this.configurationBroker.GetLoopDetectionConfiguration();
+
+            if (config.Enabled is false)
+                return false;
+
+            int count =
+                await this.eventV2Service.RetrieveEventV2CountBySignatureAsync(
+                    eventV2, cancellationToken);
+
+            return count > config.Threshold;
+        });
 
         private async ValueTask<EventV2> SetEventV2AsImmediateAsync(
             EventV2 eventV2, CancellationToken cancellationToken)
