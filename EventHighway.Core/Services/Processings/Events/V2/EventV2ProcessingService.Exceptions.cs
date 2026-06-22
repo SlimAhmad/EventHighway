@@ -3,9 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2.Exceptions;
@@ -17,6 +15,7 @@ namespace EventHighway.Core.Services.Processings.Events.V2
     internal partial class EventV2ProcessingService
     {
         private delegate ValueTask ReturningNothingFunction();
+        private delegate ValueTask<string> ReturningStringFunction();
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
         private delegate ValueTask<EventV2> ReturningEventV2Function();
 
@@ -70,6 +69,69 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             catch (EventV2ServiceException eventV2ServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventV2ServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventV2ProcessingServiceException =
+                    new FailedEventV2ProcessingServiceException(
+                        message: "Failed event service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventV2ProcessingServiceException);
+            }
+        }
+
+        private async ValueTask<string> TryCatch(ReturningStringFunction returningStringFunction)
+        {
+            try
+            {
+                return await returningStringFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2ProcessingException =
+                    new TimeoutEventV2ProcessingException(
+                        message: "Failed event processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2ProcessingDependencyException =
+                    new EventV2ProcessingDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2ProcessingDependencyException);
+
+                throw eventV2ProcessingDependencyException;
+            }
+            catch (NullEventV2ProcessingException nullEventV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullEventV2ProcessingException);
+            }
+            catch (EventV2ValidationException eventV2ValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(eventV2ValidationException);
+            }
+            catch (EventV2DependencyValidationException eventV2DependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(eventV2DependencyValidationException);
+            }
+            catch (EventV2DependencyException eventV2DependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventV2DependencyException);
+            }
+            catch (EventV2ServiceException eventV2ServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventV2ServiceException);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception exception)
             {
