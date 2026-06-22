@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
-using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
 using FluentAssertions;
 using Moq;
 using Xeptions;
@@ -15,32 +14,27 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
 {
     public partial class EventV2OrchestrationServiceTests
     {
-        [Fact]
-        public async Task ShouldThrowDependencyValidationExceptionOnIsLoopDetectedIfEventV2ProcessingValidationExceptionOccursAndLogItAsync()
+        [Theory]
+        [MemberData(nameof(DependencyValidationExceptions))]
+        public async Task ShouldThrowDependencyValidationExceptionOnIsLoopDetectedIfValidationErrorOccursAndLogItAsync(
+            Xeption validationException)
         {
             // given
             CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
             EventV2 someEventV2 = CreateRandomEventV2();
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
-
-            var eventV2ProcessingValidationException =
-                new EventV2ProcessingValidationException(
-                    someMessage,
-                    someInnerException);
 
             var expectedEventV2OrchestrationDependencyValidationException =
                 new EventV2OrchestrationDependencyValidationException(
                     message: "Event validation error occurred, fix the errors and try again.",
-                    innerException: eventV2ProcessingValidationException.InnerException as Xeption);
+                    innerException: validationException.InnerException as Xeption);
 
             this.eventV2ProcessingServiceMock.Setup(service =>
                 service.IsLoopDetectedAsync(
                     It.IsAny<EventV2>(),
                     It.IsAny<CancellationToken>()))
-                        .ThrowsAsync(eventV2ProcessingValidationException);
+                        .ThrowsAsync(validationException);
 
             // when
             ValueTask<bool> isLoopDetectedTask =
