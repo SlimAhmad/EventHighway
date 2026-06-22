@@ -30,12 +30,12 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
                     data: (validationException.InnerException as Xeption).Data);
 
             this.archivingEventV2CoordinationServiceMock.Setup(service =>
-                service.ArchiveDeadEventV2sAsync(It.IsAny<CancellationToken>()))
+                service.ArchiveEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(validationException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
-                this.archivingEventV2Client.ArchiveDeadEventV2sAsync(randomCancellationToken);
+                this.archivingEventV2Client.ArchiveEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2ClientValidationException actualArchivingEventV2ClientValidationException =
                 await Assert.ThrowsAsync<ArchivingEventV2ClientValidationException>(
@@ -46,7 +46,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
                 .BeEquivalentTo(expectedArchivingEventV2ClientValidationException);
 
             this.archivingEventV2CoordinationServiceMock.Verify(service =>
-                service.ArchiveDeadEventV2sAsync(It.IsAny<CancellationToken>()),
+                service.ArchiveEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.archivingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
@@ -79,12 +79,12 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
                         .InnerException as Xeption).Data);
 
             this.archivingEventV2CoordinationServiceMock.Setup(service =>
-                service.ArchiveDeadEventV2sAsync(It.IsAny<CancellationToken>()))
+                service.ArchiveEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(archivingEventV2CoordinationDependencyException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
-                this.archivingEventV2Client.ArchiveDeadEventV2sAsync(randomCancellationToken);
+                this.archivingEventV2Client.ArchiveEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2ClientDependencyException actualArchivingEventV2ClientDependencyException =
                 await Assert.ThrowsAsync<ArchivingEventV2ClientDependencyException>(
@@ -95,7 +95,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
                 .BeEquivalentTo(expectedArchivingEventV2ClientDependencyException);
 
             this.archivingEventV2CoordinationServiceMock.Verify(service =>
-                service.ArchiveDeadEventV2sAsync(It.IsAny<CancellationToken>()),
+                service.ArchiveEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.archivingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
@@ -128,12 +128,12 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
                         .InnerException as Xeption).Data);
 
             this.archivingEventV2CoordinationServiceMock.Setup(service =>
-                service.ArchiveDeadEventV2sAsync(It.IsAny<CancellationToken>()))
+                service.ArchiveEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(archivingEventV2CoordinationServiceException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
-                this.archivingEventV2Client.ArchiveDeadEventV2sAsync(randomCancellationToken);
+                this.archivingEventV2Client.ArchiveEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2ClientDependencyException actualArchivingEventV2ClientDependencyException =
                 await Assert.ThrowsAsync<ArchivingEventV2ClientDependencyException>(
@@ -144,7 +144,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
                 .BeEquivalentTo(expectedArchivingEventV2ClientDependencyException);
 
             this.archivingEventV2CoordinationServiceMock.Verify(service =>
-                service.ArchiveDeadEventV2sAsync(It.IsAny<CancellationToken>()),
+                service.ArchiveEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.archivingEventV2CoordinationServiceMock.VerifyNoOtherCalls();

@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
@@ -93,6 +92,17 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             {
                 throw await CreateAndLogDependencyExceptionAsync(
                     eventArchiveV2OrchestrationServiceException);
+            }
+            catch (AggregateException aggregateException)
+            {
+                var failedArchivingEventV2CoordinationServiceException =
+                    new FailedArchivingEventV2CoordinationServiceException(
+                        message: "Failed archiving event service error occurred, contact support.",
+                        innerException: aggregateException,
+                        data: aggregateException.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedArchivingEventV2CoordinationServiceException);
             }
             catch (Exception exception)
             {

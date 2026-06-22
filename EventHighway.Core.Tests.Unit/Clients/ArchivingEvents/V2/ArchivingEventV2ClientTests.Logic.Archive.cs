@@ -18,16 +18,16 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
                 TestContext.Current.CancellationToken;
 
             this.archivingEventV2CoordinationServiceMock.Setup(service =>
-                service.ArchiveDeadEventV2sAsync(randomCancellationToken))
+                service.ArchiveEventV2sAsync(randomCancellationToken))
                     .Returns(ValueTask.CompletedTask);
 
             // when
             await this.archivingEventV2Client
-                .ArchiveDeadEventV2sAsync(randomCancellationToken);
+                .ArchiveEventV2sAsync(randomCancellationToken);
 
             // then
             this.archivingEventV2CoordinationServiceMock.Verify(service =>
-                service.ArchiveDeadEventV2sAsync(randomCancellationToken),
+                service.ArchiveEventV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.archivingEventV2CoordinationServiceMock.VerifyNoOtherCalls();

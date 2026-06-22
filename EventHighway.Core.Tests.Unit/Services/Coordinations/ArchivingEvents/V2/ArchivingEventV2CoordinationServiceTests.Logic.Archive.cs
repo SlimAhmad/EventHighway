@@ -99,6 +99,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         EventArchiveV2Id = item.EventId
                     }).ToList();
 
+            // Step 1
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken))
+                        .ReturnsAsync(Enumerable.Empty<EventV2>());
+
             // Step 2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
@@ -168,9 +174,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // when
             await this.archivingEventV2CoordinationService
-                .ArchiveDeadEventV2sAsync(randomCancellationToken);
+                .ArchiveEventV2sAsync(randomCancellationToken);
 
             // then
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken),
                     Times.Exactly(2));
@@ -349,6 +359,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 key: "failedListenerEventV2Ids",
                 values: faultedListenerEventV2.Id.ToString());
 
+            // Step 1
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken))
+                        .ReturnsAsync(Enumerable.Empty<EventV2>());
+
             // Step 2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
@@ -411,9 +427,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // when
             await this.archivingEventV2CoordinationService
-                .ArchiveDeadEventV2sAsync(randomCancellationToken);
+                .ArchiveEventV2sAsync(randomCancellationToken);
 
             // then
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken),
                     Times.Exactly(2));
@@ -582,6 +602,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 key: "failedEventV2Ids",
                 values: faultedEventV2Id.ToString());
 
+            // Step 1
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken))
+                        .ReturnsAsync(Enumerable.Empty<EventV2>());
+
             // Step 2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
@@ -644,9 +670,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // when
             await this.archivingEventV2CoordinationService
-                .ArchiveDeadEventV2sAsync(randomCancellationToken);
+                .ArchiveEventV2sAsync(randomCancellationToken);
 
             // then
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken),
                     Times.Exactly(2));
@@ -792,6 +822,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 key: "failedListenerEventV2Ids",
                 values: listenerEventV2.Id.ToString());
 
+            // Step 1
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken))
+                        .ReturnsAsync(Enumerable.Empty<EventV2>());
+
             // Step 2
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
@@ -830,9 +866,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             // when
             await this.archivingEventV2CoordinationService
-                .ArchiveDeadEventV2sAsync(randomCancellationToken);
+                .ArchiveEventV2sAsync(randomCancellationToken);
 
             // then
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken),
                     Times.Exactly(2));
