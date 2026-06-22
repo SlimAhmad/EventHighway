@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Configurations.LoopDetections;
@@ -72,6 +73,70 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventV2ProcessingDependencyValidationException))),
+                        Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+        [Theory]
+        [MemberData(nameof(DependencyExceptions))]
+        public async Task
+            ShouldThrowDependencyExceptionOnIsLoopDetectedIfDependencyExceptionOccursAndLogItAsync(
+                Xeption dependencyException)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventV2 someEventV2 = CreateRandomEventV2();
+
+            var loopDetectionConfig = new LoopDetection { Enabled = true };
+
+            this.configurationBrokerMock
+                .Setup(broker => broker.GetLoopDetectionConfiguration())
+                    .Returns(loopDetectionConfig);
+
+            var expectedEventV2ProcessingDependencyException =
+                new EventV2ProcessingDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: dependencyException.InnerException as Xeption);
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.RetrieveEventV2CountBySignatureAsync(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask<bool> isLoopDetectedTask =
+                this.eventV2ProcessingService.IsLoopDetectedAsync(
+                    someEventV2,
+                    randomCancellationToken);
+
+            EventV2ProcessingDependencyException
+                actualEventV2ProcessingDependencyException =
+                    await Assert.ThrowsAsync<EventV2ProcessingDependencyException>(
+                        isLoopDetectedTask.AsTask);
+
+            // then
+            actualEventV2ProcessingDependencyException.Should()
+                .BeEquivalentTo(expectedEventV2ProcessingDependencyException);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetLoopDetectionConfiguration(),
+                    Times.Once);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.RetrieveEventV2CountBySignatureAsync(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2ProcessingDependencyException))),
                         Times.Once);
 
             this.eventV2ServiceMock.VerifyNoOtherCalls();
