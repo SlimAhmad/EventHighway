@@ -139,7 +139,7 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         public ValueTask<bool> IsLoopDetectedAsync(
             EventV2 eventV2,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            this.eventV2ProcessingService.IsLoopDetectedAsync(eventV2, cancellationToken);
 
         public ValueTask<EventV2> ModifyEventV2Async(
             EventV2 eventV2,
