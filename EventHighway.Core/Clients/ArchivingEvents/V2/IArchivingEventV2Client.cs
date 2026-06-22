@@ -24,7 +24,7 @@ namespace EventHighway.Core.Clients.ArchivingEvents.V2
         /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
         /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
         /// signaled.</exception>
-        ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default);
+        ValueTask ArchiveEventV2sAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Purges archived events older than the specified date asynchronously. This operation

@@ -10,8 +10,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 {
     public interface IArchivingEventV2CoordinationService
     {
-        ValueTask ArchiveQuarantinedEventV2sAsync(CancellationToken cancellationToken = default);
-        ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default);
+        ValueTask ArchiveEventV2sAsync(CancellationToken cancellationToken = default);
         ValueTask PurgeEventArchiveV2sAsync(DateTimeOffset olderThan, CancellationToken cancellationToken = default);
     }
 }

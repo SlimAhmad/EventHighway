@@ -43,6 +43,15 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             this.loggingBroker = loggingBroker;
         }
 
+        public ValueTask ArchiveEventV2sAsync(CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            await ArchiveQuarantinedEventV2sAsync(cancellationToken);
+            await ArchiveDeadEventsV2sAsync(cancellationToken);
+        });
+
         public ValueTask PurgeEventArchiveV2sAsync(
             DateTimeOffset olderThan,
             CancellationToken cancellationToken = default) =>
@@ -67,13 +76,54 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             while (true);
         });
 
-        public ValueTask ArchiveQuarantinedEventV2sAsync(CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
-
-        public ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
+        private async ValueTask ArchiveQuarantinedEventV2sAsync(CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            var failedEventV2Ids = new List<Guid>();
+            IEnumerable<EventV2> quarantinedEventV2s;
+
+            do
+            {
+                quarantinedEventV2s =
+                    await this.archivingEventV2OrchestrationService
+                        .RetrieveBatchOfQuarantinedEventV2sAsync(cancellationToken);
+
+                if (!quarantinedEventV2s.Any())
+                    break;
+
+                IEnumerable<EventArchiveV2> eventArchiveV2s =
+                    quarantinedEventV2s.Select(MapToEventArchiveV2).ToList();
+
+                IEnumerable<EventArchiveV2> addedEventArchiveV2s =
+                    await this.eventArchiveV2OrchestrationService
+                        .BulkAddEventArchiveV2sAsync(eventArchiveV2s, cancellationToken);
+
+                var archivedIds =
+                    addedEventArchiveV2s.Select(archive => archive.Id).ToHashSet();
+
+                IEnumerable<EventV2> removableEventV2s =
+                    quarantinedEventV2s
+                        .Where(eventV2 => archivedIds.Contains(eventV2.Id)).ToList();
+
+                if (removableEventV2s.Any())
+                {
+                    await this.archivingEventV2OrchestrationService
+                        .BulkRemoveEventV2sAsync(removableEventV2s, cancellationToken);
+                }
+
+                foreach (EventV2 unarchivedEventV2 in quarantinedEventV2s
+                    .Where(eventV2 => !archivedIds.Contains(eventV2.Id)))
+                {
+                    failedEventV2Ids.Add(unarchivedEventV2.Id);
+                }
+            }
+            while (true);
+
+            if (failedEventV2Ids.Any())
+                await LogFailedArchivingEventV2sAsync(failedEventV2Ids, Array.Empty<Guid>());
+        }
+
+        private async ValueTask ArchiveDeadEventsV2sAsync(CancellationToken cancellationToken)
+        {
             var faultedEventV2Ids = new HashSet<Guid>();
             var failedEventV2Ids = new List<Guid>();
             var failedListenerEventV2Ids = new List<Guid>();
@@ -177,7 +227,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             {
                 await LogFailedArchivingEventV2sAsync(failedEventV2Ids, failedListenerEventV2Ids);
             }
-        });
+        }
 
         private async ValueTask LogFailedArchivingEventV2sAsync(
             IEnumerable<Guid> failedEventV2Ids,
@@ -213,6 +263,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                 Content = eventV2.Content,
                 EventName = eventV2.EventName,
                 Type = (EventArchiveTypeV2)eventV2.Type,
+                Status = (EventArchiveStatusV2)eventV2.Status,
                 CreatedDate = eventV2.CreatedDate,
                 UpdatedDate = eventV2.UpdatedDate,
                 ScheduledDate = eventV2.ScheduledDate,

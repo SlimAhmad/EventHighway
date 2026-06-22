@@ -4,9 +4,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
+using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using FluentAssertions;
 using Moq;
 using Xeptions;
@@ -31,13 +34,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     innerException: validationException.InnerException as Xeption);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(Enumerable.Empty<EventV2>());
+
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(validationException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
                 this.archivingEventV2CoordinationService
-                    .ArchiveDeadEventV2sAsync(randomCancellationToken);
+                    .ArchiveEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2CoordinationDependencyValidationException
                 actualArchivingEventV2CoordinationDependencyValidationException =
@@ -47,6 +54,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // then
             actualArchivingEventV2CoordinationDependencyValidationException.Should()
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyValidationException);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
@@ -77,13 +88,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     innerException: dependencyException.InnerException as Xeption);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(Enumerable.Empty<EventV2>());
+
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dependencyException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
                 this.archivingEventV2CoordinationService
-                    .ArchiveDeadEventV2sAsync(randomCancellationToken);
+                    .ArchiveEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2CoordinationDependencyException
                 actualArchivingEventV2CoordinationDependencyException =
@@ -93,6 +108,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // then
             actualArchivingEventV2CoordinationDependencyException.Should()
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyException);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
@@ -119,7 +138,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // when
             ValueTask archiveDeadEventV2sTask =
                 this.archivingEventV2CoordinationService
-                    .ArchiveDeadEventV2sAsync(cancelledToken);
+                    .ArchiveEventV2sAsync(cancelledToken);
 
             // then
             OperationCanceledException actualException =
@@ -167,13 +186,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     innerException: timeoutArchivingEventV2CoordinationException);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(Enumerable.Empty<EventV2>());
+
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(operationCanceledException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
                 this.archivingEventV2CoordinationService
-                    .ArchiveDeadEventV2sAsync(randomCancellationToken);
+                    .ArchiveEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2CoordinationDependencyException
                 actualArchivingEventV2CoordinationDependencyException =
@@ -183,6 +206,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // then
             actualArchivingEventV2CoordinationDependencyException.Should()
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyException);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
@@ -220,13 +247,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     innerException: failedArchivingEventV2CoordinationServiceException);
 
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(Enumerable.Empty<EventV2>());
+
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(serviceException);
 
             // when
             ValueTask archiveDeadEventV2sTask =
                 this.archivingEventV2CoordinationService
-                    .ArchiveDeadEventV2sAsync(randomCancellationToken);
+                    .ArchiveEventV2sAsync(randomCancellationToken);
 
             ArchivingEventV2CoordinationServiceException
                 actualArchivingEventV2CoordinationServiceException =
@@ -238,12 +269,77 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 .BeEquivalentTo(expectedArchivingEventV2CoordinationServiceException);
 
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedArchivingEventV2CoordinationServiceException))),
+                        Times.Once);
+
+            this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldArchiveDeadEventV2sEvenWhenQuarantinedEventV2sThrowAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption();
+            someInnerException.Data.Add("ErrorCode", new List<string> { "DependencyError" });
+
+            var archivingEventV2OrchestrationDependencyException =
+                new ArchivingEventV2OrchestrationDependencyException(
+                    someMessage,
+                    someInnerException);
+
+            var expectedArchivingEventV2CoordinationDependencyException =
+                new ArchivingEventV2CoordinationDependencyException(
+                    message: "Archiving event dependency error occurred, contact support.",
+                    innerException: someInnerException);
+
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(archivingEventV2OrchestrationDependencyException);
+
+            this.archivingEventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(Enumerable.Empty<EventV2>());
+
+            // when
+            ValueTask archiveEventV2sTask =
+                this.archivingEventV2CoordinationService
+                    .ArchiveEventV2sAsync(randomCancellationToken);
+
+            ArchivingEventV2CoordinationDependencyException
+                actualArchivingEventV2CoordinationDependencyException =
+                    await Assert.ThrowsAsync<ArchivingEventV2CoordinationDependencyException>(
+                        archiveEventV2sTask.AsTask);
+
+            // then
+            actualArchivingEventV2CoordinationDependencyException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2CoordinationDependencyException);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfQuarantinedEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedArchivingEventV2CoordinationDependencyException))),
                         Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();

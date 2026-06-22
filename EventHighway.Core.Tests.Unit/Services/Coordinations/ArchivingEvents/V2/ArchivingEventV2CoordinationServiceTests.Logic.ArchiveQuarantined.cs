@@ -88,9 +88,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken))
                         .ReturnsAsync(Enumerable.Empty<EventV2>());
 
+            // Step 5
+            this.archivingEventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken))
+                        .ReturnsAsync(Enumerable.Empty<EventV2>());
+
             // when
             await this.archivingEventV2CoordinationService
-                .ArchiveQuarantinedEventV2sAsync(randomCancellationToken);
+                .ArchiveEventV2sAsync(randomCancellationToken);
 
             // then
             this.archivingEventV2OrchestrationServiceMock.Verify(service =>
@@ -108,6 +114,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     It.Is(SameEventV2sAs(retrievedQuarantinedEventV2s)),
                     randomCancellationToken),
                         Times.Once);
+
+            this.archivingEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken),
+                    Times.Once);
 
             this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();

@@ -47,12 +47,12 @@ namespace EventHighway.Core.Clients.ArchivingEvents.V2
         /// error occurs during archiving.</exception>
         /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
         /// signaled.</exception>
-        public async ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default)
+        public async ValueTask ArchiveEventV2sAsync(CancellationToken cancellationToken = default)
         {
             try
             {
                 await this.archivingEventV2CoordinationService
-                    .ArchiveDeadEventV2sAsync(cancellationToken);
+                    .ArchiveEventV2sAsync(cancellationToken);
             }
             catch (ArchivingEventV2CoordinationValidationException
                 archivingEventV2CoordinationValidationException)
