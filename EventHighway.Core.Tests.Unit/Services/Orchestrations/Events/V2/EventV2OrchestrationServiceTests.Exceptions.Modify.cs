@@ -125,5 +125,65 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
             this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.hashBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnModifyIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            EventV2 someEventV2 = CreateRandomEventV2();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventV2OrchestrationException =
+                new TimeoutEventV2OrchestrationException(
+                    message: "Failed event orchestration timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventV2OrchestrationDependencyException =
+                new EventV2OrchestrationDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutEventV2OrchestrationException);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.ModifyEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventV2> modifyEventV2Task =
+                this.eventV2OrchestrationService.ModifyEventV2Async(
+                    someEventV2,
+                    TestContext.Current.CancellationToken);
+
+            EventV2OrchestrationDependencyException
+                actualEventV2OrchestrationDependencyException =
+                    await Assert.ThrowsAsync<EventV2OrchestrationDependencyException>(
+                        modifyEventV2Task.AsTask);
+
+            // then
+            actualEventV2OrchestrationDependencyException.Should()
+                .BeEquivalentTo(expectedEventV2OrchestrationDependencyException);
+
+            this.eventV2ProcessingServiceMock.Verify(broker =>
+                broker.ModifyEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.hashBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
