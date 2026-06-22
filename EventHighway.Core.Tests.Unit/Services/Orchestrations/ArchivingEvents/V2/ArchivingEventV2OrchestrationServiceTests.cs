@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
@@ -29,6 +30,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
         private readonly Mock<IEventV2ProcessingService> eventV2ProcessingServiceMock;
         private readonly Mock<IListenerEventV2ProcessingService> listenerEventV2ProcessingServiceMock;
         private readonly Mock<IConfigurationBroker> configurationBrokerMock;
+        private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IArchivingEventV2OrchestrationService archivingEventV2OrchestrationService;
 
@@ -37,6 +39,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.eventV2ProcessingServiceMock = new Mock<IEventV2ProcessingService>();
             this.listenerEventV2ProcessingServiceMock = new Mock<IListenerEventV2ProcessingService>();
             this.configurationBrokerMock = new Mock<IConfigurationBroker>();
+            this.dateTimeBrokerMock = new Mock<IDateTimeBroker>();
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
             this.archivingEventV2OrchestrationService =
@@ -44,6 +47,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     eventV2ProcessingService: this.eventV2ProcessingServiceMock.Object,
                     listenerEventV2ProcessingService: this.listenerEventV2ProcessingServiceMock.Object,
                     configurationBroker: this.configurationBrokerMock.Object,
+                    dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }
 
