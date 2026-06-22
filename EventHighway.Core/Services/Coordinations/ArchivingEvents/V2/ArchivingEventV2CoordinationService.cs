@@ -48,8 +48,22 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await ArchiveQuarantinedEventV2sAsync(cancellationToken);
-            await ArchiveDeadEventsV2sAsync(cancellationToken);
+            var exceptions = new List<Exception>();
+
+            try { await ArchiveQuarantinedEventV2sAsync(cancellationToken); }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception ex) { exceptions.Add(ex); }
+
+            try { await ArchiveDeadEventsV2sAsync(cancellationToken); }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception ex) { exceptions.Add(ex); }
+
+            if (exceptions.Any())
+            {
+                throw new AggregateException(
+                    message: "Failed archiving event service error occurred, contact support.",
+                    innerExceptions: exceptions);
+            }
         });
 
         public ValueTask PurgeEventArchiveV2sAsync(
