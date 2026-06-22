@@ -180,7 +180,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
         private static IQueryable<EventV2> CreateRandomEventV2s(
             int immediateCount = 0,
             int scheduledCount = 0,
-            int deadCount = 0)
+            int deadCount = 0,
+            int quarantinedCount = 0)
         {
             var events = new List<EventV2>();
 
@@ -193,6 +194,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 {
                     Id = Guid.NewGuid(),
                     Type = EventTypeV2.Immediate,
+                    Status = EventStatusV2.Active,
                     RemainingRetryAttempts = GetRandomPositiveNumber(),
                     Content = GetRandomString(),
                     EventName = GetRandomString(),
@@ -208,6 +210,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 {
                     Id = Guid.NewGuid(),
                     Type = EventTypeV2.Scheduled,
+                    Status = EventStatusV2.Active,
                     RemainingRetryAttempts = GetRandomPositiveNumber(),
                     Content = GetRandomString(),
                     EventName = GetRandomString(),
@@ -223,7 +226,24 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 {
                     Id = Guid.NewGuid(),
                     Type = EventTypeV2.Immediate,
+                    Status = EventStatusV2.Active,
                     RemainingRetryAttempts = 0,
+                    Content = GetRandomString(),
+                    EventName = GetRandomString(),
+                    CreatedDate = GetRandomDateTimeOffset(),
+                    UpdatedDate = GetRandomDateTimeOffset(),
+                    EventAddressId = Guid.NewGuid()
+                });
+            }
+
+            for (int i = 0; i < quarantinedCount; i++)
+            {
+                events.Add(new EventV2
+                {
+                    Id = Guid.NewGuid(),
+                    Type = EventTypeV2.Immediate,
+                    Status = EventStatusV2.Quarantined,
+                    RemainingRetryAttempts = GetRandomPositiveNumber(),
                     Content = GetRandomString(),
                     EventName = GetRandomString(),
                     CreatedDate = GetRandomDateTimeOffset(),
@@ -299,13 +319,44 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .ToList();
         }
 
-        private static IQueryable<EventArchiveV2> CreateRandomEventArchiveV2s(int count = 0)
+        private static IQueryable<EventArchiveV2> CreateRandomEventArchiveV2s(
+            int count = 0,
+            int quarantinedCount = 0)
         {
-            int actualCount = count > 0 ? count : GetRandomPositiveNumber();
+            var archives = new List<EventArchiveV2>();
+            int activeCount = count > 0 ? count : GetRandomPositiveNumber();
 
-            return CreateEventArchiveV2Filler()
-                .Create(count: actualCount)
-                    .AsQueryable();
+            for (int i = 0; i < activeCount; i++)
+            {
+                archives.Add(new EventArchiveV2
+                {
+                    Id = Guid.NewGuid(),
+                    Status = EventArchiveStatusV2.Active,
+                    Content = GetRandomString(),
+                    EventName = GetRandomString(),
+                    CreatedDate = GetRandomDateTimeOffset(),
+                    UpdatedDate = GetRandomDateTimeOffset(),
+                    ArchivedDate = GetRandomDateTimeOffset(),
+                    EventAddressId = Guid.NewGuid()
+                });
+            }
+
+            for (int i = 0; i < quarantinedCount; i++)
+            {
+                archives.Add(new EventArchiveV2
+                {
+                    Id = Guid.NewGuid(),
+                    Status = EventArchiveStatusV2.Quarantined,
+                    Content = GetRandomString(),
+                    EventName = GetRandomString(),
+                    CreatedDate = GetRandomDateTimeOffset(),
+                    UpdatedDate = GetRandomDateTimeOffset(),
+                    ArchivedDate = GetRandomDateTimeOffset(),
+                    EventAddressId = Guid.NewGuid()
+                });
+            }
+
+            return archives.AsQueryable();
         }
 
         private static IQueryable<ListenerEventArchiveV2> CreateRandomListenerEventArchiveV2s(
@@ -364,21 +415,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             return filler;
         }
 
-        private static Filler<EventArchiveV2> CreateEventArchiveV2Filler()
-        {
-            var filler = new Filler<EventArchiveV2>();
-
-            filler.Setup()
-                .OnType<DateTimeOffset>()
-                    .Use(GetRandomDateTimeOffset)
-
-                .OnType<DateTimeOffset?>()
-                    .Use(GetRandomDateTimeOffset())
-
-                .OnProperty(e => e.ListenerEventArchiveV2s).IgnoreIt();
-
-            return filler;
-        }
     }
 }
 
