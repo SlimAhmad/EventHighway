@@ -500,6 +500,26 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             {
                 return await returningBoolFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2OrchestrationException =
+                    new TimeoutEventV2OrchestrationException(
+                        message: "Failed event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2OrchestrationDependencyException =
+                    new EventV2OrchestrationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
+                throw eventV2OrchestrationDependencyException;
+            }
             catch (NullEventV2OrchestrationException
                 nullEventV2OrchestrationException)
             {
