@@ -168,6 +168,7 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2IsNotNull(eventV2);
 
             return await this.eventV2Service.ModifyEventV2Async(eventV2, cancellationToken);
