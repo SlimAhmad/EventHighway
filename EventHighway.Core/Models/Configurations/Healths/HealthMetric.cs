@@ -22,6 +22,11 @@ namespace EventHighway.Core.Models.Configurations.Healths
         /// <summary>
         /// The number of event handlers currently registered with the system.
         /// </summary>
-        HandlerCount
+        HandlerCount,
+
+        /// <summary>
+        /// The count of events currently quarantined due to detected processing loops.
+        /// </summary>
+        LoopsDetected
     }
 }
