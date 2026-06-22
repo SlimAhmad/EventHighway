@@ -151,6 +151,10 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         public ValueTask<EventV2> ModifyEventV2Async(
             EventV2 eventV2,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            return await this.eventV2ProcessingService
+                .ModifyEventV2Async(eventV2, cancellationToken);
+        });
     }
 }
