@@ -166,7 +166,12 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         public ValueTask<EventV2> ModifyEventV2Async(
             EventV2 eventV2,
             CancellationToken cancellationToken = default) =>
-            this.eventV2Service.ModifyEventV2Async(eventV2, cancellationToken);
+        TryCatch(async () =>
+        {
+            ValidateEventV2IsNotNull(eventV2);
+
+            return await this.eventV2Service.ModifyEventV2Async(eventV2, cancellationToken);
+        });
 
         private async ValueTask<EventV2> SetEventV2AsImmediateAsync(
             EventV2 eventV2, CancellationToken cancellationToken)
