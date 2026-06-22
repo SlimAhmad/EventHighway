@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -47,6 +46,10 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             catch (OperationCanceledException)
             {
                 throw;
+            }
+            catch (LoopDetectedEventV2CoordinationException loopDetectedEventV2CoordinationException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(loopDetectedEventV2CoordinationException);
             }
             catch (NullEventV2CoordinationException nullEventV2CoordinationException)
             {

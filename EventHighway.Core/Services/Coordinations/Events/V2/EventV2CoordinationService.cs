@@ -7,9 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Jsons;
+using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -63,9 +64,23 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 _ => EventTypeV2.Scheduled,
             };
 
+            bool isLoop = await this.eventV2OrchestrationService
+                .IsLoopDetectedAsync(eventV2, cancellationToken);
+
+            if (isLoop)
+            {
+                eventV2.Status = EventStatusV2.Quarantined;
+            }
+
             EventV2 submittedEventV2 =
                 await this.eventV2OrchestrationService
                     .SubmitEventV2Async(eventV2, cancellationToken);
+
+            if (isLoop)
+            {
+                throw new LoopDetectedEventV2CoordinationException(
+                    message: "Event loop detected, event quarantined.");
+            }
 
             if (submittedEventV2.Type is EventTypeV2.Immediate)
                 await ProcessEventListenerV2sAsync(submittedEventV2, cancellationToken);
@@ -78,7 +93,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             IQueryable<EventV2> eventV2s =
                 await this.eventV2OrchestrationService
                     .RetrieveScheduledPendingEventV2sAsync(cancellationToken);
