@@ -506,6 +506,42 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 throw await CreateAndLogValidationExceptionAsync(
                     nullEventV2OrchestrationException);
             }
+            catch (EventV2ProcessingValidationException
+                eventV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventV2ProcessingValidationException);
+            }
+            catch (EventV2ProcessingDependencyValidationException
+                eventV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventV2ProcessingDependencyValidationException);
+            }
+            catch (EventAddressV2ProcessingValidationException
+                eventAddressV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventAddressV2ProcessingValidationException);
+            }
+            catch (EventAddressV2ProcessingDependencyValidationException
+                eventAddressV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventAddressV2ProcessingDependencyValidationException);
+            }
+            catch (EventCallV2ProcessingValidationException
+                eventCallV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventCallV2ProcessingValidationException);
+            }
+            catch (EventCallV2ProcessingDependencyValidationException
+                eventCallV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventCallV2ProcessingDependencyValidationException);
+            }
         }
 
         private async ValueTask<EventV2OrchestrationValidationException> CreateAndLogValidationExceptionAsync(
