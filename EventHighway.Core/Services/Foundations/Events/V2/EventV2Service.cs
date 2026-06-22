@@ -116,9 +116,6 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                     ?.FirstOrDefault(vp => vp.EventAddressId == eventV2.EventAddressId)
                     ?.VolatileContentPaths;
 
-            if (volatilePaths is null)
-                return eventV2.Content;
-
             ValidateOnRemoveVolatilePathsWithConfig(eventV2, volatilePaths);
 
             string content = eventV2.Content;
@@ -126,8 +123,11 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             if (!this.jsonBroker.IsValidJson(content))
                 return content;
 
-            foreach (string path in volatilePaths)
-                content = this.jsonBroker.RemoveNode(content, path);
+            if (volatilePaths is not null)
+            {
+                foreach (string path in volatilePaths)
+                    content = this.jsonBroker.RemoveNode(content, path);
+            }
 
             return Canonicalize(content);
         });

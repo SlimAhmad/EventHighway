@@ -17,7 +17,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
     public partial class EventV2ServiceTests
     {
         [Fact]
-        public async Task ShouldThrowValidationExceptionOnRemoveVolatilePathsIfEventAddressIdAndVolatilePathsAreInvalidAndLogItAsync()
+        public async Task ShouldThrowValidationExceptionOnRemoveVolatilePathsIfEventAddressIdIsInvalidAndLogItAsync()
         {
             // given
             CancellationToken randomCancellationToken =
@@ -40,10 +40,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             invalidEventV2Exception.UpsertDataList(
                 key: nameof(EventV2.EventAddressId),
-                value: "Required");
-
-            invalidEventV2Exception.UpsertDataList(
-                key: nameof(VolatilePaths.VolatileContentPaths),
                 value: "Required");
 
             var expectedEventV2ValidationException =
