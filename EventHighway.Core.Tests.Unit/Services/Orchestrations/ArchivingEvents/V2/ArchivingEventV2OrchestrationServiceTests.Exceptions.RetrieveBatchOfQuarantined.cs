@@ -136,5 +136,82 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(DependencyValidationExceptions))]
+        public async Task
+            ShouldThrowDependencyValidationExceptionOnRetrieveBatchOfQuarantinedIfValidationErrorOccursAndLogItAsync(
+                Xeption validationException)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
+            DateTimeOffset retrievedDateTimeOffset = GetRandomDateTimeOffset();
+            var loopDetection = new LoopDetection { Window = TimeSpan.FromDays(30) };
+
+            var expectedArchivingEventV2OrchestrationDependencyValidationException =
+                new ArchivingEventV2OrchestrationDependencyValidationException(
+                    message: "Event validation error occurred, fix the errors and try again.",
+                    innerException: validationException.InnerException as Xeption);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(randomBatchConfiguration);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetLoopDetectionConfiguration())
+                    .Returns(loopDetection);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(retrievedDateTimeOffset);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(validationException);
+
+            // when
+            ValueTask<IEnumerable<EventV2>> retrieveBatchOfQuarantinedEventV2sTask =
+                this.archivingEventV2OrchestrationService
+                    .RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken);
+
+            ArchivingEventV2OrchestrationDependencyValidationException
+                actualArchivingEventV2OrchestrationDependencyValidationException =
+                    await Assert.ThrowsAsync<ArchivingEventV2OrchestrationDependencyValidationException>(
+                        retrieveBatchOfQuarantinedEventV2sTask.AsTask);
+
+            // then
+            actualArchivingEventV2OrchestrationDependencyValidationException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2OrchestrationDependencyValidationException);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetLoopDetectionConfiguration(),
+                    Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.eventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedArchivingEventV2OrchestrationDependencyValidationException))),
+                        Times.Once);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
