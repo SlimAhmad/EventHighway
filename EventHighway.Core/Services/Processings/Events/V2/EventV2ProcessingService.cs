@@ -125,6 +125,11 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             return await this.eventV2Service.RemoveVolatilePathsAsync(eventV2, cancellationToken);
         });
 
+        public ValueTask<int> RetrieveEventV2CountBySignatureAsync(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default) =>
+                throw new NotImplementedException();
+
         private async ValueTask<EventV2> SetEventV2AsImmediateAsync(
             EventV2 eventV2, CancellationToken cancellationToken)
         {
