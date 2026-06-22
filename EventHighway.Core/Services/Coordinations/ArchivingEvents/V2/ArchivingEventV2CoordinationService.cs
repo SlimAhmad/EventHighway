@@ -67,6 +67,9 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             while (true);
         });
 
+        public ValueTask ArchiveQuarantinedEventV2sAsync(CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         public ValueTask ArchiveDeadEventV2sAsync(CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
