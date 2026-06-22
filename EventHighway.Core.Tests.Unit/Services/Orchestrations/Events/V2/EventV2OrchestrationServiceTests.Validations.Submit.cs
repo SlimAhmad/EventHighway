@@ -90,7 +90,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                     message: "Event is invalid, fix the errors and try again.");
 
             invalidEventV2OrchestrationException.UpsertDataList(
-                key: nameof(EventV2.Content),
+                key: "cleanedContent",
                 value: "Required");
 
             var expectedEventV2OrchestrationValidationException =

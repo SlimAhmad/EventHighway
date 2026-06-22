@@ -80,6 +80,8 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 await this.eventV2ProcessingService
                     .RemoveVolatilePathsAsync(eventV2, cancellationToken);
 
+            ValidateCleanedContent(cleanedContent);
+
             eventV2.ContentHash =
                 this.hashBroker.GenerateSha256Hash(cleanedContent);
 
