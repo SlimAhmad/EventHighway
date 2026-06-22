@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -221,6 +222,67 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
             this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.hashBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnIsLoopDetectedIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventV2 someEventV2 = CreateRandomEventV2();
+            var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedEventV2OrchestrationServiceException =
+                new FailedEventV2OrchestrationServiceException(
+                    message: "Failed event service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedEventV2OrchestrationServiceException =
+                new EventV2OrchestrationServiceException(
+                    message: "Event service error occurred, contact support.",
+                    innerException: failedEventV2OrchestrationServiceException);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.IsLoopDetectedAsync(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<bool> isLoopDetectedTask =
+                this.eventV2OrchestrationService.IsLoopDetectedAsync(
+                    someEventV2,
+                    randomCancellationToken);
+
+            EventV2OrchestrationServiceException
+                actualEventV2OrchestrationServiceException =
+                    await Assert.ThrowsAsync<EventV2OrchestrationServiceException>(
+                        isLoopDetectedTask.AsTask);
+
+            // then
+            actualEventV2OrchestrationServiceException.Should()
+                .BeEquivalentTo(expectedEventV2OrchestrationServiceException);
+
+            this.eventV2ProcessingServiceMock.Verify(broker =>
+                broker.IsLoopDetectedAsync(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2OrchestrationServiceException))),
+                        Times.Once);
+
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.hashBrokerMock.VerifyNoOtherCalls();
         }
     }
