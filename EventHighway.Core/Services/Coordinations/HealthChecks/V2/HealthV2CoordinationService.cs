@@ -11,6 +11,7 @@ using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Configurations.Healths;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
@@ -98,6 +99,10 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                     la.Status == ListenerEventArchiveStatusV2.Error);
 
             int handlerCount = allHandlers.Count();
+            int quarantinedEvents = allEvents.Count(e => e.Status == EventStatusV2.Quarantined);
+
+            int quarantinedArchives =
+                allArchivedEvents.Count(a => a.Status == EventArchiveStatusV2.Quarantined);
 
             HealthConfiguration healthConfig =
                 this.configurationBroker.GetHealthConfiguration();
@@ -110,6 +115,9 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
             HealthStatusV2 handlerStatus =
                 ComputeRagStatus(handlerCount, HealthMetric.HandlerCount, healthConfig);
+
+            HealthStatusV2 loopsDetectedStatus =
+                ComputeRagStatus(quarantinedEvents, HealthMetric.LoopsDetected, healthConfig);
 
             return new List<HealthCheckItemV2>
             {
@@ -128,6 +136,8 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 CreateItem("Event Archives", "Total Archived Listener Events", totalArchivedListenerEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Event Archives", "Archived Listener Errors", archivedListenerErrors.ToString(), HealthStatusV2.NA),
                 CreateItem("Event Handlers", "Registered Handlers", handlerCount.ToString(), handlerStatus),
+                CreateItem("Loop Detection", "Quarantined Events", quarantinedEvents.ToString(), loopsDetectedStatus),
+                CreateItem("Loop Detection", "Quarantined Archives", quarantinedArchives.ToString(), HealthStatusV2.NA),
             };
         });
 

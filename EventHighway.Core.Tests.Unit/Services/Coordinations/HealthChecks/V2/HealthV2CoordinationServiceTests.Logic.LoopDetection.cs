@@ -87,7 +87,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 
             actualResult.Single(i =>
                 i.Grouping == "Loop Detection" && i.Item == "Quarantined Events")
-                    .StatusCode.Should().Be((int)HealthStatusV2.Green);
+                    .StatusCode.Should().Be((int)HealthStatusV2.Amber);
 
             actualResult.Single(i =>
                 i.Grouping == "Loop Detection" && i.Item == "Quarantined Archives")

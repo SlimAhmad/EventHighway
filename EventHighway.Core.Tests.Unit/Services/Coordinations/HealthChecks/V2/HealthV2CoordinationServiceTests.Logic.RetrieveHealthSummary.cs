@@ -91,7 +91,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .RetrieveHealthSummaryV2Async(randomCancellationToken);
 
             // then
-            actualResult.Should().HaveCount(15);
+            actualResult.Should().HaveCount(17);
 
             actualResult.Single(i => i.Grouping == "Event Addresses" && i.Item == "Total")
                 .Value.Should().Be(expectedTotalAddresses.ToString());
@@ -143,6 +143,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 
             actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
                 .StatusCode.Should().Be((int)HealthStatusV2.Green);
+
+            actualResult.Single(i => i.Grouping == "Loop Detection" && i.Item == "Quarantined Events")
+                .Value.Should().Be("0");
+
+            actualResult.Single(i => i.Grouping == "Loop Detection" && i.Item == "Quarantined Events")
+                .StatusCode.Should().Be((int)HealthStatusV2.Green);
+
+            actualResult.Single(i => i.Grouping == "Loop Detection" && i.Item == "Quarantined Archives")
+                .Value.Should().Be("0");
+
+            actualResult.Single(i => i.Grouping == "Loop Detection" && i.Item == "Quarantined Archives")
+                .StatusCode.Should().Be((int)HealthStatusV2.NA);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllEventV2sAsync(randomCancellationToken),
