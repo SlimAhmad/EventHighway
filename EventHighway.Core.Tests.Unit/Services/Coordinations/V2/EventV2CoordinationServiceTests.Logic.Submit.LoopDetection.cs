@@ -21,6 +21,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
+            var mockSequence = new MockSequence();
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
@@ -29,27 +30,32 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             inputImmediateEventV2.Type = EventTypeV2.Immediate;
             EventV2 submittedEventV2 = inputImmediateEventV2;
 
-            this.dateTimeBrokerMock.Setup(broker =>
+            var loopDetectedEventV2CoordinationException =
+                new LoopDetectedEventV2CoordinationException(
+                    message: "Event loop detected, event quarantined.");
+
+            var expectedEventV2CoordinationValidationException =
+                new EventV2CoordinationValidationException(
+                    message: "Event validation error occurred, fix the errors and try again.",
+                    innerException: loopDetectedEventV2CoordinationException);
+
+            this.dateTimeBrokerMock.InSequence(mockSequence).Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
                     .ReturnsAsync(randomDateTimeOffset);
 
-            this.eventV2OrchestrationServiceMock.Setup(service =>
-                service.SubmitEventV2Async(
-                    inputImmediateEventV2,
-                    randomCancellationToken))
-                        .ReturnsAsync(submittedEventV2);
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.IsLoopDetectedAsync(
+                        inputImmediateEventV2,
+                        randomCancellationToken))
+                            .ReturnsAsync(true);
 
-            this.eventV2OrchestrationServiceMock.Setup(service =>
-                service.IsLoopDetectedAsync(
-                    submittedEventV2,
-                    randomCancellationToken))
-                        .ReturnsAsync(true);
-
-            this.eventV2OrchestrationServiceMock.Setup(service =>
-                service.ModifyEventV2Async(
-                    submittedEventV2,
-                    randomCancellationToken))
-                        .ReturnsAsync(submittedEventV2);
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.SubmitEventV2Async(
+                        inputImmediateEventV2,
+                        randomCancellationToken))
+                            .ReturnsAsync(submittedEventV2);
 
             // when
             ValueTask<EventV2> submitEventV2Task =
@@ -57,10 +63,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     inputEventV2,
                     randomCancellationToken);
 
-            await Assert.ThrowsAsync<LoopDetectedEventV2CoordinationException>(
-                submitEventV2Task.AsTask);
+            EventV2CoordinationValidationException
+                actualEventV2CoordinationValidationException =
+                    await Assert.ThrowsAsync<EventV2CoordinationValidationException>(
+                        submitEventV2Task.AsTask);
 
             // then
+            actualEventV2CoordinationValidationException.Should()
+                .BeEquivalentTo(expectedEventV2CoordinationValidationException);
+
             submittedEventV2.Status.Should().Be(EventStatusV2.Quarantined);
 
             this.dateTimeBrokerMock.Verify(broker =>
@@ -68,21 +79,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     Times.Once);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
-                service.SubmitEventV2Async(
+                service.IsLoopDetectedAsync(
                     inputImmediateEventV2,
                     randomCancellationToken),
                         Times.Once);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
-                service.IsLoopDetectedAsync(
-                    submittedEventV2,
+                service.SubmitEventV2Async(
+                    inputImmediateEventV2,
                     randomCancellationToken),
                         Times.Once);
 
-            this.eventV2OrchestrationServiceMock.Verify(service =>
-                service.ModifyEventV2Async(
-                    submittedEventV2,
-                    randomCancellationToken),
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2CoordinationValidationException))),
                         Times.Once);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
