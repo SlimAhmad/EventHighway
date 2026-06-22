@@ -128,7 +128,14 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         public ValueTask<int> RetrieveEventV2CountBySignatureAsync(
             EventV2 eventV2,
             CancellationToken cancellationToken = default) =>
-                throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventV2IsNotNull(eventV2);
+
+            return await this.eventV2Service.RetrieveEventV2CountBySignatureAsync(
+                eventV2, cancellationToken);
+        });
 
         private async ValueTask<EventV2> SetEventV2AsImmediateAsync(
             EventV2 eventV2, CancellationToken cancellationToken)
