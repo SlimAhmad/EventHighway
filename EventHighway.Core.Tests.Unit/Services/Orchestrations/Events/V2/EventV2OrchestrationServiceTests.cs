@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using EventHighway.Core.Brokers.Hashings;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -28,6 +29,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
         private readonly Mock<IEventV2ProcessingService> eventV2ProcessingServiceMock;
         private readonly Mock<IEventAddressV2ProcessingService> eventAddressV2ProcessingServiceMock;
         private readonly Mock<IEventCallV2ProcessingService> eventCallV2ProcessingServiceMock;
+        private readonly Mock<IHashBroker> hashBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IEventV2OrchestrationService eventV2OrchestrationService;
 
@@ -42,6 +44,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
             this.eventCallV2ProcessingServiceMock =
                 new Mock<IEventCallV2ProcessingService>();
 
+            this.hashBrokerMock =
+                new Mock<IHashBroker>();
+
             this.loggingBrokerMock =
                 new Mock<ILoggingBroker>();
 
@@ -50,6 +55,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                     eventV2ProcessingService: this.eventV2ProcessingServiceMock.Object,
                     eventAddressV2ProcessingService: this.eventAddressV2ProcessingServiceMock.Object,
                     eventCallV2ProcessingService: this.eventCallV2ProcessingServiceMock.Object,
+                    hashBroker: this.hashBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }
 

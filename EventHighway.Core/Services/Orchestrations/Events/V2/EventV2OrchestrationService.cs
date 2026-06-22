@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Hashings;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -21,17 +22,20 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         private readonly IEventV2ProcessingService eventV2ProcessingService;
         private readonly IEventAddressV2ProcessingService eventAddressV2ProcessingService;
         private readonly IEventCallV2ProcessingService eventCallV2ProcessingService;
+        private readonly IHashBroker hashBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventV2OrchestrationService(
             IEventV2ProcessingService eventV2ProcessingService,
             IEventAddressV2ProcessingService eventAddressV2ProcessingService,
             IEventCallV2ProcessingService eventCallV2ProcessingService,
+            IHashBroker hashBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2ProcessingService = eventV2ProcessingService;
             this.eventAddressV2ProcessingService = eventAddressV2ProcessingService;
             this.eventCallV2ProcessingService = eventCallV2ProcessingService;
+            this.hashBroker = hashBroker;
             this.loggingBroker = loggingBroker;
         }
 
