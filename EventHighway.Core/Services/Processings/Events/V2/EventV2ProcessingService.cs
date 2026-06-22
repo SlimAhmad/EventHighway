@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -18,15 +19,18 @@ namespace EventHighway.Core.Services.Processings.Events.V2
     internal partial class EventV2ProcessingService : IEventV2ProcessingService
     {
         private readonly IEventV2Service eventV2Service;
+        private readonly IConfigurationBroker configurationBroker;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventV2ProcessingService(
             IEventV2Service eventV2Service,
+            IConfigurationBroker configurationBroker,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2Service = eventV2Service;
+            this.configurationBroker = configurationBroker;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
         }
@@ -136,6 +140,11 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             return await this.eventV2Service.RetrieveEventV2CountBySignatureAsync(
                 eventV2, cancellationToken);
         });
+
+        public ValueTask<bool> IsLoopDetectedAsync(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default) =>
+                throw new NotImplementedException();
 
         private async ValueTask<EventV2> SetEventV2AsImmediateAsync(
             EventV2 eventV2, CancellationToken cancellationToken)

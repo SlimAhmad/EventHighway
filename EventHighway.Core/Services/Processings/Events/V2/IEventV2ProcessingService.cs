@@ -36,5 +36,9 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         ValueTask<int> RetrieveEventV2CountBySignatureAsync(
             EventV2 eventV2,
             CancellationToken cancellationToken = default);
+
+        ValueTask<bool> IsLoopDetectedAsync(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default);
     }
 }
