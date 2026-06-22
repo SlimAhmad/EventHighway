@@ -5,11 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Nodes;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Jsons;
 using EventHighway.Core.Brokers.Loggings;
@@ -129,6 +127,31 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 content = this.jsonBroker.RemoveNode(content, path);
 
             return Canonicalize(content);
+        });
+
+        public ValueTask<int> RetrieveEventV2CountBySignatureAsync(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            LoopDetection config = this.configurationBroker.GetLoopDetectionConfiguration();
+            ValidateOnRetrieveEventV2CountBySignature(eventV2, config);
+
+            if (config.Enabled is false)
+                return 0;
+
+            IQueryable<EventV2> eventV2s =
+                await this.storageBroker.SelectAllEventV2sAsync(cancellationToken);
+
+            DateTimeOffset now = await this.dateTimeBroker.GetDateTimeOffsetAsync();
+            DateTimeOffset createdAfter = now - config.Window;
+
+            return eventV2s.Count(ev =>
+                ev.EventAddressId == eventV2.EventAddressId
+                    && ev.EventName == eventV2.EventName
+                    && ev.ContentHash == eventV2.ContentHash
+                    && ev.CreatedDate > createdAfter);
         });
 
         private static string Canonicalize(string json)
