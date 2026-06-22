@@ -1,0 +1,103 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
+using EventHighway.Core.Models.Configurations.LoopDetections;
+using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using FluentAssertions;
+using Moq;
+using Xeptions;
+
+namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V2
+{
+    public partial class ArchivingEventV2OrchestrationServiceTests
+    {
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveBatchOfQuarantinedIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
+            DateTimeOffset retrievedDateTimeOffset = GetRandomDateTimeOffset();
+            var loopDetection = new LoopDetection { Window = TimeSpan.FromDays(30) };
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutArchivingEventV2OrchestrationException =
+                new TimeoutArchivingEventV2OrchestrationException(
+                    message: "Failed archiving event orchestration timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedArchivingEventV2OrchestrationDependencyException =
+                new ArchivingEventV2OrchestrationDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutArchivingEventV2OrchestrationException);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(randomBatchConfiguration);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetLoopDetectionConfiguration())
+                    .Returns(loopDetection);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(retrievedDateTimeOffset);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IEnumerable<EventV2>> retrieveBatchOfQuarantinedEventV2sTask =
+                this.archivingEventV2OrchestrationService
+                    .RetrieveBatchOfQuarantinedEventV2sAsync(TestContext.Current.CancellationToken);
+
+            ArchivingEventV2OrchestrationDependencyException
+                actualArchivingEventV2OrchestrationDependencyException =
+                    await Assert.ThrowsAsync<ArchivingEventV2OrchestrationDependencyException>(
+                        retrieveBatchOfQuarantinedEventV2sTask.AsTask);
+
+            // then
+            actualArchivingEventV2OrchestrationDependencyException.Should().BeEquivalentTo(
+                expectedArchivingEventV2OrchestrationDependencyException);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetLoopDetectionConfiguration(),
+                    Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.eventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedArchivingEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+    }
+}
