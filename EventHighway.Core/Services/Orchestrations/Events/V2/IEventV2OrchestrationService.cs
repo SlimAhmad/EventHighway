@@ -38,5 +38,13 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         ValueTask<EventCallV2> RunEventCallV2Async(
             EventCallV2 eventCallV2,
             CancellationToken cancellationToken = default);
+
+        ValueTask<bool> IsLoopDetectedAsync(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<EventV2> ModifyEventV2Async(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default);
     }
 }
