@@ -47,14 +47,16 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            DateTimeOffset now =
-                await this.dateTimeBroker.GetDateTimeOffsetAsync();
-
             BatchConfiguration batchConfiguration =
                 this.configurationBroker.GetBatchConfiguration();
 
+            ValidateOnRetrieveBatchOfQuarantined(batchConfiguration);
+
             LoopDetection loopDetection =
                 this.configurationBroker.GetLoopDetectionConfiguration();
+
+            DateTimeOffset now =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
 
             DateTimeOffset cutoff = now - loopDetection.Window;
 
