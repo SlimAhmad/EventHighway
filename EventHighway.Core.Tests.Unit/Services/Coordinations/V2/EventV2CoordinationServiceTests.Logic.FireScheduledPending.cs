@@ -206,6 +206,52 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         }
 
         [Fact]
+        public async Task ShouldSkipQuarantinedEventV2WhenFiringScheduledPendingEventV2sAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventV2 quarantinedEventV2 = CreateRandomEventV2();
+            quarantinedEventV2.Status = EventStatusV2.Quarantined;
+            IQueryable<EventV2> retrievedEventV2s = new[] { quarantinedEventV2 }.AsQueryable();
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveScheduledPendingEventV2sAsync(
+                    randomCancellationToken))
+                        .ReturnsAsync(retrievedEventV2s);
+
+            // when
+            await this.eventV2CoordinationService
+                .FireScheduledPendingEventV2sAsync(
+                    randomCancellationToken);
+
+            // then
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveScheduledPendingEventV2sAsync(
+                    randomCancellationToken),
+                        Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.MarkEventV2AsImmediateAsync(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.jsonBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldRecordFailuresOnFireScheduledPendingEventV2sAsync()
         {
             // given
