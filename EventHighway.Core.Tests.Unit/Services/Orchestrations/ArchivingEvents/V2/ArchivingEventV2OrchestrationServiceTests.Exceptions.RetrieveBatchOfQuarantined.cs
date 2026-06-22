@@ -289,5 +289,87 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRetrieveBatchOfQuarantinedIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
+            DateTimeOffset retrievedDateTimeOffset = GetRandomDateTimeOffset();
+            var loopDetection = new LoopDetection { Window = TimeSpan.FromDays(30) };
+            var exception = new Exception();
+            exception.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedArchivingEventV2OrchestrationServiceException =
+                new FailedArchivingEventV2OrchestrationServiceException(
+                    message: "Failed event service error occurred, contact support.",
+                    innerException: exception,
+                    data: exception.Data);
+
+            var expectedArchivingEventV2OrchestrationServiceException =
+                new ArchivingEventV2OrchestrationServiceException(
+                    message: "Event service error occurred, contact support.",
+                    innerException: failedArchivingEventV2OrchestrationServiceException);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(randomBatchConfiguration);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetLoopDetectionConfiguration())
+                    .Returns(loopDetection);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(retrievedDateTimeOffset);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(exception);
+
+            // when
+            ValueTask<IEnumerable<EventV2>> retrieveBatchOfQuarantinedEventV2sTask =
+                this.archivingEventV2OrchestrationService
+                    .RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken);
+
+            ArchivingEventV2OrchestrationServiceException
+                actualArchivingEventV2OrchestrationServiceException =
+                    await Assert.ThrowsAsync<ArchivingEventV2OrchestrationServiceException>(
+                        retrieveBatchOfQuarantinedEventV2sTask.AsTask);
+
+            // then
+            actualArchivingEventV2OrchestrationServiceException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2OrchestrationServiceException);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetLoopDetectionConfiguration(),
+                    Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.eventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedArchivingEventV2OrchestrationServiceException))),
+                        Times.Once);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
