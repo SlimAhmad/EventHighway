@@ -542,6 +542,42 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventCallV2ProcessingDependencyValidationException);
             }
+            catch (EventV2ProcessingDependencyException
+                eventV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventV2ProcessingDependencyException);
+            }
+            catch (EventV2ProcessingServiceException
+                eventV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventV2ProcessingServiceException);
+            }
+            catch (EventAddressV2ProcessingDependencyException
+                eventAddressV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventAddressV2ProcessingDependencyException);
+            }
+            catch (EventAddressV2ProcessingServiceException
+                eventAddressV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventAddressV2ProcessingServiceException);
+            }
+            catch (EventCallV2ProcessingDependencyException
+                eventCallV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventCallV2ProcessingDependencyException);
+            }
+            catch (EventCallV2ProcessingServiceException
+                eventCallV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventCallV2ProcessingServiceException);
+            }
         }
 
         private async ValueTask<EventV2OrchestrationValidationException> CreateAndLogValidationExceptionAsync(
