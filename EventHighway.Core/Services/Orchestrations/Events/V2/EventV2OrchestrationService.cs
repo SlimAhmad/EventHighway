@@ -76,6 +76,13 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 maybeEventAddressV2,
                 eventV2.EventAddressId);
 
+            string cleanedContent =
+                await this.eventV2ProcessingService
+                    .RemoveVolatilePathsAsync(eventV2, cancellationToken);
+
+            eventV2.ContentHash =
+                this.hashBroker.GenerateSha256Hash(cleanedContent);
+
             return await this.eventV2ProcessingService
                 .AddEventV2Async(eventV2, cancellationToken);
         });
