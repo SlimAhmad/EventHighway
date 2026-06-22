@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -21,6 +22,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
     public partial class EventV2ProcessingServiceTests
     {
         private readonly Mock<IEventV2Service> eventV2ServiceMock;
+        private readonly Mock<IConfigurationBroker> configurationBrokerMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IEventV2ProcessingService eventV2ProcessingService;
@@ -28,12 +30,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
         public EventV2ProcessingServiceTests()
         {
             this.eventV2ServiceMock = new Mock<IEventV2Service>();
+            this.configurationBrokerMock = new Mock<IConfigurationBroker>();
             this.dateTimeBrokerMock = new Mock<IDateTimeBroker>();
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
             this.eventV2ProcessingService =
                 new EventV2ProcessingService(
                     eventV2Service: this.eventV2ServiceMock.Object,
+                    configurationBroker: this.configurationBrokerMock.Object,
                     dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }

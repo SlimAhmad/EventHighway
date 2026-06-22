@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Configurations.LoopDetections;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.Events.V2;
@@ -18,15 +20,18 @@ namespace EventHighway.Core.Services.Processings.Events.V2
     internal partial class EventV2ProcessingService : IEventV2ProcessingService
     {
         private readonly IEventV2Service eventV2Service;
+        private readonly IConfigurationBroker configurationBroker;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventV2ProcessingService(
             IEventV2Service eventV2Service,
+            IConfigurationBroker configurationBroker,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2Service = eventV2Service;
+            this.configurationBroker = configurationBroker;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
         }
@@ -123,6 +128,39 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             ValidateEventV2IsNotNull(eventV2);
 
             return await this.eventV2Service.RemoveVolatilePathsAsync(eventV2, cancellationToken);
+        });
+
+        public ValueTask<int> RetrieveEventV2CountBySignatureAsync(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventV2IsNotNull(eventV2);
+
+            return await this.eventV2Service.RetrieveEventV2CountBySignatureAsync(
+                eventV2, cancellationToken);
+        });
+
+        public ValueTask<bool> IsLoopDetectedAsync(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventV2IsNotNull(eventV2);
+
+            LoopDetection config =
+                this.configurationBroker.GetLoopDetectionConfiguration();
+
+            if (config.Enabled is false)
+                return false;
+
+            int count =
+                await this.eventV2Service.RetrieveEventV2CountBySignatureAsync(
+                    eventV2, cancellationToken);
+
+            return count > config.Threshold;
         });
 
         private async ValueTask<EventV2> SetEventV2AsImmediateAsync(
