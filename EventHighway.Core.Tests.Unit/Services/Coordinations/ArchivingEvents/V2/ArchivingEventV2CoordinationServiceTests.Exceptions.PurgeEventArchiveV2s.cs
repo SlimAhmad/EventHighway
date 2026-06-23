@@ -88,7 +88,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>()))
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(operationCanceledException);
 
             // when
@@ -112,7 +113,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>()),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -152,7 +154,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>()))
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(dependencyValidationException);
 
             // when
@@ -176,7 +179,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>()),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -216,7 +220,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>()))
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(dependencyException);
 
             // when
@@ -240,7 +245,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>()),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
@@ -285,7 +291,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>()))
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
                         .ThrowsAsync(serviceException);
 
             // when
@@ -309,7 +316,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>()),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>

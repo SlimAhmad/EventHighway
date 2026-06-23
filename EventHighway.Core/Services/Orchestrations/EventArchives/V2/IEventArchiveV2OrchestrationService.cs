@@ -38,6 +38,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
 
         ValueTask<IEnumerable<EventArchiveV2>> RetrieveBatchOfEventArchiveV2sOlderThanAsync(
             DateTimeOffset olderThan,
-            int take);
+            int take,
+            CancellationToken cancellationToken = default);
     }
 }

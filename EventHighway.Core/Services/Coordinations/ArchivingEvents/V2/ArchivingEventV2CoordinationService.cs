@@ -79,7 +79,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             do
             {
                 batch = await this.eventArchiveV2OrchestrationService
-                    .RetrieveBatchOfEventArchiveV2sOlderThanAsync(olderThan, take);
+                    .RetrieveBatchOfEventArchiveV2sOlderThanAsync(olderThan, take, cancellationToken);
 
                 if (!batch.Any())
                     break;

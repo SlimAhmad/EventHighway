@@ -45,7 +45,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 .Setup(service =>
                     service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                         inputOlderThan,
-                        randomBatchSize))
+                        randomBatchSize,
+                        randomCancellationToken))
                             .ReturnsAsync(retrievedEventArchiveV2s);
 
             this.eventArchiveV2OrchestrationServiceMock.InSequence(mockSequence)
@@ -59,7 +60,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 .Setup(service =>
                     service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                         inputOlderThan,
-                        randomBatchSize))
+                        randomBatchSize,
+                        randomCancellationToken))
                             .ReturnsAsync(emptyEventArchiveV2s);
 
             // when
@@ -74,7 +76,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                     inputOlderThan,
-                    randomBatchSize),
+                    randomBatchSize,
+                    randomCancellationToken),
                         Times.Exactly(2));
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
