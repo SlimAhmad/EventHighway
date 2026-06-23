@@ -102,6 +102,20 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                         eventListenerIds.Contains(listenerEventArchiveV2.EventListenerId));
             }
 
+            if (startDate is not null)
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        listenerEventArchiveV2.CreatedDate >= startDate.Value);
+            }
+
+            if (endDate is not null)
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        listenerEventArchiveV2.CreatedDate <= endDate.Value);
+            }
+
             return listenerEventArchiveV2s
                 .OrderBy(listenerEventArchiveV2 => listenerEventArchiveV2.CreatedDate)
                 .ThenBy(listenerEventArchiveV2 => listenerEventArchiveV2.Id)
