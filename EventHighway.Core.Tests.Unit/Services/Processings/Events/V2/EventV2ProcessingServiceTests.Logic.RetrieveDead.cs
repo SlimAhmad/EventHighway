@@ -78,5 +78,72 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldExcludeReplayEventV2sFromDeadEventV2sWithListenersAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            List<EventV2> randomDeadEventV2s =
+                CreateRandomEventV2s(
+                    dates: GetRandomDateTimeOffset(),
+                    eventV2Type: EventTypeV2.Immediate)
+                        .ToList();
+
+            randomDeadEventV2s.ForEach(eventV2 =>
+            {
+                eventV2.RemainingRetryAttempts = 0;
+                eventV2.ListenerEventV2s = new List<ListenerEventV2>();
+            });
+
+            List<EventV2> randomReplayEventV2s =
+                CreateRandomEventV2s(
+                    dates: GetRandomDateTimeOffset(),
+                    eventV2Type: EventTypeV2.Immediate)
+                        .ToList();
+
+            randomReplayEventV2s.ForEach(eventV2 =>
+            {
+                eventV2.RemainingRetryAttempts = 0;
+
+                eventV2.ListenerEventV2s = new List<ListenerEventV2>
+                {
+                    new ListenerEventV2
+                    {
+                        Status = ListenerEventStatusV2.Replay
+                    }
+                };
+            });
+
+            IQueryable<EventV2> retrievedEventV2s =
+                randomDeadEventV2s
+                    .Union(randomReplayEventV2s)
+                        .AsQueryable();
+
+            IQueryable<EventV2> expectedEventV2s =
+                randomDeadEventV2s.AsQueryable();
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(retrievedEventV2s);
+
+            // when
+            IQueryable<EventV2> actualEventV2s =
+                await this.eventV2ProcessingService
+                    .RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken);
+
+            // then
+            actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
