@@ -129,7 +129,13 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 Parameter: nameof(EventV2.CreatedDate)),
 
                 (Rule: IsInvalid(eventV2.UpdatedDate),
-                Parameter: nameof(EventV2.UpdatedDate)));
+                Parameter: nameof(EventV2.UpdatedDate)),
+
+                (Rule: IsAfter(
+                    firstDate: eventV2.CreatedDate,
+                    secondDate: eventV2.UpdatedDate,
+                    secondDateName: nameof(EventV2.UpdatedDate)),
+                Parameter: nameof(EventV2.CreatedDate)));
         }
 
         private static void ValidateEventV2Id(Guid eventV2Id)
@@ -244,6 +250,15 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             {
                 Condition = firstDate != secondDate,
                 Message = $"Date is not the same as storage."
+            };
+
+        private static dynamic IsAfter(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate,
+            string secondDateName) => new
+            {
+                Condition = firstDate > secondDate,
+                Message = $"Date is later than {secondDateName}"
             };
 
         private static dynamic IsEarlierThan(
