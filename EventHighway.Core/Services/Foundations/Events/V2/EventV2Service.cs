@@ -100,10 +100,17 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             await this.storageBroker.BulkDeleteEventV2sAsync(eventV2s, cancellationToken);
         });
 
-        public ValueTask<IEnumerable<EventV2>> BulkRestoreEventV2sAsync(
+        public async ValueTask<IEnumerable<EventV2>> BulkRestoreEventV2sAsync(
             IEnumerable<EventV2> eventV2s,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            List<EventV2> itemsToBulkRestore = eventV2s.ToList();
+
+            await this.storageBroker.BulkInsertEventV2sAsync(
+                itemsToBulkRestore, cancellationToken);
+
+            return itemsToBulkRestore;
+        }
 
         public ValueTask<string> RemoveVolatilePathsAsync(
             EventV2 eventV2,
