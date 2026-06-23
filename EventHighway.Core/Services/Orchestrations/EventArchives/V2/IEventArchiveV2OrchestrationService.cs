@@ -12,7 +12,7 @@ using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 
 namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
 {
-    public interface IEventArchiveV2OrchestrationService
+    internal interface IEventArchiveV2OrchestrationService
     {
         ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default);
