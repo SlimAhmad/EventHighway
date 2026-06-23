@@ -89,6 +89,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         private static Guid GetRandomId() =>
             Guid.NewGuid();
 
+        private static int GetRandomNegativeNumber() =>
+            -1 * GetRandomNumber();
+
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
