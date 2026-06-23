@@ -94,7 +94,7 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
             return new HealthV2ClientValidationException(
                 message: "Health client validation error occurred, fix the errors and try again.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static HealthV2ClientDependencyException
@@ -103,7 +103,7 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
             return new HealthV2ClientDependencyException(
                 message: "Health client dependency error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static HealthV2ClientServiceException
@@ -112,7 +112,7 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
             return new HealthV2ClientServiceException(
                 message: "Health client service error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
     }
 }

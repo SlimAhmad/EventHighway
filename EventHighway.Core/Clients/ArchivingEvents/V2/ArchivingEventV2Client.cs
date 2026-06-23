@@ -90,7 +90,7 @@ namespace EventHighway.Core.Clients.ArchivingEvents.V2
             return new ArchivingEventV2ClientValidationException(
                 message: "Archiving event client validation error occurred, fix the errors and try again.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static ArchivingEventV2ClientDependencyException
@@ -99,7 +99,7 @@ namespace EventHighway.Core.Clients.ArchivingEvents.V2
             return new ArchivingEventV2ClientDependencyException(
                 message: "Archiving event client dependency error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static ArchivingEventV2ClientServiceException

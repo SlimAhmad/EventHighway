@@ -206,7 +206,7 @@ namespace EventHighway.Core.Clients.Events.V2
             return new EventV2ClientValidationException(
                 message: "Event client validation error occurred, fix the errors and try again.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static EventV2ClientDependencyException
@@ -215,7 +215,7 @@ namespace EventHighway.Core.Clients.Events.V2
             return new EventV2ClientDependencyException(
                 message: "Event client dependency error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static EventV2ClientServiceException
@@ -224,7 +224,7 @@ namespace EventHighway.Core.Clients.Events.V2
             return new EventV2ClientServiceException(
                 message: "Event client service error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
     }
 }
