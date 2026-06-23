@@ -116,12 +116,14 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                         listenerEventArchiveV2.CreatedDate <= endDate.Value);
             }
 
-            return listenerEventArchiveV2s
+            listenerEventArchiveV2s = listenerEventArchiveV2s
                 .OrderBy(listenerEventArchiveV2 => listenerEventArchiveV2.CreatedDate)
                 .ThenBy(listenerEventArchiveV2 => listenerEventArchiveV2.Id)
-                .Skip(skip)
-                .Take(take)
-                .ToList();
+                .Skip(skip);
+
+            return take == 0
+                ? listenerEventArchiveV2s.ToList()
+                : listenerEventArchiveV2s.Take(take).ToList();
         }
 
         public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
