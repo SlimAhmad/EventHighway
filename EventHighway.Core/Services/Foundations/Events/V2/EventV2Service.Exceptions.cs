@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
         private delegate ValueTask<string> ReturningStringFunction();
         private delegate ValueTask<EventV2> ReturningEventV2Function();
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
+        private delegate ValueTask<IEnumerable<EventV2>> ReturningEventV2EnumerableFunction();
 
         private async ValueTask<int> TryCatch(ReturningIntFunction returningIntFunction)
         {
@@ -324,6 +326,19 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                         data: serviceException.Data);
 
                 throw await CreateAndLogServiceExceptionAsync(failedEventV2ServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<EventV2>> TryCatch(
+            ReturningEventV2EnumerableFunction returningEventV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningEventV2EnumerableFunction();
+            }
+            catch (NullEventV2Exception nullEventV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullEventV2Exception);
             }
         }
 

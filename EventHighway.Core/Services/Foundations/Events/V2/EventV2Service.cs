@@ -101,10 +101,13 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             await this.storageBroker.BulkDeleteEventV2sAsync(eventV2s, cancellationToken);
         });
 
-        public async ValueTask<IEnumerable<EventV2>> BulkRestoreEventV2sAsync(
+        public ValueTask<IEnumerable<EventV2>> BulkRestoreEventV2sAsync(
             IEnumerable<EventV2> eventV2s,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateEventV2sIsNotNull(eventV2s);
+
             DateTimeOffset now =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();
 
@@ -130,8 +133,8 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             await this.storageBroker.BulkInsertEventV2sAsync(
                 itemsToBulkRestore, cancellationToken);
 
-            return itemsToBulkRestore;
-        }
+            return (IEnumerable<EventV2>)itemsToBulkRestore;
+        });
 
         public ValueTask<string> RemoveVolatilePathsAsync(
             EventV2 eventV2,
