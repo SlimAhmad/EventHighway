@@ -51,7 +51,20 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             int skip,
             int take,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventArchiveV2ProcessingService
+                .RetrieveBatchOfListenerEventArchiveV2sAsync(
+                    eventAddressId,
+                    eventListenerIds,
+                    startDate,
+                    endDate,
+                    skip,
+                    take,
+                    cancellationToken);
+        });
 
         public ValueTask<IEnumerable<EventArchiveV2>> RetrieveEventArchiveV2sByIdsAsync(
             IEnumerable<Guid> eventArchiveIds,
