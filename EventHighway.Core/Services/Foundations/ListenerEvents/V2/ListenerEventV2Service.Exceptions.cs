@@ -249,6 +249,20 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             {
                 return await returningListenerEventV2EnumerableFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventV2Exception =
+                    new TimeoutListenerEventV2Exception(
+                        message: "Failed listener event timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutListenerEventV2Exception);
+            }
             catch (NullListenerEventV2Exception nullListenerEventV2Exception)
             {
                 throw await CreateAndLogValidationExceptionAsync(nullListenerEventV2Exception);
