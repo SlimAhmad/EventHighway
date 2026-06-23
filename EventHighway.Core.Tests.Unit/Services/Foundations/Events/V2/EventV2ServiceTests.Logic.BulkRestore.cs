@@ -212,5 +212,78 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldBulkRestoreValidEventV2sAndLogFutureDatedOnesAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
+            DateTimeOffset now = GetRandomDateTimeOffset();
+            List<EventV2> validEventV2s = CreateRandomRestoreEventV2s();
+
+            foreach (EventV2 validEventV2 in validEventV2s)
+            {
+                validEventV2.CreatedDate = now.AddMinutes(-GetRandomNumber() - 2);
+                validEventV2.UpdatedDate = now.AddMinutes(-1);
+            }
+
+            EventV2 futureDatedEventV2 = CreateRandomRestoreEventV2s().First();
+            futureDatedEventV2.CreatedDate = now.AddMinutes(-1);
+            futureDatedEventV2.UpdatedDate = now.AddMinutes(GetRandomNumber());
+
+            List<EventV2> inputEventV2s =
+                validEventV2s.Append(futureDatedEventV2).ToList();
+
+            List<EventV2> expectedEventV2s =
+                validEventV2s.Select(item => item.DeepClone()).ToList();
+
+            var invalidEventV2Exception =
+                new InvalidEventV2Exception(
+                    message: "Event is invalid, fix the errors and try again.");
+
+            invalidEventV2Exception.AddData(
+                key: nameof(EventV2.UpdatedDate),
+                values: "Date is in the future");
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(now);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.BulkInsertEventV2sAsync(
+                    It.Is<List<EventV2>>(actual =>
+                        SameEventV2sAs(expectedEventV2s, actual)),
+                            randomCancellationToken))
+                                .Returns(ValueTask.CompletedTask);
+
+            // when
+            IEnumerable<EventV2> actualEventV2s =
+                await this.eventV2Service.BulkRestoreEventV2sAsync(
+                    inputEventV2s,
+                        randomCancellationToken);
+
+            // then
+            actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    invalidEventV2Exception))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.BulkInsertEventV2sAsync(
+                    It.Is<List<EventV2>>(actual =>
+                        SameEventV2sAs(expectedEventV2s, actual)),
+                            randomCancellationToken),
+                                Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
