@@ -172,5 +172,61 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnBulkRestoreIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            IEnumerable<EventV2> someEventV2s = CreateRandomEventV2s();
+            var serviceException = new Exception();
+
+            var failedEventV2ProcessingServiceException =
+                new FailedEventV2ProcessingServiceException(
+                    message: "Failed event service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedException =
+                new EventV2ProcessingServiceException(
+                    message: "Event service error occurred, contact support.",
+                    innerException: failedEventV2ProcessingServiceException);
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.BulkRestoreEventV2sAsync(
+                    It.IsAny<IEnumerable<EventV2>>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<IEnumerable<EventV2>> bulkRestoreEventV2sTask =
+                this.eventV2ProcessingService.BulkRestoreEventV2sAsync(
+                    someEventV2s,
+                    randomCancellationToken);
+
+            EventV2ProcessingServiceException actualException =
+                await Assert.ThrowsAsync<EventV2ProcessingServiceException>(
+                    bulkRestoreEventV2sTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(expectedException);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.BulkRestoreEventV2sAsync(
+                    It.IsAny<IEnumerable<EventV2>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(expectedException))),
+                    Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
