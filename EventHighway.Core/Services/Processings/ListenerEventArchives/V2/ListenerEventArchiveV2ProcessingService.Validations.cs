@@ -50,6 +50,34 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 Parameter: nameof(BatchConfiguration.BatchSizeForBulkProcessing)));
         }
 
+        private static void ValidateOnRetrieveBatch(
+            int skip,
+            int take,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate)
+        {
+            Validate(
+                message: "Listener event archive is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(skip),
+                Parameter: nameof(skip)),
+
+                (Rule: IsInvalid(take),
+                Parameter: nameof(take)),
+
+                (Rule: IsAfter(startDate, endDate),
+                Parameter: nameof(startDate)));
+        }
+
+        private static dynamic IsAfter(DateTimeOffset? startDate, DateTimeOffset? endDate) => new
+        {
+            Condition = startDate.HasValue
+                && endDate.HasValue
+                && startDate.Value > endDate.Value,
+
+            Message = "Date is later than endDate"
+        };
+
         private static dynamic IsInvalid(DateTimeOffset date) => new
         {
             Condition = date == default,

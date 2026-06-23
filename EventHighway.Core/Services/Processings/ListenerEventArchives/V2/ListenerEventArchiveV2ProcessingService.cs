@@ -75,6 +75,61 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 : listenerEventArchiveV2.Take(take).ToList();
         });
 
+        public ValueTask<List<ListenerEventArchiveV2>> RetrieveBatchOfListenerEventArchiveV2sAsync(
+            Guid? eventAddressId,
+            IEnumerable<Guid> eventListenerIds,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int skip,
+            int take,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnRetrieveBatch(skip, take, startDate, endDate);
+
+            IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2s =
+                await this.listenerEventArchiveV2Service
+                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+
+            if (eventAddressId is not null)
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        listenerEventArchiveV2.EventAddressId == eventAddressId.Value);
+            }
+
+            if (eventListenerIds is not null && eventListenerIds.Any())
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        eventListenerIds.Contains(listenerEventArchiveV2.EventListenerId));
+            }
+
+            if (startDate is not null)
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        listenerEventArchiveV2.CreatedDate >= startDate.Value);
+            }
+
+            if (endDate is not null)
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        listenerEventArchiveV2.CreatedDate <= endDate.Value);
+            }
+
+            listenerEventArchiveV2s = listenerEventArchiveV2s
+                .OrderBy(listenerEventArchiveV2 => listenerEventArchiveV2.CreatedDate)
+                .ThenBy(listenerEventArchiveV2 => listenerEventArchiveV2.Id)
+                .Skip(skip);
+
+            return take == 0
+                ? listenerEventArchiveV2s.ToList()
+                : listenerEventArchiveV2s.Take(take).ToList();
+        });
+
         public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
             CancellationToken cancellationToken = default) =>

@@ -86,11 +86,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 9).GetValue();
 
+        private static Guid GetRandomId() =>
+            Guid.NewGuid();
+
+        private static int GetRandomNegativeNumber() =>
+            -1 * GetRandomNumber();
+
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
         private static IQueryable<ListenerEventArchiveV2> CreateRandomListenerEventArchiveV2s() =>
             CreateListenerEventArchiveV2Filler().Create(count: GetRandomNumber()).AsQueryable();
+
+        private static IQueryable<ListenerEventArchiveV2> CreateRandomListenerEventArchiveV2s(int count) =>
+            CreateListenerEventArchiveV2Filler().Create(count: count).AsQueryable();
 
         private static ListenerEventArchiveV2 CreateRandomListenerEventArchiveV2() =>
             CreateListenerEventArchiveV2Filler().Create();
