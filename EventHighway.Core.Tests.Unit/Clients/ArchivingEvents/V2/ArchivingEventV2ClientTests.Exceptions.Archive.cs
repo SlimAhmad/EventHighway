@@ -102,6 +102,44 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
         }
 
         [Fact]
+        public async Task ShouldThrowServiceExceptionOnArchiveIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedArchivingEventV2ClientServiceException =
+                new ArchivingEventV2ClientServiceException(
+                    message: "Archiving event client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.archivingEventV2CoordinationServiceMock.Setup(service =>
+                service.ArchiveEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask archiveDeadEventV2sTask =
+                this.archivingEventV2Client.ArchiveEventV2sAsync(randomCancellationToken);
+
+            ArchivingEventV2ClientServiceException actualArchivingEventV2ClientServiceException =
+                await Assert.ThrowsAsync<ArchivingEventV2ClientServiceException>(
+                    archiveDeadEventV2sTask.AsTask);
+
+            // then
+            actualArchivingEventV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2ClientServiceException);
+
+            this.archivingEventV2CoordinationServiceMock.Verify(service =>
+                service.ArchiveEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.archivingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowDependencyExceptionOnArchiveIfServiceErrorOccursAsync()
         {
             // given
