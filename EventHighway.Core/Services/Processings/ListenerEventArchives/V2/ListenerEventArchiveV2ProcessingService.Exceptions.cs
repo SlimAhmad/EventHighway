@@ -309,6 +309,10 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             {
                 throw;
             }
+            catch (NullListenerEventArchiveV2ProcessingException nullListenerEventArchiveV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullListenerEventArchiveV2ProcessingException);
+            }
             catch (ListenerEventArchiveV2ValidationException listenerEventArchiveV2ValidationException)
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(

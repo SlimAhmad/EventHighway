@@ -68,6 +68,18 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             Guid eventListenerV2Id,
             CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Retrieves an existing event listener or registers a new one asynchronously.
+        /// </summary>
+        /// <param name="eventListenerV2">The event listener to retrieve or register.</param>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{EventListenerV2}"/> representing the asynchronous
+        /// operation that returns the existing or newly registered event listener.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when eventListenerV2 is null.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
         ValueTask<EventListenerV2> RetrieveOrRegisterEventListenerV2Async(
             EventListenerV2 eventListenerV2,
             CancellationToken cancellationToken = default);

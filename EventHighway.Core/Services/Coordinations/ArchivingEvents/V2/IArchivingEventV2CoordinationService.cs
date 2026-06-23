@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 {
-    public interface IArchivingEventV2CoordinationService
+    internal interface IArchivingEventV2CoordinationService
     {
         ValueTask ArchiveEventV2sAsync(CancellationToken cancellationToken = default);
         ValueTask PurgeEventArchiveV2sAsync(DateTimeOffset olderThan, CancellationToken cancellationToken = default);

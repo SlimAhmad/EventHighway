@@ -22,7 +22,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             }
         }
 
-        private void ValidateListenerEventArchiveV2(ListenerEventArchiveV2 listenerEventArchiveV2)
+        private static void ValidateListenerEventArchiveV2(ListenerEventArchiveV2 listenerEventArchiveV2)
         {
             if (listenerEventArchiveV2 is null)
             {

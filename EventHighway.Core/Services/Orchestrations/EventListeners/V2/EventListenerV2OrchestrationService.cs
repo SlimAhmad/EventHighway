@@ -101,6 +101,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventListenerV2IsNotNull(eventListenerV2);
 
             return await this.eventListenerV2ProcessingService.RetrieveOrRegisterEventListenerV2Async(
                 eventListenerV2,

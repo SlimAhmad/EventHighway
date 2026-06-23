@@ -252,7 +252,7 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             return new EventListenerV2ClientValidationException(
                 message: "Event listener client validation error occurred, fix the errors and try again.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static EventListenerV2ClientDependencyException
@@ -261,7 +261,7 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             return new EventListenerV2ClientDependencyException(
                 message: "Event listener client dependency error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static EventListenerV2ClientServiceException
@@ -270,7 +270,7 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             return new EventListenerV2ClientServiceException(
                 message: "Event listener client service error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
     }
 }

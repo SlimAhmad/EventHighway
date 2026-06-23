@@ -148,16 +148,5 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 .IsLoopDetectedAsync(eventV2, cancellationToken);
         });
 
-        public ValueTask<EventV2> ModifyEventV2Async(
-            EventV2 eventV2,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ValidateEventV2IsNotNull(eventV2);
-
-            return await this.eventV2ProcessingService
-                .ModifyEventV2Async(eventV2, cancellationToken);
-        });
     }
 }

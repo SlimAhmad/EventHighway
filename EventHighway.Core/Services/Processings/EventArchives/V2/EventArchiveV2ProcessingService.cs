@@ -49,13 +49,15 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
 
         public ValueTask<IEnumerable<EventArchiveV2>> RetrieveBatchOfEventArchiveV2sOlderThanAsync(
             DateTimeOffset olderThan,
-            int take) =>
+            int take,
+            CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateOnRetrieveBatchOfEventArchiveV2sOlderThan(olderThan, take);
 
             IQueryable<EventArchiveV2> allEventArchiveV2s =
-                await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync();
+                await this.eventArchiveV2Service.RetrieveAllEventArchiveV2sAsync(cancellationToken);
 
             IQueryable<EventArchiveV2> filteredEventArchiveV2s =
                 allEventArchiveV2s.Where(archive => archive.ArchivedDate < olderThan);

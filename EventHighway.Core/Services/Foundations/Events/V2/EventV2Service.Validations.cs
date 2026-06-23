@@ -140,9 +140,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             ValidateEventV2IsNotNull(eventV2);
         }
 
-        private static void ValidateOnRemoveVolatilePathsWithConfig(
-            EventV2 eventV2,
-            string[] volatileContentPaths)
+        private static void ValidateOnRemoveVolatilePathsWithConfig(EventV2 eventV2)
         {
             Validate(
                 message: "Event is invalid, fix the errors and try again.",

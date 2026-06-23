@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
+using EventHighway.Core.Models.Configurations.LoopDetections;
 using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -28,13 +29,17 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         }
 
         private static void ValidateOnRetrieveBatchOfQuarantined(
-            BatchConfiguration batchConfiguration)
+            BatchConfiguration batchConfiguration,
+            LoopDetection loopDetection)
         {
             Validate(
                 message: "Event is invalid, fix the errors and try again.",
 
                 (Rule: IsInvalid(batchConfiguration.BatchSizeForBulkProcessing),
-                Parameter: nameof(BatchConfiguration.BatchSizeForBulkProcessing)));
+                Parameter: nameof(BatchConfiguration.BatchSizeForBulkProcessing)),
+
+                (Rule: IsNull(loopDetection),
+                Parameter: nameof(LoopDetection)));
         }
 
         private static void ValidateOnRetrieveBatchOfDead(
@@ -48,6 +53,12 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         }
 
         private static dynamic IsNull(IEnumerable<Guid> value) => new
+        {
+            Condition = value is null,
+            Message = "Value is required"
+        };
+
+        private static dynamic IsNull(LoopDetection value) => new
         {
             Condition = value is null,
             Message = "Value is required"

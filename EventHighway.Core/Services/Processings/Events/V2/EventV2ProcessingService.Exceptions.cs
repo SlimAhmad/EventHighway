@@ -111,6 +111,10 @@ namespace EventHighway.Core.Services.Processings.Events.V2
 
                 throw eventV2ProcessingDependencyException;
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (NullEventV2ProcessingException nullEventV2ProcessingException)
             {
                 throw await CreateAndLogValidationExceptionAsync(nullEventV2ProcessingException);
@@ -130,10 +134,6 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             catch (EventV2ServiceException eventV2ServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventV2ServiceException);
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
             }
             catch (Exception exception)
             {

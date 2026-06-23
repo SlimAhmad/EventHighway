@@ -11,7 +11,7 @@ using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 
 namespace EventHighway.Core.Services.Processings.EventArchives.V2
 {
-    public interface IEventArchiveV2ProcessingService
+    internal interface IEventArchiveV2ProcessingService
     {
         ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default);
@@ -30,6 +30,7 @@ namespace EventHighway.Core.Services.Processings.EventArchives.V2
 
         ValueTask<IEnumerable<EventArchiveV2>> RetrieveBatchOfEventArchiveV2sOlderThanAsync(
             DateTimeOffset olderThan,
-            int take);
+            int take,
+            CancellationToken cancellationToken = default);
     }
 }

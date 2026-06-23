@@ -252,7 +252,7 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             return new EventAddressV2ClientValidationException(
                 message: "Event address client validation error occurred, fix the errors and try again.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static EventAddressV2ClientDependencyException
@@ -261,7 +261,7 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             return new EventAddressV2ClientDependencyException(
                 message: "Event address client dependency error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
 
         private static EventAddressV2ClientServiceException
@@ -270,7 +270,7 @@ namespace EventHighway.Core.Clients.EventAddresses.V2
             return new EventAddressV2ClientServiceException(
                 message: "Event address client service error occurred, contact support.",
                 innerException: innerException,
-                data: innerException.Data);
+                data: innerException?.Data);
         }
     }
 }

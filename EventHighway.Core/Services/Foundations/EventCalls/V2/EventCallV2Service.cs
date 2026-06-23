@@ -39,7 +39,7 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
 
             IEventHandler handler =
                 this.eventHandlerBroker.GetAll()
-                    .Single(h => h.Id == eventCallV2.HandlerId);
+                    .Single(handler => handler.Id == eventCallV2.HandlerId);
 
             if (HasMissingPromotedProperties(
                 eventCallV2.RequiredPromotedProperties,

@@ -30,12 +30,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             IQueryable<EventV2> retrievedEventV2s = randomEventV2s.AsQueryable();
             IEnumerable<EventV2> expectedEventV2s = retrievedEventV2s.Take(inputTake);
 
-            this.configurationBrokerMock.Setup(broker =>
-                broker.GetBatchConfiguration())
+            var mockSequence = new MockSequence();
+
+            this.configurationBrokerMock
+                .InSequence(mockSequence)
+                .Setup(broker => broker.GetBatchConfiguration())
                     .Returns(retrievedBatchConfiguration);
 
-            this.eventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken))
+            this.eventV2ProcessingServiceMock
+                .InSequence(mockSequence)
+                .Setup(service => service.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedEventV2s);
 
             // when
@@ -76,12 +80,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             IQueryable<EventV2> retrievedEventV2s = randomEventV2s.AsQueryable();
             IEnumerable<EventV2> expectedEventV2s = retrievedEventV2s.AsEnumerable();
 
-            this.configurationBrokerMock.Setup(broker =>
-                broker.GetBatchConfiguration())
+            var mockSequence = new MockSequence();
+
+            this.configurationBrokerMock
+                .InSequence(mockSequence)
+                .Setup(broker => broker.GetBatchConfiguration())
                     .Returns(batchConfiguration);
 
-            this.eventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken))
+            this.eventV2ProcessingServiceMock
+                .InSequence(mockSequence)
+                .Setup(service => service.RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedEventV2s);
 
             // when

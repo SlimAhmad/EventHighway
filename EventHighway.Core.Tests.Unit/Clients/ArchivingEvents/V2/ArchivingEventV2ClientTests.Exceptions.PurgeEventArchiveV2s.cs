@@ -113,6 +113,49 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
         }
 
         [Fact]
+        public async Task ShouldThrowServiceExceptionOnPurgeIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            DateTimeOffset someOlderThan = GetRandomDateTimeOffset();
+            CancellationToken randomCancellationToken = TestContext.Current.CancellationToken;
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedArchivingEventV2ClientServiceException =
+                new ArchivingEventV2ClientServiceException(
+                    message: "Archiving event client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.archivingEventV2CoordinationServiceMock.Setup(service =>
+                service.PurgeEventArchiveV2sAsync(
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask purgeEventArchiveV2sTask =
+                this.archivingEventV2Client
+                    .PurgeEventArchiveV2sAsync(someOlderThan, randomCancellationToken);
+
+            ArchivingEventV2ClientServiceException actualArchivingEventV2ClientServiceException =
+                await Assert.ThrowsAsync<ArchivingEventV2ClientServiceException>(
+                    purgeEventArchiveV2sTask.AsTask);
+
+            // then
+            actualArchivingEventV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedArchivingEventV2ClientServiceException);
+
+            this.archivingEventV2CoordinationServiceMock.Verify(service =>
+                service.PurgeEventArchiveV2sAsync(
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.archivingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowDependencyExceptionOnPurgeIfServiceErrorOccursAsync()
         {
             // given

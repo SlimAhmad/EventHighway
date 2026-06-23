@@ -72,6 +72,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnPurgeEventArchiveV2s(olderThan);
             BatchConfiguration batchConfiguration = this.configurationBroker.GetBatchConfiguration();
             int take = batchConfiguration.BatchSizeForBulkProcessing;
             IEnumerable<EventArchiveV2> batch;
@@ -79,7 +80,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             do
             {
                 batch = await this.eventArchiveV2OrchestrationService
-                    .RetrieveBatchOfEventArchiveV2sOlderThanAsync(olderThan, take);
+                    .RetrieveBatchOfEventArchiveV2sOlderThanAsync(olderThan, take, cancellationToken);
 
                 if (!batch.Any())
                     break;

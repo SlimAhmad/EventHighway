@@ -20,7 +20,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
     {
         private delegate ValueTask<IQueryable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2sFunction();
         private delegate ValueTask<ListenerEventArchiveV2> ReturningListenerEventArchiveV2Function();
-        private delegate ValueTask<IEnumerable<ListenerEventArchiveV2>> ReturningEnumrableListenerEventArchiveV2sFunction();
+        private delegate ValueTask<IEnumerable<ListenerEventArchiveV2>> ReturningEnumerableListenerEventArchiveV2sFunction();
         private delegate ValueTask ReturningNothingFunction();
 
         private async ValueTask<IQueryable<ListenerEventArchiveV2>> TryCatch(
@@ -176,7 +176,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
         }
 
         private async ValueTask<IEnumerable<ListenerEventArchiveV2>> TryCatch(
-            ReturningEnumrableListenerEventArchiveV2sFunction returningEnumrableListenerEventArchiveV2sFunction)
+            ReturningEnumerableListenerEventArchiveV2sFunction returningEnumrableListenerEventArchiveV2sFunction)
         {
             try
             {

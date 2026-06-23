@@ -46,7 +46,7 @@ namespace EventHighway.Core.Services.Foundations.EventListeners.V2
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            return await storageBroker.SelectAllEventListenerV2sAsync(cancellationToken);
+            return await this.storageBroker.SelectAllEventListenerV2sAsync(cancellationToken);
         });
 
         public ValueTask<EventListenerV2> RemoveEventListenerV2ByIdAsync(

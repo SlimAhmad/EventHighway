@@ -63,20 +63,26 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                 new[] { oldQuarantinedEventV2 }.AsQueryable()
                     .Take(inputTake);
 
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetDateTimeOffsetAsync())
-                    .ReturnsAsync(retrievedDateTimeOffset);
+            var mockSequence = new MockSequence();
 
-            this.configurationBrokerMock.Setup(broker =>
-                broker.GetBatchConfiguration())
+            this.configurationBrokerMock
+                .InSequence(mockSequence)
+                .Setup(broker => broker.GetBatchConfiguration())
                     .Returns(retrievedBatchConfiguration);
 
-            this.configurationBrokerMock.Setup(broker =>
-                broker.GetLoopDetectionConfiguration())
+            this.configurationBrokerMock
+                .InSequence(mockSequence)
+                .Setup(broker => broker.GetLoopDetectionConfiguration())
                     .Returns(loopDetection);
 
-            this.eventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveAllEventV2sAsync(randomCancellationToken))
+            this.dateTimeBrokerMock
+                .InSequence(mockSequence)
+                .Setup(broker => broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(retrievedDateTimeOffset);
+
+            this.eventV2ProcessingServiceMock
+                .InSequence(mockSequence)
+                .Setup(service => service.RetrieveAllEventV2sAsync(randomCancellationToken))
                     .ReturnsAsync(allEventV2s);
 
             // when

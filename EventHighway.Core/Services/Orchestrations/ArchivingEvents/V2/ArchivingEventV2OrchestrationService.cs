@@ -50,10 +50,10 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             BatchConfiguration batchConfiguration =
                 this.configurationBroker.GetBatchConfiguration();
 
-            ValidateOnRetrieveBatchOfQuarantined(batchConfiguration);
-
             LoopDetection loopDetection =
                 this.configurationBroker.GetLoopDetectionConfiguration();
+
+            ValidateOnRetrieveBatchOfQuarantined(batchConfiguration, loopDetection);
 
             DateTimeOffset now =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();
@@ -148,7 +148,10 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2IsNotNull(eventV2);
 
-            foreach (ListenerEventV2 listenerEventV2 in eventV2.ListenerEventV2s)
+            IEnumerable<ListenerEventV2> listenerEventV2s =
+                eventV2.ListenerEventV2s ?? Enumerable.Empty<ListenerEventV2>();
+
+            foreach (ListenerEventV2 listenerEventV2 in listenerEventV2s)
             {
                 await this.listenerEventV2ProcessingService
                     .RemoveListenerEventV2ByIdAsync(listenerEventV2.Id, cancellationToken);

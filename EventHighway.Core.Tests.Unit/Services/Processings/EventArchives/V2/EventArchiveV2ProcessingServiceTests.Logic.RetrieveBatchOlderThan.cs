@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using FluentAssertions;
@@ -22,6 +23,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             DateTimeOffset inputOlderThan = randomOlderThan;
             int inputTake = 0;
 
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             IQueryable<EventArchiveV2> allEventArchiveV2s =
                 CreateRandomEventArchiveV2s();
 
@@ -31,7 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                     .AsEnumerable();
 
             this.eventArchiveV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventArchiveV2sAsync())
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(allEventArchiveV2s);
 
             // when
@@ -39,18 +43,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                 await this.eventArchiveV2ProcessingService
                     .RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                         inputOlderThan,
-                        inputTake);
+                        inputTake,
+                        randomCancellationToken);
 
             // then
             actualEventArchiveV2s.Should().BeEquivalentTo(expectedEventArchiveV2s);
 
             this.eventArchiveV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventArchiveV2sAsync(),
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldRetrieveBatchOfEventArchiveV2sOlderThanWithTakeAsync()
         {
@@ -59,6 +65,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             DateTimeOffset inputOlderThan = randomOlderThan;
             int randomTake = GetRandomNumber();
             int inputTake = randomTake;
+
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
 
             IQueryable<EventArchiveV2> allEventArchiveV2s =
                 CreateRandomEventArchiveV2s();
@@ -70,7 +79,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                     .AsEnumerable();
 
             this.eventArchiveV2ServiceMock.Setup(service =>
-                service.RetrieveAllEventArchiveV2sAsync())
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(allEventArchiveV2s);
 
             // when
@@ -78,13 +87,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                 await this.eventArchiveV2ProcessingService
                     .RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                         inputOlderThan,
-                        inputTake);
+                        inputTake,
+                        randomCancellationToken);
 
             // then
             actualEventArchiveV2s.Should().BeEquivalentTo(expectedEventArchiveV2s);
 
             this.eventArchiveV2ServiceMock.Verify(service =>
-                service.RetrieveAllEventArchiveV2sAsync(),
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();

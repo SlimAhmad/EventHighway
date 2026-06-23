@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Processings.EventArchives.V2.Exceptions;
@@ -20,6 +21,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             // given
             DateTimeOffset invalidOlderThan = default;
             int negativeTake = -1;
+
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
 
             var invalidEventArchiveV2ProcessingException =
                 new InvalidEventArchiveV2ProcessingException(
@@ -43,7 +47,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
                 this.eventArchiveV2ProcessingService
                     .RetrieveBatchOfEventArchiveV2sOlderThanAsync(
                         invalidOlderThan,
-                        negativeTake);
+                        negativeTake,
+                        randomCancellationToken);
 
             EventArchiveV2ProcessingValidationException
                 actualEventArchiveV2ProcessingValidationException =

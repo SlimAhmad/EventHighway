@@ -76,6 +76,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
                     message: "Event call is invalid, fix the errors and try again.");
 
             invalidEventCallV2Exception.AddData(
+                key: nameof(EventCallV2.HandlerId),
+                values: "Id required");
+
+            invalidEventCallV2Exception.AddData(
                 key: nameof(EventCallV2.HandlerName),
                 values: "Text required");
 

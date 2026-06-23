@@ -56,6 +56,29 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             {
                 throw;
             }
+            catch (EventArchiveV2ProcessingValidationException eventArchiveV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2ProcessingValidationException);
+            }
+            catch (EventArchiveV2ProcessingDependencyValidationException
+                eventArchiveV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2ProcessingDependencyValidationException);
+            }
+            catch (ListenerEventArchiveV2ProcessingValidationException
+                listenerEventArchiveV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingValidationException);
+            }
+            catch (ListenerEventArchiveV2ProcessingDependencyValidationException
+                listenerEventArchiveV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingDependencyValidationException);
+            }
             catch (EventArchiveV2ProcessingDependencyException eventArchiveV2ProcessingDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingDependencyException);
@@ -210,6 +233,29 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             catch (OperationCanceledException)
             {
                 throw;
+            }
+            catch (EventArchiveV2ProcessingValidationException eventArchiveV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2ProcessingValidationException);
+            }
+            catch (EventArchiveV2ProcessingDependencyValidationException
+                eventArchiveV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2ProcessingDependencyValidationException);
+            }
+            catch (ListenerEventArchiveV2ProcessingValidationException
+                listenerEventArchiveV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingValidationException);
+            }
+            catch (ListenerEventArchiveV2ProcessingDependencyValidationException
+                listenerEventArchiveV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingDependencyValidationException);
             }
             catch (EventArchiveV2ProcessingDependencyException eventArchiveV2ProcessingDependencyException)
             {
