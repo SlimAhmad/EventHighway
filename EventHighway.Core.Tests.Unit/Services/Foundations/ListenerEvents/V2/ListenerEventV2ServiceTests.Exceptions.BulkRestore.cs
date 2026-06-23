@@ -183,5 +183,71 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnBulkRestoreIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            List<ListenerEventV2> someListenerEventV2s = CreateRandomRestoreListenerEventV2s();
+            var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedListenerEventV2ServiceException =
+                new FailedListenerEventV2ServiceException(
+                    message: "Failed listener event service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedListenerEventV2ServiceException =
+                new ListenerEventV2ServiceException(
+                    message: "Listener event service error occurred, contact support.",
+                    innerException: failedListenerEventV2ServiceException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(DateTimeOffset.MaxValue);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.BulkInsertListenerEventV2sAsync(
+                    It.IsAny<List<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<IEnumerable<ListenerEventV2>> bulkRestoreListenerEventV2sTask =
+                this.listenerEventV2Service.BulkRestoreListenerEventV2sAsync(
+                    someListenerEventV2s,
+                        randomCancellationToken);
+
+            ListenerEventV2ServiceException actualListenerEventV2ServiceException =
+                await Assert.ThrowsAsync<ListenerEventV2ServiceException>(
+                    bulkRestoreListenerEventV2sTask.AsTask);
+
+            // then
+            actualListenerEventV2ServiceException.Should()
+                .BeEquivalentTo(expectedListenerEventV2ServiceException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.BulkInsertListenerEventV2sAsync(
+                    It.IsAny<List<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2ServiceException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
