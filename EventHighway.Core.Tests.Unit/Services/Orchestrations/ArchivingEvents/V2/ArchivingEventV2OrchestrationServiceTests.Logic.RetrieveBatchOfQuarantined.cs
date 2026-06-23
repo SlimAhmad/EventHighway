@@ -65,11 +65,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             var mockSequence = new MockSequence();
 
-            this.dateTimeBrokerMock
-                .InSequence(mockSequence)
-                .Setup(broker => broker.GetDateTimeOffsetAsync())
-                    .ReturnsAsync(retrievedDateTimeOffset);
-
             this.configurationBrokerMock
                 .InSequence(mockSequence)
                 .Setup(broker => broker.GetBatchConfiguration())
@@ -79,6 +74,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                 .InSequence(mockSequence)
                 .Setup(broker => broker.GetLoopDetectionConfiguration())
                     .Returns(loopDetection);
+
+            this.dateTimeBrokerMock
+                .InSequence(mockSequence)
+                .Setup(broker => broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(retrievedDateTimeOffset);
 
             this.eventV2ProcessingServiceMock
                 .InSequence(mockSequence)
