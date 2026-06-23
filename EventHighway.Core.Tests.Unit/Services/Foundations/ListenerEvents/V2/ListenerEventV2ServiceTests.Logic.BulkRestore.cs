@@ -149,5 +149,68 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldBulkRestoreValidListenerEventV2sAndLogReverseDatedOnesAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            List<ListenerEventV2> validListenerEventV2s =
+                CreateRandomRestoreListenerEventV2s();
+
+            ListenerEventV2 reverseDatedListenerEventV2 =
+                CreateRandomRestoreListenerEventV2s().First();
+
+            reverseDatedListenerEventV2.UpdatedDate =
+                reverseDatedListenerEventV2.CreatedDate.AddMinutes(-GetRandomNumber());
+
+            List<ListenerEventV2> inputListenerEventV2s =
+                validListenerEventV2s.Append(reverseDatedListenerEventV2).ToList();
+
+            List<ListenerEventV2> expectedListenerEventV2s =
+                validListenerEventV2s.Select(item => item.DeepClone()).ToList();
+
+            var invalidListenerEventV2Exception =
+                new InvalidListenerEventV2Exception(
+                    message: "Listener event is invalid, fix the errors and try again.");
+
+            invalidListenerEventV2Exception.AddData(
+                key: nameof(ListenerEventV2.CreatedDate),
+                values: $"Date is later than {nameof(ListenerEventV2.UpdatedDate)}");
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.BulkInsertListenerEventV2sAsync(
+                    It.Is<List<ListenerEventV2>>(actual =>
+                        SameListenerEventV2sAs(expectedListenerEventV2s, actual)),
+                            randomCancellationToken))
+                                .Returns(ValueTask.CompletedTask);
+
+            // when
+            IEnumerable<ListenerEventV2> actualListenerEventV2s =
+                await this.listenerEventV2Service.BulkRestoreListenerEventV2sAsync(
+                    inputListenerEventV2s,
+                        randomCancellationToken);
+
+            // then
+            actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    invalidListenerEventV2Exception))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.BulkInsertListenerEventV2sAsync(
+                    It.Is<List<ListenerEventV2>>(actual =>
+                        SameListenerEventV2sAs(expectedListenerEventV2s, actual)),
+                            randomCancellationToken),
+                                Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
