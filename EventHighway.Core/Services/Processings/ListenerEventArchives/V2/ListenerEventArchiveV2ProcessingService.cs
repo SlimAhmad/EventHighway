@@ -85,6 +85,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateOnRetrieveBatch(skip, take, startDate, endDate);
 
             IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2s =
