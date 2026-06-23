@@ -340,6 +340,16 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(nullEventV2Exception);
             }
+            catch (SqlException sqlException)
+            {
+                var failedStorageEventV2Exception =
+                    new FailedStorageEventV2Exception(
+                        message: "Failed event storage error occurred, contact support.",
+                        innerException: sqlException,
+                        data: sqlException.Data);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(failedStorageEventV2Exception);
+            }
         }
 
         private async ValueTask<EventV2ValidationException> CreateAndLogValidationExceptionAsync(Xeption exception)
