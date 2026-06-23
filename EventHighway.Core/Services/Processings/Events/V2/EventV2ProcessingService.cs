@@ -120,10 +120,16 @@ namespace EventHighway.Core.Services.Processings.Events.V2
             await this.eventV2Service.BulkRemoveEventV2sAsync(eventV2s, cancellationToken);
         });
 
-        public async ValueTask<IEnumerable<EventV2>> BulkRestoreEventV2sAsync(
+        public ValueTask<IEnumerable<EventV2>> BulkRestoreEventV2sAsync(
             IEnumerable<EventV2> eventV2s,
             CancellationToken cancellationToken = default) =>
-            await this.eventV2Service.BulkRestoreEventV2sAsync(eventV2s, cancellationToken);
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventV2sIsNotNull(eventV2s);
+
+            return await this.eventV2Service.BulkRestoreEventV2sAsync(eventV2s, cancellationToken);
+        });
 
         public ValueTask<string> RemoveVolatilePathsAsync(
             EventV2 eventV2,
