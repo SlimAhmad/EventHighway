@@ -50,10 +50,10 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             BatchConfiguration batchConfiguration =
                 this.configurationBroker.GetBatchConfiguration();
 
-            ValidateOnRetrieveBatchOfQuarantined(batchConfiguration);
-
             LoopDetection loopDetection =
                 this.configurationBroker.GetLoopDetectionConfiguration();
+
+            ValidateOnRetrieveBatchOfQuarantined(batchConfiguration, loopDetection);
 
             DateTimeOffset now =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();
