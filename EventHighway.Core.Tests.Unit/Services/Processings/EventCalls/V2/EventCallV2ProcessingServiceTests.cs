@@ -34,7 +34,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
         public static TheoryData<Xeption> EventCallV2ValidationExceptions()
         {
             string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
 
             return new TheoryData<Xeption>
             {
@@ -51,7 +52,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
         public static TheoryData<Xeption> EventCallV2DependencyExceptions()
         {
             string someMessage = GetRandomString();
-            var someInnerException = new Xeption();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
 
             return new TheoryData<Xeption>
             {

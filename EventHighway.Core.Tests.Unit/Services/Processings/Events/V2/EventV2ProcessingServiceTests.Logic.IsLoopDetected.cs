@@ -77,6 +77,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
+            var mockSequence = new MockSequence();
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
             int randomThreshold = GetRandomNumber();
@@ -89,10 +90,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
             };
 
             this.configurationBrokerMock
+                .InSequence(mockSequence)
                 .Setup(broker => broker.GetLoopDetectionConfiguration())
                     .Returns(loopDetectionConfig);
 
             this.eventV2ServiceMock
+                .InSequence(mockSequence)
                 .Setup(service => service.RetrieveEventV2CountBySignatureAsync(
                     inputEventV2,
                     randomCancellationToken))
