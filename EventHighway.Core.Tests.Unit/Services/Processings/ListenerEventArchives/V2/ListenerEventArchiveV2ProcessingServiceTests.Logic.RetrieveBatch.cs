@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             // given
             DateTimeOffset olderThan = GetRandomDateTimeOffset();
 
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var batchConfiguration = new BatchConfiguration
             {
                 BatchSizeForBulkProcessing = GetRandomNumber()
@@ -54,7 +57,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     .Returns(batchConfiguration);
 
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync())
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedListenerEventArchiveV2s);
 
             // when
@@ -62,7 +65,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 await this.listenerEventArchiveV2ProcessingService
                     .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
                         olderThan,
-                        CancellationToken.None);
+                        randomCancellationToken);
 
             // then
             actualListenerEventArchiveV2s.Should()
@@ -73,7 +76,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     Times.Once);
 
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(),
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.configurationBrokerMock.VerifyNoOtherCalls();
@@ -86,6 +89,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         {
             // given
             DateTimeOffset olderThan = GetRandomDateTimeOffset();
+
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
 
             var batchConfiguration = new BatchConfiguration
             {
@@ -115,7 +121,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     .Returns(batchConfiguration);
 
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync())
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
                     .ReturnsAsync(retrievedListenerEventArchiveV2s);
 
             // when
@@ -123,7 +129,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 await this.listenerEventArchiveV2ProcessingService
                     .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
                         olderThan,
-                        CancellationToken.None);
+                        randomCancellationToken);
 
             // then
             actualListenerEventArchiveV2s.Should()
@@ -134,7 +140,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     Times.Once);
 
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(),
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
 
             this.configurationBrokerMock.VerifyNoOtherCalls();

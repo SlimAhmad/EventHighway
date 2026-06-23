@@ -29,6 +29,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 BatchSizeForBulkProcessing = 10
             };
 
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
             var expectedException =
                 new ListenerEventArchiveV2ProcessingDependencyException(
                     message: "Listener event archive dependency error occurred, contact support.",
@@ -39,7 +42,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     .Returns(batchConfiguration);
 
             this.listenerEventArchiveV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync())
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(dependencyException);
 
             // when
@@ -47,7 +50,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 this.listenerEventArchiveV2ProcessingService
                     .RetrieveNextPurgeBatchOfArchivedEventV2sAsync(
                         DateTimeOffset.UtcNow,
-                        CancellationToken.None);
+                        randomCancellationToken);
 
             ListenerEventArchiveV2ProcessingDependencyException actualException =
                 await Assert.ThrowsAsync<
@@ -63,7 +66,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                     Times.Once);
 
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(),
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
