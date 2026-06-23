@@ -263,6 +263,10 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
 
                 throw await CreateAndLogDependencyExceptionAsync(timeoutListenerEventV2Exception);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (NullListenerEventV2Exception nullListenerEventV2Exception)
             {
                 throw await CreateAndLogValidationExceptionAsync(nullListenerEventV2Exception);
