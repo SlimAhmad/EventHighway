@@ -95,6 +95,13 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                         listenerEventArchiveV2.EventAddressId == eventAddressId.Value);
             }
 
+            if (eventListenerIds is not null && eventListenerIds.Any())
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        eventListenerIds.Contains(listenerEventArchiveV2.EventListenerId));
+            }
+
             return listenerEventArchiveV2s
                 .OrderBy(listenerEventArchiveV2 => listenerEventArchiveV2.CreatedDate)
                 .ThenBy(listenerEventArchiveV2 => listenerEventArchiveV2.Id)
