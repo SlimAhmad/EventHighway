@@ -84,7 +84,8 @@ namespace EventHighway.Core.Services.Processings.Events.V2
                 eventV2.Type == EventTypeV2.Immediate
                 && eventV2.RemainingRetryAttempts == 0
                 && eventV2.ListenerEventV2s.All(listenerEvent =>
-                    listenerEvent.Status != ListenerEventStatusV2.Pending));
+                    listenerEvent.Status != ListenerEventStatusV2.Pending
+                    && listenerEvent.Status != ListenerEventStatusV2.Replay));
         });
 
         public ValueTask<EventV2> MarkEventV2AsImmediateAsync(
