@@ -63,7 +63,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                         innerException: sqlException,
                         data: sqlException.Data);
 
-                throw await CreateAndLogDependencyExceptionAsync(failedStorageEventV2Exception);
+                throw await CreateAndLogCriticalDependencyExceptionAsync(failedStorageEventV2Exception);
             }
             catch (Exception serviceException)
             {

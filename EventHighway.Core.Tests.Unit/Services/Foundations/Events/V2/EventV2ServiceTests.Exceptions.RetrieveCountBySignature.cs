@@ -85,6 +85,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveCountBySignatureAsync()
         {
@@ -124,6 +125,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldThrowDependencyExceptionOnRetrieveCountBySignatureIfSqlExceptionOccursAndLogItAsync()
         {
@@ -173,7 +175,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                 expectedEventV2DependencyException);
 
             this.loggingBrokerMock.Verify(broker =>
-                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                broker.LogCriticalAsync(It.Is(SameExceptionAs(
                     expectedEventV2DependencyException))),
                         Times.Once);
 
@@ -190,6 +192,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
         [Fact]
         public async Task ShouldThrowServiceExceptionOnRetrieveCountBySignatureIfExceptionOccursAndLogItAsync()
         {
