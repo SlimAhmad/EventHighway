@@ -105,13 +105,16 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             IEnumerable<EventV2> eventV2s,
             CancellationToken cancellationToken = default)
         {
+            DateTimeOffset now =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
             List<EventV2> itemsToBulkRestore = new List<EventV2>();
 
             foreach (EventV2 eventV2 in eventV2s)
             {
                 try
                 {
-                    ValidateEventV2OnRestore(eventV2);
+                    ValidateEventV2OnRestore(eventV2, now);
                     itemsToBulkRestore.Add(eventV2);
                 }
                 catch (NullEventV2Exception nullEventV2Exception)

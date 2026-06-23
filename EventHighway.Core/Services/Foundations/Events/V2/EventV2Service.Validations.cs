@@ -97,7 +97,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 Parameter: nameof(EventV2.UpdatedDate)));
         }
 
-        private static void ValidateEventV2OnRestore(EventV2 eventV2)
+        private static void ValidateEventV2OnRestore(EventV2 eventV2, DateTimeOffset now)
         {
             ValidateEventV2IsNotNull(eventV2);
 
@@ -135,7 +135,13 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                     firstDate: eventV2.CreatedDate,
                     secondDate: eventV2.UpdatedDate,
                     secondDateName: nameof(EventV2.UpdatedDate)),
-                Parameter: nameof(EventV2.CreatedDate)));
+                Parameter: nameof(EventV2.CreatedDate)),
+
+                (Rule: IsInFuture(date: eventV2.CreatedDate, now: now),
+                Parameter: nameof(EventV2.CreatedDate)),
+
+                (Rule: IsInFuture(date: eventV2.UpdatedDate, now: now),
+                Parameter: nameof(EventV2.UpdatedDate)));
         }
 
         private static void ValidateEventV2Id(Guid eventV2Id)
@@ -251,6 +257,12 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 Condition = firstDate != secondDate,
                 Message = $"Date is not the same as storage."
             };
+
+        private static dynamic IsInFuture(DateTimeOffset date, DateTimeOffset now) => new
+        {
+            Condition = date > now,
+            Message = "Date is in the future"
+        };
 
         private static dynamic IsAfter(
             DateTimeOffset firstDate,
