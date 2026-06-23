@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
         private delegate ValueTask<string> ReturningStringFunction();
         private delegate ValueTask<EventV2> ReturningEventV2Function();
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
+        private delegate ValueTask<IEnumerable<EventV2>> ReturningEventV2EnumerableFunction();
 
         private async ValueTask<int> TryCatch(ReturningIntFunction returningIntFunction)
         {
@@ -304,6 +306,57 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             catch (OperationCanceledException)
             {
                 throw;
+            }
+            catch (SqlException sqlException)
+            {
+                var failedStorageEventV2Exception =
+                    new FailedStorageEventV2Exception(
+                        message: "Failed event storage error occurred, contact support.",
+                        innerException: sqlException,
+                        data: sqlException.Data);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(failedStorageEventV2Exception);
+            }
+            catch (Exception serviceException)
+            {
+                var failedEventV2ServiceException =
+                    new FailedEventV2ServiceException(
+                        message: "Failed event service error occurred, contact support.",
+                        innerException: serviceException,
+                        data: serviceException.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventV2ServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<EventV2>> TryCatch(
+            ReturningEventV2EnumerableFunction returningEventV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningEventV2EnumerableFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2Exception =
+                    new TimeoutEventV2Exception(
+                        message: "Failed event timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (NullEventV2Exception nullEventV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullEventV2Exception);
             }
             catch (SqlException sqlException)
             {

@@ -15,6 +15,7 @@ using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Configurations.LoopDetections;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.Events.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Foundations.Events.V2
 {
@@ -98,6 +99,42 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             ValidateEventV2sIsNotNull(eventV2s);
 
             await this.storageBroker.BulkDeleteEventV2sAsync(eventV2s, cancellationToken);
+        });
+
+        public ValueTask<IEnumerable<EventV2>> BulkRestoreEventV2sAsync(
+            IEnumerable<EventV2> eventV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventV2sIsNotNull(eventV2s);
+
+            DateTimeOffset now =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            List<EventV2> itemsToBulkRestore = new List<EventV2>();
+
+            foreach (EventV2 eventV2 in eventV2s)
+            {
+                try
+                {
+                    ValidateEventV2OnRestore(eventV2, now);
+                    itemsToBulkRestore.Add(eventV2);
+                }
+                catch (NullEventV2Exception nullEventV2Exception)
+                {
+                    await this.loggingBroker.LogErrorAsync(nullEventV2Exception);
+                }
+                catch (InvalidEventV2Exception invalidEventV2Exception)
+                {
+                    await this.loggingBroker.LogErrorAsync(invalidEventV2Exception);
+                }
+            }
+
+            await this.storageBroker.BulkInsertEventV2sAsync(
+                itemsToBulkRestore, cancellationToken);
+
+            return (IEnumerable<EventV2>)itemsToBulkRestore;
         });
 
         public ValueTask<string> RemoveVolatilePathsAsync(
