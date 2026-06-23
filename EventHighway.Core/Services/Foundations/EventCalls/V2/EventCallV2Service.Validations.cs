@@ -21,6 +21,10 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             Validate(
                 message: "Event call is invalid, fix the errors and try again.",
 
+                (Rule: IsInvalid(eventCallV2.HandlerId),
+                Parameter: nameof(EventCallV2.HandlerId),
+                Message: "Id required"),
+
                 (Rule: IsInvalid(eventCallV2.HandlerName),
                 Parameter: nameof(EventCallV2.HandlerName),
                 Message: "Text required"),
@@ -69,6 +73,9 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 Message: $"Multiple providers found that matches '{handlerName}', " +
                     $"fix registrations and try again."));
         }
+
+        private static bool IsInvalid(Guid id) =>
+            id == Guid.Empty;
 
         private static bool IsInvalid(string text) =>
             string.IsNullOrWhiteSpace(text);
