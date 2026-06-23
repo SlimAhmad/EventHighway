@@ -72,6 +72,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnPurgeEventArchiveV2s(olderThan);
             BatchConfiguration batchConfiguration = this.configurationBroker.GetBatchConfiguration();
             int take = batchConfiguration.BatchSizeForBulkProcessing;
             IEnumerable<EventArchiveV2> batch;
