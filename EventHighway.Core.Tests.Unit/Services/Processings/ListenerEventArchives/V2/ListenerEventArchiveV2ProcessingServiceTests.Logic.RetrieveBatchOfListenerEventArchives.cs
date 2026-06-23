@@ -272,5 +272,56 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldRetrieveAllListenerEventArchiveV2sAfterSkipWhenTakeIsZeroAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            int skip = GetRandomNumber();
+            int take = 0;
+
+            IQueryable<ListenerEventArchiveV2> storageListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s(
+                    count: skip + GetRandomNumber() + GetRandomNumber());
+
+            List<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
+                storageListenerEventArchiveV2s
+                    .OrderBy(listenerEventArchiveV2 => listenerEventArchiveV2.CreatedDate)
+                    .ThenBy(listenerEventArchiveV2 => listenerEventArchiveV2.Id)
+                    .Skip(skip)
+                    .ToList();
+
+            this.listenerEventArchiveV2ServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(storageListenerEventArchiveV2s);
+
+            // when
+            List<ListenerEventArchiveV2> actualListenerEventArchiveV2s =
+                await this.listenerEventArchiveV2ProcessingService
+                    .RetrieveBatchOfListenerEventArchiveV2sAsync(
+                        eventAddressId: null,
+                        eventListenerIds: null,
+                        startDate: null,
+                        endDate: null,
+                        skip: skip,
+                        take: take,
+                        cancellationToken: randomCancellationToken);
+
+            // then
+            actualListenerEventArchiveV2s.Should().BeEquivalentTo(
+                expectedListenerEventArchiveV2s,
+                options => options.WithStrictOrdering());
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
