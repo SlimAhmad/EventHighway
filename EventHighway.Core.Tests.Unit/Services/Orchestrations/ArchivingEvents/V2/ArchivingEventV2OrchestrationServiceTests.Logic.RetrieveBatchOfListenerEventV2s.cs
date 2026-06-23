@@ -34,12 +34,16 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             IEnumerable<ListenerEventV2> retrievedListenerEventV2s = randomListenerEventV2s;
             IEnumerable<ListenerEventV2> expectedListenerEventV2s = retrievedListenerEventV2s;
 
-            this.configurationBrokerMock.Setup(broker =>
-                broker.GetBatchConfiguration())
+            var mockSequence = new MockSequence();
+
+            this.configurationBrokerMock
+                .InSequence(mockSequence)
+                .Setup(broker => broker.GetBatchConfiguration())
                     .Returns(retrievedBatchConfiguration);
 
-            this.listenerEventV2ProcessingServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
+            this.listenerEventV2ProcessingServiceMock
+                .InSequence(mockSequence)
+                .Setup(service => service.RetrieveBatchOfListenerEventV2sByEventIdsAsync(
                     inputEventV2Ids,
                     inputTake,
                     randomCancellationToken))
