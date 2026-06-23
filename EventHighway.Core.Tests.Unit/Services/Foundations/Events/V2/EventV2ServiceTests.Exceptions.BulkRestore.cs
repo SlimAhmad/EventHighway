@@ -81,5 +81,69 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnBulkRestoreIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            List<EventV2> someEventV2s = CreateRandomRestoreEventV2s();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventV2Exception =
+                new TimeoutEventV2Exception(
+                    message: "Failed event timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventV2DependencyException =
+                new EventV2DependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: timeoutEventV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(DateTimeOffset.MaxValue);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.BulkInsertEventV2sAsync(
+                    It.IsAny<List<EventV2>>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IEnumerable<EventV2>> bulkRestoreEventV2sTask =
+                this.eventV2Service.BulkRestoreEventV2sAsync(
+                    someEventV2s, TestContext.Current.CancellationToken);
+
+            EventV2DependencyException actualEventV2DependencyException =
+                await Assert.ThrowsAsync<EventV2DependencyException>(
+                    bulkRestoreEventV2sTask.AsTask);
+
+            // then
+            actualEventV2DependencyException.Should().BeEquivalentTo(
+                expectedEventV2DependencyException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.BulkInsertEventV2sAsync(
+                    It.IsAny<List<EventV2>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
