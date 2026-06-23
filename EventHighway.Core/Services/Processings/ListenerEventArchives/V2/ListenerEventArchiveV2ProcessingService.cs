@@ -93,6 +93,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
 
             await this.listenerEventArchiveV2Service.BulkRemoveListenerEventArchiveV2sAsync(
                 listenerEventArchiveV2s, cancellationToken);
