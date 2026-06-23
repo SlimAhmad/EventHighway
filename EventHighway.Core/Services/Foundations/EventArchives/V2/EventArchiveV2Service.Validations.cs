@@ -37,6 +37,12 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
                 (Rule: IsInvalid(eventArchiveV2.UpdatedDate),
                 Parameter: nameof(EventArchiveV2.UpdatedDate)),
 
+                (Rule: IsNotSameAs(
+                    firstDate: eventArchiveV2.CreatedDate,
+                    secondDate: eventArchiveV2.UpdatedDate,
+                    secondDateName: nameof(EventArchiveV2.UpdatedDate)),
+                Parameter: nameof(EventArchiveV2.CreatedDate)),
+
                 (Rule: IsInvalid(eventArchiveV2.ArchivedDate),
                 Parameter: nameof(EventArchiveV2.ArchivedDate)),
 
@@ -115,6 +121,15 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
 
             return isDefined is false;
         }
+
+        private static dynamic IsNotSameAs(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate,
+            string secondDateName) => new
+            {
+                Condition = firstDate != secondDate,
+                Message = $"Date is not the same as {secondDateName}"
+            };
 
         private async ValueTask<dynamic> IsNotRecentAsync(DateTimeOffset date) => new
         {
