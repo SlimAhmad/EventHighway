@@ -60,7 +60,10 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 message: "Listener event archive is invalid, fix the errors and try again.",
 
                 (Rule: IsInvalid(skip),
-                Parameter: nameof(skip)));
+                Parameter: nameof(skip)),
+
+                (Rule: IsInvalid(take),
+                Parameter: nameof(take)));
         }
 
         private static dynamic IsInvalid(DateTimeOffset date) => new
