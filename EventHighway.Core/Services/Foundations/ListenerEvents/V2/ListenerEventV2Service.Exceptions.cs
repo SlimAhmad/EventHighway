@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
         private delegate ValueTask ReturningNothingFunction();
         private delegate ValueTask<ListenerEventV2> ReturningListenerEventV2Function();
         private delegate ValueTask<IQueryable<ListenerEventV2>> ReturningListenerEventV2sFunction();
+        private delegate ValueTask<IEnumerable<ListenerEventV2>> ReturningListenerEventV2EnumerableFunction();
 
         private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
         {
@@ -237,6 +239,57 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
 
                 throw await CreateAndLogServiceExceptionAsync(
                     failedListenerEventV2ServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<ListenerEventV2>> TryCatch(
+            ReturningListenerEventV2EnumerableFunction returningListenerEventV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningListenerEventV2EnumerableFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutListenerEventV2Exception =
+                    new TimeoutListenerEventV2Exception(
+                        message: "Failed listener event timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutListenerEventV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (NullListenerEventV2Exception nullListenerEventV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullListenerEventV2Exception);
+            }
+            catch (SqlException sqlException)
+            {
+                var failedStorageListenerEventV2Exception =
+                    new FailedStorageListenerEventV2Exception(
+                        message: "Failed listener event storage error occurred, contact support.",
+                        innerException: sqlException,
+                        data: sqlException.Data);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(failedStorageListenerEventV2Exception);
+            }
+            catch (Exception serviceException)
+            {
+                var failedListenerEventV2ServiceException =
+                    new FailedListenerEventV2ServiceException(
+                        message: "Failed listener event service error occurred, contact support.",
+                        innerException: serviceException,
+                        data: serviceException.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedListenerEventV2ServiceException);
             }
         }
 

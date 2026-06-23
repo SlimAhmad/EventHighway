@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -14,6 +15,7 @@ using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.ListenerEvents.V2;
+using KellermanSoftware.CompareNetObjects;
 using Microsoft.Data.SqlClient;
 using Moq;
 using Tynamix.ObjectFiller;
@@ -54,6 +56,34 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
+
+        private static bool SameListenerEventV2sAs(
+            List<ListenerEventV2> expectedListenerEventV2s,
+            List<ListenerEventV2> actualListenerEventV2s)
+        {
+            var compareLogic = new CompareLogic();
+
+            ComparisonResult comparisonResult =
+                compareLogic.Compare(expectedListenerEventV2s, actualListenerEventV2s);
+
+            return comparisonResult.AreEqual;
+        }
+
+        private static List<ListenerEventV2> CreateRandomRestoreListenerEventV2s()
+        {
+            DateTimeOffset createdDate = GetRandomDateTimeOffset();
+
+            return CreateListenerEventV2Filler(dates: createdDate)
+                .Create(count: GetRandomNumber())
+                    .Select(listenerEventV2 =>
+                    {
+                        listenerEventV2.CreatedDate = createdDate;
+                        listenerEventV2.UpdatedDate = createdDate.AddMinutes(GetRandomNumber());
+
+                        return listenerEventV2;
+                    })
+                        .ToList();
+        }
 
         private static T GetInvalidEnum<T>()
         {

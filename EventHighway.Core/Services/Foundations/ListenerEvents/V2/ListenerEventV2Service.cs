@@ -11,6 +11,7 @@ using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
 {
@@ -95,6 +96,42 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             ValidateListenerEventV2sIsNotNull(listenerEventV2s);
 
             await this.storageBroker.BulkDeleteListenerEventV2sAsync(listenerEventV2s, cancellationToken);
+        });
+
+        public ValueTask<IEnumerable<ListenerEventV2>> BulkRestoreListenerEventV2sAsync(
+            IEnumerable<ListenerEventV2> listenerEventV2s,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateListenerEventV2sIsNotNull(listenerEventV2s);
+
+            DateTimeOffset now =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            List<ListenerEventV2> itemsToBulkRestore = new List<ListenerEventV2>();
+
+            foreach (ListenerEventV2 listenerEventV2 in listenerEventV2s)
+            {
+                try
+                {
+                    ValidateListenerEventV2OnRestore(listenerEventV2, now);
+                    itemsToBulkRestore.Add(listenerEventV2);
+                }
+                catch (NullListenerEventV2Exception nullListenerEventV2Exception)
+                {
+                    await this.loggingBroker.LogErrorAsync(nullListenerEventV2Exception);
+                }
+                catch (InvalidListenerEventV2Exception invalidListenerEventV2Exception)
+                {
+                    await this.loggingBroker.LogErrorAsync(invalidListenerEventV2Exception);
+                }
+            }
+
+            await this.storageBroker.BulkInsertListenerEventV2sAsync(
+                itemsToBulkRestore, cancellationToken);
+
+            return (IEnumerable<ListenerEventV2>)itemsToBulkRestore;
         });
 
         public ValueTask<IQueryable<ListenerEventV2>> RetrieveListenerEventV2sByEventIdsAsync(

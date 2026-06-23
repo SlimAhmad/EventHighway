@@ -93,6 +93,47 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 Parameter: nameof(ListenerEventV2.UpdatedDate)));
         }
 
+        private static void ValidateListenerEventV2OnRestore(ListenerEventV2 listenerEventV2, DateTimeOffset now)
+        {
+            ValidateListenerEventV2IsNotNull(listenerEventV2);
+
+            Validate(
+                message: "Listener event is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(listenerEventV2.Id),
+                Parameter: nameof(ListenerEventV2.Id)),
+
+                (Rule: IsInvalid(listenerEventV2.EventId),
+                Parameter: nameof(ListenerEventV2.EventId)),
+
+                (Rule: IsInvalid(listenerEventV2.EventAddressId),
+                Parameter: nameof(ListenerEventV2.EventAddressId)),
+
+                (Rule: IsInvalid(listenerEventV2.EventListenerId),
+                Parameter: nameof(ListenerEventV2.EventListenerId)),
+
+                (Rule: IsInvalid(listenerEventV2.Status),
+                Parameter: nameof(ListenerEventV2.Status)),
+
+                (Rule: IsInvalid(listenerEventV2.CreatedDate),
+                Parameter: nameof(ListenerEventV2.CreatedDate)),
+
+                (Rule: IsInvalid(listenerEventV2.UpdatedDate),
+                Parameter: nameof(ListenerEventV2.UpdatedDate)),
+
+                (Rule: IsAfter(
+                    firstDate: listenerEventV2.CreatedDate,
+                    secondDate: listenerEventV2.UpdatedDate,
+                    secondDateName: nameof(ListenerEventV2.UpdatedDate)),
+                Parameter: nameof(ListenerEventV2.CreatedDate)),
+
+                (Rule: IsInFuture(date: listenerEventV2.CreatedDate, now: now),
+                Parameter: nameof(ListenerEventV2.CreatedDate)),
+
+                (Rule: IsInFuture(date: listenerEventV2.UpdatedDate, now: now),
+                Parameter: nameof(ListenerEventV2.UpdatedDate)));
+        }
+
         private static void ValidateListenerEventV2AgainstStorage(
             ListenerEventV2 incomingListenerEventV2,
             ListenerEventV2 storageListenerEventV2)
@@ -210,6 +251,21 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             {
                 Condition = firstDate != secondDate,
                 Message = $"Date is not the same as storage"
+            };
+
+        private static dynamic IsInFuture(DateTimeOffset date, DateTimeOffset now) => new
+        {
+            Condition = date > now,
+            Message = "Date is in the future"
+        };
+
+        private static dynamic IsAfter(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate,
+            string secondDateName) => new
+            {
+                Condition = firstDate > secondDate,
+                Message = $"Date is later than {secondDateName}"
             };
 
         private static dynamic IsEarlierThan(
