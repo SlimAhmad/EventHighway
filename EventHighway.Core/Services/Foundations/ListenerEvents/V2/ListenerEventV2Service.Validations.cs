@@ -93,6 +93,35 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 Parameter: nameof(ListenerEventV2.UpdatedDate)));
         }
 
+        private static void ValidateListenerEventV2OnRestore(ListenerEventV2 listenerEventV2)
+        {
+            ValidateListenerEventV2IsNotNull(listenerEventV2);
+
+            Validate(
+                message: "Listener event is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(listenerEventV2.Id),
+                Parameter: nameof(ListenerEventV2.Id)),
+
+                (Rule: IsInvalid(listenerEventV2.EventId),
+                Parameter: nameof(ListenerEventV2.EventId)),
+
+                (Rule: IsInvalid(listenerEventV2.EventAddressId),
+                Parameter: nameof(ListenerEventV2.EventAddressId)),
+
+                (Rule: IsInvalid(listenerEventV2.EventListenerId),
+                Parameter: nameof(ListenerEventV2.EventListenerId)),
+
+                (Rule: IsInvalid(listenerEventV2.Status),
+                Parameter: nameof(ListenerEventV2.Status)),
+
+                (Rule: IsInvalid(listenerEventV2.CreatedDate),
+                Parameter: nameof(ListenerEventV2.CreatedDate)),
+
+                (Rule: IsInvalid(listenerEventV2.UpdatedDate),
+                Parameter: nameof(ListenerEventV2.UpdatedDate)));
+        }
+
         private static void ValidateListenerEventV2AgainstStorage(
             ListenerEventV2 incomingListenerEventV2,
             ListenerEventV2 storageListenerEventV2)

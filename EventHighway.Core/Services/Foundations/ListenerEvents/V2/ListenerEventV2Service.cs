@@ -11,6 +11,7 @@ using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
 {
@@ -101,7 +102,24 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default)
         {
-            List<ListenerEventV2> itemsToBulkRestore = listenerEventV2s.ToList();
+            List<ListenerEventV2> itemsToBulkRestore = new List<ListenerEventV2>();
+
+            foreach (ListenerEventV2 listenerEventV2 in listenerEventV2s)
+            {
+                try
+                {
+                    ValidateListenerEventV2OnRestore(listenerEventV2);
+                    itemsToBulkRestore.Add(listenerEventV2);
+                }
+                catch (NullListenerEventV2Exception nullListenerEventV2Exception)
+                {
+                    await this.loggingBroker.LogErrorAsync(nullListenerEventV2Exception);
+                }
+                catch (InvalidListenerEventV2Exception invalidListenerEventV2Exception)
+                {
+                    await this.loggingBroker.LogErrorAsync(invalidListenerEventV2Exception);
+                }
+            }
 
             await this.storageBroker.BulkInsertListenerEventV2sAsync(
                 itemsToBulkRestore, cancellationToken);
