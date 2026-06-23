@@ -119,7 +119,13 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 Parameter: nameof(ListenerEventV2.CreatedDate)),
 
                 (Rule: IsInvalid(listenerEventV2.UpdatedDate),
-                Parameter: nameof(ListenerEventV2.UpdatedDate)));
+                Parameter: nameof(ListenerEventV2.UpdatedDate)),
+
+                (Rule: IsAfter(
+                    firstDate: listenerEventV2.CreatedDate,
+                    secondDate: listenerEventV2.UpdatedDate,
+                    secondDateName: nameof(ListenerEventV2.UpdatedDate)),
+                Parameter: nameof(ListenerEventV2.CreatedDate)));
         }
 
         private static void ValidateListenerEventV2AgainstStorage(
@@ -239,6 +245,15 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             {
                 Condition = firstDate != secondDate,
                 Message = $"Date is not the same as storage"
+            };
+
+        private static dynamic IsAfter(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate,
+            string secondDateName) => new
+            {
+                Condition = firstDate > secondDate,
+                Message = $"Date is later than {secondDateName}"
             };
 
         private static dynamic IsEarlierThan(
