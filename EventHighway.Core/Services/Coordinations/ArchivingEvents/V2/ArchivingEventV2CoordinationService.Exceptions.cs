@@ -120,40 +120,40 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         private async ValueTask<ArchivingEventV2CoordinationDependencyValidationException>
             CreateAndLogDependencyValidationExceptionAsync(Xeption exception)
         {
-            var archivingEventV1CoordinationDependencyValidationException =
+            var archivingEventV2CoordinationDependencyValidationException =
                 new ArchivingEventV2CoordinationDependencyValidationException(
                     message: "Archiving event validation error occurred, fix the errors and try again.",
                     innerException: exception.InnerException as Xeption);
 
-            await this.loggingBroker.LogErrorAsync(archivingEventV1CoordinationDependencyValidationException);
+            await this.loggingBroker.LogErrorAsync(archivingEventV2CoordinationDependencyValidationException);
 
-            return archivingEventV1CoordinationDependencyValidationException;
+            return archivingEventV2CoordinationDependencyValidationException;
         }
 
         private async ValueTask<ArchivingEventV2CoordinationDependencyException>
             CreateAndLogDependencyExceptionAsync(Xeption exception)
         {
-            var archivingEventV1CoordinationDependencyException =
+            var archivingEventV2CoordinationDependencyException =
                 new ArchivingEventV2CoordinationDependencyException(
                     message: "Archiving event dependency error occurred, contact support.",
                     innerException: exception.InnerException as Xeption);
 
-            await this.loggingBroker.LogErrorAsync(archivingEventV1CoordinationDependencyException);
+            await this.loggingBroker.LogErrorAsync(archivingEventV2CoordinationDependencyException);
 
-            return archivingEventV1CoordinationDependencyException;
+            return archivingEventV2CoordinationDependencyException;
         }
 
         private async ValueTask<ArchivingEventV2CoordinationServiceException>
             CreateAndLogServiceExceptionAsync(Xeption exception)
         {
-            var archivingEventV1CoordinationServiceException =
+            var archivingEventV2CoordinationServiceException =
                 new ArchivingEventV2CoordinationServiceException(
                     message: "Archiving event service error occurred, contact support.",
                     innerException: exception);
 
-            await this.loggingBroker.LogErrorAsync(archivingEventV1CoordinationServiceException);
+            await this.loggingBroker.LogErrorAsync(archivingEventV2CoordinationServiceException);
 
-            return archivingEventV1CoordinationServiceException;
+            return archivingEventV2CoordinationServiceException;
         }
     }
 }
