@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
         private delegate ValueTask ReturningNothingFunction();
         private delegate ValueTask<ListenerEventV2> ReturningListenerEventV2Function();
         private delegate ValueTask<IQueryable<ListenerEventV2>> ReturningListenerEventV2sFunction();
+        private delegate ValueTask<IEnumerable<ListenerEventV2>> ReturningListenerEventV2EnumerableFunction();
 
         private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
         {
@@ -237,6 +239,19 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
 
                 throw await CreateAndLogServiceExceptionAsync(
                     failedListenerEventV2ServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<ListenerEventV2>> TryCatch(
+            ReturningListenerEventV2EnumerableFunction returningListenerEventV2EnumerableFunction)
+        {
+            try
+            {
+                return await returningListenerEventV2EnumerableFunction();
+            }
+            catch (NullListenerEventV2Exception nullListenerEventV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(nullListenerEventV2Exception);
             }
         }
 

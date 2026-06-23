@@ -98,10 +98,13 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             await this.storageBroker.BulkDeleteListenerEventV2sAsync(listenerEventV2s, cancellationToken);
         });
 
-        public async ValueTask<IEnumerable<ListenerEventV2>> BulkRestoreListenerEventV2sAsync(
+        public ValueTask<IEnumerable<ListenerEventV2>> BulkRestoreListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateListenerEventV2sIsNotNull(listenerEventV2s);
+
             DateTimeOffset now =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();
 
@@ -127,8 +130,8 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             await this.storageBroker.BulkInsertListenerEventV2sAsync(
                 itemsToBulkRestore, cancellationToken);
 
-            return itemsToBulkRestore;
-        }
+            return (IEnumerable<ListenerEventV2>)itemsToBulkRestore;
+        });
 
         public ValueTask<IQueryable<ListenerEventV2>> RetrieveListenerEventV2sByEventIdsAsync(
             IEnumerable<Guid> eventIds,
