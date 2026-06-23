@@ -20,7 +20,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
     {
         private delegate ValueTask<EventArchiveV2> ReturningEventArchiveV2Function();
         private delegate ValueTask<IQueryable<EventArchiveV2>> ReturningEventArchiveV2sFunction();
-        private delegate ValueTask<IEnumerable<EventArchiveV2>> ReturningEnumrableEventArchiveV2sFunction();
+        private delegate ValueTask<IEnumerable<EventArchiveV2>> ReturningEnumerableEventArchiveV2sFunction();
         private delegate ValueTask ReturningNothingFunction();
 
         private async ValueTask<EventArchiveV2> TryCatch(
@@ -180,7 +180,7 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
         }
 
         private async ValueTask<IEnumerable<EventArchiveV2>> TryCatch(
-            ReturningEnumrableEventArchiveV2sFunction returningEnumrableEventArchiveV2sFunction)
+            ReturningEnumerableEventArchiveV2sFunction returningEnumrableEventArchiveV2sFunction)
         {
             try
             {
