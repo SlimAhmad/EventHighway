@@ -69,7 +69,18 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         public ValueTask<IEnumerable<EventArchiveV2>> RetrieveEventArchiveV2sByIdsAsync(
             IEnumerable<Guid> eventArchiveIds,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            IQueryable<EventArchiveV2> eventArchiveV2s =
+                await this.eventArchiveV2ProcessingService
+                    .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+
+            return eventArchiveV2s
+                .Where(eventArchiveV2 => eventArchiveIds.Contains(eventArchiveV2.Id))
+                .ToList();
+        });
 
         public ValueTask BulkRemoveEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
