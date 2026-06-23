@@ -106,6 +106,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2sIsNotNull(eventV2s);
 
             DateTimeOffset now =

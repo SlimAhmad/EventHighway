@@ -350,6 +350,10 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
 
                 throw await CreateAndLogDependencyExceptionAsync(timeoutEventV2Exception);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (NullEventV2Exception nullEventV2Exception)
             {
                 throw await CreateAndLogValidationExceptionAsync(nullEventV2Exception);
