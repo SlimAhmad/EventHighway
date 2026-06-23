@@ -72,6 +72,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventArchiveIdsIsNotNull(eventArchiveIds);
 
             IQueryable<EventArchiveV2> eventArchiveV2s =
                 await this.eventArchiveV2ProcessingService
