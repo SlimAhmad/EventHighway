@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -103,6 +104,65 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                         endDate: null,
                         skip: skip,
                         take: invalidTake,
+                        cancellationToken: randomCancellationToken);
+
+            // then
+            ListenerEventArchiveV2ProcessingValidationException actualException =
+                await Assert.ThrowsAsync<
+                    ListenerEventArchiveV2ProcessingValidationException>(
+                        retrieveBatchTask.AsTask);
+
+            actualException.Should().BeEquivalentTo(expectedException);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(expectedException))),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Never);
+
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnRetrieveBatchOfListenerEventArchivesIfStartDateIsAfterEndDateAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            int skip = GetRandomNumber();
+            int take = GetRandomNumber();
+
+            DateTimeOffset endDate = GetRandomDateTimeOffset();
+            DateTimeOffset startDate = endDate.AddDays(GetRandomNumber());
+
+            var invalidListenerEventArchiveV2ProcessingException =
+                new InvalidListenerEventArchiveV2ProcessingException(
+                    message: "Listener event archive is invalid, fix the errors and try again.");
+
+            invalidListenerEventArchiveV2ProcessingException.UpsertDataList(
+                key: "startDate",
+                value: "Date is later than endDate");
+
+            var expectedException =
+                new ListenerEventArchiveV2ProcessingValidationException(
+                    message: "Listener event archive validation error occurred, fix the errors and try again.",
+                    innerException: invalidListenerEventArchiveV2ProcessingException);
+
+            // when
+            ValueTask<List<ListenerEventArchiveV2>> retrieveBatchTask =
+                this.listenerEventArchiveV2ProcessingService
+                    .RetrieveBatchOfListenerEventArchiveV2sAsync(
+                        eventAddressId: null,
+                        eventListenerIds: null,
+                        startDate: startDate,
+                        endDate: endDate,
+                        skip: skip,
+                        take: take,
                         cancellationToken: randomCancellationToken);
 
             // then
