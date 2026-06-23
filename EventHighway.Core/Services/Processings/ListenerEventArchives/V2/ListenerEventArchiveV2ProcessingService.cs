@@ -75,15 +75,18 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 : listenerEventArchiveV2.Take(take).ToList();
         });
 
-        public async ValueTask<List<ListenerEventArchiveV2>> RetrieveBatchOfListenerEventArchiveV2sAsync(
+        public ValueTask<List<ListenerEventArchiveV2>> RetrieveBatchOfListenerEventArchiveV2sAsync(
             Guid? eventAddressId,
             IEnumerable<Guid> eventListenerIds,
             DateTimeOffset? startDate,
             DateTimeOffset? endDate,
             int skip,
             int take,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateOnRetrieveBatch(skip, take, startDate, endDate);
+
             IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2s =
                 await this.listenerEventArchiveV2Service
                     .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
@@ -124,7 +127,7 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
             return take == 0
                 ? listenerEventArchiveV2s.ToList()
                 : listenerEventArchiveV2s.Take(take).ToList();
-        }
+        });
 
         public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
