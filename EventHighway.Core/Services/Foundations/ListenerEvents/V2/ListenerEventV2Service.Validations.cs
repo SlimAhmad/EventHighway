@@ -93,7 +93,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 Parameter: nameof(ListenerEventV2.UpdatedDate)));
         }
 
-        private static void ValidateListenerEventV2OnRestore(ListenerEventV2 listenerEventV2)
+        private static void ValidateListenerEventV2OnRestore(ListenerEventV2 listenerEventV2, DateTimeOffset now)
         {
             ValidateListenerEventV2IsNotNull(listenerEventV2);
 
@@ -125,7 +125,13 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                     firstDate: listenerEventV2.CreatedDate,
                     secondDate: listenerEventV2.UpdatedDate,
                     secondDateName: nameof(ListenerEventV2.UpdatedDate)),
-                Parameter: nameof(ListenerEventV2.CreatedDate)));
+                Parameter: nameof(ListenerEventV2.CreatedDate)),
+
+                (Rule: IsInFuture(date: listenerEventV2.CreatedDate, now: now),
+                Parameter: nameof(ListenerEventV2.CreatedDate)),
+
+                (Rule: IsInFuture(date: listenerEventV2.UpdatedDate, now: now),
+                Parameter: nameof(ListenerEventV2.UpdatedDate)));
         }
 
         private static void ValidateListenerEventV2AgainstStorage(
@@ -246,6 +252,12 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 Condition = firstDate != secondDate,
                 Message = $"Date is not the same as storage"
             };
+
+        private static dynamic IsInFuture(DateTimeOffset date, DateTimeOffset now) => new
+        {
+            Condition = date > now,
+            Message = "Date is in the future"
+        };
 
         private static dynamic IsAfter(
             DateTimeOffset firstDate,

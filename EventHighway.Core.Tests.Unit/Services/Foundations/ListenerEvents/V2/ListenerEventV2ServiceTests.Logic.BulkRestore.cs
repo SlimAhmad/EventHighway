@@ -32,6 +32,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             List<ListenerEventV2> expectedListenerEventV2s =
                 inputListenerEventV2s.Select(item => item.DeepClone()).ToList();
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(DateTimeOffset.MaxValue);
+
             this.storageBrokerMock.Setup(broker =>
                 broker.BulkInsertListenerEventV2sAsync(
                     It.Is<List<ListenerEventV2>>(actual =>
@@ -47,6 +51,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             // then
             actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.BulkInsertListenerEventV2sAsync(
@@ -117,6 +125,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                 key: nameof(ListenerEventV2.UpdatedDate),
                 values: "Required");
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(DateTimeOffset.MaxValue);
+
             this.storageBrokerMock.Setup(broker =>
                 broker.BulkInsertListenerEventV2sAsync(
                     It.Is<List<ListenerEventV2>>(actual =>
@@ -132,6 +144,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             // then
             actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
@@ -180,6 +196,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                 key: nameof(ListenerEventV2.CreatedDate),
                 values: $"Date is later than {nameof(ListenerEventV2.UpdatedDate)}");
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(DateTimeOffset.MaxValue);
+
             this.storageBrokerMock.Setup(broker =>
                 broker.BulkInsertListenerEventV2sAsync(
                     It.Is<List<ListenerEventV2>>(actual =>
@@ -195,6 +215,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             // then
             actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
