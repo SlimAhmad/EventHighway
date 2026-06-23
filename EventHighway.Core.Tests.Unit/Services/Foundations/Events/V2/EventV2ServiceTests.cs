@@ -17,6 +17,7 @@ using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.Events.V2;
+using KellermanSoftware.CompareNetObjects;
 using Microsoft.Data.SqlClient;
 using Moq;
 using Tynamix.ObjectFiller;
@@ -68,6 +69,33 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 
+        private static bool SameEventV2sAs(
+            List<EventV2> expectedEventV2s,
+            List<EventV2> actualEventV2s)
+        {
+            var compareLogic = new CompareLogic();
+
+            ComparisonResult comparisonResult =
+                compareLogic.Compare(expectedEventV2s, actualEventV2s);
+
+            return comparisonResult.AreEqual;
+        }
+
+        private static List<EventV2> CreateRandomRestoreEventV2s()
+        {
+            DateTimeOffset createdDate = GetRandomDateTimeOffset();
+
+            return CreateEventV2Filler(dates: createdDate)
+                .Create(count: GetRandomNumber())
+                    .Select(eventV2 =>
+                    {
+                        eventV2.CreatedDate = createdDate;
+                        eventV2.UpdatedDate = createdDate.AddMinutes(GetRandomNumber());
+
+                        return eventV2;
+                    })
+                        .ToList();
+        }
 
         private static Guid GetRandomId() =>
             Guid.NewGuid();
