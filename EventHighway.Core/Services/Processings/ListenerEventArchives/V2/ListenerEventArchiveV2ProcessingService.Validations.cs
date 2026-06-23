@@ -63,8 +63,20 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 Parameter: nameof(skip)),
 
                 (Rule: IsInvalid(take),
-                Parameter: nameof(take)));
+                Parameter: nameof(take)),
+
+                (Rule: IsAfter(startDate, endDate),
+                Parameter: nameof(startDate)));
         }
+
+        private static dynamic IsAfter(DateTimeOffset? startDate, DateTimeOffset? endDate) => new
+        {
+            Condition = startDate.HasValue
+                && endDate.HasValue
+                && startDate.Value > endDate.Value,
+
+            Message = "Date is later than endDate"
+        };
 
         private static dynamic IsInvalid(DateTimeOffset date) => new
         {
