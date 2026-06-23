@@ -40,9 +40,5 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         ValueTask<bool> IsLoopDetectedAsync(
             EventV2 eventV2,
             CancellationToken cancellationToken = default);
-
-        ValueTask<EventV2> ModifyEventV2Async(
-            EventV2 eventV2,
-            CancellationToken cancellationToken = default);
     }
 }
