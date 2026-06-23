@@ -97,6 +97,41 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 Parameter: nameof(EventV2.UpdatedDate)));
         }
 
+        private static void ValidateEventV2OnRestore(EventV2 eventV2)
+        {
+            ValidateEventV2IsNotNull(eventV2);
+
+            Validate(
+                message: "Event is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(eventV2.Id),
+                Parameter: nameof(EventV2.Id)),
+
+                (Rule: IsInvalid(eventV2.Content),
+                Parameter: nameof(EventV2.Content)),
+
+                (Rule: IsInvalid(eventV2.EventName),
+                Parameter: nameof(EventV2.EventName)),
+
+                (Rule: IsExceedingLengthOf(eventV2.EventName, 450),
+                Parameter: nameof(EventV2.EventName)),
+
+                (Rule: IsInvalid(eventV2.EventAddressId),
+                Parameter: nameof(EventV2.EventAddressId)),
+
+                (Rule: IsInvalid(eventV2.Type),
+                Parameter: nameof(EventV2.Type)),
+
+                (Rule: IsInvalid(eventV2.Status),
+                Parameter: nameof(EventV2.Status)),
+
+                (Rule: IsInvalid(eventV2.CreatedDate),
+                Parameter: nameof(EventV2.CreatedDate)),
+
+                (Rule: IsInvalid(eventV2.UpdatedDate),
+                Parameter: nameof(EventV2.UpdatedDate)));
+        }
+
         private static void ValidateEventV2Id(Guid eventV2Id)
         {
             Validate(
