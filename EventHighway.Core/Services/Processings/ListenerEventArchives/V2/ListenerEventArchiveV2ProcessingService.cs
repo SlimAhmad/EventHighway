@@ -88,6 +88,13 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 await this.listenerEventArchiveV2Service
                     .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
 
+            if (eventAddressId is not null)
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        listenerEventArchiveV2.EventAddressId == eventAddressId.Value);
+            }
+
             return listenerEventArchiveV2s
                 .OrderBy(listenerEventArchiveV2 => listenerEventArchiveV2.CreatedDate)
                 .ThenBy(listenerEventArchiveV2 => listenerEventArchiveV2.Id)
