@@ -43,6 +43,46 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 .RetrieveBatchOfEventArchiveV2sOlderThanAsync(olderThan, take, cancellationToken);
         });
 
+        public ValueTask<IEnumerable<ListenerEventArchiveV2>> RetrieveBatchOfListenerEventArchiveV2sAsync(
+            Guid? eventAddressId,
+            IEnumerable<Guid> eventListenerIds,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int skip,
+            int take,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventArchiveV2ProcessingService
+                .RetrieveBatchOfListenerEventArchiveV2sAsync(
+                    eventAddressId,
+                    eventListenerIds,
+                    startDate,
+                    endDate,
+                    skip,
+                    take,
+                    cancellationToken);
+        });
+
+        public ValueTask<IEnumerable<EventArchiveV2>> RetrieveEventArchiveV2sByIdsAsync(
+            IEnumerable<Guid> eventArchiveIds,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventArchiveIdsIsNotNull(eventArchiveIds);
+
+            IQueryable<EventArchiveV2> eventArchiveV2s =
+                await this.eventArchiveV2ProcessingService
+                    .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+
+            return eventArchiveV2s
+                .Where(eventArchiveV2 => eventArchiveIds.Contains(eventArchiveV2.Id))
+                .ToList();
+        });
+
         public ValueTask BulkRemoveEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default) =>
