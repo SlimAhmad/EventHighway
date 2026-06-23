@@ -40,18 +40,22 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
             await this.clientBroker.FireScheduledPendingEventV2sAsync();
 
             IQueryable<ListenerEventV2> allListenerEventV2s =
-                await this.clientBroker.RetrieveAllListenerEventV2sAsync();
+                await RetrieveAllListenerEventV2sUntilAsync(listenerEventV2 =>
+                    listenerEventV2.EventId == eventV2.Id &&
+                    listenerEventV2.Status == ListenerEventStatusV2.Success &&
+                    listenerEventV2.Response == expectedResponse);
 
             // then
             allListenerEventV2s
-                .Where(le => le.EventId == eventV2.Id)
-                .Should().ContainSingle(le =>
-                    le.Status == ListenerEventStatusV2.Success &&
-                    le.Response == expectedResponse);
+                .Where(listenerEventV2 => listenerEventV2.EventId == eventV2.Id)
+                .Should().ContainSingle(listenerEventV2 =>
+                    listenerEventV2.Status == ListenerEventStatusV2.Success &&
+                    listenerEventV2.Response == expectedResponse);
 
             // cleanup
-            foreach (ListenerEventV2 le in allListenerEventV2s.Where(le => le.EventId == eventV2.Id))
-                await this.clientBroker.RemoveListenerEventV2ByIdAsync(le.Id);
+            foreach (ListenerEventV2 listenerEventV2 in allListenerEventV2s
+                .Where(listenerEventV2 => listenerEventV2.EventId == eventV2.Id))
+                await this.clientBroker.RemoveListenerEventV2ByIdAsync(listenerEventV2.Id);
 
             await this.clientBroker.RemoveEventV2ByIdAsync(eventV2.Id);
             await this.clientBroker.RemoveEventListenerV2ByIdAsync(listenerV2.Id);

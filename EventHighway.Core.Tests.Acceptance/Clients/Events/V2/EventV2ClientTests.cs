@@ -3,11 +3,13 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Tests.Acceptance.Brokers;
 using EventHighway.EventHandlers;
 using Tynamix.ObjectFiller;
@@ -46,6 +48,24 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
 
             this.clientBroker
                 .RegisterEventHandler(this.delegateEventHandler);
+        }
+
+        private async ValueTask<IQueryable<ListenerEventV2>>
+            RetrieveAllListenerEventV2sUntilAsync(
+                Func<ListenerEventV2, bool> predicate)
+        {
+            IQueryable<ListenerEventV2> listenerEventV2s =
+                await this.clientBroker.RetrieveAllListenerEventV2sAsync();
+
+            for (int retries = 0; retries < 20 && !listenerEventV2s.Any(predicate); retries++)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(250));
+
+                listenerEventV2s =
+                    await this.clientBroker.RetrieveAllListenerEventV2sAsync();
+            }
+
+            return listenerEventV2s;
         }
 
         private static int GetRandomNumber() =>
