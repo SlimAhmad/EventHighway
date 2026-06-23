@@ -67,6 +67,52 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         }
 
         [Theory]
+        [MemberData(nameof(DependencyValidationExceptions))]
+        public async Task
+            ShouldThrowDependencyValidationExceptionOnRetrieveAllEventArchivesIfDependencyValidationExceptionOccursAndLogItAsync(
+                Xeption dependencyValidationException)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var expectedEventArchiveV2OrchestrationDependencyValidationException =
+                new EventArchiveV2OrchestrationDependencyValidationException(
+                    message: "Event archive validation error occurred, fix the errors and try again.",
+                    innerException: dependencyValidationException.InnerException as Xeption);
+
+            this.eventArchiveV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(dependencyValidationException);
+
+            // when
+            ValueTask<IQueryable<EventArchiveV2>> retrieveAllTask =
+                this.eventArchiveV2OrchestrationService.RetrieveAllEventArchiveV2sAsync(
+                    randomCancellationToken);
+
+            EventArchiveV2OrchestrationDependencyValidationException actualException =
+                await Assert.ThrowsAsync<EventArchiveV2OrchestrationDependencyValidationException>(
+                    retrieveAllTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(expectedEventArchiveV2OrchestrationDependencyValidationException);
+
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventArchiveV2OrchestrationDependencyValidationException))),
+                        Times.Once);
+
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Theory]
         [MemberData(nameof(DependencyExceptions))]
         public async Task
             ShouldThrowDependencyExceptionOnRetrieveAllEventArchivesIfDependencyExceptionOccursAndLogItAsync(
