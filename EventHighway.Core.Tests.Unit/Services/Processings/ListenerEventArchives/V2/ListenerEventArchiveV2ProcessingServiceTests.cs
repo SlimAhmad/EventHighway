@@ -86,6 +86,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 9).GetValue();
 
+        private static Guid GetRandomId() =>
+            Guid.NewGuid();
+
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
