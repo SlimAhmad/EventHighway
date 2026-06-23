@@ -151,5 +151,66 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldBulkRestoreValidEventV2sAndLogReverseDatedOnesAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            List<EventV2> validEventV2s = CreateRandomRestoreEventV2s();
+
+            EventV2 reverseDatedEventV2 = CreateRandomRestoreEventV2s().First();
+
+            reverseDatedEventV2.UpdatedDate =
+                reverseDatedEventV2.CreatedDate.AddMinutes(-GetRandomNumber());
+
+            List<EventV2> inputEventV2s =
+                validEventV2s.Append(reverseDatedEventV2).ToList();
+
+            List<EventV2> expectedEventV2s =
+                validEventV2s.Select(item => item.DeepClone()).ToList();
+
+            var invalidEventV2Exception =
+                new InvalidEventV2Exception(
+                    message: "Event is invalid, fix the errors and try again.");
+
+            invalidEventV2Exception.AddData(
+                key: nameof(EventV2.CreatedDate),
+                values: $"Date is later than {nameof(EventV2.UpdatedDate)}");
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.BulkInsertEventV2sAsync(
+                    It.Is<List<EventV2>>(actual =>
+                        SameEventV2sAs(expectedEventV2s, actual)),
+                            randomCancellationToken))
+                                .Returns(ValueTask.CompletedTask);
+
+            // when
+            IEnumerable<EventV2> actualEventV2s =
+                await this.eventV2Service.BulkRestoreEventV2sAsync(
+                    inputEventV2s,
+                        randomCancellationToken);
+
+            // then
+            actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    invalidEventV2Exception))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.BulkInsertEventV2sAsync(
+                    It.Is<List<EventV2>>(actual =>
+                        SameEventV2sAs(expectedEventV2s, actual)),
+                            randomCancellationToken),
+                                Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
