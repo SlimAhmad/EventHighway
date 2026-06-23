@@ -75,6 +75,16 @@ namespace EventHighway.Core.Services.Processings.ListenerEventArchives.V2
                 : listenerEventArchiveV2.Take(take).ToList();
         });
 
+        public ValueTask<List<ListenerEventArchiveV2>> RetrieveBatchOfListenerEventArchiveV2sAsync(
+            Guid? eventAddressId,
+            IEnumerable<Guid> eventListenerIds,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int skip,
+            int take,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
             CancellationToken cancellationToken = default) =>
