@@ -17,5 +17,8 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
             DateTimeOffset? startDate,
             DateTimeOffset? endDate,
             CancellationToken cancellationToken = default);
+
+        ValueTask ProcessReplayedListenerEventV2sAsync(
+            CancellationToken cancellationToken = default);
     }
 }
