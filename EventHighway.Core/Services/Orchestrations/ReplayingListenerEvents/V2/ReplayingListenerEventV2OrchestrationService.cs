@@ -38,10 +38,12 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
 
         public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfReplayListenerEventV2sAsync(
             int take,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
-            throw new NotImplementedException();
-        }
+            return await this.listenerEventV2ProcessingService
+                .RetrieveBatchOfReplayListenerEventV2sAsync(take, cancellationToken);
+        });
 
         public ValueTask<ListenerEventV2> ProcessReplayListenerEventV2Async(
             ListenerEventV2 listenerEventV2,
