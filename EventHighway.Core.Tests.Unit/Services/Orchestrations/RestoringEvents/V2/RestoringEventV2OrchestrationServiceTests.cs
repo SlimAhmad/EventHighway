@@ -12,6 +12,9 @@ using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Models.Services.Processings.EventListeners.V2.Exceptions;
+using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
+using EventHighway.Core.Models.Services.Processings.ListenerEvents.V2.Exceptions;
 using EventHighway.Core.Services.Orchestrations.RestoringEvents.V2;
 using EventHighway.Core.Services.Processings.EventListeners.V2;
 using EventHighway.Core.Services.Processings.Events.V2;
@@ -43,6 +46,38 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
                 listenerEventV2ProcessingService: this.listenerEventV2ProcessingServiceMock.Object,
                 eventListenerV2ProcessingService: this.eventListenerV2ProcessingServiceMock.Object,
                 loggingBroker: this.loggingBrokerMock.Object);
+        }
+
+        public static TheoryData<Xeption> DependencyValidationExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+
+            return new TheoryData<Xeption>
+            {
+                new EventV2ProcessingValidationException(someMessage, someInnerException),
+                new EventV2ProcessingDependencyValidationException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingValidationException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingDependencyValidationException(someMessage, someInnerException),
+                new EventListenerV2ProcessingValidationException(someMessage, someInnerException),
+                new EventListenerV2ProcessingDependencyValidationException(someMessage, someInnerException),
+            };
+        }
+
+        public static TheoryData<Xeption> DependencyExceptions()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+
+            return new TheoryData<Xeption>
+            {
+                new EventV2ProcessingDependencyException(someMessage, someInnerException),
+                new EventV2ProcessingServiceException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingDependencyException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingServiceException(someMessage, someInnerException),
+                new EventListenerV2ProcessingDependencyException(someMessage, someInnerException),
+                new EventListenerV2ProcessingServiceException(someMessage, someInnerException),
+            };
         }
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
