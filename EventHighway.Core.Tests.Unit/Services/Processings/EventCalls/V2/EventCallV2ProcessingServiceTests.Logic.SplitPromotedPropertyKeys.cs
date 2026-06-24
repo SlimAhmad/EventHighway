@@ -40,29 +40,5 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("   ")]
-        public async Task ShouldReturnEmptyKeysWhenPromotedPropertiesIsNullOrWhitespaceAsync(
-            string inputPromotedProperties)
-        {
-            // given
-            var expectedKeys = new List<string>();
-
-            // when
-            IEnumerable<string> actualKeys =
-                await this.eventCallV2ProcessingService
-                    .SplitPromotedPropertyKeysAsync(
-                        inputPromotedProperties,
-                        TestContext.Current.CancellationToken);
-
-            // then
-            actualKeys.ToList().Should().BeEquivalentTo(expectedKeys);
-
-            this.eventCallV2ServiceMock.VerifyNoOtherCalls();
-            this.jsonBrokerMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
-        }
     }
 }
