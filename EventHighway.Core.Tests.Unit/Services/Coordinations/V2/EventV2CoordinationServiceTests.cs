@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
-using EventHighway.Core.Brokers.Jsons;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -30,7 +29,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
     {
         private readonly Mock<IEventV2OrchestrationService> eventV2OrchestrationServiceMock;
         private readonly Mock<IEventListenerV2OrchestrationService> eventListenerV2OrchestrationServiceMock;
-        private readonly Mock<IJsonBroker> jsonBrokerMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly ICompareLogic compareLogic;
@@ -44,9 +42,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock =
                 new Mock<IEventListenerV2OrchestrationService>(
                     behavior: MockBehavior.Strict);
-
-            this.jsonBrokerMock =
-                new Mock<IJsonBroker>();
 
             this.dateTimeBrokerMock = new Mock<IDateTimeBroker>(
                 behavior: MockBehavior.Strict);
@@ -63,7 +58,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 new EventV2CoordinationService(
                     eventV2OrchestrationService: this.eventV2OrchestrationServiceMock.Object,
                     eventListenerV2OrchestrationService: this.eventListenerV2OrchestrationServiceMock.Object,
-                    jsonBroker: this.jsonBrokerMock.Object,
                     dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }

@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -111,7 +110,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
-            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -171,6 +169,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                             Content = inputImmediateEventV2.Content,
                             RequiredPromotedProperties =
                                 SplitPromotedPropertyKeys(retrievedEventListenerV2.PromotedProperties),
+                            PromotedProperties = new List<PromotedProperty>(),
                         }).ToList();
 
             int expectedDateTimeBrokerCalls =
@@ -310,7 +309,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
-            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -351,11 +349,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             IQueryable<EventListenerV2> retrievedEventListenerV2s =
                 new[] { retrievedEventListenerV2 }.AsQueryable();
 
-            var expectedPromotedProperties = new List<PromotedProperty>
+            var returnedPromotedProperties = new List<PromotedProperty>
             {
                 new PromotedProperty { Name = promotedPropertyKey1, Value = promotedPropertyValue1 },
                 new PromotedProperty { Name = promotedPropertyKey2, Value = promotedPropertyValue2 },
             };
+
+            var expectedPromotedProperties = returnedPromotedProperties;
 
             ListenerEventV2 inputListenerEventV2 =
                 new ListenerEventV2
@@ -428,29 +428,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                         randomCancellationToken))
                             .ReturnsAsync(addedListenerEventV2);
 
-            this.jsonBrokerMock.Setup(broker =>
-                broker.CheckIfPropertyExist(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey1))
-                        .Returns(true);
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.SplitPromotedPropertyKeysAsync(
+                        promotedPropertiesCsv,
+                        randomCancellationToken))
+                            .ReturnsAsync(new[] { promotedPropertyKey1, promotedPropertyKey2 });
 
-            this.jsonBrokerMock.Setup(broker =>
-                broker.GetJsonPropertyValue(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey1))
-                        .Returns(promotedPropertyValue1);
-
-            this.jsonBrokerMock.Setup(broker =>
-                broker.CheckIfPropertyExist(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey2))
-                        .Returns(true);
-
-            this.jsonBrokerMock.Setup(broker =>
-                broker.GetJsonPropertyValue(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey2))
-                        .Returns(promotedPropertyValue2);
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.PromotePropertiesAsync(
+                        inputImmediateEventV2.Content,
+                        promotedPropertiesCsv,
+                        randomCancellationToken))
+                            .ReturnsAsync(returnedPromotedProperties);
 
             this.eventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
@@ -514,28 +505,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     randomCancellationToken),
                         Times.Once);
 
-            this.jsonBrokerMock.Verify(broker =>
-                broker.CheckIfPropertyExist(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey1),
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.SplitPromotedPropertyKeysAsync(
+                    promotedPropertiesCsv,
+                    randomCancellationToken),
                         Times.Once);
 
-            this.jsonBrokerMock.Verify(broker =>
-                broker.GetJsonPropertyValue(
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.PromotePropertiesAsync(
                     inputImmediateEventV2.Content,
-                    promotedPropertyKey1),
-                        Times.Once);
-
-            this.jsonBrokerMock.Verify(broker =>
-                broker.CheckIfPropertyExist(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey2),
-                        Times.Once);
-
-            this.jsonBrokerMock.Verify(broker =>
-                broker.GetJsonPropertyValue(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey2),
+                    promotedPropertiesCsv,
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
@@ -553,7 +533,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
-            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -593,10 +572,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             IQueryable<EventListenerV2> retrievedEventListenerV2s =
                 new[] { retrievedEventListenerV2 }.AsQueryable();
 
-            var expectedPromotedProperties = new List<PromotedProperty>
+            var returnedPromotedProperties = new List<PromotedProperty>
             {
                 new PromotedProperty { Name = promotedPropertyKey1, Value = promotedPropertyValue1 },
             };
+
+            var expectedPromotedProperties = returnedPromotedProperties;
 
             ListenerEventV2 inputListenerEventV2 =
                 new ListenerEventV2
@@ -669,23 +650,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                         randomCancellationToken))
                             .ReturnsAsync(addedListenerEventV2);
 
-            this.jsonBrokerMock.Setup(broker =>
-                broker.CheckIfPropertyExist(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey1))
-                        .Returns(true);
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.SplitPromotedPropertyKeysAsync(
+                        promotedPropertiesCsv,
+                        randomCancellationToken))
+                            .ReturnsAsync(new[] { promotedPropertyKey1, promotedPropertyKey2 });
 
-            this.jsonBrokerMock.Setup(broker =>
-                broker.GetJsonPropertyValue(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey1))
-                        .Returns(promotedPropertyValue1);
-
-            this.jsonBrokerMock.Setup(broker =>
-                broker.CheckIfPropertyExist(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey2))
-                        .Returns(false);
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.PromotePropertiesAsync(
+                        inputImmediateEventV2.Content,
+                        promotedPropertiesCsv,
+                        randomCancellationToken))
+                            .ReturnsAsync(returnedPromotedProperties);
 
             this.eventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
@@ -749,22 +727,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     randomCancellationToken),
                         Times.Once);
 
-            this.jsonBrokerMock.Verify(broker =>
-                broker.CheckIfPropertyExist(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey1),
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.SplitPromotedPropertyKeysAsync(
+                    promotedPropertiesCsv,
+                    randomCancellationToken),
                         Times.Once);
 
-            this.jsonBrokerMock.Verify(broker =>
-                broker.GetJsonPropertyValue(
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.PromotePropertiesAsync(
                     inputImmediateEventV2.Content,
-                    promotedPropertyKey1),
-                        Times.Once);
-
-            this.jsonBrokerMock.Verify(broker =>
-                broker.CheckIfPropertyExist(
-                    inputImmediateEventV2.Content,
-                    promotedPropertyKey2),
+                    promotedPropertiesCsv,
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
@@ -782,7 +755,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
-            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -893,11 +865,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                         randomCancellationToken))
                             .ReturnsAsync(addedListenerEventV2);
 
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
+                    service.SplitPromotedPropertyKeysAsync(
+                        promotedPropertiesCsv,
+                        randomCancellationToken))
+                            .ReturnsAsync(new[] { promotedPropertyKey });
+
             if (invalidContent != null)
             {
-                this.jsonBrokerMock.Setup(broker =>
-                    broker.CheckIfPropertyExist(invalidContent, It.IsAny<string>()))
-                        .Throws<JsonException>();
+                this.eventV2OrchestrationServiceMock
+                    .InSequence(mockSequence).Setup(service =>
+                        service.PromotePropertiesAsync(
+                            invalidContent,
+                            promotedPropertiesCsv,
+                            randomCancellationToken))
+                                .ReturnsAsync(new List<PromotedProperty>());
             }
 
             this.eventV2OrchestrationServiceMock
@@ -963,6 +946,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                         Times.Once);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.SplitPromotedPropertyKeysAsync(
+                    promotedPropertiesCsv,
+                    randomCancellationToken),
+                        Times.Once);
+
+            if (invalidContent != null)
+            {
+                this.eventV2OrchestrationServiceMock.Verify(service =>
+                    service.PromotePropertiesAsync(
+                        invalidContent,
+                        promotedPropertiesCsv,
+                        randomCancellationToken),
+                            Times.Once);
+            }
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RunEventCallV2Async(
                     It.Is(SameEventCallAs(expectedInputCallEventV2)),
                     randomCancellationToken),
@@ -974,17 +973,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     randomCancellationToken),
                         Times.Once);
 
-            if (invalidContent != null)
-            {
-                this.jsonBrokerMock.Verify(broker =>
-                    broker.CheckIfPropertyExist(invalidContent, promotedPropertyKey),
-                        Times.Once);
-            }
-
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
-            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

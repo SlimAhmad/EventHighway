@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Core.Brokers.Jsons;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
@@ -25,20 +24,17 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
     {
         private readonly IEventV2OrchestrationService eventV2OrchestrationService;
         private readonly IEventListenerV2OrchestrationService eventListenerV2OrchestrationService;
-        private readonly IJsonBroker jsonBroker;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventV2CoordinationService(
             IEventV2OrchestrationService eventV2OrchestrationService,
             IEventListenerV2OrchestrationService eventListenerV2OrchestrationService,
-            IJsonBroker jsonBroker,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2OrchestrationService = eventV2OrchestrationService;
             this.eventListenerV2OrchestrationService = eventListenerV2OrchestrationService;
-            this.jsonBroker = jsonBroker;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
         }
@@ -160,21 +156,35 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             ListenerEventV2 listenerEventV2,
             CancellationToken cancellationToken)
         {
+            IEnumerable<string> requiredKeys =
+                string.IsNullOrWhiteSpace(eventListenerV2.PromotedProperties)
+                    ? Array.Empty<string>()
+                    : await this.eventV2OrchestrationService
+                        .SplitPromotedPropertyKeysAsync(
+                            eventListenerV2.PromotedProperties,
+                            cancellationToken);
+
             var eventCallV2 = new EventCallV2
             {
                 Content = eventV2.Content,
                 HandlerId = eventListenerV2.HandlerId,
                 HandlerName = eventListenerV2.HandlerName,
                 FilterCriteria = eventListenerV2.FilterCriteria,
-                RequiredPromotedProperties = SplitPromotedPropertyKeys(eventListenerV2.PromotedProperties),
+                RequiredPromotedProperties = requiredKeys,
                 Response = null
             };
 
             try
             {
-                eventCallV2.PromotedProperties = PromoteProperties(
-                    content: eventV2.Content,
-                    promotedProperties: eventListenerV2.PromotedProperties);
+                eventCallV2.PromotedProperties =
+                    string.IsNullOrWhiteSpace(eventV2.Content)
+                        || string.IsNullOrWhiteSpace(eventListenerV2.PromotedProperties)
+                        ? new List<PromotedProperty>()
+                        : await this.eventV2OrchestrationService
+                            .PromotePropertiesAsync(
+                                eventV2.Content,
+                                eventListenerV2.PromotedProperties,
+                                cancellationToken);
 
                 EventCallV2 ranEventCallV2 =
                     await this.eventV2OrchestrationService
@@ -199,43 +209,6 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
 
             await this.eventListenerV2OrchestrationService
                 .ModifyListenerEventV2Async(listenerEventV2, cancellationToken);
-        }
-
-        private static IEnumerable<string> SplitPromotedPropertyKeys(string promotedProperties) =>
-            string.IsNullOrWhiteSpace(promotedProperties)
-                ? Array.Empty<string>()
-                : promotedProperties.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        private List<PromotedProperty> PromoteProperties(
-            string content,
-            string promotedProperties)
-        {
-            if (string.IsNullOrWhiteSpace(promotedProperties) || string.IsNullOrWhiteSpace(content))
-                return new List<PromotedProperty>();
-
-            IEnumerable<string> keys = SplitPromotedPropertyKeys(promotedProperties);
-            var result = new List<PromotedProperty>();
-
-            try
-            {
-                foreach (string key in keys)
-                {
-                    if (this.jsonBroker.CheckIfPropertyExist(content, key))
-                    {
-                        result.Add(new PromotedProperty
-                        {
-                            Name = key,
-                            Value = this.jsonBroker.GetJsonPropertyValue(content, key)
-                        });
-                    }
-                }
-            }
-            catch
-            {
-                return new List<PromotedProperty>();
-            }
-
-            return result;
         }
 
         private static ListenerEventV2 CreateListenerEventV2(
