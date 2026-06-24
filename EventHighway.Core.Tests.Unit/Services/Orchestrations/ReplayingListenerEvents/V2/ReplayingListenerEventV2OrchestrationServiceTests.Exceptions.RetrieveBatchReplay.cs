@@ -167,5 +167,62 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task
+            ShouldThrowDependencyExceptionOnRetrieveBatchReplayIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            int randomTake = GetRandomNumber();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutReplayingListenerEventV2OrchestrationException =
+                new TimeoutReplayingListenerEventV2OrchestrationException(
+                    message: "Failed replaying listener event orchestration timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedReplayingListenerEventV2OrchestrationDependencyException =
+                new ReplayingListenerEventV2OrchestrationDependencyException(
+                    message: "Replaying listener event dependency error occurred, contact support.",
+                    innerException: timeoutReplayingListenerEventV2OrchestrationException);
+
+            this.listenerEventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveBatchOfReplayListenerEventV2sAsync(randomTake, randomCancellationToken))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchTask =
+                this.replayingListenerEventV2OrchestrationService
+                    .RetrieveBatchOfReplayListenerEventV2sAsync(randomTake, randomCancellationToken);
+
+            ReplayingListenerEventV2OrchestrationDependencyException actualException =
+                await Assert.ThrowsAsync<ReplayingListenerEventV2OrchestrationDependencyException>(
+                    retrieveBatchTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(
+                expectedReplayingListenerEventV2OrchestrationDependencyException);
+
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveBatchOfReplayListenerEventV2sAsync(randomTake, randomCancellationToken),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedReplayingListenerEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
