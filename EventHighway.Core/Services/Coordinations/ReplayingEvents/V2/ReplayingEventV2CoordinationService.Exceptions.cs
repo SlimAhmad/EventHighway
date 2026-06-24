@@ -45,6 +45,40 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     restoringEventV2OrchestrationDependencyValidationException);
             }
+            catch (EventArchiveV2OrchestrationDependencyException eventArchiveV2OrchestrationDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventArchiveV2OrchestrationDependencyException);
+            }
+            catch (EventArchiveV2OrchestrationServiceException eventArchiveV2OrchestrationServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventArchiveV2OrchestrationServiceException);
+            }
+            catch (RestoringEventV2OrchestrationDependencyException restoringEventV2OrchestrationDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    restoringEventV2OrchestrationDependencyException);
+            }
+            catch (RestoringEventV2OrchestrationServiceException restoringEventV2OrchestrationServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    restoringEventV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<ReplayingEventV2CoordinationDependencyException>
+            CreateAndLogDependencyExceptionAsync(Xeption exception)
+        {
+            var replayingEventV2CoordinationDependencyException =
+                new ReplayingEventV2CoordinationDependencyException(
+                    message: "Replaying event dependency error occurred, contact support.",
+                    innerException: exception.InnerException as Xeption);
+
+            await this.loggingBroker.LogErrorAsync(
+                replayingEventV2CoordinationDependencyException);
+
+            return replayingEventV2CoordinationDependencyException;
         }
 
         private async ValueTask<ReplayingEventV2CoordinationDependencyValidationException>
