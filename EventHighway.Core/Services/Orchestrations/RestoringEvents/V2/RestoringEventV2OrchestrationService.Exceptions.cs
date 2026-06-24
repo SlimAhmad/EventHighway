@@ -56,6 +56,50 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventListenerV2ProcessingDependencyValidationException);
             }
+            catch (EventV2ProcessingDependencyException eventV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventV2ProcessingDependencyException);
+            }
+            catch (EventV2ProcessingServiceException eventV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventV2ProcessingServiceException);
+            }
+            catch (ListenerEventV2ProcessingDependencyException listenerEventV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventV2ProcessingDependencyException);
+            }
+            catch (ListenerEventV2ProcessingServiceException listenerEventV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventV2ProcessingServiceException);
+            }
+            catch (EventListenerV2ProcessingDependencyException eventListenerV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventListenerV2ProcessingDependencyException);
+            }
+            catch (EventListenerV2ProcessingServiceException eventListenerV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventListenerV2ProcessingServiceException);
+            }
+        }
+
+        private async ValueTask<RestoringEventV2OrchestrationDependencyException>
+            CreateAndLogDependencyExceptionAsync(Xeption exception)
+        {
+            var restoringEventV2OrchestrationDependencyException =
+                new RestoringEventV2OrchestrationDependencyException(
+                    message: "Restoring event dependency error occurred, contact support.",
+                    innerException: exception.InnerException as Xeption);
+
+            await this.loggingBroker.LogErrorAsync(
+                restoringEventV2OrchestrationDependencyException);
+
+            return restoringEventV2OrchestrationDependencyException;
         }
 
         private async ValueTask<RestoringEventV2OrchestrationDependencyValidationException>
