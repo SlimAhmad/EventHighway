@@ -37,11 +37,15 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public async ValueTask RestoreAsync(
+        public ValueTask RestoreAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnRestore(eventArchiveV2s, listenerEventArchiveV2s);
+
             List<EventV2> mappedEventV2s =
                 eventArchiveV2s.Select(MapToEventV2).ToList();
 
@@ -77,7 +81,7 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
 
             await this.listenerEventV2ProcessingService.BulkRestoreListenerEventV2sAsync(
                 listenerEventV2sToRestore, cancellationToken);
-        }
+        });
 
         public async ValueTask GenerateReplayForNewListenersAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
