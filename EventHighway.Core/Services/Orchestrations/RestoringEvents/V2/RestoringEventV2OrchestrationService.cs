@@ -83,10 +83,14 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 listenerEventV2sToRestore, cancellationToken);
         });
 
-        public async ValueTask GenerateReplayForNewListenersAsync(
+        public ValueTask GenerateReplayForNewListenersAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnGenerateReplay(eventArchiveV2s);
+
             IQueryable<ListenerEventV2> existingListenerEventV2s =
                 await this.listenerEventV2ProcessingService
                     .RetrieveAllListenerEventV2sAsync(cancellationToken);
@@ -122,7 +126,7 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
 
             await this.listenerEventV2ProcessingService.BulkRestoreListenerEventV2sAsync(
                 generatedListenerEventV2s, cancellationToken);
-        }
+        });
 
         private static ListenerEventV2 GenerateListenerEventV2(
             EventArchiveV2 eventArchiveV2,

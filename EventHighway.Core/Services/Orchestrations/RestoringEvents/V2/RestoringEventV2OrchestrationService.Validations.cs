@@ -19,6 +19,12 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
         }
 
+        private static void ValidateOnGenerateReplay(
+            IEnumerable<EventArchiveV2> eventArchiveV2s)
+        {
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
+        }
+
         private static void ValidateEventArchiveV2sIsNotNull(
             IEnumerable<EventArchiveV2> eventArchiveV2s)
         {
