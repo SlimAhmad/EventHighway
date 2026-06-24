@@ -16,5 +16,9 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             IEnumerable<EventArchiveV2> eventArchiveV2s,
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
             CancellationToken cancellationToken = default);
+
+        ValueTask GenerateReplayForNewListenersAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default);
     }
 }

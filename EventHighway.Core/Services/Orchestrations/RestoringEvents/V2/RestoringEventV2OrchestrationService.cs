@@ -78,6 +78,11 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 listenerEventV2sToRestore, cancellationToken);
         }
 
+        public ValueTask GenerateReplayForNewListenersAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            CancellationToken cancellationToken = default) =>
+            throw new System.NotImplementedException();
+
         private static EventV2 MapToEventV2(EventArchiveV2 eventArchiveV2) =>
             new EventV2
             {

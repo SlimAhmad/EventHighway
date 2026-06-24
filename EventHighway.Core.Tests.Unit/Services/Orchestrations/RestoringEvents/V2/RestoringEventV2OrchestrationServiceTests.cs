@@ -66,6 +66,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
             return compareLogic.Compare(expectedListenerEventV2s, actualListenerEventV2s).AreEqual;
         }
 
+        private static bool SameGeneratedListenerEventV2sAs(
+            List<ListenerEventV2> expectedListenerEventV2s,
+            List<ListenerEventV2> actualListenerEventV2s)
+        {
+            var compareLogic = new CompareLogic(
+                new ComparisonConfig
+                {
+                    MembersToIgnore = new List<string> { nameof(ListenerEventV2.Id) }
+                });
+
+            bool fieldsMatch =
+                compareLogic.Compare(expectedListenerEventV2s, actualListenerEventV2s).AreEqual;
+
+            bool idsGenerated =
+                actualListenerEventV2s.All(listenerEventV2 => listenerEventV2.Id != Guid.Empty);
+
+            return fieldsMatch && idsGenerated;
+        }
+
         private static EventV2 MapToEventV2(EventArchiveV2 eventArchiveV2) =>
             new EventV2
             {
