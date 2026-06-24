@@ -60,15 +60,13 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
         public ValueTask<List<PromotedProperty>> PromotePropertiesAsync(
             string content,
             string promotedProperties,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
-            var promotedPropertyList = new List<PromotedProperty>();
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidatePromotePropertiesInputs(content, promotedProperties);
 
-            if (string.IsNullOrWhiteSpace(content)
-                || string.IsNullOrWhiteSpace(promotedProperties))
-            {
-                return new ValueTask<List<PromotedProperty>>(promotedPropertyList);
-            }
+            var promotedPropertyList = new List<PromotedProperty>();
 
             string[] keys = promotedProperties.Split(
                 ',',
@@ -86,7 +84,7 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
                 }
             }
 
-            return new ValueTask<List<PromotedProperty>>(promotedPropertyList);
-        }
+            return promotedPropertyList;
+        });
     }
 }

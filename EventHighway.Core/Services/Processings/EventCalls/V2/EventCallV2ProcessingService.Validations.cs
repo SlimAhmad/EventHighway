@@ -18,6 +18,9 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
             }
         }
 
+        internal virtual void ValidatePromotePropertiesInputs(string content, string promotedProperties)
+        { }
+
         internal virtual void ValidatePromotedProperties(string promotedProperties)
         {
             var invalidEventCallV2ProcessingException =

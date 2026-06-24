@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
+using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using EventHighway.Core.Models.Services.Processings.EventCalls.V2.Exceptions;
 using Xeptions;
 
@@ -17,6 +18,7 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
     {
         private delegate ValueTask<EventCallV2> ReturningEventCallV2Function();
         private delegate ValueTask<IEnumerable<string>> ReturningPromotedPropertyKeysFunction();
+        private delegate ValueTask<List<PromotedProperty>> ReturningPromotedPropertiesListFunction();
 
         private async ValueTask<IEnumerable<string>> TryCatch(
             ReturningPromotedPropertyKeysFunction returningPromotedPropertyKeysFunction)
@@ -24,6 +26,53 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
             try
             {
                 return await returningPromotedPropertyKeysFunction();
+            }
+            catch (InvalidEventCallV2ProcessingException invalidEventCallV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(invalidEventCallV2ProcessingException);
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventCallV2ProcessingException =
+                    new TimeoutEventCallV2ProcessingException(
+                        message: "Failed event call processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventCallV2ProcessingDependencyException =
+                    new EventCallV2ProcessingDependencyException(
+                        message: "Event call dependency error occurred, contact support.",
+                        innerException: timeoutEventCallV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(eventCallV2ProcessingDependencyException);
+                throw eventCallV2ProcessingDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                var failedEventCallV2ProcessingServiceException =
+                    new FailedEventCallV2ProcessingServiceException(
+                        message: "Failed event call service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventCallV2ProcessingServiceException);
+            }
+        }
+
+        private async ValueTask<List<PromotedProperty>> TryCatch(
+            ReturningPromotedPropertiesListFunction returningPromotedPropertiesListFunction)
+        {
+            try
+            {
+                return await returningPromotedPropertiesListFunction();
             }
             catch (InvalidEventCallV2ProcessingException invalidEventCallV2ProcessingException)
             {
