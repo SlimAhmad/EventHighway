@@ -143,5 +143,44 @@ namespace EventHighway.Core.Tests.Unit.Clients.ReplayingEvents.V2
 
             this.replayingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnProcessReplayedIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedReplayingEventV2ClientServiceException =
+                new ReplayingEventV2ClientServiceException(
+                    message: "Replaying event client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.replayingEventV2CoordinationServiceMock.Setup(service =>
+                service.ProcessReplayedListenerEventV2sAsync(randomCancellationToken))
+                    .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask processReplayedTask =
+                this.replayingEventV2Client
+                    .ProcessReplayedListenerEventV2sAsync(randomCancellationToken);
+
+            ReplayingEventV2ClientServiceException actualException =
+                await Assert.ThrowsAsync<ReplayingEventV2ClientServiceException>(
+                    processReplayedTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(
+                expectedReplayingEventV2ClientServiceException);
+
+            this.replayingEventV2CoordinationServiceMock.Verify(service =>
+                service.ProcessReplayedListenerEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.replayingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
