@@ -45,6 +45,10 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
                 await this.loggingBroker.LogErrorAsync(eventCallV2ProcessingDependencyException);
                 throw eventCallV2ProcessingDependencyException;
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 var failedEventCallV2ProcessingServiceException =
