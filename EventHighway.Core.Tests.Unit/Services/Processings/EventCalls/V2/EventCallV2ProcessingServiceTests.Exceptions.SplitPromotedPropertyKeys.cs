@@ -70,5 +70,65 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnSplitPromotedPropertyKeysIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            string somePromotedProperties = GetRandomString();
+
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventCallV2ProcessingException =
+                new TimeoutEventCallV2ProcessingException(
+                    message: "Failed event call processing timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventCallV2ProcessingDependencyException =
+                new EventCallV2ProcessingDependencyException(
+                    message: "Event call dependency error occurred, contact support.",
+                    innerException: timeoutEventCallV2ProcessingException);
+
+            var eventCallV2ProcessingServiceMock = new Mock<EventCallV2ProcessingService>(
+                this.eventCallV2ServiceMock.Object,
+                this.loggingBrokerMock.Object)
+            {
+                CallBase = true
+            };
+
+            eventCallV2ProcessingServiceMock.Setup(service =>
+                service.ValidatePromotedProperties(It.IsAny<string>()))
+                    .Throws(operationCanceledException);
+
+            IEventCallV2ProcessingService eventCallV2ProcessingService =
+                eventCallV2ProcessingServiceMock.Object;
+
+            // when
+            ValueTask<IEnumerable<string>> splitPromotedPropertyKeysTask =
+                eventCallV2ProcessingService.SplitPromotedPropertyKeysAsync(
+                    somePromotedProperties,
+                    TestContext.Current.CancellationToken);
+
+            EventCallV2ProcessingDependencyException
+                actualEventCallV2ProcessingDependencyException =
+                    await Assert.ThrowsAsync<EventCallV2ProcessingDependencyException>(
+                        splitPromotedPropertyKeysTask.AsTask);
+
+            // then
+            actualEventCallV2ProcessingDependencyException.Should()
+                .BeEquivalentTo(expectedEventCallV2ProcessingDependencyException);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventCallV2ProcessingDependencyException))),
+                        Times.Once);
+
+            this.eventCallV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
