@@ -2,6 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
@@ -33,5 +35,8 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
 
             return await this.eventCallV2Service.RunEventCallV2Async(eventCallV2, cancellationToken);
         });
+
+        public IEnumerable<string> SplitPromotedPropertyKeys(string promotedProperties) =>
+            throw new NotImplementedException();
     }
 }
