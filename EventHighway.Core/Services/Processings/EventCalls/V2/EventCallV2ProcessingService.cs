@@ -37,6 +37,10 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
         });
 
         public IEnumerable<string> SplitPromotedPropertyKeys(string promotedProperties) =>
-            throw new NotImplementedException();
+            string.IsNullOrWhiteSpace(promotedProperties)
+                ? Array.Empty<string>()
+                : promotedProperties.Split(
+                    ',',
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 }
