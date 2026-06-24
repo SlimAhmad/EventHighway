@@ -65,9 +65,43 @@ namespace EventHighway.Core.Clients.ReplayingEvents.V2
         }
 
         /// <inheritdoc/>
-        public ValueTask ProcessReplayedListenerEventV2sAsync(
-            CancellationToken cancellationToken = default) =>
-                throw new NotImplementedException();
+        public async ValueTask ProcessReplayedListenerEventV2sAsync(
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await this.replayingEventV2CoordinationService
+                    .ProcessReplayedListenerEventV2sAsync(cancellationToken);
+            }
+            catch (ReplayingEventV2CoordinationValidationException
+                replayingEventV2CoordinationValidationException)
+            {
+                throw CreateReplayingEventV2ClientValidationException(
+                    replayingEventV2CoordinationValidationException.InnerException as Xeption);
+            }
+            catch (ReplayingEventV2CoordinationDependencyValidationException
+                replayingEventV2CoordinationDependencyValidationException)
+            {
+                throw CreateReplayingEventV2ClientValidationException(
+                    replayingEventV2CoordinationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (ReplayingEventV2CoordinationDependencyException
+                replayingEventV2CoordinationDependencyException)
+            {
+                throw CreateReplayingEventV2ClientDependencyException(
+                    replayingEventV2CoordinationDependencyException.InnerException as Xeption);
+            }
+            catch (ReplayingEventV2CoordinationServiceException
+                replayingEventV2CoordinationServiceException)
+            {
+                throw CreateReplayingEventV2ClientDependencyException(
+                    replayingEventV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateReplayingEventV2ClientServiceException(exception as Xeption);
+            }
+        }
 
         private static ReplayingEventV2ClientValidationException
             CreateReplayingEventV2ClientValidationException(Xeption innerException)
