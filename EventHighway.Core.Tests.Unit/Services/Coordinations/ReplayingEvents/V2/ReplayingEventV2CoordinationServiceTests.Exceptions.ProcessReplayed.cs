@@ -264,5 +264,54 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task
+            ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnProcessReplayedAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            int randomTake = GetRandomNumber();
+
+            using var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            var operationCanceledException =
+                new OperationCanceledException(cancellationTokenSource.Token);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(CreateBatchConfiguration(randomTake));
+
+            this.replayingListenerEventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfReplayListenerEventV2sAsync(
+                    randomTake, randomCancellationToken))
+                .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask processReplayedTask =
+                this.replayingEventV2CoordinationService
+                    .ProcessReplayedListenerEventV2sAsync(randomCancellationToken);
+
+            // then
+            await Assert.ThrowsAsync<OperationCanceledException>(
+                processReplayedTask.AsTask);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(), Times.Once);
+
+            this.replayingListenerEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfReplayListenerEventV2sAsync(
+                    randomTake, randomCancellationToken),
+                Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.restoringEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.replayingListenerEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
