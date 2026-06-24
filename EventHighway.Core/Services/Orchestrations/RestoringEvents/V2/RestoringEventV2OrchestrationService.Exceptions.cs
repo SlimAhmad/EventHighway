@@ -113,6 +113,31 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 throw await CreateAndLogDependencyExceptionAsync(
                     eventListenerV2ProcessingServiceException);
             }
+            catch (Exception exception)
+            {
+                var failedRestoringEventV2OrchestrationServiceException =
+                    new FailedRestoringEventV2OrchestrationServiceException(
+                        message: "Failed restoring event orchestration service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedRestoringEventV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<RestoringEventV2OrchestrationServiceException>
+            CreateAndLogServiceExceptionAsync(Xeption exception)
+        {
+            var restoringEventV2OrchestrationServiceException =
+                new RestoringEventV2OrchestrationServiceException(
+                    message: "Restoring event service error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                restoringEventV2OrchestrationServiceException);
+
+            return restoringEventV2OrchestrationServiceException;
         }
 
         private async ValueTask<RestoringEventV2OrchestrationDependencyException>
