@@ -80,5 +80,69 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             this.restoringEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(DependencyExceptions))]
+        public async Task ShouldThrowDependencyExceptionOnReplayIfDependencyErrorOccursAndLogItAsync(
+            Xeption dependencyException)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid? eventAddressId = GetRandomId();
+            List<Guid> eventListenerIds = new List<Guid> { GetRandomId() };
+            DateTimeOffset? startDate = GetRandomDateTimeOffset();
+            DateTimeOffset? endDate = startDate.Value.AddDays(GetRandomNumber());
+
+            BatchConfiguration batchConfiguration = CreateBatchConfiguration(GetRandomNumber());
+
+            var expectedException =
+                new ReplayingEventV2CoordinationDependencyException(
+                    message: "Replaying event dependency error occurred, contact support.",
+                    innerException: dependencyException.InnerException as Xeption);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(batchConfiguration);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                    It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
+                    It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
+                    It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask replayTask =
+                this.replayingEventV2CoordinationService.ReplayEventArchiveV2sAsync(
+                    eventAddressId, eventListenerIds, startDate, endDate, randomCancellationToken);
+
+            ReplayingEventV2CoordinationDependencyException actualException =
+                await Assert.ThrowsAsync<ReplayingEventV2CoordinationDependencyException>(
+                    replayTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(expectedException);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                    It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
+                    It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
+                    It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(expectedException))),
+                    Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(), Times.Once);
+
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.restoringEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
