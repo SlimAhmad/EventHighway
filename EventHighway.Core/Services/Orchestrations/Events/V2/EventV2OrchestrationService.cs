@@ -165,7 +165,13 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             string content,
             string promotedProperties,
             CancellationToken cancellationToken = default) =>
-                throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.eventCallV2ProcessingService
+                .PromotePropertiesAsync(content, promotedProperties, cancellationToken);
+        });
 
     }
 }
