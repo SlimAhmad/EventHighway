@@ -12,6 +12,7 @@ using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
 using EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.RestoringEvents.V2;
@@ -96,6 +97,35 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
 
         public ValueTask ProcessReplayedListenerEventV2sAsync(
             CancellationToken cancellationToken = default) =>
-                throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            BatchConfiguration batchConfiguration =
+                this.configurationBroker.GetBatchConfiguration();
+
+            int take = batchConfiguration.BatchSizeForBulkProcessing;
+            IEnumerable<ListenerEventV2> listenerEventV2Batch;
+
+            do
+            {
+                listenerEventV2Batch =
+                    await this.replayingListenerEventV2OrchestrationService
+                        .RetrieveBatchOfReplayListenerEventV2sAsync(take, cancellationToken);
+
+                if (!listenerEventV2Batch.Any())
+                    break;
+
+                foreach (ListenerEventV2 listenerEventV2 in listenerEventV2Batch)
+                {
+                    await this.replayingListenerEventV2OrchestrationService
+                        .ProcessReplayListenerEventV2Async(listenerEventV2, cancellationToken);
+                }
+
+                if (take == 0)
+                    break;
+            }
+            while (true);
+        });
     }
 }
