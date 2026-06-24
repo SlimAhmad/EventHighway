@@ -25,6 +25,26 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
             {
                 return await returningPromotedPropertyKeysFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventCallV2ProcessingException =
+                    new TimeoutEventCallV2ProcessingException(
+                        message: "Failed event call processing timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventCallV2ProcessingDependencyException =
+                    new EventCallV2ProcessingDependencyException(
+                        message: "Event call dependency error occurred, contact support.",
+                        innerException: timeoutEventCallV2ProcessingException);
+
+                await this.loggingBroker.LogErrorAsync(eventCallV2ProcessingDependencyException);
+                throw eventCallV2ProcessingDependencyException;
+            }
             catch (Exception exception)
             {
                 var failedEventCallV2ProcessingServiceException =
