@@ -38,7 +38,8 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
 
         public ValueTask<IEnumerable<string>> SplitPromotedPropertyKeysAsync(
             string promotedProperties,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(() =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             ValidatePromotedProperties(promotedProperties);
@@ -51,6 +52,6 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
                         StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             return new ValueTask<IEnumerable<string>>(keys);
-        }
+        });
     }
 }

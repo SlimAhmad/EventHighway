@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -15,6 +16,26 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
     internal partial class EventCallV2ProcessingService
     {
         private delegate ValueTask<EventCallV2> ReturningEventCallV2Function();
+        private delegate ValueTask<IEnumerable<string>> ReturningPromotedPropertyKeysFunction();
+
+        private async ValueTask<IEnumerable<string>> TryCatch(
+            ReturningPromotedPropertyKeysFunction returningPromotedPropertyKeysFunction)
+        {
+            try
+            {
+                return await returningPromotedPropertyKeysFunction();
+            }
+            catch (Exception exception)
+            {
+                var failedEventCallV2ProcessingServiceException =
+                    new FailedEventCallV2ProcessingServiceException(
+                        message: "Failed event call service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventCallV2ProcessingServiceException);
+            }
+        }
 
         private async ValueTask<EventCallV2> TryCatch(ReturningEventCallV2Function returningEventCallV2Function)
         {
