@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ReplayingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
+using EventHighway.Core.Models.Services.Orchestrations.ReplayingListenerEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.RestoringEvents.V2.Exceptions;
 using Xeptions;
 
@@ -71,6 +72,16 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
             {
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     restoringEventV2OrchestrationDependencyValidationException);
+            }
+            catch (ReplayingListenerEventV2OrchestrationValidationException replayingListenerEventV2OrchestrationValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    replayingListenerEventV2OrchestrationValidationException);
+            }
+            catch (ReplayingListenerEventV2OrchestrationDependencyValidationException replayingListenerEventV2OrchestrationDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    replayingListenerEventV2OrchestrationDependencyValidationException);
             }
             catch (EventArchiveV2OrchestrationDependencyException eventArchiveV2OrchestrationDependencyException)
             {
