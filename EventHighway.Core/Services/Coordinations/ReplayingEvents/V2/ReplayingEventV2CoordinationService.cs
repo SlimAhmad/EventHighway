@@ -13,6 +13,7 @@ using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.RestoringEvents.V2;
 
 namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
@@ -21,17 +22,20 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
     {
         private readonly IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService;
         private readonly IRestoringEventV2OrchestrationService restoringEventV2OrchestrationService;
+        private readonly IReplayingListenerEventV2OrchestrationService replayingListenerEventV2OrchestrationService;
         private readonly IConfigurationBroker configurationBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public ReplayingEventV2CoordinationService(
             IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService,
             IRestoringEventV2OrchestrationService restoringEventV2OrchestrationService,
+            IReplayingListenerEventV2OrchestrationService replayingListenerEventV2OrchestrationService,
             IConfigurationBroker configurationBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventArchiveV2OrchestrationService = eventArchiveV2OrchestrationService;
             this.restoringEventV2OrchestrationService = restoringEventV2OrchestrationService;
+            this.replayingListenerEventV2OrchestrationService = replayingListenerEventV2OrchestrationService;
             this.configurationBroker = configurationBroker;
             this.loggingBroker = loggingBroker;
         }
@@ -89,5 +93,9 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
             }
             while (true);
         });
+
+        public ValueTask ProcessReplayedListenerEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
+                throw new NotImplementedException();
     }
 }
