@@ -36,13 +36,17 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public async ValueTask ReplayEventArchiveV2sAsync(
+        public ValueTask ReplayEventArchiveV2sAsync(
             Guid? eventAddressId,
             IEnumerable<Guid> eventListenerIds,
             DateTimeOffset? startDate,
             DateTimeOffset? endDate,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnReplay(startDate, endDate);
+
             BatchConfiguration batchConfiguration =
                 this.configurationBroker.GetBatchConfiguration();
 
@@ -84,6 +88,6 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
                 skip += take;
             }
             while (true);
-        }
+        });
     }
 }
