@@ -18,20 +18,42 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
             }
         }
 
-        internal virtual void ValidatePromotePropertiesInputs(string content, string promotedProperties)
-        { }
+        internal virtual void ValidatePromotedProperties(string promotedProperties) =>
+            Validate(
+                message: "Event call is invalid.",
 
-        internal virtual void ValidatePromotedProperties(string promotedProperties)
+                (Rule: IsInvalid(promotedProperties),
+                Parameter: nameof(promotedProperties)));
+
+        internal virtual void ValidatePromotePropertiesInputs(string content, string promotedProperties) =>
+            Validate(
+                message: "Event call is invalid.",
+
+                (Rule: IsInvalid(content),
+                Parameter: nameof(content)),
+
+                (Rule: IsInvalid(promotedProperties),
+                Parameter: nameof(promotedProperties)));
+
+        private static dynamic IsInvalid(string text) => new
+        {
+            Condition = string.IsNullOrWhiteSpace(text),
+            Message = "Text is required"
+        };
+
+        private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
         {
             var invalidEventCallV2ProcessingException =
-                new InvalidEventCallV2ProcessingException(
-                    message: "Event call is invalid.");
+                new InvalidEventCallV2ProcessingException(message);
 
-            if (string.IsNullOrWhiteSpace(promotedProperties))
+            foreach ((dynamic rule, string parameter) in validations)
             {
-                invalidEventCallV2ProcessingException.AddData(
-                    key: nameof(promotedProperties),
-                    values: "Text is required");
+                if (rule.Condition)
+                {
+                    invalidEventCallV2ProcessingException.UpsertDataList(
+                        key: parameter,
+                        value: rule.Message);
+                }
             }
 
             invalidEventCallV2ProcessingException.ThrowIfContainsErrors();
