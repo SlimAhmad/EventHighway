@@ -92,6 +92,31 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
                 throw await CreateAndLogDependencyExceptionAsync(
                     restoringEventV2OrchestrationServiceException);
             }
+            catch (Exception exception)
+            {
+                var failedReplayingEventV2CoordinationServiceException =
+                    new FailedReplayingEventV2CoordinationServiceException(
+                        message: "Failed replaying event coordination service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedReplayingEventV2CoordinationServiceException);
+            }
+        }
+
+        private async ValueTask<ReplayingEventV2CoordinationServiceException>
+            CreateAndLogServiceExceptionAsync(Xeption exception)
+        {
+            var replayingEventV2CoordinationServiceException =
+                new ReplayingEventV2CoordinationServiceException(
+                    message: "Replaying event service error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                replayingEventV2CoordinationServiceException);
+
+            return replayingEventV2CoordinationServiceException;
         }
 
         private async ValueTask<ReplayingEventV2CoordinationDependencyException>
