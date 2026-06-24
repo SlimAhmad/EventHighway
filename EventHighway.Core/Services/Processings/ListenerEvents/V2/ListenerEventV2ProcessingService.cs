@@ -98,7 +98,21 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
         public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfReplayListenerEventV2sAsync(
             int take,
             CancellationToken cancellationToken = default) =>
-                throw new System.NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnRetrieveBatchOfReplayListenerEventV2s(take);
+
+            IQueryable<ListenerEventV2> listenerEventV2s =
+                await this.listenerEventV2Service.RetrieveAllListenerEventV2sAsync(cancellationToken);
+
+            IQueryable<ListenerEventV2> replayListenerEventV2s =
+                listenerEventV2s.Where(l => l.Status == ListenerEventStatusV2.Replay);
+
+            return take == 0
+                ? replayListenerEventV2s.AsEnumerable()
+                : replayListenerEventV2s.Take(take).AsEnumerable();
+        });
 
         public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
             IEnumerable<Guid> eventIds,

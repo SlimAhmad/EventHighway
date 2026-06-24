@@ -36,6 +36,12 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
                 Parameter: nameof(ListenerEventV2.Id)));
         }
 
+        private static void ValidateOnRetrieveBatchOfReplayListenerEventV2s(int take)
+        {
+            Validate(
+                (Rule: IsInvalid(take), Parameter: "Take"));
+        }
+
         private static void ValidateOnRetrieveBatchOfListenerEventV2sByEventIds(
             IEnumerable<Guid> eventIds,
             int take)
