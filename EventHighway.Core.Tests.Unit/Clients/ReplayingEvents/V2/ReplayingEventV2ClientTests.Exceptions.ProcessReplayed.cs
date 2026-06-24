@@ -53,5 +53,50 @@ namespace EventHighway.Core.Tests.Unit.Clients.ReplayingEvents.V2
 
             this.replayingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnProcessReplayedIfDependencyErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
+
+            var replayingEventV2CoordinationDependencyException =
+                new ReplayingEventV2CoordinationDependencyException(
+                    someMessage, someInnerException);
+
+            var expectedReplayingEventV2ClientDependencyException =
+                new ReplayingEventV2ClientDependencyException(
+                    message: "Replaying event client dependency error occurred, contact support.",
+                    innerException: replayingEventV2CoordinationDependencyException.InnerException as Xeption,
+                    data: (replayingEventV2CoordinationDependencyException.InnerException as Xeption).Data);
+
+            this.replayingEventV2CoordinationServiceMock.Setup(service =>
+                service.ProcessReplayedListenerEventV2sAsync(randomCancellationToken))
+                    .ThrowsAsync(replayingEventV2CoordinationDependencyException);
+
+            // when
+            ValueTask processReplayedTask =
+                this.replayingEventV2Client
+                    .ProcessReplayedListenerEventV2sAsync(randomCancellationToken);
+
+            ReplayingEventV2ClientDependencyException actualException =
+                await Assert.ThrowsAsync<ReplayingEventV2ClientDependencyException>(
+                    processReplayedTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(
+                expectedReplayingEventV2ClientDependencyException);
+
+            this.replayingEventV2CoordinationServiceMock.Verify(service =>
+                service.ProcessReplayedListenerEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.replayingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
