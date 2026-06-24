@@ -18,6 +18,7 @@ using EventHighway.Core.Clients.EventListeners.V2;
 using EventHighway.Core.Clients.Events.V2;
 using EventHighway.Core.Clients.HealthChecks.V2;
 using EventHighway.Core.Clients.ListenerEvents.V2;
+using EventHighway.Core.Clients.ReplayingEvents.V2;
 using EventHighway.Core.Services.Coordinations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Coordinations.Events.V2;
 using EventHighway.Core.Services.Coordinations.HealthChecks.V2;
@@ -121,6 +122,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         public IListenerEventV2Client ListenerEventV2Client { get; private set; }
+
+        /// <summary>
+        /// Gets the client for replaying archived events in V2 API.
+        /// </summary>
+        public IReplayingEventV2Client ReplayingEventV2Client { get; private set; }
 
         private void InitializeClients(IServiceProvider serviceProvider)
         {
