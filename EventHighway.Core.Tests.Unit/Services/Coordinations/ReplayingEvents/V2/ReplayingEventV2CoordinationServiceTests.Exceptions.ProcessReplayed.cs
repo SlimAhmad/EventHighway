@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -124,6 +125,70 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedReplayingEventV2CoordinationDependencyException))),
+                Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.restoringEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.replayingListenerEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task
+            ShouldThrowServiceExceptionOnProcessReplayedIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            int randomTake = GetRandomNumber();
+            var serviceException = new Exception();
+
+            var failedReplayingEventV2CoordinationServiceException =
+                new FailedReplayingEventV2CoordinationServiceException(
+                    message: "Failed replaying event coordination service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedReplayingEventV2CoordinationServiceException =
+                new ReplayingEventV2CoordinationServiceException(
+                    message: "Replaying event service error occurred, contact support.",
+                    innerException: failedReplayingEventV2CoordinationServiceException);
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(CreateBatchConfiguration(randomTake));
+
+            this.replayingListenerEventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveBatchOfReplayListenerEventV2sAsync(
+                    randomTake, randomCancellationToken))
+                .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask processReplayedTask =
+                this.replayingEventV2CoordinationService
+                    .ProcessReplayedListenerEventV2sAsync(randomCancellationToken);
+
+            ReplayingEventV2CoordinationServiceException actualException =
+                await Assert.ThrowsAsync<ReplayingEventV2CoordinationServiceException>(
+                    processReplayedTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(
+                expectedReplayingEventV2CoordinationServiceException);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(), Times.Once);
+
+            this.replayingListenerEventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfReplayListenerEventV2sAsync(
+                    randomTake, randomCancellationToken),
+                Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedReplayingEventV2CoordinationServiceException))),
                 Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
