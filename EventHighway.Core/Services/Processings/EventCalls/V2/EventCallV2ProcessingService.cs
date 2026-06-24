@@ -62,7 +62,33 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
         public ValueTask<List<PromotedProperty>> PromotePropertiesAsync(
             string content,
             string promotedProperties,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            var promotedPropertyList = new List<PromotedProperty>();
+
+            if (string.IsNullOrWhiteSpace(content)
+                || string.IsNullOrWhiteSpace(promotedProperties))
+            {
+                return new ValueTask<List<PromotedProperty>>(promotedPropertyList);
+            }
+
+            string[] keys = promotedProperties.Split(
+                ',',
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (string key in keys)
+            {
+                if (this.jsonBroker.CheckIfPropertyExist(content, key))
+                {
+                    promotedPropertyList.Add(new PromotedProperty
+                    {
+                        Name = key,
+                        Value = this.jsonBroker.GetJsonPropertyValue(content, key)
+                    });
+                }
+            }
+
+            return new ValueTask<List<PromotedProperty>>(promotedPropertyList);
+        }
     }
 }
