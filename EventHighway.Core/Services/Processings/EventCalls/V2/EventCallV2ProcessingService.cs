@@ -36,11 +36,20 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
             return await this.eventCallV2Service.RunEventCallV2Async(eventCallV2, cancellationToken);
         });
 
-        public IEnumerable<string> SplitPromotedPropertyKeys(string promotedProperties) =>
-            string.IsNullOrWhiteSpace(promotedProperties)
-                ? Array.Empty<string>()
-                : promotedProperties.Split(
-                    ',',
-                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        public ValueTask<IEnumerable<string>> SplitPromotedPropertyKeysAsync(
+            string promotedProperties,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            IEnumerable<string> keys =
+                string.IsNullOrWhiteSpace(promotedProperties)
+                    ? Array.Empty<string>()
+                    : promotedProperties.Split(
+                        ',',
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            return new ValueTask<IEnumerable<string>>(keys);
+        }
     }
 }

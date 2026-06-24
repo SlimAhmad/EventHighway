@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 
@@ -12,7 +13,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
     public partial class EventCallV2ProcessingServiceTests
     {
         [Fact]
-        public void ShouldSplitPromotedPropertyKeys()
+        public async Task ShouldSplitPromotedPropertyKeysAsync()
         {
             // given
             string inputPromotedProperties = "name, age ,, address";
@@ -25,13 +26,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
             };
 
             // when
-            List<string> actualKeys =
-                this.eventCallV2ProcessingService
-                    .SplitPromotedPropertyKeys(inputPromotedProperties)
-                        .ToList();
+            IEnumerable<string> actualKeys =
+                await this.eventCallV2ProcessingService
+                    .SplitPromotedPropertyKeysAsync(
+                        inputPromotedProperties,
+                        TestContext.Current.CancellationToken);
 
             // then
-            actualKeys.Should().BeEquivalentTo(expectedKeys);
+            actualKeys.ToList().Should().BeEquivalentTo(expectedKeys);
 
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -41,20 +43,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public void ShouldReturnEmptyKeysWhenPromotedPropertiesIsNullOrWhitespace(
+        public async Task ShouldReturnEmptyKeysWhenPromotedPropertiesIsNullOrWhitespaceAsync(
             string inputPromotedProperties)
         {
             // given
             var expectedKeys = new List<string>();
 
             // when
-            List<string> actualKeys =
-                this.eventCallV2ProcessingService
-                    .SplitPromotedPropertyKeys(inputPromotedProperties)
-                        .ToList();
+            IEnumerable<string> actualKeys =
+                await this.eventCallV2ProcessingService
+                    .SplitPromotedPropertyKeysAsync(
+                        inputPromotedProperties,
+                        TestContext.Current.CancellationToken);
 
             // then
-            actualKeys.Should().BeEquivalentTo(expectedKeys);
+            actualKeys.ToList().Should().BeEquivalentTo(expectedKeys);
 
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();

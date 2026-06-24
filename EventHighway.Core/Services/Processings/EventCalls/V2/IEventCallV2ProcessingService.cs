@@ -15,6 +15,8 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
             EventCallV2 eventCallV2,
             CancellationToken cancellationToken = default);
 
-        IEnumerable<string> SplitPromotedPropertyKeys(string promotedProperties);
+        ValueTask<IEnumerable<string>> SplitPromotedPropertyKeysAsync(
+            string promotedProperties,
+            CancellationToken cancellationToken = default);
     }
 }
