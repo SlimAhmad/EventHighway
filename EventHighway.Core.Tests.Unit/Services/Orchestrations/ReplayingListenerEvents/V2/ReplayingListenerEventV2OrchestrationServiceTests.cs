@@ -86,6 +86,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
+        private static int GetRandomNumber() =>
+            new IntRange(min: 2, max: 9).GetValue();
+
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
 
