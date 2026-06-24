@@ -3,12 +3,14 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 
 namespace EventHighway.Core.Services.Orchestrations.Events.V2
 {
@@ -41,6 +43,15 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
 
         ValueTask<bool> IsLoopDetectedAsync(
             EventV2 eventV2,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<IEnumerable<string>> SplitPromotedPropertyKeysAsync(
+            string promotedProperties,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<List<PromotedProperty>> PromotePropertiesAsync(
+            string content,
+            string promotedProperties,
             CancellationToken cancellationToken = default);
     }
 }

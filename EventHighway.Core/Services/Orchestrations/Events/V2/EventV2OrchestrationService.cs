@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using EventHighway.Core.Services.Processings.EventAddresses.V2;
 using EventHighway.Core.Services.Processings.EventCalls.V2;
 using EventHighway.Core.Services.Processings.Events.V2;
@@ -147,6 +149,17 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             return await this.eventV2ProcessingService
                 .IsLoopDetectedAsync(eventV2, cancellationToken);
         });
+
+        public ValueTask<IEnumerable<string>> SplitPromotedPropertyKeysAsync(
+            string promotedProperties,
+            CancellationToken cancellationToken = default) =>
+                throw new NotImplementedException();
+
+        public ValueTask<List<PromotedProperty>> PromotePropertiesAsync(
+            string content,
+            string promotedProperties,
+            CancellationToken cancellationToken = default) =>
+                throw new NotImplementedException();
 
     }
 }
