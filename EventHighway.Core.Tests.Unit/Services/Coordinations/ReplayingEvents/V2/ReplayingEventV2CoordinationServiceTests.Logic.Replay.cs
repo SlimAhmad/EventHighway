@@ -179,6 +179,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
                     It.IsAny<IEnumerable<Guid>>(), randomCancellationToken),
                         Times.Once);
 
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                    eventAddressId, nullEventListenerIds, startDate, endDate,
+                    It.IsAny<int>(), take, randomCancellationToken),
+                        Times.Exactly(2));
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(), Times.Once);
+
             this.configurationBrokerMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.restoringEventV2OrchestrationServiceMock.VerifyNoOtherCalls();

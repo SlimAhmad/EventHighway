@@ -72,6 +72,12 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
                 await this.restoringEventV2OrchestrationService
                     .RestoreAsync(eventArchiveV2s, listenerArchiveBatch, cancellationToken);
 
+                if (eventListenerIds is null || !eventListenerIds.Any())
+                {
+                    await this.restoringEventV2OrchestrationService
+                        .GenerateReplayForNewListenersAsync(eventArchiveV2s, cancellationToken);
+                }
+
                 if (take == 0)
                     break;
 
