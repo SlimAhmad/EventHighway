@@ -177,5 +177,62 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
             this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRestoreIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            List<EventArchiveV2> someEventArchiveV2s = CreateRandomEventArchiveV2s();
+
+            List<ListenerEventArchiveV2> someListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s();
+
+            var serviceException = new Exception();
+
+            var failedRestoringEventV2OrchestrationServiceException =
+                new FailedRestoringEventV2OrchestrationServiceException(
+                    message: "Failed restoring event orchestration service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedException =
+                new RestoringEventV2OrchestrationServiceException(
+                    message: "Restoring event service error occurred, contact support.",
+                    innerException: failedRestoringEventV2OrchestrationServiceException);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask restoreTask =
+                this.restoringEventV2OrchestrationService.RestoreAsync(
+                    someEventArchiveV2s,
+                    someListenerEventArchiveV2s,
+                    randomCancellationToken);
+
+            RestoringEventV2OrchestrationServiceException actualException =
+                await Assert.ThrowsAsync<RestoringEventV2OrchestrationServiceException>(
+                    restoreTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(expectedException);
+
+            this.eventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(expectedException))),
+                    Times.Once);
+
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
