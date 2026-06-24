@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
@@ -163,6 +164,90 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedReplayingListenerEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task
+            ShouldThrowServiceExceptionOnProcessReplayIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            ListenerEventV2 someListenerEventV2 =
+                CreateRandomListenerEventV2WithNavProps();
+
+            someListenerEventV2.EventListener.PromotedProperties = null;
+
+            var serviceException = new Exception();
+
+            var failedReplayingListenerEventV2OrchestrationServiceException =
+                new FailedReplayingListenerEventV2OrchestrationServiceException(
+                    message: "Failed replaying listener event orchestration service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedReplayingListenerEventV2OrchestrationServiceException =
+                new ReplayingListenerEventV2OrchestrationServiceException(
+                    message: "Replaying listener event service error occurred, contact support.",
+                    innerException: failedReplayingListenerEventV2OrchestrationServiceException);
+
+            this.eventCallV2ProcessingServiceMock.Setup(service =>
+                service.RunEventCallV2Async(
+                    It.IsAny<EventCallV2>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new EventCallV2 { IsSuccess = true });
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                .ReturnsAsync(GetRandomDateTimeOffset());
+
+            this.listenerEventV2ProcessingServiceMock.Setup(service =>
+                service.ModifyListenerEventV2Async(
+                    It.IsAny<ListenerEventV2>(),
+                    randomCancellationToken))
+                .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<ListenerEventV2> processReplayTask =
+                this.replayingListenerEventV2OrchestrationService
+                    .ProcessReplayListenerEventV2Async(
+                        someListenerEventV2,
+                        randomCancellationToken);
+
+            ReplayingListenerEventV2OrchestrationServiceException actualException =
+                await Assert.ThrowsAsync<ReplayingListenerEventV2OrchestrationServiceException>(
+                    processReplayTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(
+                expectedReplayingListenerEventV2OrchestrationServiceException);
+
+            this.eventCallV2ProcessingServiceMock.Verify(service =>
+                service.RunEventCallV2Async(
+                    It.IsAny<EventCallV2>(),
+                    randomCancellationToken),
+                        Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
+                service.ModifyListenerEventV2Async(
+                    It.IsAny<ListenerEventV2>(),
+                    randomCancellationToken),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedReplayingListenerEventV2OrchestrationServiceException))),
                         Times.Once);
 
             this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
