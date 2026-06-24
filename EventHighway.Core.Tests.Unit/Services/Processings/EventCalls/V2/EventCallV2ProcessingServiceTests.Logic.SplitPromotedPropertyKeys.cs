@@ -36,5 +36,28 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void ShouldReturnEmptyKeysWhenPromotedPropertiesIsNullOrWhitespace(
+            string inputPromotedProperties)
+        {
+            // given
+            var expectedKeys = new List<string>();
+
+            // when
+            List<string> actualKeys =
+                this.eventCallV2ProcessingService
+                    .SplitPromotedPropertyKeys(inputPromotedProperties)
+                        .ToList();
+
+            // then
+            actualKeys.Should().BeEquivalentTo(expectedKeys);
+
+            this.eventCallV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
