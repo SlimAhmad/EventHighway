@@ -120,5 +120,62 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
             this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRestoreIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            List<EventArchiveV2> someEventArchiveV2s = CreateRandomEventArchiveV2s();
+
+            List<ListenerEventArchiveV2> someListenerEventArchiveV2s =
+                CreateRandomListenerEventArchiveV2s();
+
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutRestoringEventV2OrchestrationException =
+                new TimeoutRestoringEventV2OrchestrationException(
+                    message: "Failed restoring event orchestration timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedException =
+                new RestoringEventV2OrchestrationDependencyException(
+                    message: "Restoring event dependency error occurred, contact support.",
+                    innerException: timeoutRestoringEventV2OrchestrationException);
+
+            this.eventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask restoreTask =
+                this.restoringEventV2OrchestrationService.RestoreAsync(
+                    someEventArchiveV2s,
+                    someListenerEventArchiveV2s,
+                    TestContext.Current.CancellationToken);
+
+            RestoringEventV2OrchestrationDependencyException actualException =
+                await Assert.ThrowsAsync<RestoringEventV2OrchestrationDependencyException>(
+                    restoreTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(expectedException);
+
+            this.eventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(expectedException))),
+                    Times.Once);
+
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
