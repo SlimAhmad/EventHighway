@@ -36,6 +36,15 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
             this.loggingBroker = loggingBroker;
         }
 
+        public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfReplayListenerEventV2sAsync(
+            int take,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            return await this.listenerEventV2ProcessingService
+                .RetrieveBatchOfReplayListenerEventV2sAsync(take, cancellationToken);
+        });
+
         public ValueTask<ListenerEventV2> ProcessReplayListenerEventV2Async(
             ListenerEventV2 listenerEventV2,
             CancellationToken cancellationToken = default) =>

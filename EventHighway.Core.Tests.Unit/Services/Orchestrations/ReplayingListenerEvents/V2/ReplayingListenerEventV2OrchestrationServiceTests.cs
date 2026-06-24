@@ -71,6 +71,30 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             };
         }
 
+        public static TheoryData<Xeption> DependencyValidationExceptionsForRetrieveBatchReplay()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+
+            return new TheoryData<Xeption>
+            {
+                new ListenerEventV2ProcessingValidationException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingDependencyValidationException(someMessage, someInnerException),
+            };
+        }
+
+        public static TheoryData<Xeption> DependencyExceptionsForRetrieveBatchReplay()
+        {
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+
+            return new TheoryData<Xeption>
+            {
+                new ListenerEventV2ProcessingDependencyException(someMessage, someInnerException),
+                new ListenerEventV2ProcessingServiceException(someMessage, someInnerException),
+            };
+        }
+
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 
@@ -85,6 +109,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
 
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
+
+        private static int GetRandomNumber() =>
+            new IntRange(min: 2, max: 9).GetValue();
 
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
