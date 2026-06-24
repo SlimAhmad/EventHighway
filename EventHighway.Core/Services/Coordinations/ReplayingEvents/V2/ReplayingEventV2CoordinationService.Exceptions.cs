@@ -103,6 +103,16 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
                 throw await CreateAndLogDependencyExceptionAsync(
                     restoringEventV2OrchestrationServiceException);
             }
+            catch (ReplayingListenerEventV2OrchestrationDependencyException replayingListenerEventV2OrchestrationDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    replayingListenerEventV2OrchestrationDependencyException);
+            }
+            catch (ReplayingListenerEventV2OrchestrationServiceException replayingListenerEventV2OrchestrationServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    replayingListenerEventV2OrchestrationServiceException);
+            }
             catch (Exception exception)
             {
                 var failedReplayingEventV2CoordinationServiceException =
