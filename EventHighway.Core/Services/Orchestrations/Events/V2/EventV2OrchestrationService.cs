@@ -153,7 +153,13 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         public ValueTask<IEnumerable<string>> SplitPromotedPropertyKeysAsync(
             string promotedProperties,
             CancellationToken cancellationToken = default) =>
-                throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.eventCallV2ProcessingService
+                .SplitPromotedPropertyKeysAsync(promotedProperties, cancellationToken);
+        });
 
         public ValueTask<List<PromotedProperty>> PromotePropertiesAsync(
             string content,

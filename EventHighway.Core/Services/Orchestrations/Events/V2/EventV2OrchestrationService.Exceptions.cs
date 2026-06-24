@@ -3,12 +3,14 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.EventAddresses.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.EventCalls.V2.Exceptions;
@@ -24,6 +26,8 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         private delegate ValueTask<IQueryable<EventAddressV2>> ReturningEventAddressV2sFunction();
         private delegate ValueTask<EventCallV2> ReturningEventCallV2Function();
         private delegate ValueTask<bool> ReturningBoolFunction();
+        private delegate ValueTask<IEnumerable<string>> ReturningPromotedPropertyKeysFunction();
+        private delegate ValueTask<List<PromotedProperty>> ReturningPromotedPropertiesListFunction();
 
         private async ValueTask<EventV2> TryCatch(ReturningEventV2Function returningEventV2Function)
         {
@@ -589,6 +593,142 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             {
                 throw await CreateAndLogDependencyExceptionAsync(
                     eventAddressV2ProcessingServiceException);
+            }
+            catch (EventCallV2ProcessingDependencyException
+                eventCallV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventCallV2ProcessingDependencyException);
+            }
+            catch (EventCallV2ProcessingServiceException
+                eventCallV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventCallV2ProcessingServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventV2OrchestrationServiceException =
+                    new FailedEventV2OrchestrationServiceException(
+                        message: "Failed event service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<IEnumerable<string>> TryCatch(
+            ReturningPromotedPropertyKeysFunction returningPromotedPropertyKeysFunction)
+        {
+            try
+            {
+                return await returningPromotedPropertyKeysFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2OrchestrationException =
+                    new TimeoutEventV2OrchestrationException(
+                        message: "Failed event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2OrchestrationDependencyException =
+                    new EventV2OrchestrationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
+                throw eventV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (EventCallV2ProcessingValidationException
+                eventCallV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventCallV2ProcessingValidationException);
+            }
+            catch (EventCallV2ProcessingDependencyValidationException
+                eventCallV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventCallV2ProcessingDependencyValidationException);
+            }
+            catch (EventCallV2ProcessingDependencyException
+                eventCallV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventCallV2ProcessingDependencyException);
+            }
+            catch (EventCallV2ProcessingServiceException
+                eventCallV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventCallV2ProcessingServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventV2OrchestrationServiceException =
+                    new FailedEventV2OrchestrationServiceException(
+                        message: "Failed event service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<List<PromotedProperty>> TryCatch(
+            ReturningPromotedPropertiesListFunction returningPromotedPropertiesListFunction)
+        {
+            try
+            {
+                return await returningPromotedPropertiesListFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2OrchestrationException =
+                    new TimeoutEventV2OrchestrationException(
+                        message: "Failed event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2OrchestrationDependencyException =
+                    new EventV2OrchestrationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
+                throw eventV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (EventCallV2ProcessingValidationException
+                eventCallV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventCallV2ProcessingValidationException);
+            }
+            catch (EventCallV2ProcessingDependencyValidationException
+                eventCallV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventCallV2ProcessingDependencyValidationException);
             }
             catch (EventCallV2ProcessingDependencyException
                 eventCallV2ProcessingDependencyException)
