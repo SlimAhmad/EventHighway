@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Processings.EventListeners.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
@@ -20,6 +21,32 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutRestoringEventV2OrchestrationException =
+                    new TimeoutRestoringEventV2OrchestrationException(
+                        message: "Failed restoring event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var restoringEventV2OrchestrationDependencyException =
+                    new RestoringEventV2OrchestrationDependencyException(
+                        message: "Restoring event dependency error occurred, contact support.",
+                        innerException: timeoutRestoringEventV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(
+                    restoringEventV2OrchestrationDependencyException);
+
+                throw restoringEventV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (NullRestoringEventV2OrchestrationException nullRestoringEventV2OrchestrationException)
             {
