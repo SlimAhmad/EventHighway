@@ -25,6 +25,10 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
             {
                 return await returningPromotedPropertyKeysFunction();
             }
+            catch (InvalidEventCallV2ProcessingException invalidEventCallV2ProcessingException)
+            {
+                throw await CreateAndLogValidationExceptionAsync(invalidEventCallV2ProcessingException);
+            }
             catch (OperationCanceledException operationCanceledException)
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {

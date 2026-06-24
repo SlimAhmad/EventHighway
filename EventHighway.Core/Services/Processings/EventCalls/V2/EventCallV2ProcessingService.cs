@@ -50,11 +50,9 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
             ValidatePromotedProperties(promotedProperties);
 
             IEnumerable<string> keys =
-                string.IsNullOrWhiteSpace(promotedProperties)
-                    ? Array.Empty<string>()
-                    : promotedProperties.Split(
-                        ',',
-                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                promotedProperties.Split(
+                    ',',
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             return new ValueTask<IEnumerable<string>>(keys);
         });

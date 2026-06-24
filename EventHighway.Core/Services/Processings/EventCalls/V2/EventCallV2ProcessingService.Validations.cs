@@ -19,6 +19,19 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
         }
 
         internal virtual void ValidatePromotedProperties(string promotedProperties)
-        { }
+        {
+            var invalidEventCallV2ProcessingException =
+                new InvalidEventCallV2ProcessingException(
+                    message: "Event call is invalid.");
+
+            if (string.IsNullOrWhiteSpace(promotedProperties))
+            {
+                invalidEventCallV2ProcessingException.AddData(
+                    key: nameof(promotedProperties),
+                    values: "Text is required");
+            }
+
+            invalidEventCallV2ProcessingException.ThrowIfContainsErrors();
+        }
     }
 }

@@ -25,7 +25,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
                     message: "Event call is invalid.");
 
             invalidEventCallV2ProcessingException.AddData(
-                key: nameof(invalidPromotedProperties),
+                key: "promotedProperties",
                 values: "Text is required");
 
             var expectedEventCallV2ProcessingValidationException =
