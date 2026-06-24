@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ReplayingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
@@ -19,6 +20,32 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
             try
             {
                 await returningNothingFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutReplayingEventV2CoordinationException =
+                    new TimeoutReplayingEventV2CoordinationException(
+                        message: "Failed replaying event coordination timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var replayingEventV2CoordinationDependencyException =
+                    new ReplayingEventV2CoordinationDependencyException(
+                        message: "Replaying event dependency error occurred, contact support.",
+                        innerException: timeoutReplayingEventV2CoordinationException);
+
+                await this.loggingBroker.LogErrorAsync(
+                    replayingEventV2CoordinationDependencyException);
+
+                throw replayingEventV2CoordinationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (InvalidReplayingEventV2CoordinationException invalidReplayingEventV2CoordinationException)
             {
