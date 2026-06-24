@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq.Expressions;
+using EventHighway.Core.Brokers.Jsons;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2.Exceptions;
@@ -18,16 +19,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
     public partial class EventCallV2ProcessingServiceTests
     {
         private readonly Mock<IEventCallV2Service> eventCallV2ServiceMock;
+        private readonly Mock<IJsonBroker> jsonBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IEventCallV2ProcessingService eventCallV2ProcessingService;
 
         public EventCallV2ProcessingServiceTests()
         {
             this.eventCallV2ServiceMock = new Mock<IEventCallV2Service>();
+            this.jsonBrokerMock = new Mock<IJsonBroker>();
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
             this.eventCallV2ProcessingService = new EventCallV2ProcessingService(
                 eventCallV2Service: this.eventCallV2ServiceMock.Object,
+                jsonBroker: this.jsonBrokerMock.Object,
                 loggingBroker: this.loggingBrokerMock.Object);
         }
 

@@ -37,6 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
 
             var eventCallV2ProcessingServiceMock = new Mock<EventCallV2ProcessingService>(
                 this.eventCallV2ServiceMock.Object,
+                this.jsonBrokerMock.Object,
                 this.loggingBrokerMock.Object)
             {
                 CallBase = true
@@ -70,6 +71,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
                         Times.Once);
 
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
+            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -97,6 +99,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
 
             var eventCallV2ProcessingServiceMock = new Mock<EventCallV2ProcessingService>(
                 this.eventCallV2ServiceMock.Object,
+                this.jsonBrokerMock.Object,
                 this.loggingBrokerMock.Object)
             {
                 CallBase = true
@@ -130,6 +133,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
                         Times.Once);
 
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
+            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -167,6 +171,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
                     Times.Never);
 
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
+            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

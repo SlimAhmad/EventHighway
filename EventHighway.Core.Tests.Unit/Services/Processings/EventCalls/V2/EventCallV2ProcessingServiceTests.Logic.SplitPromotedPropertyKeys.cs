@@ -36,6 +36,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
             actualKeys.ToList().Should().BeEquivalentTo(expectedKeys);
 
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
+            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -60,6 +61,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
             actualKeys.ToList().Should().BeEquivalentTo(expectedKeys);
 
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
+            this.jsonBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

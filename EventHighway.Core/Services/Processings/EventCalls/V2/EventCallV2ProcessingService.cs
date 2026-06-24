@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Jsons;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
+using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using EventHighway.Core.Services.Foundations.EventCalls.V2;
 
 namespace EventHighway.Core.Services.Processings.EventCalls.V2
@@ -15,13 +17,16 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
     internal partial class EventCallV2ProcessingService : IEventCallV2ProcessingService
     {
         private readonly IEventCallV2Service eventCallV2Service;
+        private readonly IJsonBroker jsonBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventCallV2ProcessingService(
             IEventCallV2Service eventCallV2Service,
+            IJsonBroker jsonBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventCallV2Service = eventCallV2Service;
+            this.jsonBroker = jsonBroker;
             this.loggingBroker = loggingBroker;
         }
 
@@ -53,5 +58,11 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
 
             return new ValueTask<IEnumerable<string>>(keys);
         });
+
+        public ValueTask<List<PromotedProperty>> PromotePropertiesAsync(
+            string content,
+            string promotedProperties,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
     }
 }
