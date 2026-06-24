@@ -23,6 +23,28 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
             {
                 return await returningListenerEventV2Function();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutReplayingListenerEventV2OrchestrationException =
+                    new TimeoutReplayingListenerEventV2OrchestrationException(
+                        message: "Failed replaying listener event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var replayingListenerEventV2OrchestrationDependencyException =
+                    new ReplayingListenerEventV2OrchestrationDependencyException(
+                        message: "Replaying listener event dependency error occurred, contact support.",
+                        innerException: timeoutReplayingListenerEventV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(
+                    replayingListenerEventV2OrchestrationDependencyException);
+
+                throw replayingListenerEventV2OrchestrationDependencyException;
+            }
             catch (NullReplayingListenerEventV2OrchestrationException
                 nullReplayingListenerEventV2OrchestrationException)
             {
