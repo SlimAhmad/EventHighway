@@ -41,6 +41,7 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ValidatePromotedProperties(promotedProperties);
 
             IEnumerable<string> keys =
                 string.IsNullOrWhiteSpace(promotedProperties)

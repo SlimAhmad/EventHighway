@@ -17,5 +17,8 @@ namespace EventHighway.Core.Services.Processings.EventCalls.V2
                     message: "Event call is null.");
             }
         }
+
+        internal virtual void ValidatePromotedProperties(string promotedProperties)
+        { }
     }
 }
