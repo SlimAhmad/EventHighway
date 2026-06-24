@@ -4,11 +4,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Processings.EventCalls.V2.Exceptions;
 using EventHighway.Core.Services.Processings.EventCalls.V2;
 using FluentAssertions;
 using Moq;
+using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
 {
@@ -126,6 +128,43 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventCalls.V2
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventCallV2ProcessingDependencyException))),
                         Times.Once);
+
+            this.eventCallV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnSplitPromotedPropertyKeysAsync()
+        {
+            // given
+            string somePromotedProperties = GetRandomString();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<IEnumerable<string>> splitPromotedPropertyKeysTask =
+                this.eventCallV2ProcessingService.SplitPromotedPropertyKeysAsync(
+                    somePromotedProperties,
+                    cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    splitPromotedPropertyKeysTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventCallV2ProcessingDependencyException>();
+            actualException.Should().NotBeOfType<EventCallV2ProcessingServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
 
             this.eventCallV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
