@@ -63,5 +63,54 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(DependencyExceptionsForRetrieveBatchReplay))]
+        public async Task
+            ShouldThrowDependencyExceptionOnRetrieveBatchReplayIfDependencyErrorOccursAndLogItAsync(
+                Xeption dependencyException)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            int randomTake = GetRandomNumber();
+
+            var expectedReplayingListenerEventV2OrchestrationDependencyException =
+                new ReplayingListenerEventV2OrchestrationDependencyException(
+                    message: "Replaying listener event dependency error occurred, contact support.",
+                    innerException: dependencyException.InnerException as Xeption);
+
+            this.listenerEventV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveBatchOfReplayListenerEventV2sAsync(randomTake, randomCancellationToken))
+                    .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchTask =
+                this.replayingListenerEventV2OrchestrationService
+                    .RetrieveBatchOfReplayListenerEventV2sAsync(randomTake, randomCancellationToken);
+
+            ReplayingListenerEventV2OrchestrationDependencyException actualException =
+                await Assert.ThrowsAsync<ReplayingListenerEventV2OrchestrationDependencyException>(
+                    retrieveBatchTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(
+                expectedReplayingListenerEventV2OrchestrationDependencyException);
+
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveBatchOfReplayListenerEventV2sAsync(randomTake, randomCancellationToken),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedReplayingListenerEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
