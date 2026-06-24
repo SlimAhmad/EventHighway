@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Orchestrations.ReplayingListenerEvents.V2.Exceptions;
@@ -76,6 +77,17 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
                 throw await CreateAndLogDependencyExceptionAsync(
                     listenerEventV2ProcessingServiceException);
             }
+            catch (Exception exception)
+            {
+                var failedReplayingListenerEventV2OrchestrationServiceException =
+                    new FailedReplayingListenerEventV2OrchestrationServiceException(
+                        message: "Failed replaying listener event orchestration service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedReplayingListenerEventV2OrchestrationServiceException);
+            }
         }
 
         private async ValueTask<ReplayingListenerEventV2OrchestrationValidationException>
@@ -90,6 +102,20 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
                 replayingListenerEventV2OrchestrationValidationException);
 
             return replayingListenerEventV2OrchestrationValidationException;
+        }
+
+        private async ValueTask<ReplayingListenerEventV2OrchestrationServiceException>
+            CreateAndLogServiceExceptionAsync(Xeption exception)
+        {
+            var replayingListenerEventV2OrchestrationServiceException =
+                new ReplayingListenerEventV2OrchestrationServiceException(
+                    message: "Replaying listener event service error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                replayingListenerEventV2OrchestrationServiceException);
+
+            return replayingListenerEventV2OrchestrationServiceException;
         }
 
         private async ValueTask<ReplayingListenerEventV2OrchestrationDependencyException>
