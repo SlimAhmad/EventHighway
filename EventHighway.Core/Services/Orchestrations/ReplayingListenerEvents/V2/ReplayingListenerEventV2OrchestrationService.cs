@@ -42,6 +42,7 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ValidateListenerEventV2IsNotNull(listenerEventV2);
 
             IEnumerable<string> requiredKeys =
                 string.IsNullOrWhiteSpace(listenerEventV2.EventListener.PromotedProperties)
