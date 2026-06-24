@@ -95,6 +95,11 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
                 .BulkRemoveListenerEventV2sAsync(listenerEventV2s, cancellationToken);
         });
 
+        public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfReplayListenerEventV2sAsync(
+            int take,
+            CancellationToken cancellationToken = default) =>
+                throw new System.NotImplementedException();
+
         public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
             IEnumerable<Guid> eventIds,
             int take,
