@@ -45,6 +45,10 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
 
                 throw replayingListenerEventV2OrchestrationDependencyException;
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (NullReplayingListenerEventV2OrchestrationException
                 nullReplayingListenerEventV2OrchestrationException)
             {
