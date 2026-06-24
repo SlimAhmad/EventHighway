@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -78,10 +79,63 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 listenerEventV2sToRestore, cancellationToken);
         }
 
-        public ValueTask GenerateReplayForNewListenersAsync(
+        public async ValueTask GenerateReplayForNewListenersAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
-            CancellationToken cancellationToken = default) =>
-            throw new System.NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            IQueryable<ListenerEventV2> existingListenerEventV2s =
+                await this.listenerEventV2ProcessingService
+                    .RetrieveAllListenerEventV2sAsync(cancellationToken);
+
+            HashSet<(System.Guid EventId, System.Guid EventListenerId)> existingPairs =
+                existingListenerEventV2s
+                    .ToList()
+                    .Select(listenerEventV2 =>
+                        (listenerEventV2.EventId, listenerEventV2.EventListenerId))
+                            .ToHashSet();
+
+            List<ListenerEventV2> generatedListenerEventV2s = new List<ListenerEventV2>();
+
+            foreach (EventArchiveV2 eventArchiveV2 in eventArchiveV2s)
+            {
+                IQueryable<EventListenerV2> eventListenerV2s =
+                    await this.eventListenerV2ProcessingService
+                        .RetrieveEventListenerV2sByEventAddressIdAsync(
+                            eventArchiveV2.EventAddressId, cancellationToken);
+
+                foreach (EventListenerV2 eventListenerV2 in eventListenerV2s)
+                {
+                    bool hasListenerEvent =
+                        existingPairs.Contains((eventArchiveV2.Id, eventListenerV2.Id));
+
+                    if (hasListenerEvent is false)
+                    {
+                        generatedListenerEventV2s.Add(
+                            GenerateListenerEventV2(eventArchiveV2, eventListenerV2));
+                    }
+                }
+            }
+
+            await this.listenerEventV2ProcessingService.BulkRestoreListenerEventV2sAsync(
+                generatedListenerEventV2s, cancellationToken);
+        }
+
+        private static ListenerEventV2 GenerateListenerEventV2(
+            EventArchiveV2 eventArchiveV2,
+            EventListenerV2 eventListenerV2) =>
+            new ListenerEventV2
+            {
+                Id = System.Guid.NewGuid(),
+                Status = ListenerEventStatusV2.Replay,
+                Response = null,
+                ResponseCode = null,
+                ResponseMessage = null,
+                CreatedDate = eventArchiveV2.CreatedDate,
+                UpdatedDate = eventArchiveV2.CreatedDate,
+                EventId = eventArchiveV2.Id,
+                EventAddressId = eventArchiveV2.EventAddressId,
+                EventListenerId = eventListenerV2.Id
+            };
 
         private static EventV2 MapToEventV2(EventArchiveV2 eventArchiveV2) =>
             new EventV2
