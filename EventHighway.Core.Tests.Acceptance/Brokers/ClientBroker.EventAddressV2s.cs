@@ -17,6 +17,11 @@ namespace EventHighway.Core.Tests.Acceptance.Brokers
         public async ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync() =>
             await this.eventHighwayClient.V2.EventAddressV2Client.RetrieveAllEventAddressV2sAsync();
 
+        public async ValueTask<EventAddressV2> RetrieveOrRegisterEventAddressV2Async(
+            EventAddressV2 eventAddressV2) =>
+                await this.eventHighwayClient.V2.EventAddressV2Client
+                    .RetrieveOrRegisterEventAddressV2Async(eventAddressV2);
+
         public async ValueTask<EventAddressV2> RemoveEventAddressV2ByIdAsync(Guid eventAddressV2Id) =>
             await this.eventHighwayClient.V2.EventAddressV2Client.RemoveEventAddressV2ByIdAsync(eventAddressV2Id);
     }
