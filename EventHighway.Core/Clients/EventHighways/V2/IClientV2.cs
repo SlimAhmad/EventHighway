@@ -9,6 +9,7 @@ using EventHighway.Core.Clients.EventListeners.V2;
 using EventHighway.Core.Clients.Events.V2;
 using EventHighway.Core.Clients.HealthChecks.V2;
 using EventHighway.Core.Clients.ListenerEvents.V2;
+using EventHighway.Core.Clients.ReplayingEvents.V2;
 
 namespace EventHighway.Core.Clients.EventHighways.V2
 {
@@ -57,5 +58,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         IListenerEventV2Client ListenerEventV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for replaying archived events in V2 API.
+        /// </summary>
+        IReplayingEventV2Client ReplayingEventV2Client { get; }
     }
 }

@@ -18,6 +18,7 @@ using EventHighway.Core.Clients.EventListeners.V2;
 using EventHighway.Core.Clients.Events.V2;
 using EventHighway.Core.Clients.HealthChecks.V2;
 using EventHighway.Core.Clients.ListenerEvents.V2;
+using EventHighway.Core.Clients.ReplayingEvents.V2;
 using EventHighway.Core.Services.Coordinations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Coordinations.Events.V2;
 using EventHighway.Core.Services.Coordinations.HealthChecks.V2;
@@ -34,6 +35,7 @@ using EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
 using EventHighway.Core.Services.Orchestrations.Events.V2;
+using EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.RestoringEvents.V2;
 using EventHighway.Core.Services.Processings.EventAddresses.V2;
 using EventHighway.Core.Services.Processings.EventArchives.V2;
@@ -122,6 +124,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         /// </summary>
         public IListenerEventV2Client ListenerEventV2Client { get; private set; }
 
+        /// <summary>
+        /// Gets the client for replaying archived events in V2 API.
+        /// </summary>
+        public IReplayingEventV2Client ReplayingEventV2Client { get; private set; }
+
         private void InitializeClients(IServiceProvider serviceProvider)
         {
             using (var scope = serviceProvider.CreateScope())
@@ -150,6 +157,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
 
             this.ListenerEventV2Client =
                 serviceProvider.GetRequiredService<IListenerEventV2Client>();
+
+            this.ReplayingEventV2Client =
+                serviceProvider.GetRequiredService<IReplayingEventV2Client>();
         }
 
         private IServiceProvider ConfigureDependencies()
@@ -250,6 +260,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IRestoringEventV2OrchestrationService,
                 RestoringEventV2OrchestrationService>();
+
+            services.AddTransient<
+                IReplayingListenerEventV2OrchestrationService,
+                ReplayingListenerEventV2OrchestrationService>();
         }
 
         private static void RegisterCoordinationServices(IServiceCollection services)
@@ -296,6 +310,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IListenerEventV2Client,
                 ListenerEventV2Client>();
+
+            services.AddTransient<
+                IReplayingEventV2Client,
+                ReplayingEventV2Client>();
         }
     }
 }
