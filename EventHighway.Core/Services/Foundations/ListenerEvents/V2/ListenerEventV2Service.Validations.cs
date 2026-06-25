@@ -203,6 +203,19 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             }
         }
 
+        private static void ValidateOnRetrieveReplayBatch(int take)
+        {
+            Validate(
+                message: "Listener event is invalid, fix the errors and try again.",
+                (Rule: IsInvalid(take), Parameter: "Take"));
+        }
+
+        private static dynamic IsInvalid(int take) => new
+        {
+            Condition = take < 0,
+            Message = "Value must be greater than or equal to 0"
+        };
+
         private static dynamic IsInvalid(Guid id) => new
         {
             Condition = id == default,

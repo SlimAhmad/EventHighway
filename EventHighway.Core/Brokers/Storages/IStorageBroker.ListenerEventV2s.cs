@@ -39,5 +39,9 @@ namespace EventHighway.Core.Brokers.Storages
         ValueTask BulkDeleteListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default);
+
+        ValueTask<IQueryable<ListenerEventV2>>
+            SelectAllListenerEventV2sWithEventV2WithEventListenerV2Async(
+                CancellationToken cancellationToken = default);
     }
 }

@@ -148,5 +148,28 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             return listenerEventV2s.Where(
                 listenerEvent => eventIds.Contains(listenerEvent.EventId));
         });
+
+        public ValueTask<IEnumerable<ListenerEventV2>>
+            RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                int take,
+                CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnRetrieveReplayBatch(take);
+
+            IQueryable<ListenerEventV2> listenerEventV2s =
+                await this.storageBroker
+                    .SelectAllListenerEventV2sWithEventV2WithEventListenerV2Async(
+                        cancellationToken);
+
+            IQueryable<ListenerEventV2> replayListenerEventV2s =
+                listenerEventV2s.Where(listenerEventV2 =>
+                    listenerEventV2.Status == ListenerEventStatusV2.Replay);
+
+            return take == 0
+                ? replayListenerEventV2s.ToList()
+                : replayListenerEventV2s.Take(take).ToList();
+        });
     }
 }
