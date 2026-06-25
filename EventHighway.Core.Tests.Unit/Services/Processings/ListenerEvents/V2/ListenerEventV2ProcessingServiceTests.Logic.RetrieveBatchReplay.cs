@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -23,18 +22,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
 
             int inputTake = 0;
 
-            IQueryable<ListenerEventV2> retrievedListenerEventV2s =
+            IEnumerable<ListenerEventV2> retrievedListenerEventV2s =
                 CreateRandomListenerEventV2s();
 
-            foreach (ListenerEventV2 listenerEventV2 in retrievedListenerEventV2s)
-                listenerEventV2.Status = ListenerEventStatusV2.Replay;
-
             IEnumerable<ListenerEventV2> expectedListenerEventV2s =
-                retrievedListenerEventV2s.AsEnumerable();
+                retrievedListenerEventV2s;
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken))
-                    .ReturnsAsync(retrievedListenerEventV2s);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    inputTake,
+                    randomCancellationToken))
+                        .ReturnsAsync(retrievedListenerEventV2s);
 
             // when
             IEnumerable<ListenerEventV2> actualListenerEventV2s =
@@ -45,8 +43,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken),
-                    Times.Once);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    inputTake,
+                    randomCancellationToken),
+                        Times.Once);
 
             this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
@@ -62,18 +62,17 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             int randomTake = GetRandomNumber();
             int inputTake = randomTake;
 
-            IQueryable<ListenerEventV2> retrievedListenerEventV2s =
+            IEnumerable<ListenerEventV2> retrievedListenerEventV2s =
                 CreateRandomListenerEventV2s();
 
-            foreach (ListenerEventV2 listenerEventV2 in retrievedListenerEventV2s)
-                listenerEventV2.Status = ListenerEventStatusV2.Replay;
-
             IEnumerable<ListenerEventV2> expectedListenerEventV2s =
-                retrievedListenerEventV2s.Take(inputTake);
+                retrievedListenerEventV2s;
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken))
-                    .ReturnsAsync(retrievedListenerEventV2s);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    inputTake,
+                    randomCancellationToken))
+                        .ReturnsAsync(retrievedListenerEventV2s);
 
             // when
             IEnumerable<ListenerEventV2> actualListenerEventV2s =
@@ -84,8 +83,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
             actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken),
-                    Times.Once);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    inputTake,
+                    randomCancellationToken),
+                        Times.Once);
 
             this.listenerEventV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();

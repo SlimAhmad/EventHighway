@@ -49,11 +49,17 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             List<EventV2> mappedEventV2s =
                 eventArchiveV2s.Select(MapToEventV2).ToList();
 
+            HashSet<System.Guid> incomingEventV2Ids =
+                mappedEventV2s.Select(eventV2 => eventV2.Id).ToHashSet();
+
             IQueryable<EventV2> existingEventV2s =
                 await this.eventV2ProcessingService.RetrieveAllEventV2sAsync(cancellationToken);
 
             HashSet<System.Guid> existingEventV2Ids =
-                existingEventV2s.Select(eventV2 => eventV2.Id).ToHashSet();
+                existingEventV2s
+                    .Where(eventV2 => incomingEventV2Ids.Contains(eventV2.Id))
+                    .Select(eventV2 => eventV2.Id)
+                    .ToHashSet();
 
             List<EventV2> eventV2sToRestore =
                 mappedEventV2s
@@ -66,12 +72,18 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             List<ListenerEventV2> mappedListenerEventV2s =
                 listenerEventArchiveV2s.Select(MapToListenerEventV2).ToList();
 
+            HashSet<System.Guid> incomingListenerEventV2Ids =
+                mappedListenerEventV2s.Select(listenerEventV2 => listenerEventV2.Id).ToHashSet();
+
             IQueryable<ListenerEventV2> existingListenerEventV2s =
                 await this.listenerEventV2ProcessingService
                     .RetrieveAllListenerEventV2sAsync(cancellationToken);
 
             HashSet<System.Guid> existingListenerEventV2Ids =
-                existingListenerEventV2s.Select(listenerEventV2 => listenerEventV2.Id).ToHashSet();
+                existingListenerEventV2s
+                    .Where(listenerEventV2 => incomingListenerEventV2Ids.Contains(listenerEventV2.Id))
+                    .Select(listenerEventV2 => listenerEventV2.Id)
+                    .ToHashSet();
 
             List<ListenerEventV2> listenerEventV2sToRestore =
                 mappedListenerEventV2s
@@ -91,16 +103,25 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             cancellationToken.ThrowIfCancellationRequested();
             ValidateOnGenerateReplay(eventArchiveV2s);
 
+            HashSet<System.Guid> incomingEventIds =
+                eventArchiveV2s.Select(eventArchiveV2 => eventArchiveV2.Id).ToHashSet();
+
             IQueryable<ListenerEventV2> existingListenerEventV2s =
                 await this.listenerEventV2ProcessingService
                     .RetrieveAllListenerEventV2sAsync(cancellationToken);
 
             HashSet<(System.Guid EventId, System.Guid EventListenerId)> existingPairs =
                 existingListenerEventV2s
-                    .ToList()
+                    .Where(listenerEventV2 => incomingEventIds.Contains(listenerEventV2.EventId))
+                    .Select(listenerEventV2 => new
+                    {
+                        listenerEventV2.EventId,
+                        listenerEventV2.EventListenerId
+                    })
+                    .AsEnumerable()
                     .Select(listenerEventV2 =>
                         (listenerEventV2.EventId, listenerEventV2.EventListenerId))
-                            .ToHashSet();
+                    .ToHashSet();
 
             List<ListenerEventV2> generatedListenerEventV2s = new List<ListenerEventV2>();
 

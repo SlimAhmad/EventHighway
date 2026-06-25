@@ -38,8 +38,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                     innerException: failedListenerEventV2ProcessingServiceException);
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()))
-                    .ThrowsAsync(serviceException);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(serviceException);
 
             // when
             ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchReplayTask =
@@ -56,8 +58,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 .BeEquivalentTo(expectedListenerEventV2ProcessingServiceException);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
-                    Times.Once);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
@@ -85,8 +89,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                     innerException: listenerEventV2DependencyException.InnerException as Xeption);
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()))
-                    .ThrowsAsync(listenerEventV2DependencyException);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(listenerEventV2DependencyException);
 
             // when
             ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchReplayTask =
@@ -103,8 +109,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 .BeEquivalentTo(expectedListenerEventV2ProcessingDependencyException);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
-                    Times.Once);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
@@ -132,8 +140,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                     innerException: listenerEventV2ValidationException.InnerException as Xeption);
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()))
-                    .ThrowsAsync(listenerEventV2ValidationException);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(listenerEventV2ValidationException);
 
             // when
             ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchReplayTask =
@@ -150,8 +160,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 .BeEquivalentTo(expectedListenerEventV2ProcessingDependencyValidationException);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
-                    Times.Once);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
@@ -184,8 +196,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                     innerException: timeoutListenerEventV2ProcessingException);
 
             this.listenerEventV2ServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()))
-                    .ThrowsAsync(operationCanceledException);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
 
             // when
             ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchReplayTask =
@@ -204,8 +218,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 .BeEquivalentTo(expectedListenerEventV2ProcessingDependencyException);
 
             this.listenerEventV2ServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
-                    Times.Once);
+                service.RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(

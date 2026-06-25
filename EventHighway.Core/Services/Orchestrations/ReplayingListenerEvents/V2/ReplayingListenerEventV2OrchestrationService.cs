@@ -97,6 +97,7 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
             }
             catch (Exception exception)
             {
+                await this.loggingBroker.LogErrorAsync(exception);
                 listenerEventV2.Response = exception.Message;
                 listenerEventV2.Status = ListenerEventStatusV2.Error;
             }
