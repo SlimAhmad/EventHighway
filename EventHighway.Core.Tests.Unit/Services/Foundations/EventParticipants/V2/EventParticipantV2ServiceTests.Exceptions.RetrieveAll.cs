@@ -70,6 +70,57 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
         }
 
         [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveAllIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutEventParticipantV2Exception =
+                new TimeoutEventParticipantV2Exception(
+                    message: "Failed event participant timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedEventParticipantV2DependencyException =
+                new EventParticipantV2DependencyException(
+                    message: "Event participant dependency error occurred, contact support.",
+                    innerException: timeoutEventParticipantV2Exception);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllEventParticipantV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IQueryable<EventParticipantV2>> retrieveAllEventParticipantV2sTask =
+                this.eventParticipantV2Service
+                    .RetrieveAllEventParticipantV2sAsync(TestContext.Current.CancellationToken);
+
+            EventParticipantV2DependencyException actualEventParticipantV2DependencyException =
+                await Assert.ThrowsAsync<EventParticipantV2DependencyException>(
+                    retrieveAllEventParticipantV2sTask.AsTask);
+
+            // then
+            actualEventParticipantV2DependencyException.Should().BeEquivalentTo(
+                expectedEventParticipantV2DependencyException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllEventParticipantV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventParticipantV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowServiceExceptionOnRetrieveAllIfExceptionOccursAndLogItAsync()
         {
             // given
