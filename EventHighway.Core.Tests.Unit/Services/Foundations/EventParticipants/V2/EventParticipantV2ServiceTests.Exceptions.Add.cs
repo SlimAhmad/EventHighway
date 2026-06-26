@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -181,6 +182,64 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventParticipantV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventParticipantV2Async(
+                    It.IsAny<EventParticipantV2>(), It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventParticipantV2 someEventParticipantV2 = CreateRandomEventParticipantV2();
+            var serviceException = new Exception();
+            serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedEventParticipantV2ServiceException =
+                new FailedEventParticipantV2ServiceException(
+                    message: "Failed event participant service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedEventParticipantV2ServiceException =
+                new EventParticipantV2ServiceException(
+                    message: "Event participant service error occurred, contact support.",
+                    innerException: failedEventParticipantV2ServiceException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<EventParticipantV2> addEventParticipantV2Task =
+                this.eventParticipantV2Service.AddEventParticipantV2Async(
+                    someEventParticipantV2, randomCancellationToken);
+
+            EventParticipantV2ServiceException actualEventParticipantV2ServiceException =
+                await Assert.ThrowsAsync<EventParticipantV2ServiceException>(
+                    addEventParticipantV2Task.AsTask);
+
+            // then
+            actualEventParticipantV2ServiceException.Should()
+                .BeEquivalentTo(expectedEventParticipantV2ServiceException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventParticipantV2ServiceException))),
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
