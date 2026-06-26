@@ -164,10 +164,41 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
             }
         }
 
-        public ValueTask<EventParticipantV2> RemoveEventParticipantV2ByIdAsync(
+        public async ValueTask<EventParticipantV2> RemoveEventParticipantV2ByIdAsync(
             Guid eventParticipantV2Id,
-            CancellationToken cancellationToken = default) =>
-                throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventParticipantV2Service
+                    .RemoveEventParticipantV2ByIdAsync(eventParticipantV2Id, cancellationToken);
+            }
+            catch (EventParticipantV2ValidationException eventParticipantV2ValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantV2ValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantV2DependencyValidationException
+                eventParticipantV2DependencyValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantV2DependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantV2DependencyException eventParticipantV2DependencyException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantV2DependencyException.InnerException as Xeption);
+            }
+            catch (EventParticipantV2ServiceException eventParticipantV2ServiceException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantV2ServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateClientServiceException(exception as Xeption);
+            }
+        }
 
         private static EventParticipantV2ClientValidationException
             CreateClientValidationException(Xeption innerException)
