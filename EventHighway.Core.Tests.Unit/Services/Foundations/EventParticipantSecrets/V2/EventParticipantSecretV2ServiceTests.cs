@@ -3,12 +3,15 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2;
+using Microsoft.Data.SqlClient;
 using Moq;
 using Tynamix.ObjectFiller;
 using Xeptions;
@@ -36,6 +39,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
+
+        private static SqlException CreateSqlException() =>
+            (SqlException)RuntimeHelpers.GetUninitializedObject(type: typeof(SqlException));
+
+        private static string GetRandomString() =>
+            new MnemonicString().GetValue();
 
         private static EventParticipantSecretV2 CreateRandomEventParticipantSecretV2(DateTimeOffset dates) =>
             CreateEventParticipantSecretV2Filler(dates).Create();
