@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -140,6 +141,40 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 CreateItem("Loop Detection", "Quarantined Archives", quarantinedArchives.ToString(), HealthStatusV2.NA),
             };
         });
+
+        public ValueTask<TrafficSnapshotV2> RetrieveTrafficSnapshotV2Async(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask<IEnumerable<EventAddressSummaryV2>> RetrieveEventAddressSummaryV2Async(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask<LoopDetectionSummaryV2> RetrieveLoopDetectionSummaryV2Async(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask<DuplicateDetectionSummaryV2> RetrieveDuplicateDetectionSummaryV2Async(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask<RetryHealthSummaryV2> RetrieveRetryHealthV2Async(
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask<IEnumerable<ParticipantSummaryV2>> RetrieveParticipantSummaryV2Async(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
 
         private static HealthStatusV2 ComputeRagStatus(
             decimal value,
