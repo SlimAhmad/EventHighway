@@ -331,7 +331,94 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             TrafficPeriodV2 period,
             DateTimeOffset windowStart,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            DateTimeOffset effectiveWindowStart = ResolveWindowStart(windowStart);
+            DateTimeOffset windowEnd = ComputeWindowEnd(period, effectiveWindowStart);
+            string windowLabel = BuildWindowLabel(period, effectiveWindowStart, windowEnd);
+
+            var allAddresses =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventAddressV2sAsync(cancellationToken);
+
+            var allEvents =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventV2sAsync(cancellationToken);
+
+            var allArchivedEvents =
+                await this.eventArchiveV2OrchestrationService
+                    .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+
+            HealthConfiguration healthConfig =
+                this.configurationBroker.GetHealthConfiguration();
+
+            var quarantinedEvents = allEvents
+                .Where(e => e.Status == EventStatusV2.Quarantined
+                    && e.CreatedDate >= effectiveWindowStart && e.CreatedDate < windowEnd)
+                .ToList();
+
+            var quarantinedArchives = allArchivedEvents
+                .Where(a => a.Status == EventArchiveStatusV2.Quarantined
+                    && a.ArchivedDate >= effectiveWindowStart && a.ArchivedDate < windowEnd)
+                .ToList();
+
+            var addressNames = allAddresses
+                .ToDictionary(address => address.Id, address => address.Name);
+
+            var addressIds = quarantinedEvents.Select(e => e.EventAddressId)
+                .Concat(quarantinedArchives.Select(a => a.EventAddressId))
+                .Distinct()
+                .ToList();
+
+            var byAddress = new List<LoopDetailV2>();
+
+            foreach (var addressId in addressIds)
+            {
+                var addressActive = quarantinedEvents
+                    .Where(e => e.EventAddressId == addressId)
+                    .ToList();
+
+                var addressArchived = quarantinedArchives
+                    .Where(a => a.EventAddressId == addressId)
+                    .ToList();
+
+                var detectionDates = addressActive.Select(e => e.CreatedDate)
+                    .Concat(addressArchived.Select(a => a.ArchivedDate))
+                    .ToList();
+
+                DateTimeOffset? mostRecentDetection = detectionDates.Count > 0
+                    ? detectionDates.Max()
+                    : (DateTimeOffset?)null;
+
+                byAddress.Add(new LoopDetailV2
+                {
+                    EventAddressId = addressId,
+                    AddressName = addressNames.TryGetValue(addressId, out string name) ? name : null,
+                    ActiveQuarantined = addressActive.Count,
+                    ArchivedQuarantined = addressArchived.Count,
+                    InWindow = addressActive.Count + addressArchived.Count,
+                    MostRecentDetection = mostRecentDetection,
+                    Status = ComputeRagStatus(
+                        addressActive.Count, HealthMetric.LoopsDetected, healthConfig)
+                });
+            }
+
+            return new LoopDetectionSummaryV2
+            {
+                Period = period,
+                WindowStart = effectiveWindowStart,
+                WindowEnd = windowEnd,
+                WindowLabel = windowLabel,
+                TotalActiveQuarantined = quarantinedEvents.Count,
+                TotalArchivedQuarantined = quarantinedArchives.Count,
+                TotalInWindow = quarantinedEvents.Count + quarantinedArchives.Count,
+                ByAddress = byAddress
+                    .OrderByDescending(detail => detail.InWindow)
+                    .ToList()
+            };
+        });
 
         public ValueTask<DuplicateDetectionSummaryV2> RetrieveDuplicateDetectionSummaryV2Async(
             TrafficPeriodV2 period,
