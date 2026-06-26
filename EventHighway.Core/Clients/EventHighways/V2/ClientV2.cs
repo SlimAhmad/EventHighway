@@ -30,6 +30,7 @@ using EventHighway.Core.Services.Foundations.EventCalls.V2;
 using EventHighway.Core.Services.Foundations.EventHandlers.V2;
 using EventHighway.Core.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Services.Foundations.EventParticipants.V2;
+using EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2;
 using EventHighway.Core.Services.Foundations.Events.V2;
 using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Services.Foundations.ListenerEvents.V2;
@@ -217,6 +218,7 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<IEventArchiveV2Service, EventArchiveV2Service>();
             services.AddTransient<IListenerEventArchiveV2Service, ListenerEventArchiveV2Service>();
             services.AddTransient<IEventParticipantV2Service, EventParticipantV2Service>();
+            services.AddTransient<IEventParticipantSecretV2Service, EventParticipantSecretV2Service>();
         }
 
         private static void RegisterProcessingServices(IServiceCollection services)
