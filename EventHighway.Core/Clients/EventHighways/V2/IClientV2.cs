@@ -57,6 +57,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         IHealthStatusClientV2 HealthStatusClientV2 { get; }
 
         /// <summary>
+        /// Gets the client for retrieving health traffic snapshots in V2 API.
+        /// </summary>
+        IHealthTrafficClientV2 HealthTrafficClientV2 { get; }
+
+        /// <summary>
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         IListenerEventV2Client ListenerEventV2Client { get; }
