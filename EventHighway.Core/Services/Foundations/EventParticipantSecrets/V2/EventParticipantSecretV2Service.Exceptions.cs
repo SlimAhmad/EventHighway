@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
@@ -64,6 +65,30 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
                 throw await CreateAndLogDependencyExceptionAsync(
                     failedStorageEventParticipantSecretV2Exception);
             }
+            catch (Exception serviceException)
+            {
+                var failedEventParticipantSecretV2ServiceException =
+                    new FailedEventParticipantSecretV2ServiceException(
+                        message: "Failed event participant secret service error occurred, contact support.",
+                        innerException: serviceException,
+                        data: serviceException.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventParticipantSecretV2ServiceException);
+            }
+        }
+
+        private async ValueTask<EventParticipantSecretV2ServiceException>
+            CreateAndLogServiceExceptionAsync(Xeption exception)
+        {
+            var eventParticipantSecretV2ServiceException =
+                new EventParticipantSecretV2ServiceException(
+                    message: "Event participant secret service error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(eventParticipantSecretV2ServiceException);
+
+            return eventParticipantSecretV2ServiceException;
         }
 
         private async ValueTask<EventParticipantSecretV2DependencyException>
