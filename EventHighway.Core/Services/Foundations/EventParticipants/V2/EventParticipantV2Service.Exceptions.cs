@@ -140,7 +140,21 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
         private async ValueTask<IQueryable<EventParticipantV2>> TryCatch(
             ReturningEventParticipantV2sFunction returningEventParticipantV2sFunction)
         {
-            return await returningEventParticipantV2sFunction();
+            try
+            {
+                return await returningEventParticipantV2sFunction();
+            }
+            catch (SqlException sqlException)
+            {
+                var failedStorageEventParticipantV2Exception =
+                    new FailedStorageEventParticipantV2Exception(
+                        message: "Failed event participant storage error occurred, contact support.",
+                        innerException: sqlException,
+                        data: sqlException.Data);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(
+                    failedStorageEventParticipantV2Exception);
+            }
         }
 
         private async ValueTask<EventParticipantV2DependencyException>
