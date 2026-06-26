@@ -158,6 +158,10 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
 
                 throw await CreateAndLogDependencyExceptionAsync(timeoutEventParticipantV2Exception);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (SqlException sqlException)
             {
                 var failedStorageEventParticipantV2Exception =
