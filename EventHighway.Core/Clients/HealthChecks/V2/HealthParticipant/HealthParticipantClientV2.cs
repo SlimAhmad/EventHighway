@@ -6,8 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Clients.HealthChecks.V2.Exceptions;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
+using EventHighway.Core.Models.Coordinations.HealthChecks.V2.Exceptions;
 using EventHighway.Core.Services.Coordinations.HealthChecks.V2;
+using Xeptions;
 
 namespace EventHighway.Core.Clients.HealthChecks.V2
 {
@@ -33,8 +36,32 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
             DateTimeOffset windowStart,
             CancellationToken cancellationToken = default)
         {
-            return await this.healthV2CoordinationService
-                .RetrieveParticipantSummaryV2Async(period, windowStart, cancellationToken);
+            try
+            {
+                return await this.healthV2CoordinationService
+                    .RetrieveParticipantSummaryV2Async(period, windowStart, cancellationToken);
+            }
+            catch (HealthV2CoordinationValidationException
+                healthV2CoordinationValidationException)
+            {
+                throw CreateHealthParticipantClientV2ValidationException(
+                    healthV2CoordinationValidationException.InnerException as Xeption);
+            }
+            catch (HealthV2CoordinationDependencyValidationException
+                healthV2CoordinationDependencyValidationException)
+            {
+                throw CreateHealthParticipantClientV2ValidationException(
+                    healthV2CoordinationDependencyValidationException.InnerException as Xeption);
+            }
+        }
+
+        private static HealthParticipantClientV2ValidationException
+            CreateHealthParticipantClientV2ValidationException(Xeption innerException)
+        {
+            return new HealthParticipantClientV2ValidationException(
+                message: "Health client validation error occurred, fix the errors and try again.",
+                innerException: innerException,
+                data: innerException?.Data);
         }
     }
 }
