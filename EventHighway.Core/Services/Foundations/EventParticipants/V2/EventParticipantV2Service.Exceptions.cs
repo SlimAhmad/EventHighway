@@ -144,6 +144,20 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             {
                 return await returningEventParticipantV2sFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventParticipantV2Exception =
+                    new TimeoutEventParticipantV2Exception(
+                        message: "Failed event participant timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventParticipantV2Exception);
+            }
             catch (SqlException sqlException)
             {
                 var failedStorageEventParticipantV2Exception =
