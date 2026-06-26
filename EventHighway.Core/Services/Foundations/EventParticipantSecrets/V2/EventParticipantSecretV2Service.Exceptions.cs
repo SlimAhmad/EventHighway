@@ -24,6 +24,24 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
             {
                 return await returningEventParticipantSecretV2Function();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventParticipantSecretV2Exception =
+                    new TimeoutEventParticipantSecretV2Exception(
+                        message: "Failed event participant secret timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(timeoutEventParticipantSecretV2Exception);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (NullEventParticipantSecretV2Exception nullEventParticipantSecretV2Exception)
             {
                 throw await CreateAndLogValidationExceptionAsync(nullEventParticipantSecretV2Exception);
