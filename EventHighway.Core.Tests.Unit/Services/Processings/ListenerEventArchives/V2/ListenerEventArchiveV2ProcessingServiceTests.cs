@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
 using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
@@ -112,7 +113,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
             var filler = new Filler<ListenerEventArchiveV2>();
 
             filler.Setup()
-                .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset);
+                .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }

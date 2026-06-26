@@ -10,6 +10,7 @@ using EventHighway.Core.Brokers.Hashings;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Processings.EventAddresses.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.EventCalls.V2.Exceptions;
@@ -210,7 +211,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                     .IgnoreIt()
 
                 .OnProperty(eventV2 => eventV2.ListenerEventV2s)
-                    .IgnoreIt();
+                    .IgnoreIt()
+
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }

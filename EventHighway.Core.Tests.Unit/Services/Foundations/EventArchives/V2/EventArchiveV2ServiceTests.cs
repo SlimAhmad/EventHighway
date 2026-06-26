@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Services.Foundations.EventArchives.V2;
@@ -118,7 +119,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                     GetRandomDateTimeOffset())
 
                 .OnProperty(eventArchiveV2 => eventArchiveV2.ListenerEventArchiveV2s)
-                    .IgnoreIt();
+                    .IgnoreIt()
+
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }
