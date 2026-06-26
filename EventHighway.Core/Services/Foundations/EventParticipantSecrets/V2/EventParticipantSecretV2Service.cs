@@ -56,6 +56,11 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
             return maybeEventParticipantSecretV2;
         }));
 
+        public ValueTask<EventParticipantSecretV2> ModifyEventParticipantSecretV2Async(
+            EventParticipantSecretV2 eventParticipantSecretV2,
+            CancellationToken cancellationToken = default) =>
+        throw new NotImplementedException();
+
         public ValueTask<EventParticipantSecretV2> AddEventParticipantSecretV2Async(
             EventParticipantSecretV2 eventParticipantSecretV2,
             CancellationToken cancellationToken = default) =>
