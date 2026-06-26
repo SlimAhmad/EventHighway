@@ -310,6 +310,108 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             return listenerEvents.AsQueryable();
         }
 
+        private static EventAddressV2 CreateEventAddressV2(
+            Guid id,
+            string name,
+            string description)
+        {
+            return new EventAddressV2
+            {
+                Id = id,
+                Name = name,
+                Description = description,
+                CreatedDate = GetRandomDateTimeOffset(),
+                UpdatedDate = GetRandomDateTimeOffset()
+            };
+        }
+
+        private static EventV2 CreateEventV2ForAddress(
+            Guid eventAddressId,
+            DateTimeOffset createdDate,
+            string contentHash,
+            int remainingRetryAttempts,
+            EventStatusV2 status)
+        {
+            return new EventV2
+            {
+                Id = Guid.NewGuid(),
+                Type = EventTypeV2.Immediate,
+                Status = status,
+                RemainingRetryAttempts = remainingRetryAttempts,
+                ContentHash = contentHash,
+                Content = GetRandomString(),
+                EventName = GetRandomString(),
+                CreatedDate = createdDate,
+                UpdatedDate = createdDate,
+                EventAddressId = eventAddressId
+            };
+        }
+
+        private static ListenerEventV2 CreateListenerEventV2ForAddress(
+            Guid eventAddressId,
+            DateTimeOffset createdDate,
+            ListenerEventStatusV2 status)
+        {
+            return new ListenerEventV2
+            {
+                Id = Guid.NewGuid(),
+                Status = status,
+                CreatedDate = createdDate,
+                UpdatedDate = createdDate,
+                EventId = Guid.NewGuid(),
+                EventAddressId = eventAddressId,
+                EventListenerId = Guid.NewGuid()
+            };
+        }
+
+        private static EventListenerV2 CreateEventListenerV2ForAddress(Guid eventAddressId)
+        {
+            return new EventListenerV2
+            {
+                Id = Guid.NewGuid(),
+                Name = GetRandomString(),
+                Description = GetRandomString(),
+                CreatedDate = GetRandomDateTimeOffset(),
+                UpdatedDate = GetRandomDateTimeOffset(),
+                EventAddressId = eventAddressId
+            };
+        }
+
+        private static EventArchiveV2 CreateEventArchiveV2ForAddress(
+            Guid eventAddressId,
+            DateTimeOffset archivedDate)
+        {
+            return new EventArchiveV2
+            {
+                Id = Guid.NewGuid(),
+                Status = EventArchiveStatusV2.Active,
+                RemainingRetryAttempts = GetRandomPositiveNumber(),
+                Content = GetRandomString(),
+                EventName = GetRandomString(),
+                CreatedDate = archivedDate,
+                UpdatedDate = archivedDate,
+                ArchivedDate = archivedDate,
+                EventAddressId = eventAddressId
+            };
+        }
+
+        private static ListenerEventArchiveV2 CreateListenerEventArchiveV2ForAddress(
+            Guid eventAddressId,
+            DateTimeOffset archivedDate)
+        {
+            return new ListenerEventArchiveV2
+            {
+                Id = Guid.NewGuid(),
+                Status = ListenerEventArchiveStatusV2.Success,
+                CreatedDate = archivedDate,
+                UpdatedDate = archivedDate,
+                ArchivedDate = archivedDate,
+                EventId = Guid.NewGuid(),
+                EventAddressId = eventAddressId,
+                EventListenerId = Guid.NewGuid()
+            };
+        }
+
         private static EventV2 CreateEventV2WithDate(
             DateTimeOffset createdDate,
             EventTypeV2 type)
