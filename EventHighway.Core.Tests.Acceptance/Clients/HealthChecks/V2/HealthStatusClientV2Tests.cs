@@ -7,11 +7,11 @@ using EventHighway.Core.Tests.Acceptance.Brokers;
 namespace EventHighway.Core.Tests.Acceptance.Clients.HealthChecks.V2
 {
     [Collection(nameof(ClientTestCollection))]
-    public partial class HealthV2ClientTests
+    public partial class HealthStatusClientV2Tests
     {
         private readonly ClientBroker clientBroker;
 
-        public HealthV2ClientTests() =>
+        public HealthStatusClientV2Tests() =>
             this.clientBroker = new ClientBroker();
     }
 }

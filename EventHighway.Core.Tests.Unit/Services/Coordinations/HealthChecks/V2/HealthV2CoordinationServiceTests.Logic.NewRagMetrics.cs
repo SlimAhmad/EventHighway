@@ -34,7 +34,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Pending Listener Events")
@@ -63,7 +63,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Pending Listener Events")
@@ -100,7 +100,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Pending Listener Events")
@@ -129,7 +129,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Replay Rate %")
@@ -158,7 +158,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Replay Rate %")
@@ -195,7 +195,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Replay Rate %")
@@ -224,7 +224,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Archive Error Rate %")
@@ -253,7 +253,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Archive Error Rate %")
@@ -290,7 +290,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Archive Error Rate %")
@@ -319,7 +319,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Dead Archived Events")
@@ -348,7 +348,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Dead Archived Events")
@@ -385,7 +385,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Dead Archived Events")

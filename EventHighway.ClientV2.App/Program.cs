@@ -298,7 +298,7 @@ public partial class Program
     private static async Task PrintHealthSummaryAsync(EventHighwayClient client)
     {
         IEnumerable<HealthCheckItemV2> summary =
-            await client.V2.HealthV2Client.RetrieveHealthSummaryV2Async();
+            await client.V2.HealthStatusClientV2.RetrieveHealthRagStatusV2Async();
 
         Console.WriteLine("\n── Health Summary ──");
 

@@ -79,7 +79,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i =>
@@ -195,7 +195,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i =>
@@ -302,7 +302,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i =>

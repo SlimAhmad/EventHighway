@@ -7,9 +7,9 @@ using Xeptions;
 
 namespace EventHighway.Core.Models.Clients.HealthChecks.V2.Exceptions
 {
-    public class HealthV2ClientServiceException : Xeption
+    public class HealthStatusClientV2DependencyException : Xeption
     {
-        public HealthV2ClientServiceException(string message, Xeption innerException, IDictionary data)
+        public HealthStatusClientV2DependencyException(string message, Xeption innerException, IDictionary data)
             : base(message, innerException, data)
         { }
     }

@@ -14,7 +14,7 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
     /// Defines the contract for the V2 health check client, providing operations to retrieve
     /// health status information.
     /// </summary>
-    public interface IHealthV2Client
+    public interface IHealthStatusClientV2
     {
         /// <summary>
         /// Retrieves a summary of health check items asynchronously. This operation collects
@@ -26,15 +26,15 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
         /// <returns>A <see cref="ValueTask{IEnumerable}"/> representing the asynchronous
         /// operation that returns a collection of health check items containing status
         /// information.</returns>
-        /// <exception cref="HealthV2ClientValidationException">Thrown when validation errors
+        /// <exception cref="HealthStatusClientV2ValidationException">Thrown when validation errors
         /// occur during health check retrieval.</exception>
-        /// <exception cref="HealthV2ClientDependencyException">Thrown when dependency or
+        /// <exception cref="HealthStatusClientV2DependencyException">Thrown when dependency or
         /// service errors occur during health check retrieval.</exception>
-        /// <exception cref="HealthV2ClientServiceException">Thrown when an unexpected error
+        /// <exception cref="HealthStatusClientV2ServiceException">Thrown when an unexpected error
         /// occurs during health check retrieval.</exception>
         /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
         /// signaled.</exception>
-        ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthSummaryV2Async(
+        ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthRagStatusV2Async(
             CancellationToken cancellationToken = default);
     }
 }

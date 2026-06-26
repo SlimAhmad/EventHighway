@@ -18,19 +18,19 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
     /// Represents the V2 health check client implementation, handling health check retrieval
     /// operations while managing coordination service exceptions.
     /// </summary>
-    internal class HealthV2Client : IHealthV2Client
+    internal class HealthStatusClientV2 : IHealthStatusClientV2
     {
         private readonly IHealthV2CoordinationService healthV2CoordinationService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HealthV2Client"/> class with the
+        /// Initializes a new instance of the <see cref="HealthStatusClientV2"/> class with the
         /// specified health check coordination service.
         /// </summary>
         /// <param name="healthV2CoordinationService">The coordination service for health
         /// checks.</param>
         /// <exception cref="ArgumentNullException">Thrown when healthV2CoordinationService is
         /// null.</exception>
-        public HealthV2Client(IHealthV2CoordinationService healthV2CoordinationService) =>
+        public HealthStatusClientV2(IHealthV2CoordinationService healthV2CoordinationService) =>
             this.healthV2CoordinationService = healthV2CoordinationService;
 
         /// <summary>
@@ -42,74 +42,74 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
         /// <see cref="CancellationToken.None"/>.</param>
         /// <returns>A <see cref="ValueTask{IEnumerable}"/> representing the asynchronous
         /// operation that returns a collection of health check items.</returns>
-        /// <exception cref="HealthV2ClientValidationException">Thrown when validation errors
+        /// <exception cref="HealthStatusClientV2ValidationException">Thrown when validation errors
         /// occur in the coordination service.</exception>
-        /// <exception cref="HealthV2ClientDependencyException">Thrown when dependency or
+        /// <exception cref="HealthStatusClientV2DependencyException">Thrown when dependency or
         /// service errors occur.</exception>
-        /// <exception cref="HealthV2ClientServiceException">Thrown when an unexpected error
+        /// <exception cref="HealthStatusClientV2ServiceException">Thrown when an unexpected error
         /// occurs during retrieval.</exception>
         /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
         /// signaled.</exception>
-        public async ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthSummaryV2Async(
+        public async ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthRagStatusV2Async(
             CancellationToken cancellationToken = default)
         {
             try
             {
                 return await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(cancellationToken);
+                    .RetrieveHealthRagStatusV2Async(cancellationToken);
             }
             catch (HealthV2CoordinationValidationException
                 healthV2CoordinationValidationException)
             {
-                throw CreateHealthV2ClientValidationException(
+                throw CreateHealthStatusClientV2ValidationException(
                     healthV2CoordinationValidationException.InnerException as Xeption);
             }
             catch (HealthV2CoordinationDependencyValidationException
                 healthV2CoordinationDependencyValidationException)
             {
-                throw CreateHealthV2ClientValidationException(
+                throw CreateHealthStatusClientV2ValidationException(
                     healthV2CoordinationDependencyValidationException.InnerException as Xeption);
             }
             catch (HealthV2CoordinationDependencyException
                 healthV2CoordinationDependencyException)
             {
-                throw CreateHealthV2ClientDependencyException(
+                throw CreateHealthStatusClientV2DependencyException(
                     healthV2CoordinationDependencyException.InnerException as Xeption);
             }
             catch (HealthV2CoordinationServiceException
                 healthV2CoordinationServiceException)
             {
-                throw CreateHealthV2ClientDependencyException(
+                throw CreateHealthStatusClientV2DependencyException(
                     healthV2CoordinationServiceException.InnerException as Xeption);
             }
             catch (Exception exception)
             {
-                throw CreateHealthV2ClientServiceException(exception as Xeption);
+                throw CreateHealthStatusClientV2ServiceException(exception as Xeption);
             }
         }
 
-        private static HealthV2ClientValidationException
-            CreateHealthV2ClientValidationException(Xeption innerException)
+        private static HealthStatusClientV2ValidationException
+            CreateHealthStatusClientV2ValidationException(Xeption innerException)
         {
-            return new HealthV2ClientValidationException(
+            return new HealthStatusClientV2ValidationException(
                 message: "Health client validation error occurred, fix the errors and try again.",
                 innerException: innerException,
                 data: innerException?.Data);
         }
 
-        private static HealthV2ClientDependencyException
-            CreateHealthV2ClientDependencyException(Xeption innerException)
+        private static HealthStatusClientV2DependencyException
+            CreateHealthStatusClientV2DependencyException(Xeption innerException)
         {
-            return new HealthV2ClientDependencyException(
+            return new HealthStatusClientV2DependencyException(
                 message: "Health client dependency error occurred, contact support.",
                 innerException: innerException,
                 data: innerException?.Data);
         }
 
-        private static HealthV2ClientServiceException
-            CreateHealthV2ClientServiceException(Xeption innerException)
+        private static HealthStatusClientV2ServiceException
+            CreateHealthStatusClientV2ServiceException(Xeption innerException)
         {
-            return new HealthV2ClientServiceException(
+            return new HealthStatusClientV2ServiceException(
                 message: "Health client service error occurred, contact support.",
                 innerException: innerException,
                 data: innerException?.Data);

@@ -121,7 +121,7 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         /// <summary>
         /// Gets the client for performing health checks in V2 API.
         /// </summary>
-        public IHealthV2Client HealthV2Client { get; private set; }
+        public IHealthStatusClientV2 HealthStatusClientV2 { get; private set; }
 
         /// <summary>
         /// Gets the client for managing listener events in V2 API.
@@ -166,8 +166,8 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             this.EventV2Client =
                 serviceProvider.GetRequiredService<IEventV2Client>();
 
-            this.HealthV2Client =
-                serviceProvider.GetRequiredService<IHealthV2Client>();
+            this.HealthStatusClientV2 =
+                serviceProvider.GetRequiredService<IHealthStatusClientV2>();
 
             this.ListenerEventV2Client =
                 serviceProvider.GetRequiredService<IListenerEventV2Client>();
@@ -326,8 +326,8 @@ namespace EventHighway.Core.Clients.EventHighways.V2
                 ArchivingEventV2Client>();
 
             services.AddTransient<
-                IHealthV2Client,
-                HealthV2Client>();
+                IHealthStatusClientV2,
+                HealthStatusClientV2>();
 
             services.AddTransient<
                 IListenerEventV2Client,

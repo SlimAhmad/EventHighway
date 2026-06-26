@@ -10,7 +10,7 @@ namespace EventHighway.Core.Tests.Acceptance.Brokers
 {
     public partial class ClientBroker
     {
-        public async ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthSummaryV2Async() =>
-            await this.eventHighwayClient.V2.HealthV2Client.RetrieveHealthSummaryV2Async();
+        public async ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthRagStatusV2Async() =>
+            await this.eventHighwayClient.V2.HealthStatusClientV2.RetrieveHealthRagStatusV2Async();
     }
 }
