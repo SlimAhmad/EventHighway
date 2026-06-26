@@ -396,7 +396,95 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             TrafficPeriodV2 period,
             DateTimeOffset windowStart,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            DateTimeOffset effectiveWindowStart = ResolveWindowStart(windowStart);
+            DateTimeOffset windowEnd = ComputeWindowEnd(period, effectiveWindowStart);
+            string windowLabel = BuildWindowLabel(period, effectiveWindowStart, windowEnd);
+
+            var allAddresses =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventAddressV2sAsync(cancellationToken);
+
+            var allEvents =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventV2sAsync(cancellationToken);
+
+            var windowEvents = allEvents
+                .Where(e => e.CreatedDate >= effectiveWindowStart && e.CreatedDate < windowEnd)
+                .ToList();
+
+            var byAddress = new List<DuplicateDetailV2>();
+
+            foreach (var address in allAddresses)
+            {
+                var addressEvents = windowEvents
+                    .Where(e => e.EventAddressId == address.Id)
+                    .ToList();
+
+                if (addressEvents.Count == 0)
+                {
+                    continue;
+                }
+
+                var contentHashGroups = addressEvents
+                    .GroupBy(e => e.ContentHash)
+                    .ToList();
+
+                int totalEvents = addressEvents.Count;
+                int distinctContentHashes = contentHashGroups.Count;
+                int duplicates = totalEvents - distinctContentHashes;
+
+                var duplicateEvents = contentHashGroups
+                    .Where(group => group.Count() > 1)
+                    .SelectMany(group => group.OrderBy(e => e.CreatedDate).Skip(1))
+                    .ToList();
+
+                DateTimeOffset? lastDuplicateSeen = duplicateEvents.Count > 0
+                    ? duplicateEvents.Max(e => e.CreatedDate)
+                    : (DateTimeOffset?)null;
+
+                decimal duplicateRate = totalEvents > 0
+                    ? (decimal)duplicates / totalEvents * 100
+                    : 0;
+
+                byAddress.Add(new DuplicateDetailV2
+                {
+                    EventAddressId = address.Id,
+                    AddressName = address.Name,
+                    ParticipantId = null,
+                    ParticipantName = "Unknown",
+                    TotalEvents = totalEvents,
+                    Duplicates = duplicates,
+                    DuplicateRate = duplicateRate,
+                    LastDuplicateSeen = lastDuplicateSeen
+                });
+            }
+
+            long totalDuplicatesDetected = byAddress.Sum(detail => detail.Duplicates);
+            long totalEventsInWindow = byAddress.Sum(detail => detail.TotalEvents);
+            long totalUniqueEvents = totalEventsInWindow - totalDuplicatesDetected;
+
+            decimal overallDuplicateRate = totalEventsInWindow > 0
+                ? (decimal)totalDuplicatesDetected / totalEventsInWindow * 100
+                : 0;
+
+            return new DuplicateDetectionSummaryV2
+            {
+                Period = period,
+                WindowStart = effectiveWindowStart,
+                WindowEnd = windowEnd,
+                WindowLabel = windowLabel,
+                TotalDuplicatesDetected = totalDuplicatesDetected,
+                TotalUniqueEvents = totalUniqueEvents,
+                OverallDuplicateRate = overallDuplicateRate,
+                ByAddress = byAddress
+                    .OrderByDescending(detail => detail.Duplicates)
+                    .ToList()
+            };
+        });
 
         public ValueTask<RetryHealthSummaryV2> RetrieveRetryHealthV2Async(
             CancellationToken cancellationToken = default) =>
