@@ -29,6 +29,18 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
             this.loggingBroker = loggingBroker;
         }
 
+        public ValueTask<EventParticipantSecretV2> AddEventParticipantSecretV2Async(
+            EventParticipantSecretV2 eventParticipantSecretV2,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await ValidateEventParticipantSecretV2OnAddAsync(eventParticipantSecretV2);
+
+            return await this.storageBroker.InsertEventParticipantSecretV2Async(
+                eventParticipantSecretV2, cancellationToken);
+        });
+
         public ValueTask<IQueryable<EventParticipantSecretV2>> RetrieveAllEventParticipantSecretV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
@@ -91,17 +103,5 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
             return await this.storageBroker.DeleteEventParticipantSecretV2Async(
                 maybeEventParticipantSecretV2, cancellationToken);
         }));
-
-        public ValueTask<EventParticipantSecretV2> AddEventParticipantSecretV2Async(
-            EventParticipantSecretV2 eventParticipantSecretV2,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            await ValidateEventParticipantSecretV2OnAddAsync(eventParticipantSecretV2);
-
-            return await this.storageBroker.InsertEventParticipantSecretV2Async(
-                eventParticipantSecretV2, cancellationToken);
-        });
     }
 }
