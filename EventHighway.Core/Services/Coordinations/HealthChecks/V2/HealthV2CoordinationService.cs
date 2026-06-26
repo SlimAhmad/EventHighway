@@ -516,7 +516,61 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
         public ValueTask<RetryHealthSummaryV2> RetrieveRetryHealthV2Async(
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var allAddresses =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventAddressV2sAsync(cancellationToken);
+
+            var allEvents =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventV2sAsync(cancellationToken);
+
+            var activeEvents = allEvents
+                .Where(e => e.Status == EventStatusV2.Active)
+                .ToList();
+
+            var addressNames = allAddresses
+                .ToDictionary(address => address.Id, address => address.Name);
+
+            var distribution = activeEvents
+                .GroupBy(e => e.RemainingRetryAttempts)
+                .Select(group => new RetryBucketV2
+                {
+                    RemainingRetries = group.Key,
+                    Count = group.Count()
+                })
+                .OrderBy(bucket => bucket.RemainingRetries)
+                .ToList();
+
+            var byAddress = activeEvents
+                .GroupBy(e => e.EventAddressId)
+                .Select(group => new RetryAddressDetailV2
+                {
+                    EventAddressId = group.Key,
+                    AddressName = addressNames.TryGetValue(group.Key, out string name) ? name : null,
+                    DeadEvents = group.Count(e => e.RemainingRetryAttempts == 0),
+                    CriticalEvents = group.Count(e =>
+                        e.RemainingRetryAttempts >= 1 && e.RemainingRetryAttempts <= 2),
+                    TotalEvents = group.Count()
+                })
+                .OrderByDescending(detail => detail.DeadEvents)
+                .ThenByDescending(detail => detail.CriticalEvents)
+                .ToList();
+
+            return new RetryHealthSummaryV2
+            {
+                TotalActiveEvents = activeEvents.Count,
+                DeadEvents = activeEvents.Count(e => e.RemainingRetryAttempts == 0),
+                CriticalEvents = activeEvents.Count(e =>
+                    e.RemainingRetryAttempts >= 1 && e.RemainingRetryAttempts <= 2),
+                HealthyEvents = activeEvents.Count(e => e.RemainingRetryAttempts >= 3),
+                Distribution = distribution,
+                ByAddress = byAddress
+            };
+        });
 
         public ValueTask<IEnumerable<ParticipantSummaryV2>> RetrieveParticipantSummaryV2Async(
             TrafficPeriodV2 period,
