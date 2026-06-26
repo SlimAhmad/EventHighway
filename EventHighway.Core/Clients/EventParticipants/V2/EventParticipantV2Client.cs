@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.EventParticipants.V2.Exceptions;
@@ -55,6 +56,10 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
                 throw CreateClientServiceException(exception as Xeption);
             }
         }
+
+        public ValueTask<IEnumerable<EventParticipantV2>> RetrieveAllEventParticipantV2sAsync(
+            CancellationToken cancellationToken = default) =>
+                throw new NotImplementedException();
 
         private static EventParticipantV2ClientValidationException
             CreateClientValidationException(Xeption innerException)
