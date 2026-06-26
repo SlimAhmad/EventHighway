@@ -131,6 +131,72 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
             this.storageBrokerMock.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnAddIfCreatedDateIsNotRecentAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+
+            DateTimeOffset invalidDateTimeOffset =
+                randomDateTimeOffset.AddMinutes(GetRandomNegativeNumber());
+
+            EventParticipantV2 invalidEventParticipantV2 =
+                CreateRandomEventParticipantV2(invalidDateTimeOffset);
+
+            invalidEventParticipantV2.Id = default;
+
+            var invalidEventParticipantV2Exception =
+                new InvalidEventParticipantV2Exception(
+                    message: "Event participant is invalid, fix the errors and try again.");
+
+            invalidEventParticipantV2Exception.AddData(
+                key: nameof(EventParticipantV2.CreatedDate),
+                values: "Date is not recent");
+
+            var expectedEventParticipantV2ValidationException =
+                new EventParticipantV2ValidationException(
+                    message: "Event participant validation error occurred, fix the errors and try again.",
+                    innerException: invalidEventParticipantV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTimeOffset);
+
+            // when
+            ValueTask<EventParticipantV2> addEventParticipantV2Task =
+                this.eventParticipantV2Service.AddEventParticipantV2Async(
+                    invalidEventParticipantV2, randomCancellationToken);
+
+            EventParticipantV2ValidationException actualEventParticipantV2ValidationException =
+                await Assert.ThrowsAsync<EventParticipantV2ValidationException>(
+                    addEventParticipantV2Task.AsTask);
+
+            // then
+            actualEventParticipantV2ValidationException.Should().BeEquivalentTo(
+                expectedEventParticipantV2ValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventParticipantV2ValidationException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventParticipantV2Async(
+                    It.IsAny<EventParticipantV2>(), It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
         [Theory]
         [InlineData(null)]
         [InlineData("")]
