@@ -53,6 +53,21 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
                 throw CreateHealthParticipantClientV2ValidationException(
                     healthV2CoordinationDependencyValidationException.InnerException as Xeption);
             }
+            catch (HealthV2CoordinationDependencyException
+                healthV2CoordinationDependencyException)
+            {
+                throw CreateHealthParticipantClientV2DependencyException(
+                    healthV2CoordinationDependencyException.InnerException as Xeption);
+            }
+        }
+
+        private static HealthParticipantClientV2DependencyException
+            CreateHealthParticipantClientV2DependencyException(Xeption innerException)
+        {
+            return new HealthParticipantClientV2DependencyException(
+                message: "Health client dependency error occurred, contact support.",
+                innerException: innerException,
+                data: innerException?.Data);
         }
 
         private static HealthParticipantClientV2ValidationException
