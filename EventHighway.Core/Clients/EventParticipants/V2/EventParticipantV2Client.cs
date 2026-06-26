@@ -40,6 +40,11 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
                 throw CreateClientValidationException(
                     eventParticipantV2DependencyValidationException.InnerException as Xeption);
             }
+            catch (EventParticipantV2DependencyException eventParticipantV2DependencyException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantV2DependencyException.InnerException as Xeption);
+            }
         }
 
         private static EventParticipantV2ClientValidationException
@@ -47,6 +52,15 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
         {
             return new EventParticipantV2ClientValidationException(
                 message: "Event participant client validation error occurred, fix the errors and try again.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
+
+        private static EventParticipantV2ClientDependencyException
+            CreateClientDependencyException(Xeption innerException)
+        {
+            return new EventParticipantV2ClientDependencyException(
+                message: "Event participant client dependency error occurred, contact support.",
                 innerException: innerException,
                 data: innerException?.Data);
         }
