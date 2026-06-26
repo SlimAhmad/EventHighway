@@ -28,9 +28,10 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public async ValueTask<EventParticipantV2> AddEventParticipantV2Async(
+        public ValueTask<EventParticipantV2> AddEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             await ValidateEventParticipantV2OnAddAsync(eventParticipantV2);
@@ -38,6 +39,6 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
 
             return await this.storageBroker.InsertEventParticipantV2Async(
                 eventParticipantV2, cancellationToken);
-        }
+        });
     }
 }
