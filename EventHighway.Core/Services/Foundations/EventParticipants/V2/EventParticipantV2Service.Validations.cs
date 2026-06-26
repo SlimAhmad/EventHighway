@@ -50,6 +50,15 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
                 Parameter: nameof(EventParticipantV2.ActiveTo)));
         }
 
+        private static void ValidateEventParticipantV2Id(Guid eventParticipantV2Id)
+        {
+            Validate(
+                message: "Event participant is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(eventParticipantV2Id),
+                Parameter: nameof(EventParticipantV2.Id)));
+        }
+
         private static void ValidateEventParticipantV2IsNotNull(EventParticipantV2 eventParticipantV2)
         {
             if (eventParticipantV2 is null)

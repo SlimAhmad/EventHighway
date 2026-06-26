@@ -39,12 +39,17 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
                 cancellationToken);
         });
 
-        public async ValueTask<EventParticipantV2> RetrieveEventParticipantV2ByIdAsync(
+        public ValueTask<EventParticipantV2> RetrieveEventParticipantV2ByIdAsync(
             Guid eventParticipantV2Id,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(new ReturningEventParticipantV2Function(async () =>
         {
-            throw new NotImplementedException();
-        }
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventParticipantV2Id(eventParticipantV2Id);
+
+            return await this.storageBroker.SelectEventParticipantV2ByIdAsync(
+                eventParticipantV2Id, cancellationToken);
+        }));
 
         public ValueTask<EventParticipantV2> AddEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,
