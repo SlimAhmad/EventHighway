@@ -38,6 +38,10 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
 
                 throw await CreateAndLogDependencyExceptionAsync(timeoutEventParticipantV2Exception);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (NullEventParticipantV2Exception nullEventParticipantV2Exception)
             {
                 throw await CreateAndLogValidationExceptionAsync(nullEventParticipantV2Exception);
