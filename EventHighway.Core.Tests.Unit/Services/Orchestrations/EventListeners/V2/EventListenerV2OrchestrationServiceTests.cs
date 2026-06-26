@@ -183,6 +183,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventListeners.V2
                     .IgnoreIt()
 
                 .OnProperty(eventListenerV2 => eventListenerV2.ListenerEventV2s)
+                    .IgnoreIt()
+
+                .OnProperty(eventListenerV2 => eventListenerV2.Participant)
                     .IgnoreIt();
 
             return filler;

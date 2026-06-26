@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -77,6 +78,11 @@ namespace EventHighway.Core.Models.Services.Foundations.EventParticipants.V2
         /// Gets or sets the collection of <see cref="EventArchiveV2"/> archived events associated with this participant.
         /// </summary>
         public IEnumerable<EventArchiveV2> EventArchiveV2s { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of <see cref="EventListenerV2"/> listeners owned by this participant.
+        /// </summary>
+        public IEnumerable<EventListenerV2> EventListenerV2s { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of <see cref="ListenerEventV2"/> listener events associated with this participant.
