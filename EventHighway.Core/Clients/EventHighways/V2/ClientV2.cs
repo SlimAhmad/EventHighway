@@ -15,6 +15,7 @@ using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Clients.ArchivingEvents.V2;
 using EventHighway.Core.Clients.EventAddresses.V2;
 using EventHighway.Core.Clients.EventListeners.V2;
+using EventHighway.Core.Clients.EventParticipantSecrets.V2;
 using EventHighway.Core.Clients.EventParticipants.V2;
 using EventHighway.Core.Clients.Events.V2;
 using EventHighway.Core.Clients.HealthChecks.V2;
@@ -137,6 +138,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         /// </summary>
         public IEventParticipantV2Client EventParticipantV2Client { get; private set; }
 
+        /// <summary>
+        /// Gets the client for managing event participant secrets in V2 API.
+        /// </summary>
+        public IEventParticipantSecretV2Client EventParticipantSecretV2Client { get; private set; }
+
         private void InitializeClients(IServiceProvider serviceProvider)
         {
             using (var scope = serviceProvider.CreateScope())
@@ -171,6 +177,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
 
             this.EventParticipantV2Client =
                 serviceProvider.GetRequiredService<IEventParticipantV2Client>();
+
+            this.EventParticipantSecretV2Client =
+                serviceProvider.GetRequiredService<IEventParticipantSecretV2Client>();
         }
 
         private IServiceProvider ConfigureDependencies()
@@ -331,6 +340,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IEventParticipantV2Client,
                 EventParticipantV2Client>();
+
+            services.AddTransient<
+                IEventParticipantSecretV2Client,
+                EventParticipantSecretV2Client>();
         }
     }
 }

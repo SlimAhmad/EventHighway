@@ -1,0 +1,230 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Clients.EventParticipantSecrets.V2.Exceptions;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.Exceptions;
+using EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2;
+using Xeptions;
+
+namespace EventHighway.Core.Clients.EventParticipantSecrets.V2
+{
+    internal class EventParticipantSecretV2Client : IEventParticipantSecretV2Client
+    {
+        private readonly IEventParticipantSecretV2Service eventParticipantSecretV2Service;
+
+        public EventParticipantSecretV2Client(IEventParticipantSecretV2Service eventParticipantSecretV2Service) =>
+            this.eventParticipantSecretV2Service = eventParticipantSecretV2Service;
+
+        public async ValueTask<EventParticipantSecretV2> AddEventParticipantSecretV2Async(
+            EventParticipantSecretV2 eventParticipantSecretV2,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventParticipantSecretV2Service
+                    .AddEventParticipantSecretV2Async(eventParticipantSecretV2, cancellationToken);
+            }
+            catch (EventParticipantSecretV2ValidationException eventParticipantSecretV2ValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2ValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyValidationException
+                eventParticipantSecretV2DependencyValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2DependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyException eventParticipantSecretV2DependencyException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2DependencyException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2ServiceException eventParticipantSecretV2ServiceException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2ServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateClientServiceException(exception as Xeption);
+            }
+        }
+
+        public async ValueTask<IEnumerable<EventParticipantSecretV2>> RetrieveAllEventParticipantSecretV2sAsync(
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventParticipantSecretV2Service
+                    .RetrieveAllEventParticipantSecretV2sAsync(cancellationToken);
+            }
+            catch (EventParticipantSecretV2ValidationException eventParticipantSecretV2ValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2ValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyValidationException
+                eventParticipantSecretV2DependencyValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2DependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyException eventParticipantSecretV2DependencyException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2DependencyException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2ServiceException eventParticipantSecretV2ServiceException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2ServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateClientServiceException(exception as Xeption);
+            }
+        }
+
+        public async ValueTask<EventParticipantSecretV2> RetrieveEventParticipantSecretV2ByIdAsync(
+            Guid eventParticipantSecretV2Id,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventParticipantSecretV2Service
+                    .RetrieveEventParticipantSecretV2ByIdAsync(eventParticipantSecretV2Id, cancellationToken);
+            }
+            catch (EventParticipantSecretV2ValidationException eventParticipantSecretV2ValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2ValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyValidationException
+                eventParticipantSecretV2DependencyValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2DependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyException eventParticipantSecretV2DependencyException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2DependencyException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2ServiceException eventParticipantSecretV2ServiceException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2ServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateClientServiceException(exception as Xeption);
+            }
+        }
+
+        public async ValueTask<EventParticipantSecretV2> ModifyEventParticipantSecretV2Async(
+            EventParticipantSecretV2 eventParticipantSecretV2,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventParticipantSecretV2Service
+                    .ModifyEventParticipantSecretV2Async(eventParticipantSecretV2, cancellationToken);
+            }
+            catch (EventParticipantSecretV2ValidationException eventParticipantSecretV2ValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2ValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyValidationException
+                eventParticipantSecretV2DependencyValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2DependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyException eventParticipantSecretV2DependencyException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2DependencyException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2ServiceException eventParticipantSecretV2ServiceException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2ServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateClientServiceException(exception as Xeption);
+            }
+        }
+
+        public async ValueTask<EventParticipantSecretV2> RemoveEventParticipantSecretV2ByIdAsync(
+            Guid eventParticipantSecretV2Id,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventParticipantSecretV2Service
+                    .RemoveEventParticipantSecretV2ByIdAsync(eventParticipantSecretV2Id, cancellationToken);
+            }
+            catch (EventParticipantSecretV2ValidationException eventParticipantSecretV2ValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2ValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyValidationException
+                eventParticipantSecretV2DependencyValidationException)
+            {
+                throw CreateClientValidationException(
+                    eventParticipantSecretV2DependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2DependencyException eventParticipantSecretV2DependencyException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2DependencyException.InnerException as Xeption);
+            }
+            catch (EventParticipantSecretV2ServiceException eventParticipantSecretV2ServiceException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantSecretV2ServiceException.InnerException as Xeption);
+            }
+            catch (Exception exception)
+            {
+                throw CreateClientServiceException(exception as Xeption);
+            }
+        }
+
+        private static EventParticipantSecretV2ClientValidationException
+            CreateClientValidationException(Xeption innerException)
+        {
+            return new EventParticipantSecretV2ClientValidationException(
+                message: "Event participant secret client validation error occurred, fix the errors and try again.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
+
+        private static EventParticipantSecretV2ClientDependencyException
+            CreateClientDependencyException(Xeption innerException)
+        {
+            return new EventParticipantSecretV2ClientDependencyException(
+                message: "Event participant secret client dependency error occurred, contact support.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
+
+        private static EventParticipantSecretV2ClientServiceException
+            CreateClientServiceException(Xeption innerException)
+        {
+            return new EventParticipantSecretV2ClientServiceException(
+                message: "Event participant secret client service error occurred, contact support.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
+    }
+}
