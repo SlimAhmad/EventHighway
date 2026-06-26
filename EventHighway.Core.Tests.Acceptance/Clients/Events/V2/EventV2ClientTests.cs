@@ -161,6 +161,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
                 .OnProperty(eventV2 => eventV2.ScheduledDate).Use(scheduledDate)
                 .OnProperty(eventV2 => eventV2.Status).Use(EventStatusV2.Active)
                 .OnType<DateTimeOffset>().Use(now)
+                .OnProperty(eventV2 => eventV2.ParticipantId).IgnoreIt()
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             if (content is not null)

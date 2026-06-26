@@ -88,6 +88,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ArchivingEvents.V2
                     eventV2.RemainingRetryAttempts).Use(0)
 
                 .OnType<DateTimeOffset>().Use(now)
+                .OnProperty(eventV2 => eventV2.ParticipantId).IgnoreIt()
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
