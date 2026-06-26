@@ -67,6 +67,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         IHealthAddressClientV2 HealthAddressClientV2 { get; }
 
         /// <summary>
+        /// Gets the client for retrieving the loop-detection summary in V2 API.
+        /// </summary>
+        IHealthLoopClientV2 HealthLoopClientV2 { get; }
+
+        /// <summary>
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         IListenerEventV2Client ListenerEventV2Client { get; }
