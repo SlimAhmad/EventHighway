@@ -95,6 +95,9 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventListeners.V2
                     eventListenerV2.ListenerEventV2s).IgnoreIt()
 
                 .OnProperty(eventListenerV2 =>
+                    eventListenerV2.ParticipantId).IgnoreIt()
+
+                .OnProperty(eventListenerV2 =>
                     eventListenerV2.Participant).IgnoreIt()
 
                 .OnType<DateTimeOffset>().Use(valueToUse: now);
