@@ -3,10 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
@@ -17,14 +14,14 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 {
     internal partial class HealthV2CoordinationService
     {
-        private delegate ValueTask<IEnumerable<HealthCheckItemV2>> ReturningHealthCheckItemsFunction();
+        private delegate ValueTask<T> ReturningValueFunction<T>();
 
-        private async ValueTask<IEnumerable<HealthCheckItemV2>> TryCatch(
-            ReturningHealthCheckItemsFunction returningHealthCheckItemsFunction)
+        private async ValueTask<T> TryCatch<T>(
+            ReturningValueFunction<T> returningValueFunction)
         {
             try
             {
-                return await returningHealthCheckItemsFunction();
+                return await returningValueFunction();
             }
             catch (OperationCanceledException operationCanceledException)
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)

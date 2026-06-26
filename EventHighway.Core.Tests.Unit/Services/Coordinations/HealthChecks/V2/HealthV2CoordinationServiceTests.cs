@@ -326,6 +326,40 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             return listenerEvents.AsQueryable();
         }
 
+        private static EventV2 CreateEventV2WithDate(
+            DateTimeOffset createdDate,
+            EventTypeV2 type)
+        {
+            return new EventV2
+            {
+                Id = Guid.NewGuid(),
+                Type = type,
+                Status = EventStatusV2.Active,
+                RemainingRetryAttempts = GetRandomPositiveNumber(),
+                Content = GetRandomString(),
+                EventName = GetRandomString(),
+                CreatedDate = createdDate,
+                UpdatedDate = createdDate,
+                EventAddressId = Guid.NewGuid()
+            };
+        }
+
+        private static ListenerEventV2 CreateListenerEventV2WithDate(
+            DateTimeOffset createdDate,
+            ListenerEventStatusV2 status)
+        {
+            return new ListenerEventV2
+            {
+                Id = Guid.NewGuid(),
+                Status = status,
+                CreatedDate = createdDate,
+                UpdatedDate = createdDate,
+                EventId = Guid.NewGuid(),
+                EventAddressId = Guid.NewGuid(),
+                EventListenerId = Guid.NewGuid()
+            };
+        }
+
         private static IEnumerable<IEventHandler> CreateRandomEventHandlers(int count = -1)
         {
             int actualCount = count >= 0 ? count : GetRandomPositiveNumber();
