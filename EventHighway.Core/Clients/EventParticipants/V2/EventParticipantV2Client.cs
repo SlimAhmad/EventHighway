@@ -17,9 +17,11 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
         public EventParticipantV2Client(IEventParticipantV2Service eventParticipantV2Service) =>
             this.eventParticipantV2Service = eventParticipantV2Service;
 
-        public ValueTask<EventParticipantV2> AddEventParticipantV2Async(
+        public async ValueTask<EventParticipantV2> AddEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,
             CancellationToken cancellationToken = default) =>
-                throw new NotImplementedException();
+                await this.eventParticipantV2Service.AddEventParticipantV2Async(
+                    eventParticipantV2,
+                    cancellationToken);
     }
 }
