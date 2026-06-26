@@ -45,6 +45,11 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
                 throw CreateClientDependencyException(
                     eventParticipantV2DependencyException.InnerException as Xeption);
             }
+            catch (EventParticipantV2ServiceException eventParticipantV2ServiceException)
+            {
+                throw CreateClientDependencyException(
+                    eventParticipantV2ServiceException.InnerException as Xeption);
+            }
         }
 
         private static EventParticipantV2ClientValidationException
