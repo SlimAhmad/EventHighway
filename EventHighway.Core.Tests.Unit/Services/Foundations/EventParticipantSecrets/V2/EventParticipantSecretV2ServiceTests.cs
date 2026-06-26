@@ -37,8 +37,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 
+        private static EventParticipantSecretV2 CreateRandomEventParticipantSecretV2(DateTimeOffset dates) =>
+            CreateEventParticipantSecretV2Filler(dates).Create();
+
         private static EventParticipantSecretV2 CreateRandomEventParticipantSecretV2() =>
             CreateEventParticipantSecretV2Filler(dates: GetRandomDateTimeOffset()).Create();
+
+        private static int GetRandomNegativeNumber() =>
+            -1 * new IntRange(min: 2, max: 9).GetValue();
 
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();

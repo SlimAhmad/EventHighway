@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
@@ -59,6 +60,86 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public async Task ShouldThrowValidationExceptionOnAddIfEventParticipantSecretV2IsInvalidAndLogItAsync(
+            string invalidText)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var invalidEventParticipantSecretV2 = new EventParticipantSecretV2
+            {
+                Id = Guid.NewGuid(),
+                Secret = invalidText,
+            };
+
+            var invalidEventParticipantSecretV2Exception =
+                new InvalidEventParticipantSecretV2Exception(
+                    message: "Event participant secret is invalid, fix the errors and try again.");
+
+            invalidEventParticipantSecretV2Exception.AddData(
+                key: nameof(EventParticipantSecretV2.Id),
+                values: "Not required");
+
+            invalidEventParticipantSecretV2Exception.AddData(
+                key: nameof(EventParticipantSecretV2.Secret),
+                values: "Required");
+
+            invalidEventParticipantSecretV2Exception.AddData(
+                key: nameof(EventParticipantSecretV2.CreatedDate),
+                values: "Required");
+
+            invalidEventParticipantSecretV2Exception.AddData(
+                key: nameof(EventParticipantSecretV2.UpdatedDate),
+                values: "Required");
+
+            invalidEventParticipantSecretV2Exception.AddData(
+                key: nameof(EventParticipantSecretV2.ParticipantId),
+                values: "Required");
+
+            var expectedEventParticipantSecretV2ValidationException =
+                new EventParticipantSecretV2ValidationException(
+                    message: "Event participant secret validation error occurred, fix the errors and try again.",
+                    innerException: invalidEventParticipantSecretV2Exception);
+
+            // when
+            ValueTask<EventParticipantSecretV2> addEventParticipantSecretV2Task =
+                this.eventParticipantSecretV2Service.AddEventParticipantSecretV2Async(
+                    invalidEventParticipantSecretV2, randomCancellationToken);
+
+            EventParticipantSecretV2ValidationException actualEventParticipantSecretV2ValidationException =
+                await Assert.ThrowsAsync<EventParticipantSecretV2ValidationException>(
+                    addEventParticipantSecretV2Task.AsTask);
+
+            // then
+            actualEventParticipantSecretV2ValidationException.Should().BeEquivalentTo(
+                expectedEventParticipantSecretV2ValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is<Xeption>(
+                    actual => actual.SameExceptionAs(
+                        expectedEventParticipantSecretV2ValidationException))),
+                            Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventParticipantSecretV2Async(
+                    It.IsAny<EventParticipantSecretV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
