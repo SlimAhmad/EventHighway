@@ -62,6 +62,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         IHealthTrafficClientV2 HealthTrafficClientV2 { get; }
 
         /// <summary>
+        /// Gets the client for retrieving per-event-address health summaries in V2 API.
+        /// </summary>
+        IHealthAddressClientV2 HealthAddressClientV2 { get; }
+
+        /// <summary>
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         IListenerEventV2Client ListenerEventV2Client { get; }
