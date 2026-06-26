@@ -5,6 +5,7 @@
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.Exceptions;
+using Microsoft.Data.SqlClient;
 using Xeptions;
 
 namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
@@ -28,6 +29,30 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(invalidEventParticipantSecretV2Exception);
             }
+            catch (SqlException sqlException)
+            {
+                var failedStorageEventParticipantSecretV2Exception =
+                    new FailedStorageEventParticipantSecretV2Exception(
+                        message: "Failed event participant secret storage error occurred, contact support.",
+                        innerException: sqlException,
+                        data: sqlException.Data);
+
+                throw await CreateAndLogCriticalDependencyExceptionAsync(
+                    failedStorageEventParticipantSecretV2Exception);
+            }
+        }
+
+        private async ValueTask<EventParticipantSecretV2DependencyException>
+            CreateAndLogCriticalDependencyExceptionAsync(Xeption exception)
+        {
+            var eventParticipantSecretV2DependencyException =
+                new EventParticipantSecretV2DependencyException(
+                    message: "Event participant secret dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogCriticalAsync(eventParticipantSecretV2DependencyException);
+
+            return eventParticipantSecretV2DependencyException;
         }
 
         private async ValueTask<EventParticipantSecretV2ValidationException>
