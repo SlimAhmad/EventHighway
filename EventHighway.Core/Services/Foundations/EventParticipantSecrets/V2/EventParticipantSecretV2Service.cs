@@ -19,9 +19,10 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
             this.storageBroker = storageBroker;
         }
 
-        public ValueTask<EventParticipantSecretV2> AddEventParticipantSecretV2Async(
+        public async ValueTask<EventParticipantSecretV2> AddEventParticipantSecretV2Async(
             EventParticipantSecretV2 eventParticipantSecretV2,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            await this.storageBroker.InsertEventParticipantSecretV2Async(
+                eventParticipantSecretV2, cancellationToken);
     }
 }
