@@ -155,6 +155,17 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
                     failedStorageEventParticipantV2Exception);
             }
+            catch (Exception serviceException)
+            {
+                var failedEventParticipantV2ServiceException =
+                    new FailedEventParticipantV2ServiceException(
+                        message: "Failed event participant service error occurred, contact support.",
+                        innerException: serviceException,
+                        data: serviceException.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventParticipantV2ServiceException);
+            }
         }
 
         private async ValueTask<EventParticipantV2DependencyException>
