@@ -139,6 +139,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         public IHealthLoopClientV2 HealthLoopClientV2 { get; private set; }
 
         /// <summary>
+        /// Gets the client for retrieving the duplicate-detection summary in V2 API.
+        /// </summary>
+        public IHealthDuplicateClientV2 HealthDuplicateClientV2 { get; private set; }
+
+        /// <summary>
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         public IListenerEventV2Client ListenerEventV2Client { get; private set; }
@@ -192,6 +197,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
 
             this.HealthLoopClientV2 =
                 serviceProvider.GetRequiredService<IHealthLoopClientV2>();
+
+            this.HealthDuplicateClientV2 =
+                serviceProvider.GetRequiredService<IHealthDuplicateClientV2>();
 
             this.ListenerEventV2Client =
                 serviceProvider.GetRequiredService<IListenerEventV2Client>();
@@ -364,6 +372,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IHealthLoopClientV2,
                 HealthLoopClientV2>();
+
+            services.AddTransient<
+                IHealthDuplicateClientV2,
+                HealthDuplicateClientV2>();
 
             services.AddTransient<
                 IListenerEventV2Client,
