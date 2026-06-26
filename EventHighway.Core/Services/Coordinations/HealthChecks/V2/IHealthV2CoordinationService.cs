@@ -12,7 +12,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 {
     internal interface IHealthV2CoordinationService
     {
-        ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthSummaryV2Async(
+        ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthRagStatusV2Async(
             CancellationToken cancellationToken = default);
 
         ValueTask<TrafficSnapshotV2> RetrieveTrafficSnapshotV2Async(

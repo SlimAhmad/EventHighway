@@ -10,16 +10,16 @@ using FluentAssertions;
 
 namespace EventHighway.Core.Tests.Acceptance.Clients.HealthChecks.V2
 {
-    public partial class HealthV2ClientTests
+    public partial class HealthStatusClientV2Tests
     {
         [Fact]
-        public async Task ShouldRetrieveHealthSummaryV2Async()
+        public async Task ShouldRetrieveHealthRagStatusV2Async()
         {
             // given . when
             Func<Task> retrieveHealthSummaryV2Task = async () =>
             {
                 IEnumerable<HealthCheckItemV2> actualHealthCheckItemV2s =
-                    await this.clientBroker.RetrieveHealthSummaryV2Async();
+                    await this.clientBroker.RetrieveHealthRagStatusV2Async();
 
                 actualHealthCheckItemV2s.Should().NotBeNull();
             };

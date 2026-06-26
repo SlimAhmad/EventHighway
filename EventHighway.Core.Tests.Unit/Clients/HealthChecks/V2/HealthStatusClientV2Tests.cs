@@ -14,18 +14,18 @@ using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
 {
-    public partial class HealthV2ClientTests
+    public partial class HealthStatusClientV2Tests
     {
         private readonly Mock<IHealthV2CoordinationService> healthV2CoordinationServiceMock;
-        private readonly IHealthV2Client healthV2Client;
+        private readonly IHealthStatusClientV2 healthV2Client;
 
-        public HealthV2ClientTests()
+        public HealthStatusClientV2Tests()
         {
             this.healthV2CoordinationServiceMock =
                 new Mock<IHealthV2CoordinationService>();
 
             this.healthV2Client =
-                new HealthV2Client(
+                new HealthStatusClientV2(
                     healthV2CoordinationService:
                         this.healthV2CoordinationServiceMock.Object);
         }

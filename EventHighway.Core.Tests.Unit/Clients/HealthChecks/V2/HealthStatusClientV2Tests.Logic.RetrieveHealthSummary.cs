@@ -12,10 +12,10 @@ using Moq;
 
 namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
 {
-    public partial class HealthV2ClientTests
+    public partial class HealthStatusClientV2Tests
     {
         [Fact]
-        public async Task ShouldRetrieveHealthSummaryV2Async()
+        public async Task ShouldRetrieveHealthRagStatusV2Async()
         {
             // given
             CancellationToken randomCancellationToken =
@@ -31,20 +31,20 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
                 returnedHealthCheckItemV2s.DeepClone();
 
             this.healthV2CoordinationServiceMock.Setup(service =>
-                service.RetrieveHealthSummaryV2Async(randomCancellationToken))
+                service.RetrieveHealthRagStatusV2Async(randomCancellationToken))
                     .ReturnsAsync(returnedHealthCheckItemV2s);
 
             // when
             IEnumerable<HealthCheckItemV2> actualHealthCheckItemV2s =
                 await this.healthV2Client
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualHealthCheckItemV2s.Should()
                 .BeEquivalentTo(expectedHealthCheckItemV2s);
 
             this.healthV2CoordinationServiceMock.Verify(service =>
-                service.RetrieveHealthSummaryV2Async(randomCancellationToken),
+                service.RetrieveHealthRagStatusV2Async(randomCancellationToken),
                     Times.Once);
 
             this.healthV2CoordinationServiceMock

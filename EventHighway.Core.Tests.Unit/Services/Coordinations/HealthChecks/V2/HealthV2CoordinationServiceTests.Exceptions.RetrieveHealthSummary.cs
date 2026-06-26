@@ -27,7 +27,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             ValueTask<IEnumerable<HealthCheckItemV2>> retrieveHealthSummaryTask =
                 this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(cancelledToken);
+                    .RetrieveHealthRagStatusV2Async(cancelledToken);
 
             // then
             OperationCanceledException actualException =
@@ -73,7 +73,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             ValueTask<IEnumerable<HealthCheckItemV2>> retrieveTask =
                 this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             HealthV2CoordinationDependencyValidationException actualException =
                 await Assert.ThrowsAsync<HealthV2CoordinationDependencyValidationException>(
@@ -125,7 +125,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             ValueTask<IEnumerable<HealthCheckItemV2>> retrieveHealthSummaryTask =
                 this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(TestContext.Current.CancellationToken);
+                    .RetrieveHealthRagStatusV2Async(TestContext.Current.CancellationToken);
 
             HealthV2CoordinationDependencyException actualHealthV2CoordinationDependencyException =
                 await Assert.ThrowsAsync<HealthV2CoordinationDependencyException>(
@@ -171,7 +171,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             ValueTask<IEnumerable<HealthCheckItemV2>> retrieveTask =
                 this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             HealthV2CoordinationDependencyException actualException =
                 await Assert.ThrowsAsync<HealthV2CoordinationDependencyException>(

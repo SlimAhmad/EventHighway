@@ -14,7 +14,7 @@ using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
 {
-    public partial class HealthV2ClientTests
+    public partial class HealthStatusClientV2Tests
     {
         [Theory]
         [MemberData(nameof(ValidationExceptions))]
@@ -25,30 +25,30 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
-            var expectedHealthV2ClientValidationException =
-                new HealthV2ClientValidationException(
+            var expectedHealthStatusClientV2ValidationException =
+                new HealthStatusClientV2ValidationException(
                     message: "Health client validation error occurred, fix the errors and try again.",
                     innerException: validationException.InnerException as Xeption,
                     data: (validationException.InnerException as Xeption).Data);
 
             this.healthV2CoordinationServiceMock.Setup(service =>
-                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()))
+                service.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(validationException);
 
             // when
             ValueTask<IEnumerable<HealthCheckItemV2>> retrieveTask =
-                this.healthV2Client.RetrieveHealthSummaryV2Async(randomCancellationToken);
+                this.healthV2Client.RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
-            HealthV2ClientValidationException actualException =
-                await Assert.ThrowsAsync<HealthV2ClientValidationException>(
+            HealthStatusClientV2ValidationException actualException =
+                await Assert.ThrowsAsync<HealthStatusClientV2ValidationException>(
                     retrieveTask.AsTask);
 
             // then
             actualException.Should()
-                .BeEquivalentTo(expectedHealthV2ClientValidationException);
+                .BeEquivalentTo(expectedHealthStatusClientV2ValidationException);
 
             this.healthV2CoordinationServiceMock.Verify(service =>
-                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()),
+                service.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();
@@ -70,30 +70,30 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
                     someMessage,
                     someInnerException);
 
-            var expectedHealthV2ClientDependencyException =
-                new HealthV2ClientDependencyException(
+            var expectedHealthStatusClientV2DependencyException =
+                new HealthStatusClientV2DependencyException(
                     message: "Health client dependency error occurred, contact support.",
                     innerException: healthV2CoordinationDependencyException.InnerException as Xeption,
                     data: (healthV2CoordinationDependencyException.InnerException as Xeption).Data);
 
             this.healthV2CoordinationServiceMock.Setup(service =>
-                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()))
+                service.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(healthV2CoordinationDependencyException);
 
             // when
             ValueTask<IEnumerable<HealthCheckItemV2>> retrieveTask =
-                this.healthV2Client.RetrieveHealthSummaryV2Async(randomCancellationToken);
+                this.healthV2Client.RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
-            HealthV2ClientDependencyException actualException =
-                await Assert.ThrowsAsync<HealthV2ClientDependencyException>(
+            HealthStatusClientV2DependencyException actualException =
+                await Assert.ThrowsAsync<HealthStatusClientV2DependencyException>(
                     retrieveTask.AsTask);
 
             // then
             actualException.Should()
-                .BeEquivalentTo(expectedHealthV2ClientDependencyException);
+                .BeEquivalentTo(expectedHealthStatusClientV2DependencyException);
 
             this.healthV2CoordinationServiceMock.Verify(service =>
-                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()),
+                service.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();
@@ -115,30 +115,30 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
                     someMessage,
                     someInnerException);
 
-            var expectedHealthV2ClientDependencyException =
-                new HealthV2ClientDependencyException(
+            var expectedHealthStatusClientV2DependencyException =
+                new HealthStatusClientV2DependencyException(
                     message: "Health client dependency error occurred, contact support.",
                     innerException: healthV2CoordinationServiceException.InnerException as Xeption,
                     data: (healthV2CoordinationServiceException.InnerException as Xeption).Data);
 
             this.healthV2CoordinationServiceMock.Setup(service =>
-                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()))
+                service.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(healthV2CoordinationServiceException);
 
             // when
             ValueTask<IEnumerable<HealthCheckItemV2>> retrieveTask =
-                this.healthV2Client.RetrieveHealthSummaryV2Async(randomCancellationToken);
+                this.healthV2Client.RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
-            HealthV2ClientDependencyException actualException =
-                await Assert.ThrowsAsync<HealthV2ClientDependencyException>(
+            HealthStatusClientV2DependencyException actualException =
+                await Assert.ThrowsAsync<HealthStatusClientV2DependencyException>(
                     retrieveTask.AsTask);
 
             // then
             actualException.Should()
-                .BeEquivalentTo(expectedHealthV2ClientDependencyException);
+                .BeEquivalentTo(expectedHealthStatusClientV2DependencyException);
 
             this.healthV2CoordinationServiceMock.Verify(service =>
-                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()),
+                service.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();
@@ -153,30 +153,30 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
 
             var someXeption = new Xeption(message: GetRandomString());
 
-            var expectedHealthV2ClientServiceException =
-                new HealthV2ClientServiceException(
+            var expectedHealthStatusClientV2ServiceException =
+                new HealthStatusClientV2ServiceException(
                     message: "Health client service error occurred, contact support.",
                     innerException: someXeption,
                     data: someXeption.Data);
 
             this.healthV2CoordinationServiceMock.Setup(service =>
-                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()))
+                service.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()))
                     .ThrowsAsync(someXeption);
 
             // when
             ValueTask<IEnumerable<HealthCheckItemV2>> retrieveTask =
-                this.healthV2Client.RetrieveHealthSummaryV2Async(randomCancellationToken);
+                this.healthV2Client.RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
-            HealthV2ClientServiceException actualException =
-                await Assert.ThrowsAsync<HealthV2ClientServiceException>(
+            HealthStatusClientV2ServiceException actualException =
+                await Assert.ThrowsAsync<HealthStatusClientV2ServiceException>(
                     retrieveTask.AsTask);
 
             // then
             actualException.Should()
-                .BeEquivalentTo(expectedHealthV2ClientServiceException);
+                .BeEquivalentTo(expectedHealthStatusClientV2ServiceException);
 
             this.healthV2CoordinationServiceMock.Verify(service =>
-                service.RetrieveHealthSummaryV2Async(It.IsAny<CancellationToken>()),
+                service.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();

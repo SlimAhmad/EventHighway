@@ -44,7 +44,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthSummaryV2Async(
+        public ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthRagStatusV2Async(
             CancellationToken cancellationToken = default) =>
         TryCatch<IEnumerable<HealthCheckItemV2>>(async () =>
         {

@@ -89,7 +89,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Should().HaveCount(21);
@@ -266,7 +266,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Dead (0 retries)")
@@ -362,7 +362,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Dead (0 retries)")
@@ -458,7 +458,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Error Rate %")
@@ -554,7 +554,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Error Rate %")
@@ -650,7 +650,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
@@ -754,7 +754,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Dead (0 retries)")
@@ -859,7 +859,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Error Rate %")
@@ -964,7 +964,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // when
             IEnumerable<HealthCheckItemV2> actualResult =
                 await this.healthV2CoordinationService
-                    .RetrieveHealthSummaryV2Async(randomCancellationToken);
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
             actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
