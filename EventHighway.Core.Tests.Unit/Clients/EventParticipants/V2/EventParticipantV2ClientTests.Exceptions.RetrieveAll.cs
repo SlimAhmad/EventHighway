@@ -108,5 +108,51 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventParticipants.V2
 
             this.eventParticipantV2ServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task
+            ShouldThrowDependencyExceptionOnRetrieveAllIfDependencyExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var someInnerException = new Xeption(message: GetRandomString());
+
+            var eventParticipantV2DependencyException =
+                new EventParticipantV2DependencyException(
+                    message: "Event participant dependency error occurred, contact support.",
+                    innerException: someInnerException);
+
+            var expectedEventParticipantV2ClientDependencyException =
+                new EventParticipantV2ClientDependencyException(
+                    message: "Event participant client dependency error occurred, contact support.",
+                    innerException: someInnerException,
+                    data: someInnerException.Data);
+
+            this.eventParticipantV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventParticipantV2sAsync(randomCancellationToken))
+                    .ThrowsAsync(eventParticipantV2DependencyException);
+
+            // when
+            ValueTask<IEnumerable<EventParticipantV2>> retrieveAllEventParticipantV2sTask =
+                this.eventParticipantV2Client
+                    .RetrieveAllEventParticipantV2sAsync(randomCancellationToken);
+
+            EventParticipantV2ClientDependencyException
+                actualEventParticipantV2ClientDependencyException =
+                    await Assert.ThrowsAsync<EventParticipantV2ClientDependencyException>(
+                        retrieveAllEventParticipantV2sTask.AsTask);
+
+            // then
+            actualEventParticipantV2ClientDependencyException.Should()
+                .BeEquivalentTo(expectedEventParticipantV2ClientDependencyException);
+
+            this.eventParticipantV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventParticipantV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.eventParticipantV2ServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
