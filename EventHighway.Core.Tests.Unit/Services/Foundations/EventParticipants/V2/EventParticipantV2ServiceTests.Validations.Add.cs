@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
@@ -60,6 +61,80 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public async Task ShouldThrowValidationExceptionOnAddIfEventParticipantV2IsInvalidAndLogItAsync(
+            string invalidText)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var invalidEventParticipantV2 = new EventParticipantV2
+            {
+                Id = Guid.NewGuid(),
+                Name = invalidText,
+            };
+
+            var invalidEventParticipantV2Exception =
+                new InvalidEventParticipantV2Exception(
+                    message: "Event participant is invalid, fix the errors and try again.");
+
+            invalidEventParticipantV2Exception.AddData(
+                key: nameof(EventParticipantV2.Id),
+                values: "Not required");
+
+            invalidEventParticipantV2Exception.AddData(
+                key: nameof(EventParticipantV2.Name),
+                values: "Required");
+
+            invalidEventParticipantV2Exception.AddData(
+                key: nameof(EventParticipantV2.CreatedDate),
+                values: "Required");
+
+            invalidEventParticipantV2Exception.AddData(
+                key: nameof(EventParticipantV2.UpdatedDate),
+                values: "Required");
+
+            var expectedEventParticipantV2ValidationException =
+                new EventParticipantV2ValidationException(
+                    message: "Event participant validation error occurred, fix the errors and try again.",
+                    innerException: invalidEventParticipantV2Exception);
+
+            // when
+            ValueTask<EventParticipantV2> addEventParticipantV2Task =
+                this.eventParticipantV2Service.AddEventParticipantV2Async(
+                    invalidEventParticipantV2, randomCancellationToken);
+
+            EventParticipantV2ValidationException actualEventParticipantV2ValidationException =
+                await Assert.ThrowsAsync<EventParticipantV2ValidationException>(
+                    addEventParticipantV2Task.AsTask);
+
+            // then
+            actualEventParticipantV2ValidationException.Should().BeEquivalentTo(
+                expectedEventParticipantV2ValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventParticipantV2ValidationException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventParticipantV2Async(
+                    It.IsAny<EventParticipantV2>(), It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
         }
     }
