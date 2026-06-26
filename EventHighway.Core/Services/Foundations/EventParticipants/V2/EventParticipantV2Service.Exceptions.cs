@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Threading.Tasks;
+using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.Exceptions;
 using Microsoft.Data.SqlClient;
@@ -40,6 +41,30 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
                 throw await CreateAndLogCriticalDependencyExceptionAsync(
                     failedStorageEventParticipantV2Exception);
             }
+            catch (DuplicateKeyException duplicateKeyException)
+            {
+                var alreadyExistsEventParticipantV2Exception =
+                    new AlreadyExistsEventParticipantV2Exception(
+                        message: "Event participant with the same id already exists.",
+                        innerException: duplicateKeyException,
+                        data: duplicateKeyException.Data);
+
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    alreadyExistsEventParticipantV2Exception);
+            }
+        }
+
+        private async ValueTask<EventParticipantV2DependencyValidationException>
+            CreateAndLogDependencyValidationExceptionAsync(Xeption exception)
+        {
+            var eventParticipantV2DependencyValidationException =
+                new EventParticipantV2DependencyValidationException(
+                    message: "Event participant validation error occurred, fix the errors and try again.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(eventParticipantV2DependencyValidationException);
+
+            return eventParticipantV2DependencyValidationException;
         }
 
         private async ValueTask<EventParticipantV2DependencyException>
