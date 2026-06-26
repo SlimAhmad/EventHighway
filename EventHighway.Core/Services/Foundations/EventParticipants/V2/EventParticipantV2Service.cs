@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
@@ -26,6 +27,12 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             this.storageBroker = storageBroker;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
+        }
+
+        public async ValueTask<IQueryable<EventParticipantV2>> RetrieveAllEventParticipantV2sAsync(
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
 
         public ValueTask<EventParticipantV2> AddEventParticipantV2Async(
