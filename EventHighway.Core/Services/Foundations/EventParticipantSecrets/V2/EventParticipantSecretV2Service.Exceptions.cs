@@ -7,6 +7,7 @@ using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.Exceptions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Xeptions;
 
 namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
@@ -52,6 +53,30 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     alreadyExistsEventParticipantSecretV2Exception);
             }
+            catch (DbUpdateException dbUpdateException)
+            {
+                var failedStorageEventParticipantSecretV2Exception =
+                    new FailedStorageEventParticipantSecretV2Exception(
+                        message: "Failed event participant secret storage error occurred, contact support.",
+                        innerException: dbUpdateException,
+                        data: dbUpdateException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(
+                    failedStorageEventParticipantSecretV2Exception);
+            }
+        }
+
+        private async ValueTask<EventParticipantSecretV2DependencyException>
+            CreateAndLogDependencyExceptionAsync(Xeption exception)
+        {
+            var eventParticipantSecretV2DependencyException =
+                new EventParticipantSecretV2DependencyException(
+                    message: "Event participant secret dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(eventParticipantSecretV2DependencyException);
+
+            return eventParticipantSecretV2DependencyException;
         }
 
         private async ValueTask<EventParticipantSecretV2DependencyValidationException>
