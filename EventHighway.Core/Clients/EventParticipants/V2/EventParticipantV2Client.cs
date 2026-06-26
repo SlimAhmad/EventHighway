@@ -57,9 +57,10 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
             }
         }
 
-        public ValueTask<IEnumerable<EventParticipantV2>> RetrieveAllEventParticipantV2sAsync(
+        public async ValueTask<IEnumerable<EventParticipantV2>> RetrieveAllEventParticipantV2sAsync(
             CancellationToken cancellationToken = default) =>
-                throw new NotImplementedException();
+                await this.eventParticipantV2Service
+                    .RetrieveAllEventParticipantV2sAsync(cancellationToken);
 
         private static EventParticipantV2ClientValidationException
             CreateClientValidationException(Xeption innerException)
