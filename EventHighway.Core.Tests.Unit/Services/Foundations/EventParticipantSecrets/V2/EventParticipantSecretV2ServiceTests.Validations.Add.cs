@@ -211,6 +211,72 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
         }
 
         [Fact]
+        public async Task ShouldThrowValidationExceptionOnAddIfActiveFromIsSetToDefaultAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+
+            EventParticipantSecretV2 invalidEventParticipantSecretV2 =
+                CreateRandomEventParticipantSecretV2(randomDateTimeOffset);
+
+            invalidEventParticipantSecretV2.Id = Guid.Empty;
+            invalidEventParticipantSecretV2.ActiveFrom = default(DateTimeOffset);
+
+            var invalidEventParticipantSecretV2Exception =
+                new InvalidEventParticipantSecretV2Exception(
+                    message: "Event participant secret is invalid, fix the errors and try again.");
+
+            invalidEventParticipantSecretV2Exception.AddData(
+                key: nameof(EventParticipantSecretV2.ActiveFrom),
+                values: "Required");
+
+            var expectedEventParticipantSecretV2ValidationException =
+                new EventParticipantSecretV2ValidationException(
+                    message: "Event participant secret validation error occurred, fix the errors and try again.",
+                    innerException: invalidEventParticipantSecretV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTimeOffset);
+
+            // when
+            ValueTask<EventParticipantSecretV2> addEventParticipantSecretV2Task =
+                this.eventParticipantSecretV2Service.AddEventParticipantSecretV2Async(
+                    invalidEventParticipantSecretV2, randomCancellationToken);
+
+            EventParticipantSecretV2ValidationException actualEventParticipantSecretV2ValidationException =
+                await Assert.ThrowsAsync<EventParticipantSecretV2ValidationException>(
+                    addEventParticipantSecretV2Task.AsTask);
+
+            // then
+            actualEventParticipantSecretV2ValidationException.Should().BeEquivalentTo(
+                expectedEventParticipantSecretV2ValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is<Xeption>(
+                    actual => actual.SameExceptionAs(
+                        expectedEventParticipantSecretV2ValidationException))),
+                            Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventParticipantSecretV2Async(
+                    It.IsAny<EventParticipantSecretV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowValidationExceptionOnAddIfCreatedDateIsNotSameAsUpdatedDateAndLogItAsync()
         {
             // given
