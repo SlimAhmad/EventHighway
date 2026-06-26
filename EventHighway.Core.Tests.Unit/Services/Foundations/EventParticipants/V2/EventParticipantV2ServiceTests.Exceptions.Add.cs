@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.Exceptions;
 using FluentAssertions;
@@ -122,6 +123,64 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventParticipantV2DependencyValidationException))),
+                        Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventParticipantV2Async(
+                    It.IsAny<EventParticipantV2>(), It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnAddIfDbUpdateExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventParticipantV2 someEventParticipantV2 = CreateRandomEventParticipantV2();
+            var dbUpdateException = new DbUpdateException();
+            dbUpdateException.Data.Add("ErrorCode", new List<string> { "DbUpdateError" });
+
+            var failedStorageEventParticipantV2Exception =
+                new FailedStorageEventParticipantV2Exception(
+                    message: "Failed event participant storage error occurred, contact support.",
+                    innerException: dbUpdateException,
+                    data: dbUpdateException.Data);
+
+            var expectedEventParticipantV2DependencyException =
+                new EventParticipantV2DependencyException(
+                    message: "Event participant dependency error occurred, contact support.",
+                    innerException: failedStorageEventParticipantV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ThrowsAsync(dbUpdateException);
+
+            // when
+            ValueTask<EventParticipantV2> addEventParticipantV2Task =
+                this.eventParticipantV2Service.AddEventParticipantV2Async(
+                    someEventParticipantV2, randomCancellationToken);
+
+            EventParticipantV2DependencyException actualEventParticipantV2DependencyException =
+                await Assert.ThrowsAsync<EventParticipantV2DependencyException>(
+                    addEventParticipantV2Task.AsTask);
+
+            // then
+            actualEventParticipantV2DependencyException.Should()
+                .BeEquivalentTo(expectedEventParticipantV2DependencyException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventParticipantV2DependencyException))),
                         Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
