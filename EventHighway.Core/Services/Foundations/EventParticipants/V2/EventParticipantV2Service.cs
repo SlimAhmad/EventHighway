@@ -56,12 +56,23 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             return maybeEventParticipantV2;
         }));
 
-        public async ValueTask<EventParticipantV2> ModifyEventParticipantV2Async(
+        public ValueTask<EventParticipantV2> ModifyEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(new ReturningEventParticipantV2Function(async () =>
         {
-            throw new NotImplementedException();
-        }
+            cancellationToken.ThrowIfCancellationRequested();
+            await ValidateEventParticipantV2OnModifyAsync(eventParticipantV2);
+
+            EventParticipantV2 maybeEventParticipantV2 =
+                await this.storageBroker.SelectEventParticipantV2ByIdAsync(
+                    eventParticipantV2.Id, cancellationToken);
+
+            ValidateEventParticipantV2AgainstStorage(eventParticipantV2, maybeEventParticipantV2);
+
+            return await this.storageBroker.UpdateEventParticipantV2Async(
+                eventParticipantV2, cancellationToken);
+        }));
 
         public ValueTask<EventParticipantV2> AddEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,

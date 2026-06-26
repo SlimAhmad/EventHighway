@@ -11,6 +11,65 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
 {
     internal partial class EventParticipantV2Service
     {
+        private async ValueTask ValidateEventParticipantV2OnModifyAsync(EventParticipantV2 eventParticipantV2)
+        {
+            ValidateEventParticipantV2IsNotNull(eventParticipantV2);
+
+            Validate(
+                message: "Event participant is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(eventParticipantV2.Id),
+                Parameter: nameof(EventParticipantV2.Id)),
+
+                (Rule: IsInvalid(eventParticipantV2.Name),
+                Parameter: nameof(EventParticipantV2.Name)),
+
+                (Rule: IsInvalid(eventParticipantV2.CreatedDate),
+                Parameter: nameof(EventParticipantV2.CreatedDate)),
+
+                (Rule: IsInvalid(eventParticipantV2.UpdatedDate),
+                Parameter: nameof(EventParticipantV2.UpdatedDate)),
+
+                (Rule: IsSameAs(
+                    firstDate: eventParticipantV2.UpdatedDate,
+                    secondDate: eventParticipantV2.CreatedDate,
+                    secondDateName: nameof(EventParticipantV2.CreatedDate)),
+
+                Parameter: nameof(EventParticipantV2.UpdatedDate)),
+
+                (Rule: await IsNotRecentAsync(eventParticipantV2.UpdatedDate),
+                Parameter: nameof(EventParticipantV2.UpdatedDate)),
+
+                (Rule: IsInvalidIfSet(eventParticipantV2.ActiveFrom),
+                Parameter: nameof(EventParticipantV2.ActiveFrom)),
+
+                (Rule: IsInvalidIfSet(eventParticipantV2.ActiveTo),
+                Parameter: nameof(EventParticipantV2.ActiveTo)),
+
+                (Rule: IsRangeInvalid(eventParticipantV2.ActiveFrom, eventParticipantV2.ActiveTo),
+                Parameter: nameof(EventParticipantV2.ActiveTo)));
+        }
+
+        private static void ValidateEventParticipantV2AgainstStorage(
+            EventParticipantV2 incomingEventParticipantV2,
+            EventParticipantV2 storageEventParticipantV2)
+        {
+            ValidateEventParticipantV2Exists(storageEventParticipantV2, incomingEventParticipantV2.Id);
+
+            Validate(
+                message: "Event participant is invalid, fix the errors and try again.",
+
+                (Rule: IsNotSameAsStorage(
+                    firstDate: incomingEventParticipantV2.CreatedDate,
+                    secondDate: storageEventParticipantV2.CreatedDate),
+                Parameter: nameof(EventParticipantV2.CreatedDate)),
+
+                (Rule: IsEarlierThan(
+                    firstDate: incomingEventParticipantV2.UpdatedDate,
+                    secondDate: storageEventParticipantV2.UpdatedDate),
+                Parameter: nameof(EventParticipantV2.UpdatedDate)));
+        }
+
         private async ValueTask ValidateEventParticipantV2OnAddAsync(EventParticipantV2 eventParticipantV2)
         {
             ValidateEventParticipantV2IsNotNull(eventParticipantV2);
@@ -108,6 +167,31 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             {
                 Condition = firstDate != secondDate,
                 Message = $"Date is not the same as {secondDateName}"
+            };
+
+        private static dynamic IsSameAs(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate,
+            string secondDateName) => new
+            {
+                Condition = firstDate == secondDate,
+                Message = $"Date is the same as {secondDateName}."
+            };
+
+        private static dynamic IsNotSameAsStorage(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate) => new
+            {
+                Condition = firstDate != secondDate,
+                Message = "Date is not the same as storage."
+            };
+
+        private static dynamic IsEarlierThan(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate) => new
+            {
+                Condition = firstDate < secondDate,
+                Message = "Date is earlier than storage."
             };
 
         private static dynamic IsInvalidIfSet(DateTimeOffset? date) => new
