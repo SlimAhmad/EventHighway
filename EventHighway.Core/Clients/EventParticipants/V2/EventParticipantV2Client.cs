@@ -50,6 +50,10 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
                 throw CreateClientDependencyException(
                     eventParticipantV2ServiceException.InnerException as Xeption);
             }
+            catch (Exception exception)
+            {
+                throw CreateClientServiceException(exception as Xeption);
+            }
         }
 
         private static EventParticipantV2ClientValidationException
@@ -66,6 +70,15 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
         {
             return new EventParticipantV2ClientDependencyException(
                 message: "Event participant client dependency error occurred, contact support.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
+
+        private static EventParticipantV2ClientServiceException
+            CreateClientServiceException(Xeption innerException)
+        {
+            return new EventParticipantV2ClientServiceException(
+                message: "Event participant client service error occurred, contact support.",
                 innerException: innerException,
                 data: innerException?.Data);
         }
