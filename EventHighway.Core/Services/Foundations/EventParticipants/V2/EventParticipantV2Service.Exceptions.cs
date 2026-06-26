@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +65,30 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
                 throw await CreateAndLogDependencyExceptionAsync(
                     failedStorageEventParticipantV2Exception);
             }
+            catch (Exception serviceException)
+            {
+                var failedEventParticipantV2ServiceException =
+                    new FailedEventParticipantV2ServiceException(
+                        message: "Failed event participant service error occurred, contact support.",
+                        innerException: serviceException,
+                        data: serviceException.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventParticipantV2ServiceException);
+            }
+        }
+
+        private async ValueTask<EventParticipantV2ServiceException>
+            CreateAndLogServiceExceptionAsync(Xeption exception)
+        {
+            var eventParticipantV2ServiceException =
+                new EventParticipantV2ServiceException(
+                    message: "Event participant service error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(eventParticipantV2ServiceException);
+
+            return eventParticipantV2ServiceException;
         }
 
         private async ValueTask<EventParticipantV2DependencyException>
