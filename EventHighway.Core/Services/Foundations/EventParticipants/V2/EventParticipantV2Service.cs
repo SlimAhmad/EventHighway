@@ -29,11 +29,15 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             this.loggingBroker = loggingBroker;
         }
 
-        public async ValueTask<IQueryable<EventParticipantV2>> RetrieveAllEventParticipantV2sAsync(
-            CancellationToken cancellationToken = default)
+        public ValueTask<IQueryable<EventParticipantV2>> RetrieveAllEventParticipantV2sAsync(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
-            throw new NotImplementedException();
-        }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.storageBroker.SelectAllEventParticipantV2sAsync(
+                cancellationToken);
+        });
 
         public ValueTask<EventParticipantV2> AddEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,

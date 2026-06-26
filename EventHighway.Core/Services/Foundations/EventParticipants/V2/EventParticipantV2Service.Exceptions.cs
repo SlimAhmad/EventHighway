@@ -3,12 +3,13 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
-using Microsoft.EntityFrameworkCore;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.Exceptions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Xeptions;
 
 namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
@@ -16,6 +17,7 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
     internal partial class EventParticipantV2Service
     {
         private delegate ValueTask<EventParticipantV2> ReturningEventParticipantV2Function();
+        private delegate ValueTask<IQueryable<EventParticipantV2>> ReturningEventParticipantV2sFunction();
 
         private async ValueTask<EventParticipantV2> TryCatch(
             ReturningEventParticipantV2Function returningEventParticipantV2Function)
@@ -133,6 +135,12 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             await this.loggingBroker.LogErrorAsync(eventParticipantV2DependencyValidationException);
 
             return eventParticipantV2DependencyValidationException;
+        }
+
+        private async ValueTask<IQueryable<EventParticipantV2>> TryCatch(
+            ReturningEventParticipantV2sFunction returningEventParticipantV2sFunction)
+        {
+            return await returningEventParticipantV2sFunction();
         }
 
         private async ValueTask<EventParticipantV2DependencyException>
