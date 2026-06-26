@@ -129,6 +129,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         public IHealthTrafficClientV2 HealthTrafficClientV2 { get; private set; }
 
         /// <summary>
+        /// Gets the client for retrieving per-event-address health summaries in V2 API.
+        /// </summary>
+        public IHealthAddressClientV2 HealthAddressClientV2 { get; private set; }
+
+        /// <summary>
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         public IListenerEventV2Client ListenerEventV2Client { get; private set; }
@@ -176,6 +181,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
 
             this.HealthTrafficClientV2 =
                 serviceProvider.GetRequiredService<IHealthTrafficClientV2>();
+
+            this.HealthAddressClientV2 =
+                serviceProvider.GetRequiredService<IHealthAddressClientV2>();
 
             this.ListenerEventV2Client =
                 serviceProvider.GetRequiredService<IListenerEventV2Client>();
@@ -340,6 +348,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IHealthTrafficClientV2,
                 HealthTrafficClientV2>();
+
+            services.AddTransient<
+                IHealthAddressClientV2,
+                HealthAddressClientV2>();
 
             services.AddTransient<
                 IListenerEventV2Client,
