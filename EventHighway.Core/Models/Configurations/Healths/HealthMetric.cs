@@ -27,6 +27,26 @@ namespace EventHighway.Core.Models.Configurations.Healths
         /// <summary>
         /// The count of events currently quarantined due to detected processing loops.
         /// </summary>
-        LoopsDetected
+        LoopsDetected,
+
+        /// <summary>
+        /// The count of listener events still pending processing (backlog depth).
+        /// </summary>
+        PendingBacklog,
+
+        /// <summary>
+        /// The percentage of listener events that ended in a replay state.
+        /// </summary>
+        ReplayRate,
+
+        /// <summary>
+        /// The percentage of archived listener events that ended in an error state.
+        /// </summary>
+        ArchiveErrorRate,
+
+        /// <summary>
+        /// The count of archived events whose remaining retry attempts had reached zero.
+        /// </summary>
+        DeadArchivedEvents
     }
 }
