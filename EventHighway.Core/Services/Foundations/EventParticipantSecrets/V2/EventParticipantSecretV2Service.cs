@@ -32,7 +32,7 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            ValidateEventParticipantSecretV2IsNotNull(eventParticipantSecretV2);
+            await ValidateEventParticipantSecretV2OnAddAsync(eventParticipantSecretV2);
 
             return await this.storageBroker.InsertEventParticipantSecretV2Async(
                 eventParticipantSecretV2, cancellationToken);

@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
@@ -20,11 +21,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
             CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
-            EventParticipantSecretV2 randomEventParticipantSecretV2 =
-                CreateRandomEventParticipantSecretV2();
+            DateTimeOffset randomDateTimeOffset =
+                GetRandomDateTimeOffset();
 
+            EventParticipantSecretV2 randomEventParticipantSecretV2 =
+                CreateRandomEventParticipantSecretV2(randomDateTimeOffset);
+
+            randomEventParticipantSecretV2.Id = Guid.Empty;
             EventParticipantSecretV2 inputEventParticipantSecretV2 = randomEventParticipantSecretV2;
             EventParticipantSecretV2 insertedEventParticipantSecretV2 = inputEventParticipantSecretV2;
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ReturnsAsync(randomDateTimeOffset);
 
             this.storageBrokerMock.Setup(broker =>
                 broker.InsertEventParticipantSecretV2Async(
@@ -43,6 +52,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
             // then
             actualEventParticipantSecretV2.Should().BeEquivalentTo(
                 expectedEventParticipantSecretV2);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.InsertEventParticipantSecretV2Async(
