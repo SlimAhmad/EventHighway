@@ -29,6 +29,11 @@ namespace EventHighway.Core.Brokers.Storages
                 .HasForeignKey(eventArchiveV2 => eventArchiveV2.ParticipantId)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            model.HasMany(eventParticipantV2 => eventParticipantV2.EventListenerV2s)
+                .WithOne(eventListenerV2 => eventListenerV2.Participant)
+                .HasForeignKey(eventListenerV2 => eventListenerV2.ParticipantId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             model.HasMany(eventParticipantV2 => eventParticipantV2.ListenerEventV2s)
                 .WithOne(listenerEventV2 => listenerEventV2.Participant)
                 .HasForeignKey(listenerEventV2 => listenerEventV2.ParticipantId)

@@ -137,6 +137,9 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventParticipantSecrets.V2
                     eventParticipantV2.EventArchiveV2s).IgnoreIt()
 
                 .OnProperty(eventParticipantV2 =>
+                    eventParticipantV2.EventListenerV2s).IgnoreIt()
+
+                .OnProperty(eventParticipantV2 =>
                     eventParticipantV2.ListenerEventV2s).IgnoreIt()
 
                 .OnProperty(eventParticipantV2 =>

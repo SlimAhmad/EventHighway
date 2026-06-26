@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 
 namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
@@ -79,5 +80,16 @@ namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
         /// listener.
         /// </summary>
         public IEnumerable<ListenerEventV2> ListenerEventV2s { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique identifier of the participant that owns this listener.
+        /// Nullable: a listener need not be associated with a participant.
+        /// </summary>
+        public Guid? ParticipantId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the participant that owns this listener.
+        /// </summary>
+        public EventParticipantV2 Participant { get; set; }
     }
 }
