@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
 using KellermanSoftware.CompareNetObjects;
@@ -110,7 +111,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             var filler = new Filler<ListenerEventArchiveV2>();
 
             filler.Setup()
-                .OnType<DateTimeOffset>().Use(date);
+                .OnType<DateTimeOffset>().Use(date)
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }
