@@ -1,0 +1,43 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace EventHighway.Core.Brokers.Storages
+{
+    internal partial class StorageBroker
+    {
+        private static void ConfigureEventParticipantV2s(EntityTypeBuilder<EventParticipantV2> model)
+        {
+            model.ToTable("EventParticipantV2s");
+            model.HasKey(eventParticipantV2 => eventParticipantV2.Id);
+
+            model.HasMany(eventParticipantV2 => eventParticipantV2.EventV2s)
+                .WithOne(eventV2 => eventV2.Participant)
+                .HasForeignKey(eventV2 => eventV2.ParticipantId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            model.HasMany(eventParticipantV2 => eventParticipantV2.EventArchiveV2s)
+                .WithOne(eventArchiveV2 => eventArchiveV2.Participant)
+                .HasForeignKey(eventArchiveV2 => eventArchiveV2.ParticipantId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            model.HasMany(eventParticipantV2 => eventParticipantV2.ListenerEventV2s)
+                .WithOne(listenerEventV2 => listenerEventV2.Participant)
+                .HasForeignKey(listenerEventV2 => listenerEventV2.ParticipantId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            model.HasMany(eventParticipantV2 => eventParticipantV2.ListenerEventArchiveV2s)
+                .WithOne(listenerEventArchiveV2 => listenerEventArchiveV2.Participant)
+                .HasForeignKey(listenerEventArchiveV2 => listenerEventArchiveV2.ParticipantId)
+                .OnDelete(DeleteBehavior.SetNull);
+        }
+    }
+}

@@ -13,6 +13,7 @@ using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V1;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events;
 using EventHighway.Core.Models.Services.Foundations.Events.V1;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -47,6 +48,8 @@ namespace EventHighway.Core.Brokers.Storages
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ConfigureEventParticipantV2s(modelBuilder.Entity<EventParticipantV2>());
+            ConfigureEventParticipantSecretV2s(modelBuilder.Entity<EventParticipantSecretV2>());
             ConfigureEvents(modelBuilder.Entity<Event>());
             ConfigureEventV1s(modelBuilder.Entity<EventV1>());
             ConfigureEventV2s(modelBuilder.Entity<EventV2>());
