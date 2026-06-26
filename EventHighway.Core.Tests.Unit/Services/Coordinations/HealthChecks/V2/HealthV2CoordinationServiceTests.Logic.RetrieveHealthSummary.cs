@@ -33,14 +33,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             var randomListenerEventV2s = CreateRandomListenerEventV2s(
                 successCount: 18,
                 pendingCount: 1,
-                errorCount: 0);
+                errorCount: 0,
+                replayCount: 0);
 
             var randomHandlers = CreateRandomEventHandlers(count: 2);
             var randomEventArchiveV2s = CreateRandomEventArchiveV2s();
 
             var randomListenerEventArchiveV2s = CreateRandomListenerEventArchiveV2s(
-                successCount: 3,
-                errorCount: 1);
+                successCount: 18,
+                errorCount: 0);
 
             int expectedTotalAddresses = randomEventAddressV2s.Count();
             int expectedTotalListeners = randomEventListenerV2s.Count();
@@ -54,7 +55,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             int expectedErrorListenerEvents = 0;
             int expectedTotalArchivedEvents = randomEventArchiveV2s.Count();
             int expectedTotalArchivedListenerEvents = randomListenerEventArchiveV2s.Count();
-            int expectedArchivedListenerErrors = 1;
+            int expectedArchivedListenerErrors = 0;
             int expectedHandlerCount = 2;
 
             this.eventV2OrchestrationServiceMock.Setup(service =>
@@ -91,7 +92,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .RetrieveHealthSummaryV2Async(randomCancellationToken);
 
             // then
-            actualResult.Should().HaveCount(17);
+            actualResult.Should().HaveCount(21);
 
             actualResult.Single(i => i.Grouping == "Event Addresses" && i.Item == "Total")
                 .Value.Should().Be(expectedTotalAddresses.ToString());
@@ -155,6 +156,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 
             actualResult.Single(i => i.Grouping == "Loop Detection" && i.Item == "Quarantined Archives")
                 .StatusCode.Should().Be((int)HealthStatusV2.NA);
+
+            actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Pending Listener Events")
+                .StatusCode.Should().Be((int)HealthStatusV2.Green);
+
+            actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Replay Rate %")
+                .StatusCode.Should().Be((int)HealthStatusV2.Green);
+
+            actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Archive Error Rate %")
+                .StatusCode.Should().Be((int)HealthStatusV2.Green);
+
+            actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Dead Archived Events")
+                .StatusCode.Should().Be((int)HealthStatusV2.Green);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllEventV2sAsync(randomCancellationToken),
