@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using EFxceptions.Models.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.Exceptions;
 using FluentAssertions;
@@ -65,6 +66,69 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
                 broker.LogCriticalAsync(It.Is<Xeption>(
                     actual => actual.SameExceptionAs(
                         expectedEventParticipantSecretV2DependencyException))),
+                            Times.Once);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.InsertEventParticipantSecretV2Async(
+                    It.IsAny<EventParticipantSecretV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.storageBrokerMock.VerifyNoOtherCalls();
+        }
+        [Fact]
+        public async Task ShouldThrowDependencyValidationExceptionOnAddIfEventParticipantSecretV2AlreadyExistsAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            string someMessage = GetRandomString();
+            EventParticipantSecretV2 someEventParticipantSecretV2 =
+                CreateRandomEventParticipantSecretV2();
+
+            var duplicateKeyException = new DuplicateKeyException(someMessage);
+            duplicateKeyException.Data.Add("ErrorCode", new List<string> { "DuplicateKeyError" });
+
+            var alreadyExistsEventParticipantSecretV2Exception =
+                new AlreadyExistsEventParticipantSecretV2Exception(
+                    message: "Event participant secret with the same id already exists.",
+                    innerException: duplicateKeyException,
+                    data: duplicateKeyException.Data);
+
+            var expectedEventParticipantSecretV2DependencyValidationException =
+                new EventParticipantSecretV2DependencyValidationException(
+                    message: "Event participant secret validation error occurred, fix the errors and try again.",
+                    innerException: alreadyExistsEventParticipantSecretV2Exception);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetDateTimeOffsetAsync())
+                    .ThrowsAsync(duplicateKeyException);
+
+            // when
+            ValueTask<EventParticipantSecretV2> addEventParticipantSecretV2Task =
+                this.eventParticipantSecretV2Service.AddEventParticipantSecretV2Async(
+                    someEventParticipantSecretV2, randomCancellationToken);
+
+            EventParticipantSecretV2DependencyValidationException
+                actualEventParticipantSecretV2DependencyValidationException =
+                    await Assert.ThrowsAsync<EventParticipantSecretV2DependencyValidationException>(
+                        addEventParticipantSecretV2Task.AsTask);
+
+            // then
+            actualEventParticipantSecretV2DependencyValidationException.Should()
+                .BeEquivalentTo(expectedEventParticipantSecretV2DependencyValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetDateTimeOffsetAsync(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is<Xeption>(
+                    actual => actual.SameExceptionAs(
+                        expectedEventParticipantSecretV2DependencyValidationException))),
                             Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
