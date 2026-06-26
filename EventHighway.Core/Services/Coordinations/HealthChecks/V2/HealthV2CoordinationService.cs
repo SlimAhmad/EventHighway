@@ -576,7 +576,143 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             TrafficPeriodV2 period,
             DateTimeOffset windowStart,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch<IEnumerable<ParticipantSummaryV2>>(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            DateTimeOffset effectiveWindowStart = ResolveWindowStart(windowStart);
+            DateTimeOffset windowEnd = ComputeWindowEnd(period, effectiveWindowStart);
+            string windowLabel = BuildWindowLabel(period, effectiveWindowStart, windowEnd);
+
+            var allAddresses =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventAddressV2sAsync(cancellationToken);
+
+            var allEvents =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventV2sAsync(cancellationToken);
+
+            var allListeners =
+                await this.eventListenerV2OrchestrationService
+                    .RetrieveAllEventListenerV2sAsync(cancellationToken);
+
+            var allListenerEvents =
+                await this.eventListenerV2OrchestrationService
+                    .RetrieveAllListenerEventV2sAsync(cancellationToken);
+
+            HealthConfiguration healthConfig =
+                this.configurationBroker.GetHealthConfiguration();
+
+            var windowEvents = allEvents
+                .Where(e => e.CreatedDate >= effectiveWindowStart && e.CreatedDate < windowEnd)
+                .ToList();
+
+            var windowListenerEvents = allListenerEvents
+                .Where(le => le.CreatedDate >= effectiveWindowStart && le.CreatedDate < windowEnd)
+                .ToList();
+
+            var addressNames = allAddresses
+                .ToDictionary(address => address.Id, address => address.Name);
+
+            var participantsById = windowEvents
+                .Where(e => e.Participant != null).Select(e => e.Participant)
+                .Concat(allListeners.Where(l => l.Participant != null).Select(l => l.Participant))
+                .GroupBy(participant => participant.Id)
+                .ToDictionary(group => group.Key, group => group.First());
+
+            var participantKeys = windowEvents.Select(e => e.ParticipantId ?? Guid.Empty)
+                .Concat(allListeners.Select(l => l.ParticipantId ?? Guid.Empty))
+                .Distinct()
+                .ToList();
+
+            var summaries = new List<ParticipantSummaryV2>();
+
+            foreach (var participantKey in participantKeys)
+            {
+                var participantEvents = windowEvents
+                    .Where(e => (e.ParticipantId ?? Guid.Empty) == participantKey)
+                    .ToList();
+
+                var ownedListenerIds = allListeners
+                    .Where(l => (l.ParticipantId ?? Guid.Empty) == participantKey)
+                    .Select(l => l.Id)
+                    .ToHashSet();
+
+                var participantEventIds = participantEvents.Select(e => e.Id).ToHashSet();
+
+                var ownedListenerEvents = windowListenerEvents
+                    .Where(le => ownedListenerIds.Contains(le.EventListenerId))
+                    .ToList();
+
+                var publisherListenerEvents = windowListenerEvents
+                    .Where(le => participantEventIds.Contains(le.EventId))
+                    .ToList();
+
+                decimal publisherErrorRate = publisherListenerEvents.Count > 0
+                    ? (decimal)publisherListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Error)
+                        / publisherListenerEvents.Count * 100
+                    : 0;
+
+                decimal listenerErrorRate = ownedListenerEvents.Count > 0
+                    ? (decimal)ownedListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Error)
+                        / ownedListenerEvents.Count * 100
+                    : 0;
+
+                var addressIds = participantEvents
+                    .Select(e => e.EventAddressId)
+                    .Distinct()
+                    .ToList();
+
+                var addressNamesForParticipant = addressIds
+                    .Where(id => addressNames.ContainsKey(id))
+                    .Select(id => addressNames[id])
+                    .ToList();
+
+                int distinctContentHashes = participantEvents.Select(e => e.ContentHash).Distinct().Count();
+
+                var activityDates = participantEvents.Select(e => e.CreatedDate)
+                    .Concat(ownedListenerEvents.Select(le => le.CreatedDate))
+                    .ToList();
+
+                DateTimeOffset? lastActivity = activityDates.Count > 0
+                    ? activityDates.Max()
+                    : (DateTimeOffset?)null;
+
+                participantsById.TryGetValue(participantKey, out var participant);
+
+                bool isKnownParticipant =
+                    participantKey != Guid.Empty && participant != null;
+
+                summaries.Add(new ParticipantSummaryV2
+                {
+                    ParticipantId = participantKey,
+                    Name = isKnownParticipant ? participant.Name : "Unknown",
+                    ContactEmail = isKnownParticipant ? participant.ContactEmail : null,
+                    ContactPhone = isKnownParticipant ? participant.ContactPhone : null,
+                    IsActive = isKnownParticipant && participant.IsActive,
+                    Period = period,
+                    WindowStart = effectiveWindowStart,
+                    WindowEnd = windowEnd,
+                    WindowLabel = windowLabel,
+                    TotalEventsSubmitted = participantEvents.Count,
+                    ActiveEventAddresses = addressIds.Count,
+                    ActiveEventAddressNames = addressNamesForParticipant,
+                    TotalListenerEvents = ownedListenerEvents.Count,
+                    OwnedListeners = ownedListenerIds.Count,
+                    PublisherErrorRate = publisherErrorRate,
+                    ListenerErrorRate = listenerErrorRate,
+                    LoopsDetected = participantEvents.Count(e => e.Status == EventStatusV2.Quarantined),
+                    DuplicatesDetected = participantEvents.Count - distinctContentHashes,
+                    Status = ComputeRagStatus(publisherErrorRate, HealthMetric.ErrorRate, healthConfig),
+                    LastActivity = lastActivity
+                });
+            }
+
+            return summaries
+                .OrderByDescending(summary => summary.TotalEventsSubmitted)
+                .ThenBy(summary => summary.Name)
+                .ToList();
+        });
 
         private static HealthStatusV2 ComputeRagStatus(
             decimal value,
