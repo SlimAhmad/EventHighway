@@ -52,6 +52,10 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(invalidEventParticipantSecretV2Exception);
             }
+            catch (NotFoundEventParticipantSecretV2Exception notFoundEventParticipantSecretV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(notFoundEventParticipantSecretV2Exception);
+            }
             catch (SqlException sqlException)
             {
                 var failedStorageEventParticipantSecretV2Exception =
