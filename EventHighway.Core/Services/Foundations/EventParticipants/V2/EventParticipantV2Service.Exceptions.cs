@@ -24,6 +24,10 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(nullEventParticipantV2Exception);
             }
+            catch (InvalidEventParticipantV2Exception invalidEventParticipantV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(invalidEventParticipantV2Exception);
+            }
         }
 
         private async ValueTask<EventParticipantV2ValidationException>
