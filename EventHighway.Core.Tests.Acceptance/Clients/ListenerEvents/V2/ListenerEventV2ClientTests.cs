@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -147,7 +148,8 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
                 .OnProperty(eventV2 => eventV2.ListenerEventV2s).IgnoreIt()
                 .OnProperty(eventV2 => eventV2.EventAddressId).Use(eventAddressV2Id)
                 .OnProperty(eventV2 => eventV2.ScheduledDate).Use(scheduledDate)
-                .OnType<DateTimeOffset>().Use(now);
+                .OnType<DateTimeOffset>().Use(now)
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }

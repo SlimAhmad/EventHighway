@@ -12,6 +12,7 @@ using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
@@ -132,7 +133,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
                     .IgnoreIt()
 
                 .OnType<EventAddressV2>().IgnoreIt()
-                .OnType<EventListenerV2>().IgnoreIt();
+                .OnType<EventListenerV2>().IgnoreIt()
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }
@@ -144,6 +146,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             filler.Setup()
                 .OnType<DateTimeOffset>()
                     .Use(GetRandomDateTimeOffset)
+
+                .OnType<EventParticipantV2>().IgnoreIt()
 
                 .OnProperty(listenerEventV2 => listenerEventV2.Event)
                     .IgnoreIt()

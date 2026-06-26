@@ -5,6 +5,7 @@
 using System;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Tests.Acceptance.Brokers;
 using Tynamix.ObjectFiller;
@@ -86,7 +87,8 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ArchivingEvents.V2
                 .OnProperty(eventV2 =>
                     eventV2.RemainingRetryAttempts).Use(0)
 
-                .OnType<DateTimeOffset>().Use(now);
+                .OnType<DateTimeOffset>().Use(now)
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }
