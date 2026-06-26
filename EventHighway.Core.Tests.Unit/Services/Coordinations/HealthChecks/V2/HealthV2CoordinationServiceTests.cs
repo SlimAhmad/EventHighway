@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
@@ -258,7 +259,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
         private static IQueryable<ListenerEventV2> CreateRandomListenerEventV2s(
             int successCount = 0,
             int pendingCount = 0,
-            int errorCount = 0)
+            int errorCount = 0,
+            int replayCount = 0)
         {
             var listenerEvents = new List<ListenerEventV2>();
 
@@ -307,6 +309,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 });
             }
 
+            for (int i = 0; i < replayCount; i++)
+            {
+                listenerEvents.Add(new ListenerEventV2
+                {
+                    Id = Guid.NewGuid(),
+                    Status = ListenerEventStatusV2.Replay,
+                    CreatedDate = GetRandomDateTimeOffset(),
+                    UpdatedDate = GetRandomDateTimeOffset(),
+                    EventId = Guid.NewGuid(),
+                    EventAddressId = Guid.NewGuid(),
+                    EventListenerId = Guid.NewGuid()
+                });
+            }
+
             return listenerEvents.AsQueryable();
         }
 
@@ -321,7 +337,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 
         private static IQueryable<EventArchiveV2> CreateRandomEventArchiveV2s(
             int count = 0,
-            int quarantinedCount = 0)
+            int quarantinedCount = 0,
+            int deadCount = 0)
         {
             var archives = new List<EventArchiveV2>();
             int activeCount = count > 0 ? count : GetRandomPositiveNumber();
@@ -332,6 +349,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 {
                     Id = Guid.NewGuid(),
                     Status = EventArchiveStatusV2.Active,
+                    RemainingRetryAttempts = GetRandomPositiveNumber(),
                     Content = GetRandomString(),
                     EventName = GetRandomString(),
                     CreatedDate = GetRandomDateTimeOffset(),
@@ -347,6 +365,23 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 {
                     Id = Guid.NewGuid(),
                     Status = EventArchiveStatusV2.Quarantined,
+                    RemainingRetryAttempts = GetRandomPositiveNumber(),
+                    Content = GetRandomString(),
+                    EventName = GetRandomString(),
+                    CreatedDate = GetRandomDateTimeOffset(),
+                    UpdatedDate = GetRandomDateTimeOffset(),
+                    ArchivedDate = GetRandomDateTimeOffset(),
+                    EventAddressId = Guid.NewGuid()
+                });
+            }
+
+            for (int i = 0; i < deadCount; i++)
+            {
+                archives.Add(new EventArchiveV2
+                {
+                    Id = Guid.NewGuid(),
+                    Status = EventArchiveStatusV2.Active,
+                    RemainingRetryAttempts = 0,
                     Content = GetRandomString(),
                     EventName = GetRandomString(),
                     CreatedDate = GetRandomDateTimeOffset(),
@@ -398,6 +433,78 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             }
 
             return archives.AsQueryable();
+        }
+
+        private void SetupHealthOrchestrationMocks(
+            CancellationToken cancellationToken,
+            IQueryable<EventV2> events,
+            IQueryable<EventAddressV2> addresses,
+            IQueryable<EventListenerV2> listeners,
+            IQueryable<ListenerEventV2> listenerEvents,
+            IEnumerable<IEventHandler> handlers,
+            IQueryable<EventArchiveV2> archives,
+            IQueryable<ListenerEventArchiveV2> listenerArchives)
+        {
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(cancellationToken))
+                    .ReturnsAsync(events);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventAddressV2sAsync(cancellationToken))
+                    .ReturnsAsync(addresses);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventListenerV2sAsync(cancellationToken))
+                    .ReturnsAsync(listeners);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventV2sAsync(cancellationToken))
+                    .ReturnsAsync(listenerEvents);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventHandlerV2sAsync(cancellationToken))
+                    .ReturnsAsync(handlers);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sAsync(cancellationToken))
+                    .ReturnsAsync(archives);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(cancellationToken))
+                    .ReturnsAsync(listenerArchives);
+        }
+
+        private void VerifyHealthOrchestrationMocksOnce(CancellationToken cancellationToken)
+        {
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(cancellationToken), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventAddressV2sAsync(cancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventListenerV2sAsync(cancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventV2sAsync(cancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventHandlerV2sAsync(cancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sAsync(cancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(cancellationToken), Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
         private static Filler<EventAddressV2> CreateEventAddressV2Filler()
