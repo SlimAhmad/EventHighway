@@ -69,6 +69,9 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventParticipants.V2
 
             filler.Setup()
                 .OnProperty(eventParticipantV2 =>
+                    eventParticipantV2.Id).Use(Guid.Empty)
+
+                .OnProperty(eventParticipantV2 =>
                     eventParticipantV2.IsActive).Use(true)
 
                 .OnProperty(eventParticipantV2 =>

@@ -5,7 +5,6 @@
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using FluentAssertions;
-using Force.DeepCloner;
 
 namespace EventHighway.Core.Tests.Acceptance.Clients.EventParticipants.V2
 {
@@ -21,9 +20,6 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventParticipants.V2
             EventParticipantV2 inputEventParticipantV2 =
                 randomEventParticipantV2;
 
-            EventParticipantV2 expectedEventParticipantV2 =
-                inputEventParticipantV2.DeepClone();
-
             // when
             EventParticipantV2 actualEventParticipantV2 =
                 await this.clientBroker
@@ -31,12 +27,13 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventParticipants.V2
                         inputEventParticipantV2);
 
             // then
+            // service mutates inputEventParticipantV2.Id on Add; compare against it
             actualEventParticipantV2.Should()
-                .BeEquivalentTo(expectedEventParticipantV2);
+                .BeEquivalentTo(inputEventParticipantV2);
 
             await this.clientBroker
                 .RemoveEventParticipantV2ByIdAsync(
-                    inputEventParticipantV2.Id);
+                    actualEventParticipantV2.Id);
         }
     }
 }
