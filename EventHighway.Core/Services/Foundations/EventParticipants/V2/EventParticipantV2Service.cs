@@ -56,6 +56,13 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             return maybeEventParticipantV2;
         }));
 
+        public async ValueTask<EventParticipantV2> ModifyEventParticipantV2Async(
+            EventParticipantV2 eventParticipantV2,
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
         public ValueTask<EventParticipantV2> AddEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,
             CancellationToken cancellationToken = default) =>
