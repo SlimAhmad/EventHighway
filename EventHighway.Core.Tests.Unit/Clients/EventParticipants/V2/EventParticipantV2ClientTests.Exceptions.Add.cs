@@ -170,5 +170,57 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventParticipants.V2
 
             this.eventParticipantV2ServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task
+            ShouldThrowDependencyExceptionOnAddIfServiceExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventParticipantV2 someEventParticipantV2 = CreateRandomEventParticipantV2();
+            var someInnerException = new Xeption(message: GetRandomString());
+
+            var eventParticipantV2ServiceException =
+                new EventParticipantV2ServiceException(
+                    message: "Event participant service error occurred, contact support.",
+                    innerException: someInnerException);
+
+            var expectedEventParticipantV2ClientDependencyException =
+                new EventParticipantV2ClientDependencyException(
+                    message: "Event participant client dependency error occurred, contact support.",
+                    innerException: someInnerException,
+                    data: someInnerException.Data);
+
+            this.eventParticipantV2ServiceMock.Setup(service =>
+                service.AddEventParticipantV2Async(
+                    someEventParticipantV2,
+                    randomCancellationToken))
+                        .ThrowsAsync(eventParticipantV2ServiceException);
+
+            // when
+            ValueTask<EventParticipantV2> addEventParticipantV2Task =
+                this.eventParticipantV2Client.AddEventParticipantV2Async(
+                    someEventParticipantV2,
+                    randomCancellationToken);
+
+            EventParticipantV2ClientDependencyException
+                actualEventParticipantV2ClientDependencyException =
+                    await Assert.ThrowsAsync<EventParticipantV2ClientDependencyException>(
+                        addEventParticipantV2Task.AsTask);
+
+            // then
+            actualEventParticipantV2ClientDependencyException.Should()
+                .BeEquivalentTo(expectedEventParticipantV2ClientDependencyException);
+
+            this.eventParticipantV2ServiceMock.Verify(service =>
+                service.AddEventParticipantV2Async(
+                    someEventParticipantV2,
+                    randomCancellationToken),
+                        Times.Once);
+
+            this.eventParticipantV2ServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
