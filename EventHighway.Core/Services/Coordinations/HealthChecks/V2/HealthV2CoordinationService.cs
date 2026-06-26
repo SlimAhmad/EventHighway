@@ -219,7 +219,113 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             TrafficPeriodV2 period,
             DateTimeOffset windowStart,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch<IEnumerable<EventAddressSummaryV2>>(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            DateTimeOffset effectiveWindowStart = ResolveWindowStart(windowStart);
+            DateTimeOffset windowEnd = ComputeWindowEnd(period, effectiveWindowStart);
+            string windowLabel = BuildWindowLabel(period, effectiveWindowStart, windowEnd);
+
+            var allAddresses =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventAddressV2sAsync(cancellationToken);
+
+            var allEvents =
+                await this.eventV2OrchestrationService
+                    .RetrieveAllEventV2sAsync(cancellationToken);
+
+            var allListeners =
+                await this.eventListenerV2OrchestrationService
+                    .RetrieveAllEventListenerV2sAsync(cancellationToken);
+
+            var allListenerEvents =
+                await this.eventListenerV2OrchestrationService
+                    .RetrieveAllListenerEventV2sAsync(cancellationToken);
+
+            var allArchivedEvents =
+                await this.eventArchiveV2OrchestrationService
+                    .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+
+            var allArchivedListenerEvents =
+                await this.eventArchiveV2OrchestrationService
+                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+
+            HealthConfiguration healthConfig =
+                this.configurationBroker.GetHealthConfiguration();
+
+            var summaries = new List<EventAddressSummaryV2>();
+
+            foreach (var address in allAddresses)
+            {
+                var addressEvents = allEvents
+                    .Where(e => e.EventAddressId == address.Id
+                        && e.CreatedDate >= effectiveWindowStart && e.CreatedDate < windowEnd)
+                    .ToList();
+
+                var addressListenerEvents = allListenerEvents
+                    .Where(le => le.EventAddressId == address.Id
+                        && le.CreatedDate >= effectiveWindowStart && le.CreatedDate < windowEnd)
+                    .ToList();
+
+                int totalArchivedEvents = allArchivedEvents.Count(a =>
+                    a.EventAddressId == address.Id
+                    && a.ArchivedDate >= effectiveWindowStart && a.ArchivedDate < windowEnd);
+
+                int totalArchivedListenerEvents = allArchivedListenerEvents.Count(la =>
+                    la.EventAddressId == address.Id
+                    && la.ArchivedDate >= effectiveWindowStart && la.ArchivedDate < windowEnd);
+
+                int activeListeners = allListeners.Count(l => l.EventAddressId == address.Id);
+
+                int totalListenerEvents = addressListenerEvents.Count;
+                int errorListenerEvents = addressListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Error);
+
+                decimal errorRate = totalListenerEvents > 0
+                    ? (decimal)errorListenerEvents / totalListenerEvents * 100
+                    : 0;
+
+                int totalActiveEvents = addressEvents.Count;
+                int distinctContentHashes = addressEvents.Select(e => e.ContentHash).Distinct().Count();
+                int duplicates = totalActiveEvents - distinctContentHashes;
+
+                decimal duplicateRate = totalActiveEvents > 0
+                    ? (decimal)duplicates / totalActiveEvents * 100
+                    : 0;
+
+                var activityDates = addressEvents.Select(e => e.CreatedDate)
+                    .Concat(addressListenerEvents.Select(le => le.CreatedDate))
+                    .ToList();
+
+                DateTimeOffset? lastActivity = activityDates.Count > 0
+                    ? activityDates.Max()
+                    : (DateTimeOffset?)null;
+
+                summaries.Add(new EventAddressSummaryV2
+                {
+                    Id = address.Id,
+                    Name = address.Name,
+                    Description = address.Description,
+                    Period = period,
+                    WindowStart = effectiveWindowStart,
+                    WindowEnd = windowEnd,
+                    WindowLabel = windowLabel,
+                    TotalActiveEvents = totalActiveEvents,
+                    TotalArchivedEvents = totalArchivedEvents,
+                    TotalListenerEvents = totalListenerEvents,
+                    TotalArchivedListenerEvents = totalArchivedListenerEvents,
+                    ActiveListeners = activeListeners,
+                    DeadEvents = addressEvents.Count(e => e.RemainingRetryAttempts == 0),
+                    LoopsDetected = addressEvents.Count(e => e.Status == EventStatusV2.Quarantined),
+                    ErrorRate = errorRate,
+                    DuplicateRate = duplicateRate,
+                    Status = ComputeRagStatus(errorRate, HealthMetric.ErrorRate, healthConfig),
+                    LastActivity = lastActivity
+                });
+            }
+
+            return summaries;
+        });
 
         public ValueTask<LoopDetectionSummaryV2> RetrieveLoopDetectionSummaryV2Async(
             TrafficPeriodV2 period,
