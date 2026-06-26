@@ -55,6 +55,72 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
                 Parameter: nameof(EventParticipantSecretV2.ActiveTo)));
         }
 
+        private async ValueTask ValidateEventParticipantSecretV2OnModifyAsync(
+            EventParticipantSecretV2 eventParticipantSecretV2)
+        {
+            ValidateEventParticipantSecretV2IsNotNull(eventParticipantSecretV2);
+
+            Validate(
+                message: "Event participant secret is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(eventParticipantSecretV2.Id),
+                Parameter: nameof(EventParticipantSecretV2.Id)),
+
+                (Rule: IsInvalid(eventParticipantSecretV2.Secret),
+                Parameter: nameof(EventParticipantSecretV2.Secret)),
+
+                (Rule: IsInvalid(eventParticipantSecretV2.CreatedDate),
+                Parameter: nameof(EventParticipantSecretV2.CreatedDate)),
+
+                (Rule: IsInvalid(eventParticipantSecretV2.UpdatedDate),
+                Parameter: nameof(EventParticipantSecretV2.UpdatedDate)),
+
+                (Rule: IsSameAs(
+                    firstDate: eventParticipantSecretV2.UpdatedDate,
+                    secondDate: eventParticipantSecretV2.CreatedDate,
+                    secondDateName: nameof(EventParticipantSecretV2.CreatedDate)),
+                Parameter: nameof(EventParticipantSecretV2.UpdatedDate)),
+
+                (Rule: await IsNotRecentAsync(eventParticipantSecretV2.UpdatedDate),
+                Parameter: nameof(EventParticipantSecretV2.UpdatedDate)),
+
+                (Rule: IsInvalid(eventParticipantSecretV2.ParticipantId),
+                Parameter: nameof(EventParticipantSecretV2.ParticipantId)),
+
+                (Rule: IsInvalidIfSet(eventParticipantSecretV2.ActiveFrom),
+                Parameter: nameof(EventParticipantSecretV2.ActiveFrom)),
+
+                (Rule: IsInvalidIfSet(eventParticipantSecretV2.ActiveTo),
+                Parameter: nameof(EventParticipantSecretV2.ActiveTo)),
+
+                (Rule: IsRangeInvalid(
+                    eventParticipantSecretV2.ActiveFrom,
+                    eventParticipantSecretV2.ActiveTo),
+                Parameter: nameof(EventParticipantSecretV2.ActiveTo)));
+        }
+
+        private static void ValidateEventParticipantSecretV2AgainstStorage(
+            EventParticipantSecretV2 incomingEventParticipantSecretV2,
+            EventParticipantSecretV2 storageEventParticipantSecretV2)
+        {
+            ValidateEventParticipantSecretV2Exists(
+                storageEventParticipantSecretV2,
+                incomingEventParticipantSecretV2.Id);
+
+            Validate(
+                message: "Event participant secret is invalid, fix the errors and try again.",
+
+                (Rule: IsNotSameAsStorage(
+                    firstDate: incomingEventParticipantSecretV2.CreatedDate,
+                    secondDate: storageEventParticipantSecretV2.CreatedDate),
+                Parameter: nameof(EventParticipantSecretV2.CreatedDate)),
+
+                (Rule: IsEarlierThan(
+                    firstDate: incomingEventParticipantSecretV2.UpdatedDate,
+                    secondDate: storageEventParticipantSecretV2.UpdatedDate),
+                Parameter: nameof(EventParticipantSecretV2.UpdatedDate)));
+        }
+
         private static void ValidateEventParticipantSecretV2Id(Guid eventParticipantSecretV2Id)
         {
             Validate(
@@ -116,6 +182,31 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
             {
                 Condition = firstDate != secondDate,
                 Message = $"Date is not the same as {secondDateName}"
+            };
+
+        private static dynamic IsSameAs(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate,
+            string secondDateName) => new
+            {
+                Condition = firstDate == secondDate,
+                Message = $"Date is the same as {secondDateName}."
+            };
+
+        private static dynamic IsNotSameAsStorage(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate) => new
+            {
+                Condition = firstDate != secondDate,
+                Message = "Date is not the same as storage."
+            };
+
+        private static dynamic IsEarlierThan(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate) => new
+            {
+                Condition = firstDate < secondDate,
+                Message = "Date is earlier than storage."
             };
 
         private static dynamic IsInvalidIfSet(DateTimeOffset? date) => new
