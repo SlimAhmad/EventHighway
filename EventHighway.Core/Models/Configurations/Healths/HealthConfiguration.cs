@@ -25,6 +25,10 @@ namespace EventHighway.Core.Models.Configurations.Healths
             new RagThreshold { Metric = HealthMetric.ErrorRate,     Green = 9.99m, Red = 25 },
             new RagThreshold { Metric = HealthMetric.HandlerCount,  Green = 1,    Red = 0  },
             new RagThreshold { Metric = HealthMetric.LoopsDetected, Green = 0,    Red = 6  },
+            new RagThreshold { Metric = HealthMetric.PendingBacklog,     Green = 50,    Red = 500 },
+            new RagThreshold { Metric = HealthMetric.ReplayRate,         Green = 5,     Red = 20  },
+            new RagThreshold { Metric = HealthMetric.ArchiveErrorRate,   Green = 9.99m, Red = 25  },
+            new RagThreshold { Metric = HealthMetric.DeadArchivedEvents, Green = 0,     Red = 6   },
         };
     }
 }
