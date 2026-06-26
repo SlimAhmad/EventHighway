@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using EventHighway.Core.Brokers.Loggings;
@@ -52,8 +53,21 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
         private static EventParticipantSecretV2 CreateRandomEventParticipantSecretV2() =>
             CreateEventParticipantSecretV2Filler(dates: GetRandomDateTimeOffset()).Create();
 
+        private static Guid GetRandomId() =>
+            Guid.NewGuid();
+
+        private static int GetRandomNumber() =>
+            new IntRange(min: 2, max: 9).GetValue();
+
+        private static IQueryable<EventParticipantSecretV2> CreateRandomEventParticipantSecretV2s()
+        {
+            return CreateEventParticipantSecretV2Filler(dates: GetRandomDateTimeOffset())
+                .Create(count: GetRandomNumber())
+                    .AsQueryable();
+        }
+
         private static int GetRandomNegativeNumber() =>
-            -1 * new IntRange(min: 2, max: 9).GetValue();
+            -1 * GetRandomNumber();
 
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
