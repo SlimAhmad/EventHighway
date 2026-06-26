@@ -52,6 +52,10 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             {
                 throw await CreateAndLogValidationExceptionAsync(invalidEventParticipantV2Exception);
             }
+            catch (NotFoundEventParticipantV2Exception notFoundEventParticipantV2Exception)
+            {
+                throw await CreateAndLogValidationExceptionAsync(notFoundEventParticipantV2Exception);
+            }
             catch (SqlException sqlException)
             {
                 var failedStorageEventParticipantV2Exception =

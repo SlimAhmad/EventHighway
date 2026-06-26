@@ -47,8 +47,13 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             cancellationToken.ThrowIfCancellationRequested();
             ValidateEventParticipantV2Id(eventParticipantV2Id);
 
-            return await this.storageBroker.SelectEventParticipantV2ByIdAsync(
-                eventParticipantV2Id, cancellationToken);
+            EventParticipantV2 maybeEventParticipantV2 =
+                await this.storageBroker.SelectEventParticipantV2ByIdAsync(
+                    eventParticipantV2Id, cancellationToken);
+
+            ValidateEventParticipantV2Exists(maybeEventParticipantV2, eventParticipantV2Id);
+
+            return maybeEventParticipantV2;
         }));
 
         public ValueTask<EventParticipantV2> AddEventParticipantV2Async(

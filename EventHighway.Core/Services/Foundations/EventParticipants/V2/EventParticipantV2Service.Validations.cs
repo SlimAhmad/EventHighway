@@ -59,6 +59,15 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
                 Parameter: nameof(EventParticipantV2.Id)));
         }
 
+        private static void ValidateEventParticipantV2Exists(EventParticipantV2 eventParticipantV2, Guid eventParticipantV2Id)
+        {
+            if (eventParticipantV2 is null)
+            {
+                throw new NotFoundEventParticipantV2Exception(
+                    message: $"Could not find event participant with id: {eventParticipantV2Id}.");
+            }
+        }
+
         private static void ValidateEventParticipantV2IsNotNull(EventParticipantV2 eventParticipantV2)
         {
             if (eventParticipantV2 is null)
