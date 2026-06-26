@@ -209,7 +209,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> removeEventAddressV2ByIdTask =
                 this.eventAddressV2ProcessingService.RemoveEventAddressV2ByIdAsync(
-                    someEventAddressV2Id);
+                    someEventAddressV2Id,
+                    TestContext.Current.CancellationToken);
 
             EventAddressV2ProcessingDependencyException
                 actualEventAddressV2ProcessingDependencyException =

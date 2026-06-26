@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2.Exceptions;
 using EventHighway.Core.Services.Foundations.Events.V2;
@@ -154,7 +155,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                     .IgnoreIt()
 
                 .OnProperty(eventV2 => eventV2.ListenerEventV2s)
-                    .IgnoreIt();
+                    .IgnoreIt()
+
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }

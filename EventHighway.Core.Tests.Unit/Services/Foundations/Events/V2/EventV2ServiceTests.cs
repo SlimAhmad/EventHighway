@@ -14,6 +14,7 @@ using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Configurations.LoopDetections;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.Events.V2;
@@ -174,7 +175,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     .IgnoreIt()
 
                 .OnType<EventAddressV2>().IgnoreIt()
-                .OnType<ListenerEventV2>().IgnoreIt();
+                .OnType<ListenerEventV2>().IgnoreIt()
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }

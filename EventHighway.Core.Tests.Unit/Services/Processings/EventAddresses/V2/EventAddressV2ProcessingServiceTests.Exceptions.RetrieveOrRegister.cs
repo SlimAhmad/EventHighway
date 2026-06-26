@@ -198,7 +198,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             // when
             ValueTask<EventAddressV2> retrieveOrRegisterEventAddressV2Task =
                 this.eventAddressV2ProcessingService.RetrieveOrRegisterEventAddressV2Async(
-                    someEventAddressV2);
+                    someEventAddressV2,
+                    TestContext.Current.CancellationToken);
 
             EventAddressV2ProcessingDependencyException
                 actualEventAddressV2ProcessingDependencyException =

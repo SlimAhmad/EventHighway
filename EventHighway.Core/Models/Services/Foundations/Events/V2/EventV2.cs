@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 
 namespace EventHighway.Core.Models.Services.Foundations.Events.V2
@@ -84,5 +85,10 @@ namespace EventHighway.Core.Models.Services.Foundations.Events.V2
         /// processed this event.
         /// </summary>
         public IEnumerable<ListenerEventV2> ListenerEventV2s { get; set; }
+
+        public string ParticipantSecret { get; set; }
+        public Guid? ParticipantId { get; set; }
+        public EventParticipantV2 Participant { get; set; }
+
     }
 }

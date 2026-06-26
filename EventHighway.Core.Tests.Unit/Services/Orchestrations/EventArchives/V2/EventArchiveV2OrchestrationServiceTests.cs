@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2;
@@ -127,7 +128,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                     .Use(GetRandomDateTimeOffset)
 
                 .OnType<DateTimeOffset?>()
-                    .Use(GetRandomDateTimeOffset());
+                    .Use(GetRandomDateTimeOffset())
+
+                .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
         }

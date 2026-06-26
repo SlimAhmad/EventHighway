@@ -11,6 +11,7 @@ using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
@@ -226,6 +227,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
                 .OnType<EventAddressV2>().IgnoreIt()
                 .OnType<ListenerEventV2>().IgnoreIt()
+                .OnType<EventParticipantV2>().IgnoreIt()
 
                 .OnProperty(eventV2 =>
                     eventV2.Status).Use(EventStatusV2.Active);
