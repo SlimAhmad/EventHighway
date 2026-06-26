@@ -31,7 +31,13 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
 
         public ValueTask<IQueryable<EventParticipantSecretV2>> RetrieveAllEventParticipantSecretV2sAsync(
             CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.storageBroker.SelectAllEventParticipantSecretV2sAsync(
+                cancellationToken);
+        });
 
         public ValueTask<EventParticipantSecretV2> AddEventParticipantSecretV2Async(
             EventParticipantSecretV2 eventParticipantSecretV2,
