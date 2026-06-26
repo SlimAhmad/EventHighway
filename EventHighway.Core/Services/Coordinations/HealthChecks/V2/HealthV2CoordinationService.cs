@@ -88,9 +88,14 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             int pendingListenerEvents = allListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Pending);
             int successListenerEvents = allListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Success);
             int errorListenerEvents = allListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Error);
+            int replayListenerEvents = allListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Replay);
 
             decimal errorRate = totalListenerEvents > 0
                 ? (decimal)errorListenerEvents / totalListenerEvents * 100
+                : 0;
+
+            decimal replayRate = totalListenerEvents > 0
+                ? (decimal)replayListenerEvents / totalListenerEvents * 100
                 : 0;
 
             int totalArchivedEvents = allArchivedEvents.Count();
@@ -99,6 +104,13 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             int archivedListenerErrors =
                 allArchivedListenerEvents.Count(la =>
                     la.Status == ListenerEventArchiveStatusV2.Error);
+
+            decimal archiveErrorRate = totalArchivedListenerEvents > 0
+                ? (decimal)archivedListenerErrors / totalArchivedListenerEvents * 100
+                : 0;
+
+            int deadArchivedEvents =
+                allArchivedEvents.Count(a => a.RemainingRetryAttempts == 0);
 
             int handlerCount = allHandlers.Count();
             int quarantinedEvents = allEvents.Count(e => e.Status == EventStatusV2.Quarantined);
@@ -121,6 +133,18 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             HealthStatusV2 loopsDetectedStatus =
                 ComputeRagStatus(quarantinedEvents, HealthMetric.LoopsDetected, healthConfig);
 
+            HealthStatusV2 pendingBacklogStatus =
+                ComputeRagStatus(pendingListenerEvents, HealthMetric.PendingBacklog, healthConfig);
+
+            HealthStatusV2 replayRateStatus =
+                ComputeRagStatus(replayRate, HealthMetric.ReplayRate, healthConfig);
+
+            HealthStatusV2 archiveErrorRateStatus =
+                ComputeRagStatus(archiveErrorRate, HealthMetric.ArchiveErrorRate, healthConfig);
+
+            HealthStatusV2 deadArchivedEventsStatus =
+                ComputeRagStatus(deadArchivedEvents, HealthMetric.DeadArchivedEvents, healthConfig);
+
             return new List<HealthCheckItemV2>
             {
                 CreateItem("Event Addresses", "Total", totalAddresses.ToString(), HealthStatusV2.NA),
@@ -140,6 +164,10 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 CreateItem("Event Handlers", "Registered Handlers", handlerCount.ToString(), handlerStatus),
                 CreateItem("Loop Detection", "Quarantined Events", quarantinedEvents.ToString(), loopsDetectedStatus),
                 CreateItem("Loop Detection", "Quarantined Archives", quarantinedArchives.ToString(), HealthStatusV2.NA),
+                CreateItem("Listener Events", "Pending Listener Events", pendingListenerEvents.ToString(), pendingBacklogStatus),
+                CreateItem("Listener Events", "Replay Rate %", $"{replayRate:F2}", replayRateStatus),
+                CreateItem("Event Archives", "Archive Error Rate %", $"{archiveErrorRate:F2}", archiveErrorRateStatus),
+                CreateItem("Event Archives", "Dead Archived Events", deadArchivedEvents.ToString(), deadArchivedEventsStatus),
             };
         });
 
