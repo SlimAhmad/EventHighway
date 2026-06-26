@@ -128,6 +128,11 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
             }
         }
 
+        public ValueTask<EventParticipantV2> ModifyEventParticipantV2Async(
+            EventParticipantV2 eventParticipantV2,
+            CancellationToken cancellationToken = default) =>
+                throw new NotImplementedException();
+
         private static EventParticipantV2ClientValidationException
             CreateClientValidationException(Xeption innerException)
         {
