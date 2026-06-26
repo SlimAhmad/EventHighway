@@ -395,6 +395,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             };
         }
 
+        private static EventArchiveV2 CreateEventArchiveV2ForAddress(
+            Guid eventAddressId,
+            DateTimeOffset archivedDate,
+            EventArchiveStatusV2 status)
+        {
+            return new EventArchiveV2
+            {
+                Id = Guid.NewGuid(),
+                Status = status,
+                RemainingRetryAttempts = GetRandomPositiveNumber(),
+                Content = GetRandomString(),
+                EventName = GetRandomString(),
+                CreatedDate = archivedDate,
+                UpdatedDate = archivedDate,
+                ArchivedDate = archivedDate,
+                EventAddressId = eventAddressId
+            };
+        }
+
         private static ListenerEventArchiveV2 CreateListenerEventArchiveV2ForAddress(
             Guid eventAddressId,
             DateTimeOffset archivedDate)
