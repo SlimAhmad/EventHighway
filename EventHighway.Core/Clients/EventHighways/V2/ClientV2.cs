@@ -134,6 +134,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         public IHealthAddressClientV2 HealthAddressClientV2 { get; private set; }
 
         /// <summary>
+        /// Gets the client for retrieving the loop-detection summary in V2 API.
+        /// </summary>
+        public IHealthLoopClientV2 HealthLoopClientV2 { get; private set; }
+
+        /// <summary>
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         public IListenerEventV2Client ListenerEventV2Client { get; private set; }
@@ -184,6 +189,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
 
             this.HealthAddressClientV2 =
                 serviceProvider.GetRequiredService<IHealthAddressClientV2>();
+
+            this.HealthLoopClientV2 =
+                serviceProvider.GetRequiredService<IHealthLoopClientV2>();
 
             this.ListenerEventV2Client =
                 serviceProvider.GetRequiredService<IListenerEventV2Client>();
@@ -352,6 +360,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IHealthAddressClientV2,
                 HealthAddressClientV2>();
+
+            services.AddTransient<
+                IHealthLoopClientV2,
+                HealthLoopClientV2>();
 
             services.AddTransient<
                 IListenerEventV2Client,
