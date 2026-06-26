@@ -18,5 +18,9 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
 
         ValueTask<IEnumerable<EventParticipantV2>> RetrieveAllEventParticipantV2sAsync(
             CancellationToken cancellationToken = default);
+
+        ValueTask<EventParticipantV2> RetrieveEventParticipantV2ByIdAsync(
+            Guid eventParticipantV2Id,
+            CancellationToken cancellationToken = default);
     }
 }
