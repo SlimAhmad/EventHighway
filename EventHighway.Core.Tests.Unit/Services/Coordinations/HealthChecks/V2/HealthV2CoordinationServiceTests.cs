@@ -13,6 +13,7 @@ using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Configurations.Healths;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
@@ -324,6 +325,90 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             }
 
             return listenerEvents.AsQueryable();
+        }
+
+        private static EventParticipantV2 CreateEventParticipantV2(
+            Guid id,
+            string name,
+            string contactEmail,
+            string contactPhone,
+            bool isActive)
+        {
+            return new EventParticipantV2
+            {
+                Id = id,
+                Name = name,
+                Description = GetRandomString(),
+                ContactEmail = contactEmail,
+                ContactPhone = contactPhone,
+                IsActive = isActive,
+                CreatedDate = GetRandomDateTimeOffset(),
+                UpdatedDate = GetRandomDateTimeOffset()
+            };
+        }
+
+        private static EventV2 CreateEventV2ForParticipant(
+            Guid id,
+            Guid eventAddressId,
+            Guid? participantId,
+            EventParticipantV2 participant,
+            DateTimeOffset createdDate,
+            string contentHash,
+            EventStatusV2 status)
+        {
+            return new EventV2
+            {
+                Id = id,
+                Type = EventTypeV2.Immediate,
+                Status = status,
+                RemainingRetryAttempts = GetRandomPositiveNumber(),
+                ContentHash = contentHash,
+                Content = GetRandomString(),
+                EventName = GetRandomString(),
+                CreatedDate = createdDate,
+                UpdatedDate = createdDate,
+                EventAddressId = eventAddressId,
+                ParticipantId = participantId,
+                Participant = participant
+            };
+        }
+
+        private static EventListenerV2 CreateEventListenerV2ForParticipant(
+            Guid id,
+            Guid eventAddressId,
+            Guid? participantId,
+            EventParticipantV2 participant)
+        {
+            return new EventListenerV2
+            {
+                Id = id,
+                Name = GetRandomString(),
+                Description = GetRandomString(),
+                CreatedDate = GetRandomDateTimeOffset(),
+                UpdatedDate = GetRandomDateTimeOffset(),
+                EventAddressId = eventAddressId,
+                ParticipantId = participantId,
+                Participant = participant
+            };
+        }
+
+        private static ListenerEventV2 CreateListenerEventV2ForEventAndListener(
+            Guid eventId,
+            Guid eventListenerId,
+            Guid eventAddressId,
+            DateTimeOffset createdDate,
+            ListenerEventStatusV2 status)
+        {
+            return new ListenerEventV2
+            {
+                Id = Guid.NewGuid(),
+                Status = status,
+                CreatedDate = createdDate,
+                UpdatedDate = createdDate,
+                EventId = eventId,
+                EventAddressId = eventAddressId,
+                EventListenerId = eventListenerId
+            };
         }
 
         private static EventAddressV2 CreateEventAddressV2(
