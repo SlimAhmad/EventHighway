@@ -42,7 +42,19 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
         public ValueTask<EventParticipantSecretV2> RetrieveEventParticipantSecretV2ByIdAsync(
             Guid eventParticipantSecretV2Id,
             CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+        TryCatch(new ReturningEventParticipantSecretV2Function(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventParticipantSecretV2Id(eventParticipantSecretV2Id);
+
+            EventParticipantSecretV2 maybeEventParticipantSecretV2 =
+                await this.storageBroker.SelectEventParticipantSecretV2ByIdAsync(
+                    eventParticipantSecretV2Id, cancellationToken);
+
+            ValidateEventParticipantSecretV2Exists(maybeEventParticipantSecretV2, eventParticipantSecretV2Id);
+
+            return maybeEventParticipantSecretV2;
+        }));
 
         public ValueTask<EventParticipantSecretV2> AddEventParticipantSecretV2Async(
             EventParticipantSecretV2 eventParticipantSecretV2,

@@ -55,6 +55,26 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
                 Parameter: nameof(EventParticipantSecretV2.ActiveTo)));
         }
 
+        private static void ValidateEventParticipantSecretV2Id(Guid eventParticipantSecretV2Id)
+        {
+            Validate(
+                message: "Event participant secret is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(eventParticipantSecretV2Id),
+                Parameter: nameof(EventParticipantSecretV2.Id)));
+        }
+
+        private static void ValidateEventParticipantSecretV2Exists(
+            EventParticipantSecretV2 eventParticipantSecretV2,
+            Guid eventParticipantSecretV2Id)
+        {
+            if (eventParticipantSecretV2 is null)
+            {
+                throw new NotFoundEventParticipantSecretV2Exception(
+                    message: $"Could not find event participant secret with id: {eventParticipantSecretV2Id}.");
+            }
+        }
+
         private static void ValidateEventParticipantSecretV2IsNotNull(
             EventParticipantSecretV2 eventParticipantSecretV2)
         {
