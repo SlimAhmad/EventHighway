@@ -28,10 +28,13 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
         public HealthParticipantClientV2(IHealthV2CoordinationService healthV2CoordinationService) =>
             this.healthV2CoordinationService = healthV2CoordinationService;
 
-        public ValueTask<IEnumerable<ParticipantSummaryV2>> RetrieveParticipantSummaryV2Async(
+        public async ValueTask<IEnumerable<ParticipantSummaryV2>> RetrieveParticipantSummaryV2Async(
             TrafficPeriodV2 period,
             DateTimeOffset windowStart,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            return await this.healthV2CoordinationService
+                .RetrieveParticipantSummaryV2Async(period, windowStart, cancellationToken);
+        }
     }
 }
