@@ -49,7 +49,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
                     inputEventParticipantSecretV2, randomCancellationToken),
                         Times.Once);
 
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

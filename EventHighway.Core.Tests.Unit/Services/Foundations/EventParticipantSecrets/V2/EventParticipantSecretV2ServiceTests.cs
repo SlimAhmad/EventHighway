@@ -3,26 +3,39 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq.Expressions;
+using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Storages;
+using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2;
 using Moq;
 using Tynamix.ObjectFiller;
+using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecrets.V2
 {
     public partial class EventParticipantSecretV2ServiceTests
     {
         private readonly Mock<IStorageBroker> storageBrokerMock;
+        private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
+        private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IEventParticipantSecretV2Service eventParticipantSecretV2Service;
 
         public EventParticipantSecretV2ServiceTests()
         {
             this.storageBrokerMock = new Mock<IStorageBroker>();
+            this.dateTimeBrokerMock = new Mock<IDateTimeBroker>();
+            this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
             this.eventParticipantSecretV2Service = new EventParticipantSecretV2Service(
-                storageBroker: this.storageBrokerMock.Object);
+                storageBroker: this.storageBrokerMock.Object,
+                dateTimeBroker: this.dateTimeBrokerMock.Object,
+                loggingBroker: this.loggingBrokerMock.Object);
         }
+
+        private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
+            actualException => actualException.SameExceptionAs(expectedException);
 
         private static EventParticipantSecretV2 CreateRandomEventParticipantSecretV2() =>
             CreateEventParticipantSecretV2Filler(dates: GetRandomDateTimeOffset()).Create();
