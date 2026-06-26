@@ -222,5 +222,52 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventParticipants.V2
 
             this.eventParticipantV2ServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task
+            ShouldThrowServiceExceptionOnAddIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventParticipantV2 someEventParticipantV2 = CreateRandomEventParticipantV2();
+            var someException = new Exception(message: GetRandomString());
+
+            var expectedEventParticipantV2ClientServiceException =
+                new EventParticipantV2ClientServiceException(
+                    message: "Event participant client service error occurred, contact support.",
+                    innerException: someException as Xeption,
+                    data: someException.Data);
+
+            this.eventParticipantV2ServiceMock.Setup(service =>
+                service.AddEventParticipantV2Async(
+                    someEventParticipantV2,
+                    randomCancellationToken))
+                        .ThrowsAsync(someException);
+
+            // when
+            ValueTask<EventParticipantV2> addEventParticipantV2Task =
+                this.eventParticipantV2Client.AddEventParticipantV2Async(
+                    someEventParticipantV2,
+                    randomCancellationToken);
+
+            EventParticipantV2ClientServiceException
+                actualEventParticipantV2ClientServiceException =
+                    await Assert.ThrowsAsync<EventParticipantV2ClientServiceException>(
+                        addEventParticipantV2Task.AsTask);
+
+            // then
+            actualEventParticipantV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedEventParticipantV2ClientServiceException);
+
+            this.eventParticipantV2ServiceMock.Verify(service =>
+                service.AddEventParticipantV2Async(
+                    someEventParticipantV2,
+                    randomCancellationToken),
+                        Times.Once);
+
+            this.eventParticipantV2ServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
