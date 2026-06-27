@@ -76,7 +76,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         EventName = item.EventName,
                         Type = (EventArchiveTypeV2)item.Type,
                         CreatedDate = item.CreatedDate,
-                        UpdatedDate = item.UpdatedDate,
+                        UpdatedDate = item.CreatedDate,
                         ScheduledDate = item.ScheduledDate,
                         RemainingRetryAttempts = item.RemainingRetryAttempts,
                         EventAddressId = item.EventAddressId
@@ -92,7 +92,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         ResponseCode = item.ResponseCode,
                         ResponseMessage = item.ResponseMessage,
                         CreatedDate = item.CreatedDate,
-                        UpdatedDate = item.UpdatedDate,
+                        UpdatedDate = item.CreatedDate,
                         EventId = item.EventId,
                         EventAddressId = item.EventAddressId,
                         EventListenerId = item.EventListenerId,
