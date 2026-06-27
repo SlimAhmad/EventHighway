@@ -5,14 +5,13 @@
 using EventHighway.ClientV2.SubstrateApp;
 using EventHighway.ClientV2.SubstrateApp.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
-HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+IServiceCollection services = new ServiceCollection();
 
-builder.Services.AddSubstrateApp();
+services.AddSubstrateApp();
 
-using IHost host = builder.Build();
+IServiceProvider serviceProvider = services.BuildServiceProvider();
 
-await host.Services
+await serviceProvider
     .GetRequiredService<NFlixSample>()
     .RunAsync();

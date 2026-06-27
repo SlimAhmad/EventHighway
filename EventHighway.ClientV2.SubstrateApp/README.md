@@ -75,13 +75,13 @@ no unit tests of their own.)
 `Program.cs` is a thin composition root, like a web app's:
 
 ```csharp
-HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+IServiceCollection services = new ServiceCollection();
 
-builder.Services.AddSubstrateApp();
+services.AddSubstrateApp();
 
-using IHost host = builder.Build();
+IServiceProvider serviceProvider = services.BuildServiceProvider();
 
-await host.Services
+await serviceProvider
     .GetRequiredService<NFlixSample>()
     .RunAsync();
 ```
