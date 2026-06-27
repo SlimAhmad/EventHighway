@@ -457,38 +457,52 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                     continue;
                 }
 
-                var contentHashGroups = addressEvents
-                    .GroupBy(e => e.ContentHash)
+                var participantGroups = addressEvents
+                    .GroupBy(e => e.ParticipantId ?? Guid.Empty)
                     .ToList();
 
-                int totalEvents = addressEvents.Count;
-                int distinctContentHashes = contentHashGroups.Count;
-                int duplicates = totalEvents - distinctContentHashes;
-
-                var duplicateEvents = contentHashGroups
-                    .Where(group => group.Count() > 1)
-                    .SelectMany(group => group.OrderBy(e => e.CreatedDate).Skip(1))
-                    .ToList();
-
-                DateTimeOffset? lastDuplicateSeen = duplicateEvents.Count > 0
-                    ? duplicateEvents.Max(e => e.CreatedDate)
-                    : (DateTimeOffset?)null;
-
-                decimal duplicateRate = totalEvents > 0
-                    ? (decimal)duplicates / totalEvents * 100
-                    : 0;
-
-                byAddress.Add(new DuplicateDetailV2
+                foreach (var participantGroup in participantGroups)
                 {
-                    EventAddressId = address.Id,
-                    AddressName = address.Name,
-                    ParticipantId = null,
-                    ParticipantName = "Unknown",
-                    TotalEvents = totalEvents,
-                    Duplicates = duplicates,
-                    DuplicateRate = duplicateRate,
-                    LastDuplicateSeen = lastDuplicateSeen
-                });
+                    var participantEvents = participantGroup.ToList();
+
+                    var contentHashGroups = participantEvents
+                        .GroupBy(e => e.ContentHash)
+                        .ToList();
+
+                    int totalEvents = participantEvents.Count;
+                    int distinctContentHashes = contentHashGroups.Count;
+                    int duplicates = totalEvents - distinctContentHashes;
+
+                    var duplicateEvents = contentHashGroups
+                        .Where(group => group.Count() > 1)
+                        .SelectMany(group => group.OrderBy(e => e.CreatedDate).Skip(1))
+                        .ToList();
+
+                    DateTimeOffset? lastDuplicateSeen = duplicateEvents.Count > 0
+                        ? duplicateEvents.Max(e => e.CreatedDate)
+                        : (DateTimeOffset?)null;
+
+                    decimal duplicateRate = totalEvents > 0
+                        ? (decimal)duplicates / totalEvents * 100
+                        : 0;
+
+                    var participant = participantEvents[0].Participant;
+
+                    bool isKnownParticipant =
+                        participantGroup.Key != Guid.Empty && participant != null;
+
+                    byAddress.Add(new DuplicateDetailV2
+                    {
+                        EventAddressId = address.Id,
+                        AddressName = address.Name,
+                        ParticipantId = isKnownParticipant ? participantGroup.Key : (Guid?)null,
+                        ParticipantName = isKnownParticipant ? participant.Name : "Unknown",
+                        TotalEvents = totalEvents,
+                        Duplicates = duplicates,
+                        DuplicateRate = duplicateRate,
+                        LastDuplicateSeen = lastDuplicateSeen
+                    });
+                }
             }
 
             long totalDuplicatesDetected = byAddress.Sum(detail => detail.Duplicates);
