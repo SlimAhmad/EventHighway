@@ -95,6 +95,53 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
             while (true);
         });
 
+        public ValueTask ReplayEventArchiveV2sAsync(
+            Guid eventV2Id,
+            Guid? eventAddressId,
+            IEnumerable<Guid> eventListenerIds,
+            bool allowReplayOfQuarantinedItem = false,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnTargetedReplay(eventV2Id, eventListenerIds);
+
+            IEnumerable<EventArchiveV2> eventArchiveV2s =
+                await this.eventArchiveV2OrchestrationService
+                    .RetrieveEventArchiveV2sByIdsAsync(
+                        new[] { eventV2Id }, cancellationToken);
+
+            EventArchiveV2 eventArchiveV2 = eventArchiveV2s.FirstOrDefault();
+
+            if (eventArchiveV2 is null)
+                return;
+
+            if (eventAddressId.HasValue
+                && eventArchiveV2.EventAddressId != eventAddressId.Value)
+            {
+                return;
+            }
+
+            if (eventArchiveV2.Status is EventArchiveStatusV2.Quarantined
+                && allowReplayOfQuarantinedItem is false)
+            {
+                return;
+            }
+
+            var targetedEventArchiveV2s =
+                new List<EventArchiveV2> { eventArchiveV2 };
+
+            await this.restoringEventV2OrchestrationService
+                .RestoreAsync(
+                    targetedEventArchiveV2s,
+                    new List<ListenerEventArchiveV2>(),
+                    cancellationToken);
+
+            await this.restoringEventV2OrchestrationService
+                .GenerateReplayForListenersAsync(
+                    targetedEventArchiveV2s, eventListenerIds, cancellationToken);
+        });
+
         public ValueTask ProcessReplayedListenerEventV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
