@@ -192,8 +192,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         {
             // given
             EventV2 someEventV2 = CreateRandomEventV2();
-
-            SetupValidateEventParticipantsSucceeds();
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
             CancellationToken cancelledToken = cancellationTokenSource.Token;

@@ -162,6 +162,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
                 .OnProperty(eventV2 => eventV2.Status).Use(EventStatusV2.Active)
                 .OnType<DateTimeOffset>().Use(now)
                 .OnProperty(eventV2 => eventV2.ParticipantId).IgnoreIt()
+                .OnProperty(eventV2 => eventV2.ParticipantSecret).IgnoreIt()
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             if (content is not null)
@@ -180,6 +181,64 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
                 .OnProperty(eventAddressV2 => eventAddressV2.Events).IgnoreIt()
                 .OnProperty(eventAddressV2 => eventAddressV2.EventListenerV2s).IgnoreIt()
                 .OnProperty(eventAddressV2 => eventAddressV2.ListenerEventV2s).IgnoreIt();
+
+            return filler;
+        }
+
+        private async ValueTask<EventParticipantV2> CreateRandomEventParticipantV2Async()
+        {
+            EventParticipantV2 randomEventParticipantV2 =
+                CreateEventParticipantV2Filler().Create();
+
+            return await this.clientBroker.AddEventParticipantV2Async(
+                randomEventParticipantV2);
+        }
+
+        private async ValueTask<EventParticipantSecretV2> CreateRandomEventParticipantSecretV2Async(
+            Guid participantId)
+        {
+            EventParticipantSecretV2 randomEventParticipantSecretV2 =
+                CreateEventParticipantSecretV2Filler(participantId).Create();
+
+            return await this.clientBroker.AddEventParticipantSecretV2Async(
+                randomEventParticipantSecretV2);
+        }
+
+        private static Filler<EventParticipantV2> CreateEventParticipantV2Filler()
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            var filler = new Filler<EventParticipantV2>();
+
+            filler.Setup()
+                .OnProperty(eventParticipantV2 => eventParticipantV2.Id).Use(Guid.Empty)
+                .OnProperty(eventParticipantV2 => eventParticipantV2.IsActive).Use(true)
+                .OnProperty(eventParticipantV2 => eventParticipantV2.ActiveFrom).IgnoreIt()
+                .OnProperty(eventParticipantV2 => eventParticipantV2.ActiveTo).IgnoreIt()
+                .OnProperty(eventParticipantV2 => eventParticipantV2.EventV2s).IgnoreIt()
+                .OnProperty(eventParticipantV2 => eventParticipantV2.EventArchiveV2s).IgnoreIt()
+                .OnProperty(eventParticipantV2 => eventParticipantV2.EventListenerV2s).IgnoreIt()
+                .OnProperty(eventParticipantV2 => eventParticipantV2.ListenerEventV2s).IgnoreIt()
+                .OnProperty(eventParticipantV2 => eventParticipantV2.ListenerEventArchiveV2s).IgnoreIt()
+                .OnProperty(eventParticipantV2 => eventParticipantV2.EventParticipantSecretV2s).IgnoreIt()
+                .OnType<DateTimeOffset>().Use(valueToUse: now);
+
+            return filler;
+        }
+
+        private static Filler<EventParticipantSecretV2> CreateEventParticipantSecretV2Filler(
+            Guid participantId)
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            var filler = new Filler<EventParticipantSecretV2>();
+
+            filler.Setup()
+                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.Id).Use(Guid.Empty)
+                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.ParticipantId).Use(participantId)
+                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.IsActive).Use(true)
+                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.ActiveFrom).IgnoreIt()
+                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.ActiveTo).IgnoreIt()
+                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.EventParticipantV2).IgnoreIt()
+                .OnType<DateTimeOffset>().Use(valueToUse: now);
 
             return filler;
         }

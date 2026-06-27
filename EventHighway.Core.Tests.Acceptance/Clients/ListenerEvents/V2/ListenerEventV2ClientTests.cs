@@ -150,6 +150,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
                 .OnProperty(eventV2 => eventV2.ScheduledDate).Use(scheduledDate)
                 .OnType<DateTimeOffset>().Use(now)
                 .OnProperty(eventV2 => eventV2.ParticipantId).IgnoreIt()
+                .OnProperty(eventV2 => eventV2.ParticipantSecret).IgnoreIt()
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;

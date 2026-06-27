@@ -89,6 +89,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ArchivingEvents.V2
 
                 .OnType<DateTimeOffset>().Use(now)
                 .OnProperty(eventV2 => eventV2.ParticipantId).IgnoreIt()
+                .OnProperty(eventV2 => eventV2.ParticipantSecret).IgnoreIt()
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
