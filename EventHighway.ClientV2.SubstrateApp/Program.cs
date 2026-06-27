@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.ClientV2.SubstrateApp.Brokers.EventSubstrates;
+using EventHighway.ClientV2.SubstrateApp.Models.MediaItems;
 using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
@@ -571,13 +572,4 @@ public partial class Program
 
         return server;
     }
-}
-
-public class MediaItem
-{
-    public Guid Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string Type { get; set; } = string.Empty; // "Movie" or "Series"
-    public List<string> Genres { get; set; } = new();
-    public double Rating { get; set; }
 }
