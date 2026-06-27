@@ -223,5 +223,49 @@ namespace EventHighway.Core.Tests.Unit.Clients.ReplayingEvents.V2
 
             this.replayingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnReplayAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.replayingEventV2CoordinationServiceMock.Setup(service =>
+                service.ReplayEventArchiveV2sAsync(
+                    It.IsAny<Guid?>(),
+                    It.IsAny<IEnumerable<Guid>>(),
+                    It.IsAny<DateTimeOffset?>(),
+                    It.IsAny<DateTimeOffset?>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask replayTask =
+                this.replayingEventV2Client.ReplayEventArchiveV2sAsync(
+                    null, null, null, null, randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    replayTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(
+                operationCanceledException);
+
+            this.replayingEventV2CoordinationServiceMock.Verify(service =>
+                service.ReplayEventArchiveV2sAsync(
+                    It.IsAny<Guid?>(),
+                    It.IsAny<IEnumerable<Guid>>(),
+                    It.IsAny<DateTimeOffset?>(),
+                    It.IsAny<DateTimeOffset?>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+
+            this.replayingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
     }
 }

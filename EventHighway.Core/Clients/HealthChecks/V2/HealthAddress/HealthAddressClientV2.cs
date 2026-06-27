@@ -76,6 +76,10 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
                 throw CreateHealthAddressClientV2DependencyException(
                     healthV2CoordinationServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateHealthAddressClientV2ServiceException(exception as Xeption);

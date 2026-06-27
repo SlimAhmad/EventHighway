@@ -165,5 +165,91 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
 
             this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRemoveByIdIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid someEventAddressV2Id = GetRandomId();
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedEventAddressV2ClientServiceException =
+                new EventAddressV2ClientServiceException(
+                    message: "Event address client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.eventAddressV2ProcessingServiceMock.Setup(service =>
+                service.RemoveEventAddressV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask<EventAddressV2> removeEventAddressV2ByIdTask =
+                this.eventAddressV2Client.RemoveEventAddressV2ByIdAsync(
+                    someEventAddressV2Id,
+                    randomCancellationToken);
+
+            EventAddressV2ClientServiceException actualEventAddressV2ClientServiceException =
+                await Assert.ThrowsAsync<EventAddressV2ClientServiceException>(
+                    removeEventAddressV2ByIdTask.AsTask);
+
+            // then
+            actualEventAddressV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedEventAddressV2ClientServiceException);
+
+            this.eventAddressV2ProcessingServiceMock.Verify(service =>
+                service.RemoveEventAddressV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRemoveByIdAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid someEventAddressV2Id = GetRandomId();
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.eventAddressV2ProcessingServiceMock.Setup(service =>
+                service.RemoveEventAddressV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventAddressV2> removeEventAddressV2ByIdTask =
+                this.eventAddressV2Client.RemoveEventAddressV2ByIdAsync(
+                    someEventAddressV2Id,
+                    randomCancellationToken);
+
+            OperationCanceledException actualOperationCanceledException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    removeEventAddressV2ByIdTask.AsTask);
+
+            // then
+            actualOperationCanceledException.Should()
+                .BeEquivalentTo(operationCanceledException);
+
+            this.eventAddressV2ProcessingServiceMock.Verify(service =>
+                service.RemoveEventAddressV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+        }
     }
 }

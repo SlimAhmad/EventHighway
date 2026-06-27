@@ -165,5 +165,92 @@ namespace EventHighway.Core.Tests.Unit.Clients.Events.V2
 
             this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRemoveByIdIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid someEventV2Id = GetRandomId();
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedEventV2ClientServiceException =
+                new EventV2ClientServiceException(
+                    message: "Event client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.RemoveEventV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask<EventV2> removeEventV2ByIdTask =
+                this.eventV2Client.RemoveEventV2ByIdAsync(
+                    someEventV2Id,
+                    randomCancellationToken);
+
+            EventV2ClientServiceException actualEventV2ClientServiceException =
+                await Assert.ThrowsAsync<EventV2ClientServiceException>(
+                    removeEventV2ByIdTask.AsTask);
+
+            // then
+            actualEventV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedEventV2ClientServiceException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.RemoveEventV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRemoveByIdAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid someEventV2Id = GetRandomId();
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.RemoveEventV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventV2> removeEventV2ByIdTask =
+                this.eventV2Client.RemoveEventV2ByIdAsync(
+                    someEventV2Id,
+                    randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    removeEventV2ByIdTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.RemoveEventV2ByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
     }
 }

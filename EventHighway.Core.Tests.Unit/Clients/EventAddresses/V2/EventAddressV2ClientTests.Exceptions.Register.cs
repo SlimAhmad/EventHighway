@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.EventAddresses.V2.Exceptions;
@@ -155,6 +156,92 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventAddresses.V2
             // then
             actualEventAddressV2ClientDependencyException.Should()
                 .BeEquivalentTo(expectedEventAddressV2ClientDependencyException);
+
+            this.eventAddressV2ProcessingServiceMock.Verify(service =>
+                service.RegisterEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRegisterIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedEventAddressV2ClientServiceException =
+                new EventAddressV2ClientServiceException(
+                    message: "Event address client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.eventAddressV2ProcessingServiceMock.Setup(service =>
+                service.RegisterEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask<EventAddressV2> registerEventAddressV2Task =
+                this.eventAddressV2Client.RegisterEventAddressV2Async(
+                    someEventAddressV2,
+                    randomCancellationToken);
+
+            EventAddressV2ClientServiceException actualEventAddressV2ClientServiceException =
+                await Assert.ThrowsAsync<EventAddressV2ClientServiceException>(
+                    registerEventAddressV2Task.AsTask);
+
+            // then
+            actualEventAddressV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedEventAddressV2ClientServiceException);
+
+            this.eventAddressV2ProcessingServiceMock.Verify(service =>
+                service.RegisterEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventAddressV2ProcessingServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRegisterAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventAddressV2 someEventAddressV2 = CreateRandomEventAddressV2();
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.eventAddressV2ProcessingServiceMock.Setup(service =>
+                service.RegisterEventAddressV2Async(
+                    It.IsAny<EventAddressV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventAddressV2> registerEventAddressV2Task =
+                this.eventAddressV2Client.RegisterEventAddressV2Async(
+                    someEventAddressV2,
+                    randomCancellationToken);
+
+            OperationCanceledException actualOperationCanceledException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    registerEventAddressV2Task.AsTask);
+
+            // then
+            actualOperationCanceledException.Should()
+                .BeEquivalentTo(operationCanceledException);
 
             this.eventAddressV2ProcessingServiceMock.Verify(service =>
                 service.RegisterEventAddressV2Async(

@@ -177,5 +177,94 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventListeners.V2
 
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task
+            ShouldThrowServiceExceptionOnRetrieveByEventAddressIdIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid someEventAddressId = GetRandomId();
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedEventListenerV2ClientServiceException =
+                new EventListenerV2ClientServiceException(
+                    message: "Event listener client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask<IQueryable<EventListenerV2>> retrieveEventListenerV2sTask =
+                this.eventListenerV2Client.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    someEventAddressId,
+                    randomCancellationToken);
+
+            EventListenerV2ClientServiceException actualEventListenerV2ClientServiceException =
+                await Assert.ThrowsAsync<EventListenerV2ClientServiceException>(
+                    retrieveEventListenerV2sTask.AsTask);
+
+            // then
+            actualEventListenerV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedEventListenerV2ClientServiceException);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task
+            ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveByEventAddressIdAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid someEventAddressId = GetRandomId();
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IQueryable<EventListenerV2>> retrieveEventListenerV2sTask =
+                this.eventListenerV2Client.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    someEventAddressId,
+                    randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveEventListenerV2sTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+        }
     }
 }

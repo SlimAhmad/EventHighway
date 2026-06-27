@@ -82,6 +82,10 @@ namespace EventHighway.Core.Clients.ListenerEvents.V2
                 throw CreateListenerEventV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateListenerEventV2ClientServiceException(exception as Xeption);
@@ -139,6 +143,10 @@ namespace EventHighway.Core.Clients.ListenerEvents.V2
             {
                 throw CreateListenerEventV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception exception)
             {

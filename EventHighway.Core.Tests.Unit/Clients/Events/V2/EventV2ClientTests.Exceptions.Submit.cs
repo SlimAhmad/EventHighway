@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.Events.V2.Exceptions;
@@ -155,6 +156,93 @@ namespace EventHighway.Core.Tests.Unit.Clients.Events.V2
             // then
             actualEventV2ClientDependencyException.Should()
                 .BeEquivalentTo(expectedEventV2ClientDependencyException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.SubmitEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnSubmitIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventV2 someEventV2 = CreateRandomEventV2();
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedEventV2ClientServiceException =
+                new EventV2ClientServiceException(
+                    message: "Event client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.SubmitEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask<EventV2> submitEventV2Task =
+                this.eventV2Client.SubmitEventV2Async(
+                    someEventV2,
+                    randomCancellationToken);
+
+            EventV2ClientServiceException actualEventV2ClientServiceException =
+                await Assert.ThrowsAsync<EventV2ClientServiceException>(
+                    submitEventV2Task.AsTask);
+
+            // then
+            actualEventV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedEventV2ClientServiceException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.SubmitEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnSubmitAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventV2 someEventV2 = CreateRandomEventV2();
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.SubmitEventV2Async(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventV2> submitEventV2Task =
+                this.eventV2Client.SubmitEventV2Async(
+                    someEventV2,
+                    randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    submitEventV2Task.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
 
             this.eventV2CoordinationServiceMock.Verify(service =>
                 service.SubmitEventV2Async(

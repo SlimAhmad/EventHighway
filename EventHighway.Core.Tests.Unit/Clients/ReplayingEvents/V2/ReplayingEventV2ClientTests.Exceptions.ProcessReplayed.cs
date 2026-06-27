@@ -182,5 +182,39 @@ namespace EventHighway.Core.Tests.Unit.Clients.ReplayingEvents.V2
 
             this.replayingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnProcessReplayedAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.replayingEventV2CoordinationServiceMock.Setup(service =>
+                service.ProcessReplayedListenerEventV2sAsync(randomCancellationToken))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask processReplayedTask =
+                this.replayingEventV2Client
+                    .ProcessReplayedListenerEventV2sAsync(randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    processReplayedTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(
+                operationCanceledException);
+
+            this.replayingEventV2CoordinationServiceMock.Verify(service =>
+                service.ProcessReplayedListenerEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.replayingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
     }
 }

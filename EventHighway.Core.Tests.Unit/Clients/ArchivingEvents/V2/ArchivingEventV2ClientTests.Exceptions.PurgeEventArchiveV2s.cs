@@ -209,5 +209,42 @@ namespace EventHighway.Core.Tests.Unit.Clients.ArchivingEvents.V2
             this.archivingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnPurgeAsync()
+        {
+            // given
+            DateTimeOffset someOlderThan = GetRandomDateTimeOffset();
+            CancellationToken someCancellationToken = TestContext.Current.CancellationToken;
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.archivingEventV2CoordinationServiceMock.Setup(service =>
+                service.PurgeEventArchiveV2sAsync(
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask purgeEventArchiveV2sTask =
+                this.archivingEventV2Client
+                    .PurgeEventArchiveV2sAsync(someOlderThan, someCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    purgeEventArchiveV2sTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
+
+            this.archivingEventV2CoordinationServiceMock.Verify(service =>
+                service.PurgeEventArchiveV2sAsync(
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.archivingEventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
     }
 }

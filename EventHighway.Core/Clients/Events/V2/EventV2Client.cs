@@ -83,6 +83,10 @@ namespace EventHighway.Core.Clients.Events.V2
                 throw CreateEventV2ClientDependencyException(
                     eventV2CoordinationServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateEventV2ClientServiceException(exception as Xeption);
@@ -136,6 +140,10 @@ namespace EventHighway.Core.Clients.Events.V2
             {
                 throw CreateEventV2ClientDependencyException(
                     eventV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception exception)
             {
@@ -193,6 +201,10 @@ namespace EventHighway.Core.Clients.Events.V2
             {
                 throw CreateEventV2ClientDependencyException(
                     eventV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception exception)
             {

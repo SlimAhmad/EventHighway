@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.EventListeners.V2.Exceptions;
@@ -155,6 +156,93 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventListeners.V2
             // then
             actualEventListenerV2ClientDependencyException.Should()
                 .BeEquivalentTo(expectedEventListenerV2ClientDependencyException);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.AddEventListenerV2Async(
+                    It.IsAny<EventListenerV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRegisterIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventListenerV2 someEventListenerV2 = CreateRandomEventListenerV2();
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedEventListenerV2ClientServiceException =
+                new EventListenerV2ClientServiceException(
+                    message: "Event listener client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.AddEventListenerV2Async(
+                    It.IsAny<EventListenerV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask<EventListenerV2> registerEventListenerV2Task =
+                this.eventListenerV2Client.RegisterEventListenerV2Async(
+                    someEventListenerV2,
+                    randomCancellationToken);
+
+            EventListenerV2ClientServiceException actualEventListenerV2ClientServiceException =
+                await Assert.ThrowsAsync<EventListenerV2ClientServiceException>(
+                    registerEventListenerV2Task.AsTask);
+
+            // then
+            actualEventListenerV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedEventListenerV2ClientServiceException);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.AddEventListenerV2Async(
+                    It.IsAny<EventListenerV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRegisterAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventListenerV2 someEventListenerV2 = CreateRandomEventListenerV2();
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.AddEventListenerV2Async(
+                    It.IsAny<EventListenerV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventListenerV2> registerEventListenerV2Task =
+                this.eventListenerV2Client.RegisterEventListenerV2Async(
+                    someEventListenerV2,
+                    randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    registerEventListenerV2Task.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.AddEventListenerV2Async(
