@@ -384,25 +384,53 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                     .Where(a => a.EventAddressId == addressId)
                     .ToList();
 
-                var detectionDates = addressActive.Select(e => e.CreatedDate)
-                    .Concat(addressArchived.Select(a => a.ArchivedDate))
+                string addressName =
+                    addressNames.TryGetValue(addressId, out string name) ? name : null;
+
+                var participantKeys = addressActive.Select(e => e.ParticipantId ?? Guid.Empty)
+                    .Concat(addressArchived.Select(a => a.ParticipantId ?? Guid.Empty))
+                    .Distinct()
                     .ToList();
 
-                DateTimeOffset? mostRecentDetection = detectionDates.Count > 0
-                    ? detectionDates.Max()
-                    : (DateTimeOffset?)null;
-
-                byAddress.Add(new LoopDetailV2
+                foreach (var participantKey in participantKeys)
                 {
-                    EventAddressId = addressId,
-                    AddressName = addressNames.TryGetValue(addressId, out string name) ? name : null,
-                    ActiveQuarantined = addressActive.Count,
-                    ArchivedQuarantined = addressArchived.Count,
-                    InWindow = addressActive.Count + addressArchived.Count,
-                    MostRecentDetection = mostRecentDetection,
-                    Status = ComputeRagStatus(
-                        addressActive.Count, HealthMetric.LoopsDetected, healthConfig)
-                });
+                    var participantActive = addressActive
+                        .Where(e => (e.ParticipantId ?? Guid.Empty) == participantKey)
+                        .ToList();
+
+                    var participantArchived = addressArchived
+                        .Where(a => (a.ParticipantId ?? Guid.Empty) == participantKey)
+                        .ToList();
+
+                    var detectionDates = participantActive.Select(e => e.CreatedDate)
+                        .Concat(participantArchived.Select(a => a.ArchivedDate))
+                        .ToList();
+
+                    DateTimeOffset? mostRecentDetection = detectionDates.Count > 0
+                        ? detectionDates.Max()
+                        : (DateTimeOffset?)null;
+
+                    var participant = participantActive.Select(e => e.Participant)
+                        .Concat(participantArchived.Select(a => a.Participant))
+                        .FirstOrDefault(p => p != null);
+
+                    bool isKnownParticipant =
+                        participantKey != Guid.Empty && participant != null;
+
+                    byAddress.Add(new LoopDetailV2
+                    {
+                        EventAddressId = addressId,
+                        AddressName = addressName,
+                        ParticipantId = isKnownParticipant ? participantKey : (Guid?)null,
+                        ParticipantName = isKnownParticipant ? participant.Name : "Unknown",
+                        ActiveQuarantined = participantActive.Count,
+                        ArchivedQuarantined = participantArchived.Count,
+                        InWindow = participantActive.Count + participantArchived.Count,
+                        MostRecentDetection = mostRecentDetection,
+                        Status = ComputeRagStatus(
+                            participantActive.Count, HealthMetric.LoopsDetected, healthConfig)
+                    });
+                }
             }
 
             return new LoopDetectionSummaryV2
@@ -457,38 +485,52 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                     continue;
                 }
 
-                var contentHashGroups = addressEvents
-                    .GroupBy(e => e.ContentHash)
+                var participantGroups = addressEvents
+                    .GroupBy(e => e.ParticipantId ?? Guid.Empty)
                     .ToList();
 
-                int totalEvents = addressEvents.Count;
-                int distinctContentHashes = contentHashGroups.Count;
-                int duplicates = totalEvents - distinctContentHashes;
-
-                var duplicateEvents = contentHashGroups
-                    .Where(group => group.Count() > 1)
-                    .SelectMany(group => group.OrderBy(e => e.CreatedDate).Skip(1))
-                    .ToList();
-
-                DateTimeOffset? lastDuplicateSeen = duplicateEvents.Count > 0
-                    ? duplicateEvents.Max(e => e.CreatedDate)
-                    : (DateTimeOffset?)null;
-
-                decimal duplicateRate = totalEvents > 0
-                    ? (decimal)duplicates / totalEvents * 100
-                    : 0;
-
-                byAddress.Add(new DuplicateDetailV2
+                foreach (var participantGroup in participantGroups)
                 {
-                    EventAddressId = address.Id,
-                    AddressName = address.Name,
-                    ParticipantId = null,
-                    ParticipantName = "Unknown",
-                    TotalEvents = totalEvents,
-                    Duplicates = duplicates,
-                    DuplicateRate = duplicateRate,
-                    LastDuplicateSeen = lastDuplicateSeen
-                });
+                    var participantEvents = participantGroup.ToList();
+
+                    var contentHashGroups = participantEvents
+                        .GroupBy(e => e.ContentHash)
+                        .ToList();
+
+                    int totalEvents = participantEvents.Count;
+                    int distinctContentHashes = contentHashGroups.Count;
+                    int duplicates = totalEvents - distinctContentHashes;
+
+                    var duplicateEvents = contentHashGroups
+                        .Where(group => group.Count() > 1)
+                        .SelectMany(group => group.OrderBy(e => e.CreatedDate).Skip(1))
+                        .ToList();
+
+                    DateTimeOffset? lastDuplicateSeen = duplicateEvents.Count > 0
+                        ? duplicateEvents.Max(e => e.CreatedDate)
+                        : (DateTimeOffset?)null;
+
+                    decimal duplicateRate = totalEvents > 0
+                        ? (decimal)duplicates / totalEvents * 100
+                        : 0;
+
+                    var participant = participantEvents[0].Participant;
+
+                    bool isKnownParticipant =
+                        participantGroup.Key != Guid.Empty && participant != null;
+
+                    byAddress.Add(new DuplicateDetailV2
+                    {
+                        EventAddressId = address.Id,
+                        AddressName = address.Name,
+                        ParticipantId = isKnownParticipant ? participantGroup.Key : (Guid?)null,
+                        ParticipantName = isKnownParticipant ? participant.Name : "Unknown",
+                        TotalEvents = totalEvents,
+                        Duplicates = duplicates,
+                        DuplicateRate = duplicateRate,
+                        LastDuplicateSeen = lastDuplicateSeen
+                    });
+                }
             }
 
             long totalDuplicatesDetected = byAddress.Sum(detail => detail.Duplicates);
