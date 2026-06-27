@@ -176,6 +176,49 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
         }
 
         [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveParticipantSummaryAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            TrafficPeriodV2 randomPeriod = GetRandomTrafficPeriodV2();
+            DateTimeOffset randomWindowStart = GetRandomDateTimeOffset();
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.healthV2CoordinationServiceMock.Setup(service =>
+                service.RetrieveParticipantSummaryV2Async(
+                    It.IsAny<TrafficPeriodV2>(),
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IEnumerable<ParticipantSummaryV2>> retrieveTask =
+                this.healthParticipantClientV2.RetrieveParticipantSummaryV2Async(
+                    randomPeriod, randomWindowStart, randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
+
+            this.healthV2CoordinationServiceMock.Verify(service =>
+                service.RetrieveParticipantSummaryV2Async(
+                    It.IsAny<TrafficPeriodV2>(),
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowServiceExceptionOnRetrieveParticipantSummaryIfUnexpectedErrorOccursAsync()
         {
             // given
