@@ -25,6 +25,24 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
         }
 
+        private static void ValidateOnGenerateReplayForListeners(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            IEnumerable<System.Guid> eventListenerIds)
+        {
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
+            ValidateEventListenerIdsIsNotNull(eventListenerIds);
+        }
+
+        private static void ValidateEventListenerIdsIsNotNull(
+            IEnumerable<System.Guid> eventListenerIds)
+        {
+            if (eventListenerIds is null)
+            {
+                throw new NullRestoringEventV2OrchestrationException(
+                    message: "Event listener ids are null.");
+            }
+        }
+
         private static void ValidateEventArchiveV2sIsNotNull(
             IEnumerable<EventArchiveV2> eventArchiveV2s)
         {

@@ -149,6 +149,66 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 generatedListenerEventV2s, cancellationToken);
         });
 
+        public ValueTask GenerateReplayForListenersAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
+            IEnumerable<System.Guid> eventListenerIds,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnGenerateReplayForListeners(eventArchiveV2s, eventListenerIds);
+
+            HashSet<System.Guid> targetListenerIds = eventListenerIds.ToHashSet();
+
+            HashSet<System.Guid> incomingEventIds =
+                eventArchiveV2s.Select(eventArchiveV2 => eventArchiveV2.Id).ToHashSet();
+
+            IQueryable<ListenerEventV2> existingListenerEventV2s =
+                await this.listenerEventV2ProcessingService
+                    .RetrieveAllListenerEventV2sAsync(cancellationToken);
+
+            HashSet<(System.Guid EventId, System.Guid EventListenerId)> existingPairs =
+                existingListenerEventV2s
+                    .Where(listenerEventV2 => incomingEventIds.Contains(listenerEventV2.EventId))
+                    .Select(listenerEventV2 => new
+                    {
+                        listenerEventV2.EventId,
+                        listenerEventV2.EventListenerId
+                    })
+                    .AsEnumerable()
+                    .Select(listenerEventV2 =>
+                        (listenerEventV2.EventId, listenerEventV2.EventListenerId))
+                    .ToHashSet();
+
+            List<ListenerEventV2> generatedListenerEventV2s = new List<ListenerEventV2>();
+
+            foreach (EventArchiveV2 eventArchiveV2 in eventArchiveV2s)
+            {
+                IQueryable<EventListenerV2> eventListenerV2s =
+                    await this.eventListenerV2ProcessingService
+                        .RetrieveEventListenerV2sByEventAddressIdAsync(
+                            eventArchiveV2.EventAddressId, cancellationToken);
+
+                foreach (EventListenerV2 eventListenerV2 in eventListenerV2s)
+                {
+                    if (targetListenerIds.Contains(eventListenerV2.Id) is false)
+                        continue;
+
+                    bool hasListenerEvent =
+                        existingPairs.Contains((eventArchiveV2.Id, eventListenerV2.Id));
+
+                    if (hasListenerEvent is false)
+                    {
+                        generatedListenerEventV2s.Add(
+                            GenerateListenerEventV2(eventArchiveV2, eventListenerV2));
+                    }
+                }
+            }
+
+            await this.listenerEventV2ProcessingService.BulkRestoreListenerEventV2sAsync(
+                generatedListenerEventV2s, cancellationToken);
+        });
+
         private static ListenerEventV2 GenerateListenerEventV2(
             EventArchiveV2 eventArchiveV2,
             EventListenerV2 eventListenerV2) =>
