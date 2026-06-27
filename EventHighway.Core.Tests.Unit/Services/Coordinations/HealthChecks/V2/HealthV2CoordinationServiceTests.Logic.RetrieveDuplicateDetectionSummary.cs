@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using FluentAssertions;
 using Moq;
@@ -86,6 +87,95 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             DuplicateDetailV2 detailB =
                 actualSummary.ByAddress.Single(d => d.EventAddressId == addressBId);
 
+            detailB.TotalEvents.Should().Be(2);
+            detailB.Duplicates.Should().Be(1);
+            detailB.LastDuplicateSeen.Should().Be(windowStart.AddHours(5));
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldSplitDuplicateDetectionSummaryV2ByParticipantForWindowAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var windowStart = new DateTimeOffset(2026, 6, 24, 0, 0, 0, TimeSpan.Zero);
+            Guid addressId = Guid.NewGuid();
+            string addressName = GetRandomString();
+
+            Guid participantAId = Guid.NewGuid();
+            Guid participantBId = Guid.NewGuid();
+            string participantAName = GetRandomString();
+            string participantBName = GetRandomString();
+
+            EventParticipantV2 participantA = CreateEventParticipantV2(
+                participantAId, participantAName, GetRandomString(), GetRandomString(), true);
+
+            EventParticipantV2 participantB = CreateEventParticipantV2(
+                participantBId, participantBName, GetRandomString(), GetRandomString(), true);
+
+            var addresses = new[]
+            {
+                CreateEventAddressV2(addressId, addressName, GetRandomString())
+            }.AsQueryable();
+
+            var events = new[]
+            {
+                CreateEventV2ForParticipant(Guid.NewGuid(), addressId, participantAId, participantA,
+                    windowStart.AddHours(1), "a1", EventStatusV2.Active),
+                CreateEventV2ForParticipant(Guid.NewGuid(), addressId, participantAId, participantA,
+                    windowStart.AddHours(2), "a1", EventStatusV2.Active),
+                CreateEventV2ForParticipant(Guid.NewGuid(), addressId, participantAId, participantA,
+                    windowStart.AddHours(3), "a1", EventStatusV2.Active),
+                CreateEventV2ForParticipant(Guid.NewGuid(), addressId, participantBId, participantB,
+                    windowStart.AddHours(4), "b1", EventStatusV2.Active),
+                CreateEventV2ForParticipant(Guid.NewGuid(), addressId, participantBId, participantB,
+                    windowStart.AddHours(5), "b1", EventStatusV2.Active)
+            }.AsQueryable();
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(addresses);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(events);
+
+            // when
+            DuplicateDetectionSummaryV2 actualSummary =
+                await this.healthV2CoordinationService
+                    .RetrieveDuplicateDetectionSummaryV2Async(
+                        TrafficPeriodV2.Day, windowStart, randomCancellationToken);
+
+            // then
+            actualSummary.ByAddress.Should().HaveCount(2);
+
+            DuplicateDetailV2 detailA =
+                actualSummary.ByAddress.Single(d => d.ParticipantId == participantAId);
+
+            detailA.EventAddressId.Should().Be(addressId);
+            detailA.AddressName.Should().Be(addressName);
+            detailA.ParticipantName.Should().Be(participantAName);
+            detailA.TotalEvents.Should().Be(3);
+            detailA.Duplicates.Should().Be(2);
+            detailA.LastDuplicateSeen.Should().Be(windowStart.AddHours(3));
+
+            DuplicateDetailV2 detailB =
+                actualSummary.ByAddress.Single(d => d.ParticipantId == participantBId);
+
+            detailB.ParticipantName.Should().Be(participantBName);
             detailB.TotalEvents.Should().Be(2);
             detailB.Duplicates.Should().Be(1);
             detailB.LastDuplicateSeen.Should().Be(windowStart.AddHours(5));
