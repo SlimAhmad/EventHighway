@@ -384,25 +384,53 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                     .Where(a => a.EventAddressId == addressId)
                     .ToList();
 
-                var detectionDates = addressActive.Select(e => e.CreatedDate)
-                    .Concat(addressArchived.Select(a => a.ArchivedDate))
+                string addressName =
+                    addressNames.TryGetValue(addressId, out string name) ? name : null;
+
+                var participantKeys = addressActive.Select(e => e.ParticipantId ?? Guid.Empty)
+                    .Concat(addressArchived.Select(a => a.ParticipantId ?? Guid.Empty))
+                    .Distinct()
                     .ToList();
 
-                DateTimeOffset? mostRecentDetection = detectionDates.Count > 0
-                    ? detectionDates.Max()
-                    : (DateTimeOffset?)null;
-
-                byAddress.Add(new LoopDetailV2
+                foreach (var participantKey in participantKeys)
                 {
-                    EventAddressId = addressId,
-                    AddressName = addressNames.TryGetValue(addressId, out string name) ? name : null,
-                    ActiveQuarantined = addressActive.Count,
-                    ArchivedQuarantined = addressArchived.Count,
-                    InWindow = addressActive.Count + addressArchived.Count,
-                    MostRecentDetection = mostRecentDetection,
-                    Status = ComputeRagStatus(
-                        addressActive.Count, HealthMetric.LoopsDetected, healthConfig)
-                });
+                    var participantActive = addressActive
+                        .Where(e => (e.ParticipantId ?? Guid.Empty) == participantKey)
+                        .ToList();
+
+                    var participantArchived = addressArchived
+                        .Where(a => (a.ParticipantId ?? Guid.Empty) == participantKey)
+                        .ToList();
+
+                    var detectionDates = participantActive.Select(e => e.CreatedDate)
+                        .Concat(participantArchived.Select(a => a.ArchivedDate))
+                        .ToList();
+
+                    DateTimeOffset? mostRecentDetection = detectionDates.Count > 0
+                        ? detectionDates.Max()
+                        : (DateTimeOffset?)null;
+
+                    var participant = participantActive.Select(e => e.Participant)
+                        .Concat(participantArchived.Select(a => a.Participant))
+                        .FirstOrDefault(p => p != null);
+
+                    bool isKnownParticipant =
+                        participantKey != Guid.Empty && participant != null;
+
+                    byAddress.Add(new LoopDetailV2
+                    {
+                        EventAddressId = addressId,
+                        AddressName = addressName,
+                        ParticipantId = isKnownParticipant ? participantKey : (Guid?)null,
+                        ParticipantName = isKnownParticipant ? participant.Name : "Unknown",
+                        ActiveQuarantined = participantActive.Count,
+                        ArchivedQuarantined = participantArchived.Count,
+                        InWindow = participantActive.Count + participantArchived.Count,
+                        MostRecentDetection = mostRecentDetection,
+                        Status = ComputeRagStatus(
+                            participantActive.Count, HealthMetric.LoopsDetected, healthConfig)
+                    });
+                }
             }
 
             return new LoopDetectionSummaryV2
