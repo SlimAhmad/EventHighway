@@ -149,6 +149,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         public IHealthRetryClientV2 HealthRetryClientV2 { get; private set; }
 
         /// <summary>
+        /// Gets the client for retrieving the per-participant health summary in V2 API.
+        /// </summary>
+        public IHealthParticipantClientV2 HealthParticipantClientV2 { get; private set; }
+
+        /// <summary>
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         public IListenerEventV2Client ListenerEventV2Client { get; private set; }
@@ -208,6 +213,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
 
             this.HealthRetryClientV2 =
                 serviceProvider.GetRequiredService<IHealthRetryClientV2>();
+
+            this.HealthParticipantClientV2 =
+                serviceProvider.GetRequiredService<IHealthParticipantClientV2>();
 
             this.ListenerEventV2Client =
                 serviceProvider.GetRequiredService<IListenerEventV2Client>();
@@ -388,6 +396,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IHealthRetryClientV2,
                 HealthRetryClientV2>();
+
+            services.AddTransient<
+                IHealthParticipantClientV2,
+                HealthParticipantClientV2>();
 
             services.AddTransient<
                 IListenerEventV2Client,
