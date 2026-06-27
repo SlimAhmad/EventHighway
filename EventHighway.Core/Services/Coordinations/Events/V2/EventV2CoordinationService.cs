@@ -16,6 +16,7 @@ using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
+using EventHighway.Core.Services.Orchestrations.EventParticipants.V2;
 using EventHighway.Core.Services.Orchestrations.Events.V2;
 
 namespace EventHighway.Core.Services.Coordinations.Events.V2
@@ -24,17 +25,20 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
     {
         private readonly IEventV2OrchestrationService eventV2OrchestrationService;
         private readonly IEventListenerV2OrchestrationService eventListenerV2OrchestrationService;
+        private readonly IEventParticipantV2OrchestrationService eventParticipantV2OrchestrationService;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventV2CoordinationService(
             IEventV2OrchestrationService eventV2OrchestrationService,
             IEventListenerV2OrchestrationService eventListenerV2OrchestrationService,
+            IEventParticipantV2OrchestrationService eventParticipantV2OrchestrationService,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2OrchestrationService = eventV2OrchestrationService;
             this.eventListenerV2OrchestrationService = eventListenerV2OrchestrationService;
+            this.eventParticipantV2OrchestrationService = eventParticipantV2OrchestrationService;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
         }
@@ -46,6 +50,9 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
         {
             cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2IsNotNull(eventV2);
+
+            await this.eventParticipantV2OrchestrationService
+                .ValidateEventParticipantsAsync(eventV2, cancellationToken);
 
             DateTimeOffset now =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();

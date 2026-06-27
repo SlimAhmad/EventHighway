@@ -22,6 +22,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 TestContext.Current.CancellationToken;
 
             var mockSequence = new MockSequence();
+
+            SetupValidateEventParticipantsInSequence(mockSequence);
+
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
@@ -101,9 +104,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
+            VerifyValidateEventParticipantsCalledOnce();
+
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

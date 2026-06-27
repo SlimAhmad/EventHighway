@@ -28,6 +28,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             EventV2 someEventV2 = CreateRandomEventV2();
 
+            SetupValidateEventParticipantsSucceeds();
+
             var expectedEventV2CoordinationDependencyValidationException =
                 new EventV2CoordinationDependencyValidationException(
                     message: "Event validation error occurred, fix the errors and try again.",
@@ -51,6 +53,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             // then
             actualEventV2CoordinationDependencyValidationException.Should()
                 .BeEquivalentTo(expectedEventV2CoordinationDependencyValidationException);
+
+            VerifyValidateEventParticipantsCalledOnce();
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
@@ -95,6 +99,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
         [Theory]
@@ -107,6 +112,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 TestContext.Current.CancellationToken;
 
             EventV2 someEventV2 = CreateRandomEventV2();
+
+            SetupValidateEventParticipantsSucceeds();
 
             var expectedEventV2CoordinationDependencyException =
                 new EventV2CoordinationDependencyException(
@@ -131,6 +138,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             // then
             actualEventV2CoordinationDependencyException.Should()
                 .BeEquivalentTo(expectedEventV2CoordinationDependencyException);
+
+            VerifyValidateEventParticipantsCalledOnce();
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
@@ -175,6 +184,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -182,6 +192,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         {
             // given
             EventV2 someEventV2 = CreateRandomEventV2();
+
+            SetupValidateEventParticipantsSucceeds();
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
             CancellationToken cancelledToken = cancellationTokenSource.Token;
@@ -213,6 +225,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -220,6 +233,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         {
             // given
             EventV2 someEventV2 = CreateRandomEventV2();
+
+            SetupValidateEventParticipantsSucceeds();
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
@@ -255,6 +270,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             actualEventV2CoordinationDependencyException.Should()
                 .BeEquivalentTo(expectedEventV2CoordinationDependencyException);
 
+            VerifyValidateEventParticipantsCalledOnce();
+
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
                     Times.Once);
@@ -298,6 +315,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -308,6 +326,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 TestContext.Current.CancellationToken;
 
             EventV2 someEventV2 = CreateRandomEventV2();
+
+            SetupValidateEventParticipantsSucceeds();
             var serviceException = new Exception();
 
             var failedEventV2CoordinationServiceException =
@@ -338,6 +358,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             // then
             actualEventV2CoordinationServiceException.Should()
                 .BeEquivalentTo(expectedEventV2CoordinationServiceException);
+
+            VerifyValidateEventParticipantsCalledOnce();
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
@@ -382,6 +404,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
     }
 }

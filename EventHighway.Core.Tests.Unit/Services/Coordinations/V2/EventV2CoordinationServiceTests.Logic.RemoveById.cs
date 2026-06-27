@@ -58,6 +58,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock
                 .VerifyNoOtherCalls();
 
+            this.eventParticipantV2OrchestrationServiceMock
+                .VerifyNoOtherCalls();
+
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
