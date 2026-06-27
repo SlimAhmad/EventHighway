@@ -1,0 +1,102 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+using EventHighway.Abstractions.EventHandlers;
+using EventHighway.ClientV2.SubstrateApp.Models.MediaItems;
+using EventHighway.EventHandlers;
+using WireMock.Server;
+
+namespace EventHighway.ClientV2.SubstrateApp.Infrastructure
+{
+    /// <summary>
+    /// Holds the event handlers wired into the substrate. BingeBox logs to the console;
+    /// Joe and Ann forward each release to a REST API (here, the WireMock server).
+    /// </summary>
+    public sealed class MediaEventHandlers
+    {
+        public DelegateEventHandler BingeBox { get; }
+        public DelegateEventHandler Joe { get; }
+        public DelegateEventHandler Ann { get; }
+
+        public MediaEventHandlers(WireMockServer wireMock)
+        {
+            this.BingeBox = new DelegateEventHandler(
+                Guid.NewGuid(),
+                (content, cancellationToken) =>
+                {
+                    MediaItem item = MediaItemSerializer.Deserialize(content);
+
+                    Console.WriteLine(
+                        $"[BingeBox] New Release - {item.Title} " +
+                        $"({item.Type} with rating of {item.Rating})");
+
+                    return ValueTask.FromResult(new EventHandlerResult
+                    {
+                        IsSuccess = true,
+                        Response = item.Title,
+                        ResponseCode = "200",
+                        ResponseMessage = "OK"
+                    });
+                },
+                name: "BingeBox");
+
+            this.Joe = CreateRestHandler("Joe", wireMock);
+            this.Ann = CreateRestHandler("Ann", wireMock);
+        }
+
+        private static DelegateEventHandler CreateRestHandler(string label, WireMockServer wireMock) =>
+            new DelegateEventHandler(
+                Guid.NewGuid(),
+                async (content, cancellationToken) =>
+                {
+                    MediaItem item = MediaItemSerializer.Deserialize(content);
+                    string baseUrl = wireMock.Url ?? string.Empty;
+                    using var http = new HttpClient();
+
+                    var tokenPayload = new FormUrlEncodedContent(new Dictionary<string, string>
+                    {
+                        ["client_id"] = "client",
+                        ["client_secret"] = "secret",
+                        ["scope"] = "enrollment",
+                        ["grant_type"] = "client_credentials"
+                    });
+
+                    HttpResponseMessage tokenResponse =
+                        await http.PostAsync($"{baseUrl}/token", tokenPayload, cancellationToken);
+
+                    string tokenJson =
+                        await tokenResponse.Content.ReadAsStringAsync(cancellationToken);
+
+                    string token = JsonDocument.Parse(tokenJson)
+                        .RootElement.GetProperty("access_token").GetString() ?? string.Empty;
+
+                    http.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", token);
+
+                    var eventRequest = new StringContent(content, Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response =
+                        await http.PostAsync($"{baseUrl}/events", eventRequest, cancellationToken);
+
+                    string responseBody =
+                        await response.Content.ReadAsStringAsync(cancellationToken);
+
+                    Console.WriteLine(
+                        $"[{label}] New Release - {item.Title} " +
+                        $"({item.Type} with rating of {item.Rating})");
+
+                    return new EventHandlerResult
+                    {
+                        IsSuccess = response.IsSuccessStatusCode,
+                        Response = responseBody,
+                        ResponseCode = ((int)response.StatusCode).ToString(),
+                        ResponseMessage = response.ReasonPhrase ?? string.Empty
+                    };
+                },
+                name: label);
+    }
+}

@@ -51,11 +51,10 @@ public ValueTask<EventV2> SubmitEventAsync(EventV2 eventV2, CancellationToken ct
     this.eventHighwayClient.V2.EventV2Client.SubmitEventV2Async(eventV2, ct);
 ```
 
-So `Program.cs` reads as plain application intent and never names `EventHighwayClient`:
+So the application code reads as plain intent and never names `EventHighwayClient` — it just
+takes an `IEventSubstrateBroker`:
 
 ```csharp
-IEventSubstrateBroker broker = new EventSubstrateBroker(connectionString, configuration);
-
 await broker.AddParticipantAsync(nflix);
 await broker.RetrieveOrRegisterAddressAsync(newReleases);
 await broker.SubmitEventAsync(eventV2);
@@ -70,6 +69,31 @@ the standard "broker wraps the external dependency" pattern: the application is 
 from the substrate, the dependency can be swapped or mocked in one place, and the call sites
 stay readable. (Per The Standard, brokers are thin pass-throughs with no business logic and
 no unit tests of their own.)
+
+### Composition with a DI container
+
+`Program.cs` is a thin composition root, like a web app's:
+
+```csharp
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+
+builder.Services.AddSubstrateApp();
+
+using IHost host = builder.Build();
+
+await host.Services
+    .GetRequiredService<NFlixSample>()
+    .RunAsync();
+```
+
+Registration lives in
+[`SubstrateAppRegistration.AddSubstrateApp`](Infrastructure/SubstrateAppRegistration.cs),
+which wires the configuration, the WireMock server, the brokers
+(`IDateTimeBroker`, `ILoggingBroker`, `IJsonSerializationBroker`, `IEventSubstrateBroker`),
+the foundation services (`IMediaItemService`), and the `NFlixSample` runner — and registers
+the event handlers on the substrate broker as it is built. The end-to-end story itself lives
+in [`NFlixSample.RunAsync`](NFlixSample.cs), which only depends on the abstractions it is
+handed.
 
 ---
 
