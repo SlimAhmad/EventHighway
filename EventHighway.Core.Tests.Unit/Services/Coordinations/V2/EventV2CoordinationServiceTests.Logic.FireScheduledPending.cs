@@ -202,6 +202,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -247,6 +248,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -434,6 +436,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
     }
 }

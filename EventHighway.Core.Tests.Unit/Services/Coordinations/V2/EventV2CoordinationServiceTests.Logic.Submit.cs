@@ -41,6 +41,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             EventV2 submittedEventV2 = inputScheduledEventV2;
             EventV2 expectedEventV2 = submittedEventV2.DeepClone();
 
+            SetupValidateEventParticipantsSucceeds();
+
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetDateTimeOffsetAsync())
                     .ReturnsAsync(retrievedDateTimeOffset);
@@ -107,9 +109,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
+            VerifyValidateEventParticipantsCalledOnce();
+
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -124,6 +129,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 TestContext.Current.CancellationToken;
 
             var mockSequence = new MockSequence();
+
+            SetupValidateEventParticipantsInSequence(mockSequence);
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
             inputEventV2.ScheduledDate = scheduledDate;
@@ -306,9 +313,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                             Times.Once);
             }
 
+            VerifyValidateEventParticipantsCalledOnce();
+
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -323,6 +333,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 TestContext.Current.CancellationToken;
 
             var mockSequence = new MockSequence();
+
+            SetupValidateEventParticipantsInSequence(mockSequence);
             string promotedPropertyKey1 = GetRandomString();
             string promotedPropertyKey2 = GetRandomString();
             string promotedPropertyValue1 = GetRandomString();
@@ -530,9 +542,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     randomCancellationToken),
                         Times.Once);
 
+            VerifyValidateEventParticipantsCalledOnce();
+
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -547,6 +562,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 TestContext.Current.CancellationToken;
 
             var mockSequence = new MockSequence();
+
+            SetupValidateEventParticipantsInSequence(mockSequence);
             string promotedPropertyKey1 = GetRandomString();
             string promotedPropertyKey2 = GetRandomString();
             string promotedPropertyValue1 = GetRandomString();
@@ -752,9 +769,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     randomCancellationToken),
                         Times.Once);
 
+            VerifyValidateEventParticipantsCalledOnce();
+
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -770,6 +790,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 TestContext.Current.CancellationToken;
 
             var mockSequence = new MockSequence();
+
+            SetupValidateEventParticipantsInSequence(mockSequence);
             string promotedPropertyKey = GetRandomString();
             string promotedPropertiesCsv = promotedPropertyKey;
 
@@ -973,9 +995,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     randomCancellationToken),
                         Times.Once);
 
+            VerifyValidateEventParticipantsCalledOnce();
+
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

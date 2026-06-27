@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
@@ -15,9 +17,11 @@ using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
+using EventHighway.Core.Models.Services.Orchestrations.EventParticipants.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
 using EventHighway.Core.Services.Coordinations.Events.V2;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
+using EventHighway.Core.Services.Orchestrations.EventParticipants.V2;
 using EventHighway.Core.Services.Orchestrations.Events.V2;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
@@ -30,6 +34,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
     {
         private readonly Mock<IEventV2OrchestrationService> eventV2OrchestrationServiceMock;
         private readonly Mock<IEventListenerV2OrchestrationService> eventListenerV2OrchestrationServiceMock;
+        private readonly Mock<IEventParticipantV2OrchestrationService> eventParticipantV2OrchestrationServiceMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly ICompareLogic compareLogic;
@@ -42,6 +47,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventListenerV2OrchestrationServiceMock =
                 new Mock<IEventListenerV2OrchestrationService>(
+                    behavior: MockBehavior.Strict);
+
+            this.eventParticipantV2OrchestrationServiceMock =
+                new Mock<IEventParticipantV2OrchestrationService>(
                     behavior: MockBehavior.Strict);
 
             this.dateTimeBrokerMock = new Mock<IDateTimeBroker>(
@@ -59,6 +68,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 new EventV2CoordinationService(
                     eventV2OrchestrationService: this.eventV2OrchestrationServiceMock.Object,
                     eventListenerV2OrchestrationService: this.eventListenerV2OrchestrationServiceMock.Object,
+                    eventParticipantV2OrchestrationService: this.eventParticipantV2OrchestrationServiceMock.Object,
                     dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
         }
@@ -84,6 +94,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
                 new EventListenerV2OrchestrationDependencyValidationException(
                     someMessage,
+                    someInnerException),
+
+                new EventParticipantV2OrchestrationValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventParticipantV2OrchestrationDependencyValidationException(
+                    someMessage,
                     someInnerException)
             };
         }
@@ -108,6 +126,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     someInnerException),
 
                 new EventListenerV2OrchestrationServiceException(
+                    someMessage,
+                    someInnerException),
+
+                new EventParticipantV2OrchestrationDependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new EventParticipantV2OrchestrationServiceException(
                     someMessage,
                     someInnerException),
             };
@@ -152,6 +178,27 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 }
             };
         }
+
+        private void SetupValidateEventParticipantsSucceeds() =>
+            this.eventParticipantV2OrchestrationServiceMock.Setup(service =>
+                service.ValidateEventParticipantsAsync(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .Returns(ValueTask.CompletedTask);
+
+        private void SetupValidateEventParticipantsInSequence(MockSequence mockSequence) =>
+            this.eventParticipantV2OrchestrationServiceMock.InSequence(mockSequence).Setup(service =>
+                service.ValidateEventParticipantsAsync(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()))
+                        .Returns(ValueTask.CompletedTask);
+
+        private void VerifyValidateEventParticipantsCalledOnce() =>
+            this.eventParticipantV2OrchestrationServiceMock.Verify(service =>
+                service.ValidateEventParticipantsAsync(
+                    It.IsAny<EventV2>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);

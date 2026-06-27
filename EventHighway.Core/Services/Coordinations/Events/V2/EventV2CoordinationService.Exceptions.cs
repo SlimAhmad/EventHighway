@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
+using EventHighway.Core.Models.Services.Orchestrations.EventParticipants.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
 using Xeptions;
 
@@ -84,6 +85,18 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventListenerV2OrchestrationDependencyValidationException);
             }
+            catch (EventParticipantV2OrchestrationValidationException
+                eventParticipantV2OrchestrationValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventParticipantV2OrchestrationValidationException);
+            }
+            catch (EventParticipantV2OrchestrationDependencyValidationException
+                eventParticipantV2OrchestrationDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventParticipantV2OrchestrationDependencyValidationException);
+            }
             catch (EventV2OrchestrationDependencyException eventV2OrchestrationDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
@@ -105,6 +118,18 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             {
                 throw await CreateAndLogDependencyExceptionAsync(
                     eventListenerV2OrchestrationServiceException);
+            }
+            catch (EventParticipantV2OrchestrationDependencyException
+                eventParticipantV2OrchestrationDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventParticipantV2OrchestrationDependencyException);
+            }
+            catch (EventParticipantV2OrchestrationServiceException
+                eventParticipantV2OrchestrationServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventParticipantV2OrchestrationServiceException);
             }
             catch (Exception exception)
             {
@@ -171,6 +196,18 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventListenerV2OrchestrationDependencyValidationException);
             }
+            catch (EventParticipantV2OrchestrationValidationException
+                eventParticipantV2OrchestrationValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventParticipantV2OrchestrationValidationException);
+            }
+            catch (EventParticipantV2OrchestrationDependencyValidationException
+                eventParticipantV2OrchestrationDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventParticipantV2OrchestrationDependencyValidationException);
+            }
             catch (EventV2OrchestrationDependencyException eventV2OrchestrationDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(
@@ -192,6 +229,18 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             {
                 throw await CreateAndLogDependencyExceptionAsync(
                     eventListenerV2OrchestrationServiceException);
+            }
+            catch (EventParticipantV2OrchestrationDependencyException
+                eventParticipantV2OrchestrationDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventParticipantV2OrchestrationDependencyException);
+            }
+            catch (EventParticipantV2OrchestrationServiceException
+                eventParticipantV2OrchestrationServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventParticipantV2OrchestrationServiceException);
             }
             catch (Exception exception)
             {
