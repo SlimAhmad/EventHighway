@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Clients.EventHighways;
 using EventHighway.Core.Models.Configurations;
+using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
@@ -83,9 +84,30 @@ public partial class Program
             },
             name: "Joe");
 
+        var annHandler = new DelegateEventHandler(
+            Guid.NewGuid(),
+            (content, cancellationToken) =>
+            {
+                MediaItem item = Deserialize(content);
+
+                Console.WriteLine(
+                    $"[Ann] New Release - {item.Title} " +
+                    $"({item.Type} with rating of {item.Rating})");
+
+                return ValueTask.FromResult(new EventHandlerResult
+                {
+                    IsSuccess = true,
+                    Response = item.Title,
+                    ResponseCode = "200",
+                    ResponseMessage = "OK"
+                });
+            },
+            name: "Ann");
+
         client.V2
             .RegisterEventHandler(bingeBoxHandler)
-            .RegisterEventHandler(joeHandler);
+            .RegisterEventHandler(joeHandler)
+            .RegisterEventHandler(annHandler);
 
         DateTimeOffset now = DateTimeOffset.UtcNow;
 
@@ -225,24 +247,26 @@ public partial class Program
             Rating = 8.2
         };
 
+        var acceptedEventIds = new List<Guid>();
+
         // 1) Yellowstone — scheduled
-        await SubmitMediaAsync(client, newReleases.Id, yellowstone,
-            scheduled: true, participantId: nflix.Id, secret: "NFlix");
+        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(client, newReleases.Id, yellowstone,
+            scheduled: true, participantId: nflix.Id, secret: "NFlix"));
 
         // 2) Spider-Verse — immediate
-        await SubmitMediaAsync(client, newReleases.Id, spiderVerse,
-            scheduled: false, participantId: nflix.Id, secret: "NFlix");
+        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(client, newReleases.Id, spiderVerse,
+            scheduled: false, participantId: nflix.Id, secret: "NFlix"));
 
         // 3) Guardians — immediate
-        await SubmitMediaAsync(client, newReleases.Id, guardians,
-            scheduled: false, participantId: nflix.Id, secret: "NFlix");
+        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(client, newReleases.Id, guardians,
+            scheduled: false, participantId: nflix.Id, secret: "NFlix"));
 
         // 4) Top Gun — scheduled, submitted 4 times to simulate a loop
         for (int attempt = 1; attempt <= 4; attempt++)
         {
-            await SubmitMediaAsync(client, newReleases.Id, topGun,
+            AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(client, newReleases.Id, topGun,
                 scheduled: true, participantId: nflix.Id, secret: "NFlix",
-                attempt: attempt);
+                attempt: attempt));
         }
 
         // 5) John Wick — unauthorised: null participant id with a random secret
@@ -265,15 +289,74 @@ public partial class Program
         await client.V2.EventV2Client.FireScheduledPendingEventV2sAsync();
 
         // =========================================================
-        // 9) Summary of what each listener actually recorded
+        // 9) Summary of what the original subscribers recorded
         // =========================================================
         await PrintListenerSummaryAsync(
             client,
             (bingeBoxListener.Id, "BingeBox"),
             (joeListener.Id, "Joe"));
+
+        // =========================================================
+        // 10) Ann joins late and back-fills via a targeted replay
+        // =========================================================
+        // Replay sources events from the archive, so first archive the processed
+        // events (successful + quarantined) to make them available to replay.
+        await client.V2.ArchivingEventV2Client.ArchiveEventV2sAsync();
+
+        DateTimeOffset lateNow = DateTimeOffset.UtcNow;
+
+        EventParticipantV2 ann =
+            await client.V2.EventParticipantV2Client.AddEventParticipantV2Async(
+                new EventParticipantV2
+                {
+                    Name = "Ann",
+                    Description = "Ann",
+                    IsActive = true,
+                    CreatedDate = lateNow,
+                    UpdatedDate = lateNow
+                });
+
+        var annListener =
+            await client.V2.EventListenerV2Client.RegisterEventListenerV2Async(
+                new EventListenerV2
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Ann New Releases Listener",
+                    Description = "Ann, a late joiner who wants the back-catalogue.",
+                    HandlerId = annHandler.Id,
+                    HandlerName = annHandler.Name,
+                    EventAddressId = newReleases.Id,
+                    ParticipantId = ann.Id,
+                    CreatedDate = lateNow,
+                    UpdatedDate = lateNow
+                });
+
+        Console.WriteLine("\n── Replaying archived releases to Ann ──");
+
+        // Targeted replay: re-deliver each archived release to Ann's listener only.
+        // Quarantined (loop-detected) events are skipped unless explicitly allowed.
+        foreach (Guid eventId in acceptedEventIds)
+        {
+            await client.V2.ReplayingEventV2Client.ReplayEventArchiveV2sAsync(
+                eventV2Id: eventId,
+                eventAddressId: newReleases.Id,
+                eventListenerIds: new[] { annListener.Id },
+                allowReplayOfQuarantinedItem: false);
+        }
+
+        await client.V2.ReplayingEventV2Client.ProcessReplayedListenerEventV2sAsync();
+
+        await PrintListenerSummaryAsync(client, (annListener.Id, "Ann"));
+
+        // =========================================================
+        // 11) Archive again (housekeeping), then the health summary
+        // =========================================================
+        await client.V2.ArchivingEventV2Client.ArchiveEventV2sAsync();
+
+        await PrintHealthSummaryAsync(client);
     }
 
-    private static async Task SubmitMediaAsync(
+    private static async Task<Guid?> SubmitMediaAsync(
         EventHighwayClient client,
         Guid eventAddressId,
         MediaItem item,
@@ -303,12 +386,35 @@ public partial class Program
         try
         {
             await client.V2.EventV2Client.SubmitEventV2Async(eventV2);
-            Console.WriteLine($"  ✓ accepted  {label} [{kind}]");
+
+            WriteMarker(
+                "  [Success]", ConsoleColor.Green,
+                $" accepted  {label} [{kind}]");
+
+            return eventV2.Id;
         }
         catch (Exception exception)
         {
-            Console.WriteLine($"  ✗ blocked   {label} [{kind}] — {RootMessage(exception)}");
+            WriteMarker(
+                "  [Fail]   ", ConsoleColor.Red,
+                $" blocked   {label} [{kind}] - {RootMessage(exception)}");
+
+            return null;
         }
+    }
+
+    private static void AddIfAccepted(List<Guid> acceptedEventIds, Guid? eventId)
+    {
+        if (eventId.HasValue)
+            acceptedEventIds.Add(eventId.Value);
+    }
+
+    private static void WriteMarker(string marker, ConsoleColor color, string text)
+    {
+        Console.ForegroundColor = color;
+        Console.Write(marker);
+        Console.ResetColor();
+        Console.WriteLine(text);
     }
 
     private static async Task PrintListenerSummaryAsync(
@@ -333,10 +439,52 @@ public partial class Program
 
             foreach (ListenerEventV2 listenerEvent in events)
             {
-                Console.WriteLine(
-                    $"    [{listenerEvent.Status}] {listenerEvent.ResponseCode} " +
+                ConsoleColor color = listenerEvent.Status switch
+                {
+                    ListenerEventStatusV2.Success => ConsoleColor.Green,
+                    ListenerEventStatusV2.Error => ConsoleColor.Red,
+                    ListenerEventStatusV2.Pending => ConsoleColor.Yellow,
+                    _ => ConsoleColor.Gray,
+                };
+
+                WriteMarker(
+                    $"    [{listenerEvent.Status}]", color,
+                    $" {listenerEvent.ResponseCode} " +
                     $"{listenerEvent.ResponseMessage} {listenerEvent.Response}");
             }
+        }
+
+        Console.WriteLine();
+    }
+
+    private static async Task PrintHealthSummaryAsync(EventHighwayClient client)
+    {
+        IEnumerable<HealthCheckItemV2> summary =
+            await client.V2.HealthStatusClientV2.RetrieveHealthRagStatusV2Async();
+
+        Console.WriteLine("── Health summary ──");
+
+        string? currentGrouping = null;
+
+        foreach (HealthCheckItemV2 item in summary)
+        {
+            if (item.Grouping != currentGrouping)
+            {
+                currentGrouping = item.Grouping;
+                Console.WriteLine($"\n  {currentGrouping}");
+            }
+
+            ConsoleColor color = item.Status switch
+            {
+                nameof(HealthStatusV2.Green) => ConsoleColor.Green,
+                nameof(HealthStatusV2.Amber) => ConsoleColor.Yellow,
+                nameof(HealthStatusV2.Red) => ConsoleColor.Red,
+                _ => ConsoleColor.Gray,
+            };
+
+            WriteMarker(
+                $"    [{item.Status,-5}]", color,
+                $" {item.Item}: {item.Value}");
         }
 
         Console.WriteLine();

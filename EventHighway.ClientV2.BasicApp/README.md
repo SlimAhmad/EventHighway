@@ -25,14 +25,17 @@ NFlix announces its releases on a single channel — an **event address** called
 
 ### The subscribers
 
-Two parties are interested in NFlix's releases, and their interests are different:
+Three parties are interested in NFlix's releases, and their interests are different:
 
 | Subscriber | Who they are | What they care about |
 |---|---|---|
 | **BingeBox** | A NFlix affiliate that re-lists everything | **Every** new release, no exceptions |
 | **Joe** | An individual movie buff | **Only good movies** — a `Movie` (not a series) rated **8.0 or higher** |
+| **Ann** | A **late joiner** | Every release — but she signs up *after* the originals were already sent, so she needs the back-catalogue too |
 
-Both are registered as **participants** and each owns an **event listener** on the
+BingeBox and Joe are registered up front; Ann arrives later (see
+[Section 1 — Ann, the late joiner](#ann-the-late-joiner)). Each is registered as a
+**participant** and owns an **event listener** on the
 `NFlix-NewReleases` address. A listener is a standing subscription: "when something lands
 on this address, run my code."
 
@@ -85,6 +88,36 @@ Running the sample prints this, ending with a per-subscriber summary.
   BingeBox: handled 4 event(s)
   Joe: handled 2 event(s)
 ```
+
+### Ann, the late joiner
+
+Ann shows up **after** the four releases have already gone out. Going forward she would
+receive every new release automatically (her listener has no filter, just like
+BingeBox) — but she has missed everything published before she signed up, and she does
+not want a gap.
+
+To bridge that gap we use a **targeted replay**: we re-deliver the already-published
+releases, but **restricted to Ann's listener only**, so BingeBox and Joe are not
+re-notified of things they already handled. Ann ends up with the same four releases
+BingeBox got:
+
+| Release | Ann (late joiner, back-filled by replay) |
+|---|---|
+| Yellowstone (Series, 8.6) | ✅ replayed |
+| Spider-Verse (Movie, 8.5) | ✅ replayed |
+| Guardians (Movie, 7.9) | ✅ replayed |
+| Top Gun #1 (Movie, 8.2) | ✅ replayed |
+| Top Gun #2–4 (loop-detected) | 🚫 quarantined — not replayed |
+
+```
+── Replaying archived releases to Ann ──
+[Ann] New Release - Guardians of the Galaxy Vol. 3 (Movie with rating of 7.9)
+[Ann] New Release - Yellowstone (Series with rating of 8.6)
+...
+  Ann: handled 4 event(s)
+```
+
+How this works in EventHighway is the subject of [Section 5](#5-late-joiners-targeted-replay).
 
 ---
 
@@ -341,8 +374,101 @@ public class MediaItem
 | `NFlix-NewReleases` | Event address | The single channel releases flow through |
 | BingeBox | Participant + listener (no filter) | Wants every release |
 | Joe | Participant + listener (promoted props + filter) | Wants only Movies rated ≥ 8.0 |
+| Ann | Participant + listener (no filter), added late | A late joiner back-filled by replay |
 | A release | Event (`EventV2`) | One announcement, immediate or scheduled |
 | The handler delegate | `DelegateEventHandler` | The subscriber's reaction — console here, **your REST call / business logic in production** |
 | Loop detection | Configuration | Blocks the same release announced repeatedly |
 | Participant validation | Built-in | Blocks unauthenticated senders |
+| Archive + targeted replay | Lifecycle | Moves handled events aside, then re-delivers them to a chosen listener |
 | `ListenerEventV2` | Result record | The audit trail of who handled what |
+
+---
+
+## 5. Late joiners: targeted replay
+
+Ann signs up after the four releases have already been published and handled. EventHighway
+back-fills her using **archiving** plus a **targeted replay**.
+
+### Step 1 — Archive the handled releases
+
+Replay does not read from the live events table — it reads from the **archive**. So before
+replaying we archive the processed events. `ArchiveEventV2sAsync` moves events aside once
+they are settled:
+
+- **successful** events,
+- **dead** events that have exhausted their retries (events still holding retries are left
+  alone so they can be re-attempted),
+- **quarantined** (loop-detected) events.
+
+```csharp
+await client.V2.ArchivingEventV2Client.ArchiveEventV2sAsync();
+```
+
+### Step 2 — Add the late joiner
+
+Ann is just another participant with a no-filter listener — added now, after the originals
+were sent.
+
+```csharp
+EventParticipantV2 ann = await client.V2.EventParticipantV2Client.AddEventParticipantV2Async(/* … */);
+
+var annListener = await client.V2.EventListenerV2Client.RegisterEventListenerV2Async(new EventListenerV2
+{
+    Id = Guid.NewGuid(),
+    Name = "Ann New Releases Listener",
+    HandlerId = annHandler.Id,
+    HandlerName = annHandler.Name,
+    EventAddressId = newReleases.Id,
+    ParticipantId = ann.Id,
+    CreatedDate = lateNow,
+    UpdatedDate = lateNow
+});
+```
+
+### Step 3 — Replay the archived releases to Ann only
+
+The targeted overload of `ReplayEventArchiveV2sAsync` takes a **single archived event id**
+and the **listener ids** to deliver it to. We call it for each release Ann missed,
+restricting delivery to her listener so BingeBox and Joe are never re-notified.
+
+```csharp
+foreach (Guid eventId in acceptedEventIds)
+{
+    await client.V2.ReplayingEventV2Client.ReplayEventArchiveV2sAsync(
+        eventV2Id: eventId,
+        eventAddressId: newReleases.Id,
+        eventListenerIds: new[] { annListener.Id },
+        allowReplayOfQuarantinedItem: false);
+}
+
+// Replay restores the events and queues replay listener events; this delivers them.
+await client.V2.ReplayingEventV2Client.ProcessReplayedListenerEventV2sAsync();
+```
+
+What the targeted replay does for each event:
+
+1. Looks the event up **in the archive** by id (nothing happens if it is not archived).
+2. Honours the **quarantine gate** — a loop-detected event is skipped unless
+   `allowReplayOfQuarantinedItem: true`. (Because the replay path does **not** re-run loop
+   detection, a quarantined event allowed back in will succeed the second time.)
+3. Restores the event and creates fresh **replay listener events for the supplied listeners
+   only** — so Ann is hydrated even though she never had a listener event for these
+   releases, and no one else is touched.
+
+`ProcessReplayedListenerEventV2sAsync` then runs Ann's handler for each, exactly as if the
+releases had just arrived. Ann ends up having handled all four.
+
+### Step 4 — Housekeeping
+
+A final `ArchiveEventV2sAsync` tidies the events that replay restored, and the run ends with
+the health summary.
+
+```csharp
+await client.V2.ArchivingEventV2Client.ArchiveEventV2sAsync();
+await PrintHealthSummaryAsync(client);
+```
+
+> **Why replay sources from the archive.** Keeping the live events table lean is the whole
+> point of archiving; replay deliberately reads the archive so that re-delivery and
+> back-fill work against the durable record rather than the hot path. That is why the
+> sample archives *before* replaying Ann's back-catalogue.
