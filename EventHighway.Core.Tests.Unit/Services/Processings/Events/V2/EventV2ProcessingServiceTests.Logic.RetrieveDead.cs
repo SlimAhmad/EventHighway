@@ -35,7 +35,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
                         .ToList();
 
             randomImmediateEventV2sWithRetries.ForEach(eventV2 =>
-                eventV2.RemainingRetryAttempts = GetRandomNumber());
+            {
+                eventV2.RemainingRetryAttempts = GetRandomNumber();
+
+                eventV2.ListenerEventV2s = new List<ListenerEventV2>
+                {
+                    new ListenerEventV2 { Status = ListenerEventStatusV2.Error }
+                };
+            });
 
             List<EventV2> randomDeadEventV2s =
                 CreateRandomEventV2s(
@@ -57,6 +64,74 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V2
 
             IQueryable<EventV2> expectedEventV2s =
                 randomDeadEventV2s.AsQueryable();
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(retrievedEventV2s);
+
+            // when
+            IQueryable<EventV2> actualEventV2s =
+                await this.eventV2ProcessingService
+                    .RetrieveAllDeadEventV2sWithListenersAsync(randomCancellationToken);
+
+            // then
+            actualEventV2s.Should().BeEquivalentTo(expectedEventV2s);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldIncludeSuccessfulEventV2sWithRemainingRetriesInDeadEventV2sWithListenersAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            List<EventV2> randomSuccessfulEventV2sWithRetries =
+                CreateRandomEventV2s(
+                    dates: GetRandomDateTimeOffset(),
+                    eventV2Type: EventTypeV2.Immediate)
+                        .ToList();
+
+            randomSuccessfulEventV2sWithRetries.ForEach(eventV2 =>
+            {
+                eventV2.RemainingRetryAttempts = GetRandomNumber();
+
+                eventV2.ListenerEventV2s = new List<ListenerEventV2>
+                {
+                    new ListenerEventV2 { Status = ListenerEventStatusV2.Success }
+                };
+            });
+
+            List<EventV2> randomFailedEventV2sWithRetries =
+                CreateRandomEventV2s(
+                    dates: GetRandomDateTimeOffset(),
+                    eventV2Type: EventTypeV2.Immediate)
+                        .ToList();
+
+            randomFailedEventV2sWithRetries.ForEach(eventV2 =>
+            {
+                eventV2.RemainingRetryAttempts = GetRandomNumber();
+
+                eventV2.ListenerEventV2s = new List<ListenerEventV2>
+                {
+                    new ListenerEventV2 { Status = ListenerEventStatusV2.Error }
+                };
+            });
+
+            IQueryable<EventV2> retrievedEventV2s =
+                randomSuccessfulEventV2sWithRetries
+                    .Union(randomFailedEventV2sWithRetries)
+                        .AsQueryable();
+
+            IQueryable<EventV2> expectedEventV2s =
+                randomSuccessfulEventV2sWithRetries.AsQueryable();
 
             this.eventV2ServiceMock.Setup(service =>
                 service.RetrieveAllEventV2sAsync(randomCancellationToken))

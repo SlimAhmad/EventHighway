@@ -82,10 +82,12 @@ namespace EventHighway.Core.Services.Processings.Events.V2
 
             return eventV2s.Where(eventV2 =>
                 eventV2.Type == EventTypeV2.Immediate
-                && eventV2.RemainingRetryAttempts == 0
                 && eventV2.ListenerEventV2s.All(listenerEvent =>
                     listenerEvent.Status != ListenerEventStatusV2.Pending
-                    && listenerEvent.Status != ListenerEventStatusV2.Replay));
+                    && listenerEvent.Status != ListenerEventStatusV2.Replay)
+                && (eventV2.RemainingRetryAttempts == 0
+                    || eventV2.ListenerEventV2s.All(listenerEvent =>
+                        listenerEvent.Status == ListenerEventStatusV2.Success)));
         });
 
         public ValueTask<EventV2> MarkEventV2AsImmediateAsync(
