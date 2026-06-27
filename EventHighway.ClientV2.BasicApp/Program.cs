@@ -249,22 +249,25 @@ public partial class Program
 
         var acceptedEventIds = new List<Guid>();
 
+        // We mint each event id up front so we can track and later replay a specific one.
+        Guid spiderVerseEventId = Guid.NewGuid();
+
         // 1) Yellowstone — scheduled
-        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(client, newReleases.Id, yellowstone,
+        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(Guid.NewGuid(), client, newReleases.Id, yellowstone,
             scheduled: true, participantId: nflix.Id, secret: "NFlix"));
 
         // 2) Spider-Verse — immediate
-        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(client, newReleases.Id, spiderVerse,
+        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(spiderVerseEventId, client, newReleases.Id, spiderVerse,
             scheduled: false, participantId: nflix.Id, secret: "NFlix"));
 
         // 3) Guardians — immediate
-        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(client, newReleases.Id, guardians,
+        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(Guid.NewGuid(), client, newReleases.Id, guardians,
             scheduled: false, participantId: nflix.Id, secret: "NFlix"));
 
         // 4) Top Gun — scheduled, submitted 4 times to simulate a loop
         for (int attempt = 1; attempt <= 4; attempt++)
         {
-            AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(client, newReleases.Id, topGun,
+            AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(Guid.NewGuid(), client, newReleases.Id, topGun,
                 scheduled: true, participantId: nflix.Id, secret: "NFlix",
                 attempt: attempt));
         }
@@ -278,7 +281,7 @@ public partial class Program
             Rating = 7.6
         };
 
-        await SubmitMediaAsync(client, newReleases.Id, johnWick,
+        await SubmitMediaAsync(Guid.NewGuid(), client, newReleases.Id, johnWick,
             scheduled: false, participantId: null, secret: Guid.NewGuid().ToString());
 
         // =========================================================
@@ -349,14 +352,33 @@ public partial class Program
         await PrintListenerSummaryAsync(client, (annListener.Id, "Ann"));
 
         // =========================================================
-        // 11) Archive again (housekeeping), then the health summary
+        // 11) Archive again (housekeeping)
         // =========================================================
         await client.V2.ArchivingEventV2Client.ArchiveEventV2sAsync();
 
+        // =========================================================
+        // 12) Joe asks to re-process one specific release he had trouble with
+        // =========================================================
+        Console.WriteLine("\n── Replaying Spider-Verse to Joe ──");
+
+        await client.V2.ReplayingEventV2Client.ReplayEventArchiveV2sAsync(
+            eventV2Id: spiderVerseEventId,
+            eventAddressId: newReleases.Id,
+            eventListenerIds: new[] { joeListener.Id },
+            allowReplayOfQuarantinedItem: false);
+
+        await client.V2.ReplayingEventV2Client.ProcessReplayedListenerEventV2sAsync();
+
+        await PrintListenerSummaryAsync(client, (joeListener.Id, "Joe"));
+
+        // =========================================================
+        // 13) Health summary
+        // =========================================================
         await PrintHealthSummaryAsync(client);
     }
 
     private static async Task<Guid?> SubmitMediaAsync(
+        Guid eventV2Id,
         EventHighwayClient client,
         Guid eventAddressId,
         MediaItem item,
@@ -369,7 +391,7 @@ public partial class Program
 
         var eventV2 = new EventV2
         {
-            Id = Guid.NewGuid(),
+            Id = eventV2Id,
             Content = JsonSerializer.Serialize(item, MediaJsonOptions),
             EventName = item.Title,
             EventAddressId = eventAddressId,

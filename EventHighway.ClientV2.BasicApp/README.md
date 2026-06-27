@@ -119,6 +119,21 @@ BingeBox got:
 
 How this works in EventHighway is the subject of [Section 5](#5-late-joiners-targeted-replay).
 
+### Joe asks for a re-run of one release
+
+Separately, **Joe** reports that something went wrong on **his** side while processing one
+specific release — *Spider-Man: Across the Spider-Verse* — and asks for that **one event**
+to be sent to him again. This is the same targeted-replay machinery as Ann's back-fill, but
+pointed at a **single, already-known event id** and delivered to **Joe's existing listener
+only**. The sample does this right before the health summary, and Joe re-handles exactly
+that one release:
+
+```
+── Replaying Spider-Verse to Joe ──
+[Joe] New Release - Spider-Man: Across the Spider-Verse (Movie with rating of 8.5)
+  Joe: handled 1 event(s)
+```
+
 ---
 
 ## 2. How it is set up
@@ -472,3 +487,49 @@ await PrintHealthSummaryAsync(client);
 > point of archiving; replay deliberately reads the archive so that re-delivery and
 > back-fill work against the durable record rather than the hot path. That is why the
 > sample archives *before* replaying Ann's back-catalogue.
+
+### Re-processing a single event for an existing listener (Joe)
+
+The same targeted replay also covers a very different need: **re-running one specific event
+for a listener that already exists**. Joe reports a processing problem on his side with one
+release and asks for just that event again.
+
+To replay a *known* event you need its id. The sample mints each event id up front and
+passes it in, so the id is captured at submit time:
+
+```csharp
+private static async Task<Guid?> SubmitMediaAsync(
+    Guid eventV2Id,              // supplied by the caller, not generated inside
+    EventHighwayClient client,
+    Guid eventAddressId,
+    MediaItem item,
+    bool scheduled,
+    Guid? participantId,
+    string secret,
+    int attempt = 0)
+{
+    var eventV2 = new EventV2 { Id = eventV2Id, /* … */ };
+    // …
+}
+```
+
+```csharp
+Guid spiderVerseEventId = Guid.NewGuid();
+await SubmitMediaAsync(spiderVerseEventId, client, newReleases.Id, spiderVerse, /* … */);
+```
+
+Then, after the housekeeping archive, that single event is replayed to **Joe's listener
+only**:
+
+```csharp
+await client.V2.ReplayingEventV2Client.ReplayEventArchiveV2sAsync(
+    eventV2Id: spiderVerseEventId,
+    eventAddressId: newReleases.Id,
+    eventListenerIds: new[] { joeListener.Id },
+    allowReplayOfQuarantinedItem: false);
+
+await client.V2.ReplayingEventV2Client.ProcessReplayedListenerEventV2sAsync();
+```
+
+Joe re-handles that one release and nothing else — BingeBox and Ann are untouched, and no
+other events are re-sent.
