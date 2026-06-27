@@ -270,5 +270,47 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventParticipantSecrets.V2
 
             this.eventParticipantSecretV2ServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task
+            ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveByIdAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid someEventParticipantSecretV2Id = GetRandomId();
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.eventParticipantSecretV2ServiceMock.Setup(service =>
+                service.RetrieveEventParticipantSecretV2ByIdAsync(
+                    someEventParticipantSecretV2Id,
+                    randomCancellationToken))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<EventParticipantSecretV2> retrieveEventParticipantSecretV2ByIdTask =
+                this.eventParticipantSecretV2Client.RetrieveEventParticipantSecretV2ByIdAsync(
+                    someEventParticipantSecretV2Id,
+                    randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveEventParticipantSecretV2ByIdTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
+
+            this.eventParticipantSecretV2ServiceMock.Verify(service =>
+                service.RetrieveEventParticipantSecretV2ByIdAsync(
+                    someEventParticipantSecretV2Id,
+                    randomCancellationToken),
+                        Times.Once);
+
+            this.eventParticipantSecretV2ServiceMock.VerifyNoOtherCalls();
+        }
     }
 }

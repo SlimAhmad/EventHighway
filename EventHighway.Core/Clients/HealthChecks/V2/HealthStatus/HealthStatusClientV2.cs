@@ -28,8 +28,6 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
         /// </summary>
         /// <param name="healthV2CoordinationService">The coordination service for health
         /// checks.</param>
-        /// <exception cref="ArgumentNullException">Thrown when healthV2CoordinationService is
-        /// null.</exception>
         public HealthStatusClientV2(IHealthV2CoordinationService healthV2CoordinationService) =>
             this.healthV2CoordinationService = healthV2CoordinationService;
 
@@ -81,6 +79,10 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
             {
                 throw CreateHealthStatusClientV2DependencyException(
                     healthV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception exception)
             {

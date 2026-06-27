@@ -58,6 +58,10 @@ namespace EventHighway.Core.Clients.ReplayingEvents.V2
                 throw CreateReplayingEventV2ClientDependencyException(
                     replayingEventV2CoordinationServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateReplayingEventV2ClientServiceException(exception as Xeption);
@@ -96,6 +100,10 @@ namespace EventHighway.Core.Clients.ReplayingEvents.V2
             {
                 throw CreateReplayingEventV2ClientDependencyException(
                     replayingEventV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception exception)
             {

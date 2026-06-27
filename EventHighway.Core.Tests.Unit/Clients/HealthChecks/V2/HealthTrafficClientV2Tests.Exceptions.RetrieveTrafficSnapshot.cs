@@ -194,5 +194,41 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
 
             this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveTrafficSnapshotAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.healthV2CoordinationServiceMock.Setup(service =>
+                service.RetrieveTrafficSnapshotV2Async(
+                    It.IsAny<TrafficPeriodV2>(), It.IsAny<DateTimeOffset>(), It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<TrafficSnapshotV2> retrieveTask =
+                this.healthTrafficClientV2.RetrieveTrafficSnapshotV2Async(
+                    GetRandomTrafficPeriodV2(), GetRandomDateTimeOffset(), randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
+
+            this.healthV2CoordinationServiceMock.Verify(service =>
+                service.RetrieveTrafficSnapshotV2Async(
+                    It.IsAny<TrafficPeriodV2>(), It.IsAny<DateTimeOffset>(), It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
     }
 }

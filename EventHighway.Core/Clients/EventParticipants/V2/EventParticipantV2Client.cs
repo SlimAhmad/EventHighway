@@ -51,6 +51,10 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
                 throw CreateClientDependencyException(
                     eventParticipantV2ServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateClientServiceException(exception as Xeption);
@@ -85,6 +89,10 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
             {
                 throw CreateClientDependencyException(
                     eventParticipantV2ServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception exception)
             {
@@ -122,6 +130,10 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
                 throw CreateClientDependencyException(
                     eventParticipantV2ServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateClientServiceException(exception as Xeption);
@@ -158,6 +170,10 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
                 throw CreateClientDependencyException(
                     eventParticipantV2ServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateClientServiceException(exception as Xeption);
@@ -193,6 +209,10 @@ namespace EventHighway.Core.Clients.EventParticipants.V2
             {
                 throw CreateClientDependencyException(
                     eventParticipantV2ServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception exception)
             {

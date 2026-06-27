@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -174,6 +175,39 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             // then
             actualException.Should()
                 .BeEquivalentTo(expectedHealthRetryClientV2ServiceException);
+
+            this.healthV2CoordinationServiceMock.Verify(service =>
+                service.RetrieveRetryHealthV2Async(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.healthV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveRetryHealthAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.healthV2CoordinationServiceMock.Setup(service =>
+                service.RetrieveRetryHealthV2Async(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<RetryHealthSummaryV2> retrieveTask =
+                this.healthRetryClientV2.RetrieveRetryHealthV2Async(randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
 
             this.healthV2CoordinationServiceMock.Verify(service =>
                 service.RetrieveRetryHealthV2Async(It.IsAny<CancellationToken>()),

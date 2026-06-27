@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.Events.V2.Exceptions;
@@ -202,6 +203,83 @@ namespace EventHighway.Core.Tests.Unit.Clients.Events.V2
             // then
             actualEventV2ClientDependencyException.Should()
                 .BeEquivalentTo(expectedEventV2ClientDependencyException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnFireIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedEventV2ClientServiceException =
+                new EventV2ClientServiceException(
+                    message: "Event client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask fireScheduledPendingEventV2sTask =
+                this.eventV2Client.FireScheduledPendingEventV2sAsync(
+                    randomCancellationToken);
+
+            EventV2ClientServiceException actualEventV2ClientServiceException =
+                await Assert.ThrowsAsync<EventV2ClientServiceException>(
+                    fireScheduledPendingEventV2sTask.AsTask);
+
+            // then
+            actualEventV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedEventV2ClientServiceException);
+
+            this.eventV2CoordinationServiceMock.Verify(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventV2CoordinationServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnFireAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.eventV2CoordinationServiceMock.Setup(service =>
+                service.FireScheduledPendingEventV2sAsync(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask fireScheduledPendingEventV2sTask =
+                this.eventV2Client.FireScheduledPendingEventV2sAsync(
+                    randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    fireScheduledPendingEventV2sTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
 
             this.eventV2CoordinationServiceMock.Verify(service =>
                 service.FireScheduledPendingEventV2sAsync(

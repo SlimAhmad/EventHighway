@@ -85,6 +85,10 @@ namespace EventHighway.Core.Clients.EventListeners.V2
                 throw CreateEventListenerV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateEventListenerV2ClientServiceException(exception as Xeption);
@@ -144,6 +148,10 @@ namespace EventHighway.Core.Clients.EventListeners.V2
                 throw CreateEventListenerV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateEventListenerV2ClientServiceException(exception as Xeption);
@@ -201,12 +209,34 @@ namespace EventHighway.Core.Clients.EventListeners.V2
                 throw CreateEventListenerV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateEventListenerV2ClientServiceException(exception as Xeption);
             }
         }
 
+        /// <summary>
+        /// Retrieves an existing event listener or registers a new one asynchronously by
+        /// delegating to the orchestration service and handling any exceptions that occur.
+        /// </summary>
+        /// <param name="eventListenerV2">The event listener to retrieve or register.</param>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{EventListenerV2}"/> representing the asynchronous
+        /// operation that returns the retrieved or registered event listener.</returns>
+        /// <exception cref="EventListenerV2ClientValidationException">Thrown when validation
+        /// errors occur in the orchestration service.</exception>
+        /// <exception cref="EventListenerV2ClientDependencyException">Thrown when dependency
+        /// or service errors occur.</exception>
+        /// <exception cref="EventListenerV2ClientServiceException">Thrown when an unexpected
+        /// error occurs during retrieval or registration.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
         public async ValueTask<EventListenerV2> RetrieveOrRegisterEventListenerV2Async(
             EventListenerV2 eventListenerV2,
             CancellationToken cancellationToken = default)
@@ -239,6 +269,10 @@ namespace EventHighway.Core.Clients.EventListeners.V2
             {
                 throw CreateEventListenerV2ClientDependencyException(
                     eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception exception)
             {
