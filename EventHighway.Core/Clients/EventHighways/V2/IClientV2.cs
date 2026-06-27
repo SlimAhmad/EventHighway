@@ -82,6 +82,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         IHealthRetryClientV2 HealthRetryClientV2 { get; }
 
         /// <summary>
+        /// Gets the client for retrieving the per-participant health summary in V2 API.
+        /// </summary>
+        IHealthParticipantClientV2 HealthParticipantClientV2 { get; }
+
+        /// <summary>
         /// Gets the client for managing listener events in V2 API.
         /// </summary>
         IListenerEventV2Client ListenerEventV2Client { get; }
