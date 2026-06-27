@@ -6,12 +6,14 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using EventHighway.Abstractions.EventHandlers;
-using EventHighway.ClientV2.BasicApp.Brokers.EventSubstrates;
-using EventHighway.Core.Clients.EventHighways;
+using EventHighway.ClientV2.SubstrateApp.Brokers.EventSubstrates;
+using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.EventHandlers;
@@ -19,66 +21,343 @@ using WireMock.Server;
 
 public partial class Program
 {
+    // Rating is written as a JSON string so it can be used as a promoted property
+    // (promotion reads JSON values as strings) and read back into a double by handlers.
+    private static readonly JsonSerializerOptions MediaJsonOptions = new()
+    {
+        NumberHandling =
+            JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString
+    };
+
     private static async Task Main(string[] args)
     {
         string connectionString = string.Concat(
             "Server=(localdb)\\MSSQLLocalDB;Database=EventHighwayDB;",
             "Trusted_Connection=True;MultipleActiveResultSets=true");
 
-        DateTimeOffset now = DateTimeOffset.UtcNow;
+        // A stand-in for the downstream REST API that Joe and Ann forward releases to.
         using WireMockServer wireMock = SetupWireMock();
 
-        var delegateHandler1 = new DelegateEventHandler(
+        // =========================================================
+        // 1) Configure loop detection: only allow 1 identical item per minute
+        // =========================================================
+        var configuration = new EventHighwayConfiguration();
+        configuration.LoopDetection.Enabled = true;
+        configuration.LoopDetection.Threshold = 0;
+        configuration.LoopDetection.Window = TimeSpan.FromMinutes(1);
+
+        // Everything goes through the substrate broker — the app never touches
+        // EventHighwayClient directly.
+        IEventSubstrateBroker broker =
+            new EventSubstrateBroker(connectionString, configuration);
+
+        // =========================================================
+        // 2) Create and register the handlers
+        // =========================================================
+        // BingeBox simply logs to the console.
+        var bingeBoxHandler = new DelegateEventHandler(
             Guid.NewGuid(),
             (content, cancellationToken) =>
             {
-                int sum = content.Split(',')
-                    .Select(p => int.TryParse(p.Trim(), out int n) ? n : 0)
-                    .Sum();
+                MediaItem item = Deserialize(content);
 
-                Console.WriteLine($"[Handler 1 - Sum Numbers] {content} => {sum}");
+                Console.WriteLine(
+                    $"[BingeBox] New Release - {item.Title} " +
+                    $"({item.Type} with rating of {item.Rating})");
 
                 return ValueTask.FromResult(new EventHandlerResult
                 {
                     IsSuccess = true,
-                    Response = sum.ToString(),
+                    Response = item.Title,
                     ResponseCode = "200",
                     ResponseMessage = "OK"
                 });
-            });
+            },
+            name: "BingeBox");
 
-        var delegateHandler2 = new DelegateEventHandler(
-            Guid.NewGuid(),
-            (content, cancellationToken) =>
-            {
-                double[] scores = content.Split(',')
-                    .Select(p => double.TryParse(p.Trim(), out double d) ? d : 0.0)
-                    .ToArray();
+        // Joe and Ann forward each release to a REST API (here, the WireMock server).
+        var joeHandler = CreateRestHandler("Joe", wireMock);
+        var annHandler = CreateRestHandler("Ann", wireMock);
 
-                double average = scores.Length > 0 ? scores.Average() : 0;
+        broker
+            .RegisterEventHandler(bingeBoxHandler)
+            .RegisterEventHandler(joeHandler)
+            .RegisterEventHandler(annHandler);
 
-                string grade =
-                    average >= 90 ? "A" :
-                    average >= 80 ? "B" :
-                    average >= 70 ? "C" :
-                    average >= 60 ? "D" : "F";
+        DateTimeOffset now = DateTimeOffset.UtcNow;
 
-                string result = $"Average: {average:F1}, Grade: {grade}";
-                Console.WriteLine($"[Handler 2 - Grade Calculator] {content} => {result}");
-
-                return ValueTask.FromResult(new EventHandlerResult
+        // =========================================================
+        // 3) Register the publishing participant (NFlix) and its secret
+        // =========================================================
+        EventParticipantV2 nflix =
+            await broker.AddParticipantAsync(
+                new EventParticipantV2
                 {
-                    IsSuccess = true,
-                    Response = result,
-                    ResponseCode = "200",
-                    ResponseMessage = "OK"
+                    Name = "NFlix",
+                    Description = "NFlix streaming platform.",
+                    IsActive = true,
+                    CreatedDate = now,
+                    UpdatedDate = now
                 });
+
+        await broker.AddParticipantSecretAsync(
+            new EventParticipantSecretV2
+            {
+                Secret = "NFlix",
+                ParticipantId = nflix.Id,
+                IsActive = true,
+                CreatedDate = now,
+                UpdatedDate = now
             });
 
-        var delegateHandler3 = new DelegateEventHandler(
+        // =========================================================
+        // 4) Register (or add) the event address
+        // =========================================================
+        EventAddressV2 newReleases =
+            await broker.RetrieveOrRegisterAddressAsync(
+                new EventAddressV2
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "NFlix-NewReleases",
+                    Description = "NFlix New Releases",
+                    CreatedDate = now,
+                    UpdatedDate = now
+                });
+
+        // =========================================================
+        // 5) BingeBox participant + listener (receives every release)
+        // =========================================================
+        EventParticipantV2 bingeBox =
+            await broker.AddParticipantAsync(
+                new EventParticipantV2
+                {
+                    Name = "BingeBox",
+                    Description = "BingeBox a NFlix affiliate",
+                    IsActive = true,
+                    CreatedDate = now,
+                    UpdatedDate = now
+                });
+
+        var bingeBoxListener =
+            await broker.RegisterListenerAsync(
+                new EventListenerV2
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "BingeBox New Releases Listener",
+                    Description = "Receives every NFlix new release.",
+                    HandlerId = bingeBoxHandler.Id,
+                    HandlerName = bingeBoxHandler.Name,
+                    EventAddressId = newReleases.Id,
+                    ParticipantId = bingeBox.Id,
+                    CreatedDate = now,
+                    UpdatedDate = now
+                });
+
+        // =========================================================
+        // 6) Joe participant + listener (only good movies, forwarded over REST)
+        // =========================================================
+        EventParticipantV2 joe =
+            await broker.AddParticipantAsync(
+                new EventParticipantV2
+                {
+                    Name = "Joe",
+                    Description = "Joe, a movie buff.",
+                    IsActive = true,
+                    CreatedDate = now,
+                    UpdatedDate = now
+                });
+
+        var joeListener =
+            await broker.RegisterListenerAsync(
+                new EventListenerV2
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Joe Good Movies Listener",
+                    Description = "Forwards movies rated 8.0 or higher to Joe's API.",
+                    HandlerId = joeHandler.Id,
+                    HandlerName = joeHandler.Name,
+                    EventAddressId = newReleases.Id,
+                    ParticipantId = joe.Id,
+                    PromotedProperties = "Title,Type,Rating",
+                    FilterCriteria =
+                        "meta(\"Type\") == \"Movie\" && double.Parse(meta(\"Rating\")) >= 8.0",
+                    CreatedDate = now,
+                    UpdatedDate = now
+                });
+
+        // =========================================================
+        // 7) Submit events as NFlix (with participant id + secret)
+        // =========================================================
+        Console.WriteLine("\n── Submitting events ──");
+
+        var yellowstone = new MediaItem
+        {
+            Id = Guid.NewGuid(),
+            Title = "Yellowstone",
+            Type = "Series",
+            Rating = 8.6
+        };
+
+        var spiderVerse = new MediaItem
+        {
+            Id = Guid.NewGuid(),
+            Title = "Spider-Man: Across the Spider-Verse",
+            Type = "Movie",
+            Rating = 8.5
+        };
+
+        var guardians = new MediaItem
+        {
+            Id = Guid.NewGuid(),
+            Title = "Guardians of the Galaxy Vol. 3",
+            Type = "Movie",
+            Rating = 7.9
+        };
+
+        var topGun = new MediaItem
+        {
+            Id = Guid.NewGuid(),
+            Title = "Top Gun: Maverick",
+            Type = "Movie",
+            Rating = 8.2
+        };
+
+        var acceptedEventIds = new List<Guid>();
+
+        // We mint each event id up front so we can track and later replay a specific one.
+        Guid spiderVerseEventId = Guid.NewGuid();
+
+        // 1) Yellowstone — scheduled
+        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(Guid.NewGuid(), broker, newReleases.Id, yellowstone,
+            scheduled: true, participantId: nflix.Id, secret: "NFlix"));
+
+        // 2) Spider-Verse — immediate
+        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(spiderVerseEventId, broker, newReleases.Id, spiderVerse,
+            scheduled: false, participantId: nflix.Id, secret: "NFlix"));
+
+        // 3) Guardians — immediate
+        AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(Guid.NewGuid(), broker, newReleases.Id, guardians,
+            scheduled: false, participantId: nflix.Id, secret: "NFlix"));
+
+        // 4) Top Gun — scheduled, submitted 4 times to simulate a loop
+        for (int attempt = 1; attempt <= 4; attempt++)
+        {
+            AddIfAccepted(acceptedEventIds, await SubmitMediaAsync(Guid.NewGuid(), broker, newReleases.Id, topGun,
+                scheduled: true, participantId: nflix.Id, secret: "NFlix",
+                attempt: attempt));
+        }
+
+        // 5) John Wick — unauthorised: null participant id with a random secret
+        var johnWick = new MediaItem
+        {
+            Id = Guid.NewGuid(),
+            Title = "John Wick: Chapter 4",
+            Type = "Movie",
+            Rating = 7.6
+        };
+
+        await SubmitMediaAsync(Guid.NewGuid(), broker, newReleases.Id, johnWick,
+            scheduled: false, participantId: null, secret: Guid.NewGuid().ToString());
+
+        // =========================================================
+        // 8) Fire the scheduled (pending) events
+        // =========================================================
+        Console.WriteLine("\n── Firing scheduled events ──");
+        await Task.Delay(TimeSpan.FromSeconds(3));
+        await broker.FirePendingEventsAsync();
+
+        // =========================================================
+        // 9) Summary of what the original subscribers recorded
+        // =========================================================
+        await PrintListenerSummaryAsync(
+            broker,
+            (bingeBoxListener.Id, "BingeBox"),
+            (joeListener.Id, "Joe"));
+
+        // =========================================================
+        // 10) Ann joins late and back-fills via a targeted replay
+        // =========================================================
+        // Replay sources events from the archive, so first archive the processed
+        // events (successful + quarantined) to make them available to replay.
+        await broker.ArchiveEventsAsync();
+
+        DateTimeOffset lateNow = DateTimeOffset.UtcNow;
+
+        EventParticipantV2 ann =
+            await broker.AddParticipantAsync(
+                new EventParticipantV2
+                {
+                    Name = "Ann",
+                    Description = "Ann",
+                    IsActive = true,
+                    CreatedDate = lateNow,
+                    UpdatedDate = lateNow
+                });
+
+        var annListener =
+            await broker.RegisterListenerAsync(
+                new EventListenerV2
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Ann New Releases Listener",
+                    Description = "Ann, a late joiner who wants the back-catalogue.",
+                    HandlerId = annHandler.Id,
+                    HandlerName = annHandler.Name,
+                    EventAddressId = newReleases.Id,
+                    ParticipantId = ann.Id,
+                    CreatedDate = lateNow,
+                    UpdatedDate = lateNow
+                });
+
+        Console.WriteLine("\n── Replaying archived releases to Ann ──");
+
+        // Targeted replay: re-deliver each archived release to Ann's listener only.
+        // Quarantined (loop-detected) events are skipped unless explicitly allowed.
+        foreach (Guid eventId in acceptedEventIds)
+        {
+            await broker.ReplayEventToListenersAsync(
+                eventV2Id: eventId,
+                eventAddressId: newReleases.Id,
+                eventListenerIds: new[] { annListener.Id },
+                allowReplayOfQuarantinedItem: false);
+        }
+
+        await broker.ProcessReplayedEventsAsync();
+
+        await PrintListenerSummaryAsync(broker, (annListener.Id, "Ann"));
+
+        // =========================================================
+        // 11) Archive again (housekeeping)
+        // =========================================================
+        await broker.ArchiveEventsAsync();
+
+        // =========================================================
+        // 12) Joe asks to re-process one specific release he had trouble with
+        // =========================================================
+        Console.WriteLine("\n── Replaying Spider-Verse to Joe ──");
+
+        await broker.ReplayEventToListenersAsync(
+            eventV2Id: spiderVerseEventId,
+            eventAddressId: newReleases.Id,
+            eventListenerIds: new[] { joeListener.Id },
+            allowReplayOfQuarantinedItem: false);
+
+        await broker.ProcessReplayedEventsAsync();
+
+        await PrintListenerSummaryAsync(broker, (joeListener.Id, "Joe"));
+
+        // =========================================================
+        // 13) Health summary
+        // =========================================================
+        await PrintHealthSummaryAsync(broker);
+    }
+
+    private static DelegateEventHandler CreateRestHandler(string label, WireMockServer wireMock) =>
+        new DelegateEventHandler(
             Guid.NewGuid(),
             async (content, cancellationToken) =>
             {
+                MediaItem item = Deserialize(content);
                 string baseUrl = wireMock.Url ?? string.Empty;
                 using var http = new HttpClient();
 
@@ -111,7 +390,8 @@ public partial class Program
                     await response.Content.ReadAsStringAsync(cancellationToken);
 
                 Console.WriteLine(
-                    $"[Handler 3 - REST via Delegate] {content} => {response.StatusCode} {responseBody}");
+                    $"[{label}] New Release - {item.Title} " +
+                    $"({item.Type} with rating of {item.Rating})");
 
                 return new EventHandlerResult
                 {
@@ -120,187 +400,117 @@ public partial class Program
                     ResponseCode = ((int)response.StatusCode).ToString(),
                     ResponseMessage = response.ReasonPhrase ?? string.Empty
                 };
-            });
+            },
+            name: label);
 
-        var delegateHandler4 = new DelegateEventHandler(
-            Guid.NewGuid(),
-            (content, cancellationToken) =>
-                PostWithBearerTokenAsync(content, wireMock.Url ?? string.Empty, cancellationToken));
-
-        // =========================================================
-        // 1) Initialise the client and broker
-        // =========================================================
-        var client = new EventHighwayClient(connectionString);
-        var broker = new EventSubstrateBroker(client);
-
-        // =========================================================
-        // 2) Register event handlers
-        // =========================================================
-        client.V2
-            .RegisterEventHandler(delegateHandler1)
-            .RegisterEventHandler(delegateHandler2)
-            .RegisterEventHandler(delegateHandler3)
-            .RegisterEventHandler(delegateHandler4);
-
-        // =========================================================
-        // 3) Register Event Address 1: Student Enrolled
-        // =========================================================
-
-        await broker.RegisterStudentEnrolledAddressAsync(new EventAddressV2
-        {
-            Id = Guid.NewGuid(),
-            Name = "Student Enrolled",
-            Description = "Raised when a new student enrols in the system.",
-            CreatedDate = now,
-            UpdatedDate = now
-        });
-
-        // =========================================================
-        // 4) Register Event Listeners for Event Address 1: Student Enrolled
-        // =========================================================
-
-        await broker.RegisterStudentEnrolledListenerAsync(new EventListenerV2
-        {
-            Id = Guid.NewGuid(),
-            Name = "Sum Numbers Listener",
-            Description = "Parses comma-separated numbers from the event content and sums them.",
-            HandlerId = delegateHandler1.Id,
-            HandlerName = delegateHandler1.Name,
-            CreatedDate = now,
-            UpdatedDate = now
-        });
-
-        await broker.RegisterStudentEnrolledListenerAsync(new EventListenerV2
-        {
-            Id = Guid.NewGuid(),
-            Name = "REST via Delegate Listener",
-            Description = "Replicates RestBearerEventHandler behaviour using a DelegateEventHandler.",
-            HandlerId = delegateHandler3.Id,
-            HandlerName = delegateHandler3.Name,
-            CreatedDate = now,
-            UpdatedDate = now
-        });
-
-        // =========================================================
-        // 5) Submit an event for Event Address 1: Student Enrolled
-        // =========================================================
-
-        EventV2 studentEvent =
-            await broker.RaiseStudentEnrolledAsync("42,17,85");
-
-        // =========================================================
-        // 6) Register Event Address 2: Course Completed
-        // =========================================================
-
-        await broker.RegisterCourseCompletedAddressAsync(new EventAddressV2
-        {
-            Id = Guid.NewGuid(),
-            Name = "Course Completed",
-            Description = "Raised when a student completes a course.",
-            CreatedDate = now,
-            UpdatedDate = now
-        });
-
-        // =========================================================
-        // 7) Register Event Listeners for Event Address 2: Course Completed
-        // =========================================================
-
-        await broker.RegisterCourseCompletedListenerAsync(new EventListenerV2
-        {
-            Id = Guid.NewGuid(),
-            Name = "Grade Calculator Listener",
-            Description = "Calculates the average score and letter grade from the event content.",
-            HandlerId = delegateHandler2.Id,
-            HandlerName = delegateHandler2.Name,
-            CreatedDate = now,
-            UpdatedDate = now
-        });
-
-        await broker.RegisterCourseCompletedListenerAsync(new EventListenerV2
-        {
-            Id = Guid.NewGuid(),
-            Name = "REST via Delegate Method Listener",
-            Description = "Calls PostWithBearerTokenAsync on Program directly via a DelegateEventHandler.",
-            HandlerId = delegateHandler4.Id,
-            HandlerName = delegateHandler4.Name,
-            CreatedDate = now,
-            UpdatedDate = now
-        });
-
-        // =========================================================
-        // 8) Submit an event for Event Address 2: Course Completed
-        // =========================================================
-
-        EventV2 courseEvent =
-            await broker.RaiseCourseCompletedAsync("88,92,75,95,83");
-
-        // =========================================================
-        // Fire all pending immediate events
-        // =========================================================
-
-        await broker.FirePendingEventsAsync();
-
-        await PrintListenerEventResultsAsync(
-            client,
-            studentEvent.Id,
-            courseEvent.Id);
-
-        await PrintHealthSummaryAsync(client);
-    }
-
-    private static async ValueTask<EventHandlerResult> PostWithBearerTokenAsync(
-        string content,
-        string baseUrl,
-        CancellationToken cancellationToken)
+    private static async Task<Guid?> SubmitMediaAsync(
+        Guid eventV2Id,
+        IEventSubstrateBroker broker,
+        Guid eventAddressId,
+        MediaItem item,
+        bool scheduled,
+        Guid? participantId,
+        string secret,
+        int attempt = 0)
     {
-        using var http = new HttpClient();
+        DateTimeOffset now = DateTimeOffset.UtcNow;
 
-        var tokenPayload = new FormUrlEncodedContent(new Dictionary<string, string>
+        var eventV2 = new EventV2
         {
-            ["client_id"] = "client",
-            ["client_secret"] = "secret",
-            ["scope"] = "courses",
-            ["grant_type"] = "client_credentials"
-        });
-
-        HttpResponseMessage tokenResponse =
-            await http.PostAsync($"{baseUrl}/token", tokenPayload, cancellationToken);
-
-        string tokenJson =
-            await tokenResponse.Content.ReadAsStringAsync(cancellationToken);
-
-        string token = JsonDocument.Parse(tokenJson)
-            .RootElement.GetProperty("access_token").GetString() ?? string.Empty;
-
-        http.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", token);
-
-        var eventRequest = new StringContent(content, Encoding.UTF8, "application/json");
-
-        HttpResponseMessage response =
-            await http.PostAsync($"{baseUrl}/events", eventRequest, cancellationToken);
-
-        string responseBody =
-            await response.Content.ReadAsStringAsync(cancellationToken);
-
-        Console.WriteLine(
-            $"[Handler 4 - REST via Delegate Method] {content} => {response.StatusCode} {responseBody}");
-
-        return new EventHandlerResult
-        {
-            IsSuccess = response.IsSuccessStatusCode,
-            Response = responseBody,
-            ResponseCode = ((int)response.StatusCode).ToString(),
-            ResponseMessage = response.ReasonPhrase ?? string.Empty
+            Id = eventV2Id,
+            Content = JsonSerializer.Serialize(item, MediaJsonOptions),
+            EventName = item.Title,
+            EventAddressId = eventAddressId,
+            ScheduledDate = scheduled ? now.AddSeconds(1) : null,
+            ParticipantId = participantId,
+            ParticipantSecret = secret,
+            CreatedDate = now,
+            UpdatedDate = now
         };
+
+        string label = attempt > 0 ? $"{item.Title} (attempt {attempt})" : item.Title;
+        string kind = scheduled ? "scheduled" : "immediate";
+
+        try
+        {
+            await broker.SubmitEventAsync(eventV2);
+
+            WriteMarker(
+                "  [Success]", ConsoleColor.Green,
+                $" accepted  {label} [{kind}]");
+
+            return eventV2.Id;
+        }
+        catch (Exception exception)
+        {
+            WriteMarker(
+                "  [Fail]   ", ConsoleColor.Red,
+                $" blocked   {label} [{kind}] - {RootMessage(exception)}");
+
+            return null;
+        }
     }
 
-    private static async Task PrintHealthSummaryAsync(EventHighwayClient client)
+    private static void AddIfAccepted(List<Guid> acceptedEventIds, Guid? eventId)
+    {
+        if (eventId.HasValue)
+            acceptedEventIds.Add(eventId.Value);
+    }
+
+    private static void WriteMarker(string marker, ConsoleColor color, string text)
+    {
+        Console.ForegroundColor = color;
+        Console.Write(marker);
+        Console.ResetColor();
+        Console.WriteLine(text);
+    }
+
+    private static async Task PrintListenerSummaryAsync(
+        IEventSubstrateBroker broker,
+        params (Guid ListenerId, string Participant)[] listeners)
+    {
+        IQueryable<ListenerEventV2> all =
+            await broker.RetrieveAllListenerEventsAsync();
+
+        Console.WriteLine("\n── Listener results ──");
+
+        foreach ((Guid listenerId, string participant) in listeners)
+        {
+            List<ListenerEventV2> events =
+                all.Where(listenerEvent => listenerEvent.EventListenerId == listenerId)
+                    .ToList();
+
+            int handled = events.Count(listenerEvent =>
+                listenerEvent.ResponseCode == "200");
+
+            Console.WriteLine($"\n  {participant}: handled {handled} event(s)");
+
+            foreach (ListenerEventV2 listenerEvent in events)
+            {
+                ConsoleColor color = listenerEvent.Status switch
+                {
+                    ListenerEventStatusV2.Success => ConsoleColor.Green,
+                    ListenerEventStatusV2.Error => ConsoleColor.Red,
+                    ListenerEventStatusV2.Pending => ConsoleColor.Yellow,
+                    _ => ConsoleColor.Gray,
+                };
+
+                WriteMarker(
+                    $"    [{listenerEvent.Status}]", color,
+                    $" {listenerEvent.ResponseCode} " +
+                    $"{listenerEvent.ResponseMessage} {listenerEvent.Response}");
+            }
+        }
+
+        Console.WriteLine();
+    }
+
+    private static async Task PrintHealthSummaryAsync(IEventSubstrateBroker broker)
     {
         IEnumerable<HealthCheckItemV2> summary =
-            await client.V2.HealthStatusClientV2.RetrieveHealthRagStatusV2Async();
+            await broker.RetrieveHealthRagStatusAsync();
 
-        Console.WriteLine("\n── Health Summary ──");
+        Console.WriteLine("── Health summary ──");
 
         string? currentGrouping = null;
 
@@ -312,7 +522,7 @@ public partial class Program
                 Console.WriteLine($"\n  {currentGrouping}");
             }
 
-            Console.ForegroundColor = item.Status switch
+            ConsoleColor color = item.Status switch
             {
                 nameof(HealthStatusV2.Green) => ConsoleColor.Green,
                 nameof(HealthStatusV2.Amber) => ConsoleColor.Yellow,
@@ -320,33 +530,26 @@ public partial class Program
                 _ => ConsoleColor.Gray,
             };
 
-            Console.WriteLine($"    [{item.Status,-6}] {item.Item}: {item.Value}");
-            Console.ResetColor();
+            WriteMarker(
+                $"    [{item.Status,-5}]", color,
+                $" {item.Item}: {item.Value}");
         }
 
         Console.WriteLine();
     }
 
-    private static async Task PrintListenerEventResultsAsync(
-        EventHighwayClient client,
-        params Guid[] eventIds)
+    private static MediaItem Deserialize(string content) =>
+        JsonSerializer.Deserialize<MediaItem>(content, MediaJsonOptions)
+            ?? new MediaItem();
+
+    private static string RootMessage(Exception exception)
     {
-        IQueryable<ListenerEventV2> all =
-            await client.V2.ListenerEventV2Client.RetrieveAllListenerEventV2sAsync();
+        Exception current = exception;
 
-        foreach (Guid eventId in eventIds)
-        {
-            Console.WriteLine($"\n── Results for event {eventId} ──");
+        while (current.InnerException is not null)
+            current = current.InnerException;
 
-            foreach (ListenerEventV2 result in all.Where(le => le.EventId == eventId))
-            {
-                Console.WriteLine($"  Status   : {result.Status}");
-                Console.WriteLine($"  Code     : {result.ResponseCode}");
-                Console.WriteLine($"  Message  : {result.ResponseMessage}");
-                Console.WriteLine($"  Response : {result.Response}");
-                Console.WriteLine();
-            }
-        }
+        return current.Message;
     }
 
     private static WireMockServer SetupWireMock()
@@ -368,4 +571,13 @@ public partial class Program
 
         return server;
     }
+}
+
+public class MediaItem
+{
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty; // "Movie" or "Series"
+    public List<string> Genres { get; set; } = new();
+    public double Rating { get; set; }
 }
