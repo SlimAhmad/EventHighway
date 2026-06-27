@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,6 +43,8 @@ namespace EventHighway.Core.Services.Orchestrations.EventParticipants.V2
 
             if (eventV2.ParticipantId is null)
             {
+                ValidateParticipantSecretHasParticipantId(eventV2);
+
                 return;
             }
 
@@ -50,7 +53,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventParticipants.V2
                     eventV2.ParticipantId.Value,
                     cancellationToken);
 
-            System.DateTimeOffset now =
+            DateTimeOffset now =
                 await this.dateTimeBroker.GetDateTimeOffsetAsync();
 
             ValidateParticipant(maybeEventParticipantV2, now);

@@ -20,8 +20,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
         private async Task RunSecretValidationFailureScenarioAsync(
             EventParticipantSecretV2 storedSecret,
             string inputSecret,
-            string expectedDataKey,
-            string expectedDataValue)
+            string expectedMessage)
         {
             // given
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
@@ -43,11 +42,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
-                    message: "Invalid event participant or secret, fix the errors and try again.");
-
-            invalidEventParticipantV2OrchestrationException.UpsertDataList(
-                key: expectedDataKey,
-                value: expectedDataValue);
+                    message: expectedMessage);
 
             var expectedEventParticipantV2OrchestrationValidationException =
                 new EventParticipantV2OrchestrationValidationException(
@@ -124,8 +119,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             await RunSecretValidationFailureScenarioAsync(
                 storedSecret: nonMatchingSecret,
                 inputSecret: inputSecret,
-                expectedDataKey: "Secret",
-                expectedDataValue: "Secret not found.");
+                expectedMessage: "Event participant secret not found.");
         }
 
         [Fact]
@@ -143,8 +137,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             await RunSecretValidationFailureScenarioAsync(
                 storedSecret: inactiveSecret,
                 inputSecret: inputSecret,
-                expectedDataKey: "SecretIsActive",
-                expectedDataValue: "Secret is not active.");
+                expectedMessage: "Event participant secret is not active.");
         }
 
         [Fact]
@@ -162,8 +155,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             await RunSecretValidationFailureScenarioAsync(
                 storedSecret: notYetActiveSecret,
                 inputSecret: inputSecret,
-                expectedDataKey: "SecretActiveWindow",
-                expectedDataValue: "Secret is outside its active window.");
+                expectedMessage: "Event participant secret is outside its active window.");
         }
 
         [Fact]
@@ -181,8 +173,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             await RunSecretValidationFailureScenarioAsync(
                 storedSecret: expiredSecret,
                 inputSecret: inputSecret,
-                expectedDataKey: "SecretActiveWindow",
-                expectedDataValue: "Secret is outside its active window.");
+                expectedMessage: "Event participant secret is outside its active window.");
         }
     }
 }

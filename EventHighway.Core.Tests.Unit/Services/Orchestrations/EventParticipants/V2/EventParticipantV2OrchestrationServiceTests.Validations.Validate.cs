@@ -29,11 +29,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
-                    message: "Invalid event participant or secret, fix the errors and try again.");
-
-            invalidEventParticipantV2OrchestrationException.UpsertDataList(
-                key: "Participant",
-                value: "Participant not found.");
+                    message: "Event participant not found.");
 
             var expectedEventParticipantV2OrchestrationValidationException =
                 new EventParticipantV2OrchestrationValidationException(
@@ -105,11 +101,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
-                    message: "Invalid event participant or secret, fix the errors and try again.");
-
-            invalidEventParticipantV2OrchestrationException.UpsertDataList(
-                key: "IsActive",
-                value: "Participant is not active.");
+                    message: "Event participant is not active.");
 
             var expectedEventParticipantV2OrchestrationValidationException =
                 new EventParticipantV2OrchestrationValidationException(
@@ -181,11 +173,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
-                    message: "Invalid event participant or secret, fix the errors and try again.");
-
-            invalidEventParticipantV2OrchestrationException.UpsertDataList(
-                key: "ActiveWindow",
-                value: "Participant is outside its active window.");
+                    message: "Event participant is outside its active window.");
 
             var expectedEventParticipantV2OrchestrationValidationException =
                 new EventParticipantV2OrchestrationValidationException(
@@ -257,11 +245,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
-                    message: "Invalid event participant or secret, fix the errors and try again.");
-
-            invalidEventParticipantV2OrchestrationException.UpsertDataList(
-                key: "ActiveWindow",
-                value: "Participant is outside its active window.");
+                    message: "Event participant is outside its active window.");
 
             var expectedEventParticipantV2OrchestrationValidationException =
                 new EventParticipantV2OrchestrationValidationException(
@@ -303,6 +287,51 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
                     Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventParticipantV2OrchestrationValidationException))),
+                        Times.Once);
+
+            this.eventParticipantV2ServiceMock.VerifyNoOtherCalls();
+            this.eventParticipantSecretV2ServiceMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnValidateIfSecretIsProvidedWithoutParticipantIdAndLogItAsync()
+        {
+            // given
+            EventV2 randomEventV2 = CreateRandomEventV2();
+            EventV2 inputEventV2 = randomEventV2;
+            inputEventV2.ParticipantId = null;
+            inputEventV2.ParticipantSecret = GetRandomString();
+
+            var invalidEventParticipantV2OrchestrationException =
+                new InvalidEventParticipantV2OrchestrationException(
+                    message: "Event participant secret requires a participant id.");
+
+            var expectedEventParticipantV2OrchestrationValidationException =
+                new EventParticipantV2OrchestrationValidationException(
+                    message: "Event participant validation error occurred, fix the errors and try again.",
+                    innerException: invalidEventParticipantV2OrchestrationException);
+
+            // when
+            ValueTask validateTask =
+                this.eventParticipantV2OrchestrationService
+                    .ValidateEventParticipantsAsync(
+                        inputEventV2,
+                        TestContext.Current.CancellationToken);
+
+            EventParticipantV2OrchestrationValidationException
+                actualEventParticipantV2OrchestrationValidationException =
+                    await Assert.ThrowsAsync<EventParticipantV2OrchestrationValidationException>(
+                        validateTask.AsTask);
+
+            // then
+            actualEventParticipantV2OrchestrationValidationException.Should()
+                .BeEquivalentTo(expectedEventParticipantV2OrchestrationValidationException);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(

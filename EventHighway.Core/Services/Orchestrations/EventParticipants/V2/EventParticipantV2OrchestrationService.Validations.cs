@@ -4,89 +4,71 @@
 
 using System;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Orchestrations.EventParticipants.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Orchestrations.EventParticipants.V2
 {
     internal partial class EventParticipantV2OrchestrationService
     {
-        private static void ValidateParticipant(EventParticipantV2 participant, DateTimeOffset now)
+        private static void ValidateParticipantSecretHasParticipantId(EventV2 eventV2)
         {
-            Validate(
-                (Rule: IsNotFound(participant), Parameter: "Participant"),
-                (Rule: IsInactive(participant), Parameter: "IsActive"),
-                (Rule: IsOutsideActiveWindow(participant, now), Parameter: "ActiveWindow"));
+            if (string.IsNullOrWhiteSpace(eventV2.ParticipantSecret) is false)
+            {
+                throw new InvalidEventParticipantV2OrchestrationException(
+                    message: "Event participant secret requires a participant id.");
+            }
         }
 
-        private static dynamic IsNotFound(EventParticipantV2 participant) => new
+        private static void ValidateParticipant(EventParticipantV2 participant, DateTimeOffset now)
         {
-            Condition = participant is null,
-            Message = "Participant not found."
-        };
+            if (participant is null)
+            {
+                throw new InvalidEventParticipantV2OrchestrationException(
+                    message: "Event participant not found.");
+            }
 
-        private static dynamic IsInactive(EventParticipantV2 participant) => new
-        {
-            Condition = participant is not null && participant.IsActive is false,
-            Message = "Participant is not active."
-        };
+            if (participant.IsActive is false)
+            {
+                throw new InvalidEventParticipantV2OrchestrationException(
+                    message: "Event participant is not active.");
+            }
 
-        private static dynamic IsOutsideActiveWindow(EventParticipantV2 participant, DateTimeOffset now) => new
-        {
-            Condition = participant is not null
-                && participant.IsActive
-                && ((participant.ActiveFrom != null && participant.ActiveFrom > now)
-                    || (participant.ActiveTo != null && participant.ActiveTo < now)),
-
-            Message = "Participant is outside its active window."
-        };
+            if (IsOutsideActiveWindow(participant.ActiveFrom, participant.ActiveTo, now))
+            {
+                throw new InvalidEventParticipantV2OrchestrationException(
+                    message: "Event participant is outside its active window.");
+            }
+        }
 
         private static void ValidateSecret(EventParticipantSecretV2 secret, DateTimeOffset now)
         {
-            Validate(
-                (Rule: IsSecretNotFound(secret), Parameter: "Secret"),
-                (Rule: IsSecretInactive(secret), Parameter: "SecretIsActive"),
-                (Rule: IsSecretOutsideActiveWindow(secret, now), Parameter: "SecretActiveWindow"));
-        }
-
-        private static dynamic IsSecretNotFound(EventParticipantSecretV2 secret) => new
-        {
-            Condition = secret is null,
-            Message = "Secret not found."
-        };
-
-        private static dynamic IsSecretInactive(EventParticipantSecretV2 secret) => new
-        {
-            Condition = secret is not null && secret.IsActive is false,
-            Message = "Secret is not active."
-        };
-
-        private static dynamic IsSecretOutsideActiveWindow(EventParticipantSecretV2 secret, DateTimeOffset now) => new
-        {
-            Condition = secret is not null
-                && secret.IsActive
-                && ((secret.ActiveFrom != null && secret.ActiveFrom > now)
-                    || (secret.ActiveTo != null && secret.ActiveTo < now)),
-
-            Message = "Secret is outside its active window."
-        };
-
-        private static void Validate(params (dynamic Rule, string Parameter)[] validations)
-        {
-            var invalidEventParticipantV2OrchestrationException =
-                new InvalidEventParticipantV2OrchestrationException(
-                    message: "Invalid event participant or secret, fix the errors and try again.");
-
-            foreach ((dynamic rule, string parameter) in validations)
+            if (secret is null)
             {
-                if (rule.Condition)
-                {
-                    invalidEventParticipantV2OrchestrationException.UpsertDataList(
-                        key: parameter,
-                        value: rule.Message);
-                }
+                throw new InvalidEventParticipantV2OrchestrationException(
+                    message: "Event participant secret not found.");
             }
 
-            invalidEventParticipantV2OrchestrationException.ThrowIfContainsErrors();
+            if (secret.IsActive is false)
+            {
+                throw new InvalidEventParticipantV2OrchestrationException(
+                    message: "Event participant secret is not active.");
+            }
+
+            if (IsOutsideActiveWindow(secret.ActiveFrom, secret.ActiveTo, now))
+            {
+                throw new InvalidEventParticipantV2OrchestrationException(
+                    message: "Event participant secret is outside its active window.");
+            }
+        }
+
+        private static bool IsOutsideActiveWindow(
+            DateTimeOffset? activeFrom,
+            DateTimeOffset? activeTo,
+            DateTimeOffset now)
+        {
+            return (activeFrom != null && activeFrom > now)
+                || (activeTo != null && activeTo < now);
         }
     }
 }
