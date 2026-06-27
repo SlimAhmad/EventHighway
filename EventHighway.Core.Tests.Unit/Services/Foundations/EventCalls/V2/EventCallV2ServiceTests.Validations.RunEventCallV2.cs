@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Abstractions.EventHandlers;
@@ -166,25 +167,25 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             CancellationToken randomCancellationToken =
                 TestContext.Current.CancellationToken;
 
-            string randomHandlerName = GetRandomString();
+            Guid randomHandlerId = Guid.NewGuid();
             EventCallV2 someEventCallV2 = CreateRandomEventCallV2();
-            someEventCallV2.HandlerName = randomHandlerName;
+            someEventCallV2.HandlerId = randomHandlerId;
 
             IEventHandler[] handlers;
 
             if (matchingHandlerCount == 0)
             {
                 var noMatchHandlerMock = new Mock<IEventHandler>();
-                noMatchHandlerMock.SetupGet(h => h.Name).Returns(GetRandomString());
+                noMatchHandlerMock.SetupGet(h => h.Id).Returns(Guid.NewGuid());
                 handlers = new[] { noMatchHandlerMock.Object };
             }
             else
             {
                 var matchHandlerMock1 = new Mock<IEventHandler>();
-                matchHandlerMock1.SetupGet(h => h.Name).Returns(randomHandlerName);
+                matchHandlerMock1.SetupGet(h => h.Id).Returns(randomHandlerId);
 
                 var matchHandlerMock2 = new Mock<IEventHandler>();
-                matchHandlerMock2.SetupGet(h => h.Name).Returns(randomHandlerName);
+                matchHandlerMock2.SetupGet(h => h.Id).Returns(randomHandlerId);
 
                 handlers = new[] { matchHandlerMock1.Object, matchHandlerMock2.Object };
             }
@@ -201,11 +202,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
                     message: "EventHandlerBrokers on event call is invalid, fix the errors and try again.");
 
             invalidEventCallV2Exception.AddData(
-                key: nameof(EventCallV2.HandlerName),
+                key: nameof(EventCallV2.HandlerId),
                 values: matchingHandlerCount == 0
-                    ? $"No handler found that matches '{randomHandlerName}', " +
+                    ? $"No handler found that matches '{randomHandlerId}', " +
                         $"fix registrations and try again."
-                    : $"Multiple providers found that matches '{randomHandlerName}', " +
+                    : $"Multiple providers found that matches '{randomHandlerId}', " +
                         $"fix registrations and try again.");
 
             var expectedEventCallV2ValidationException =

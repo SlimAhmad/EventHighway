@@ -26,6 +26,10 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             EventV2 eventV2,
             CancellationToken cancellationToken = default);
 
+        ValueTask<EventV2> StampContentHashAsync(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default);
+
         ValueTask<IQueryable<EventV2>> RetrieveScheduledPendingEventV2sAsync(
             CancellationToken cancellationToken = default);
 

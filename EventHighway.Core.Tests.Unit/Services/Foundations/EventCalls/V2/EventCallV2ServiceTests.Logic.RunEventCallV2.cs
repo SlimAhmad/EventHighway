@@ -57,9 +57,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Id)
                 .Returns(inputEventCallV2.HandlerId);
 
-            this.eventHandlerMock.SetupGet(handler => handler.Name)
-                .Returns(randomHandlerName);
-
             this.eventHandlerMock
                 .Setup(handler =>
                     handler.HandleAsync(
@@ -81,9 +78,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerBrokerMock.VerifyNoOtherCalls();
 
             this.eventHandlerMock.VerifyGet(handler => handler.Id,
-                Times.AtLeastOnce);
-
-            this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
             this.eventHandlerMock.Verify(handler =>
@@ -130,14 +124,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             expectedEventCallV2.ResponseMessage =
                 "Event was not handled because it did not match the listener's filter criteria.";
 
+            expectedEventCallV2.Response = expectedEventCallV2.ResponseMessage;
+
             this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
                 .Returns(new[] { this.eventHandlerMock.Object });
 
             this.eventHandlerMock.SetupGet(handler => handler.Id)
                 .Returns(inputEventCallV2.HandlerId);
-
-            this.eventHandlerMock.SetupGet(handler => handler.Name)
-                .Returns(randomHandlerName);
 
             this.eventHandlerMock
                 .Setup(handler =>
@@ -160,9 +153,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerBrokerMock.VerifyNoOtherCalls();
 
             this.eventHandlerMock.VerifyGet(handler => handler.Id,
-                Times.AtLeastOnce);
-
-            this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
             this.eventHandlerMock.Verify(handler =>
@@ -202,14 +192,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
                 "See the Dynamic Expresso documentation for more details - " +
                 "https://github.com/dynamicexpresso/DynamicExpresso";
 
+            expectedEventCallV2.Response = expectedEventCallV2.ResponseMessage;
+
             this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
                 .Returns(new[] { this.eventHandlerMock.Object });
 
             this.eventHandlerMock.SetupGet(handler => handler.Id)
                 .Returns(inputEventCallV2.HandlerId);
-
-            this.eventHandlerMock.SetupGet(handler => handler.Name)
-                .Returns(randomHandlerName);
 
             this.eventHandlerMock
                 .Setup(handler =>
@@ -235,9 +224,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerBrokerMock.VerifyNoOtherCalls();
 
             this.eventHandlerMock.VerifyGet(handler => handler.Id,
-                Times.AtLeastOnce);
-
-            this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
             this.eventHandlerMock.Verify(handler =>
@@ -276,14 +262,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
                 "Check that the event listener is correctly configured. " +
                 "Promoted properties must match property names in the event content. (Case Sensitive)";
 
+            expectedEventCallV2.Response = expectedEventCallV2.ResponseMessage;
+
             this.eventHandlerBrokerMock.Setup(broker => broker.GetAll())
                 .Returns(new[] { this.eventHandlerMock.Object });
 
             this.eventHandlerMock.SetupGet(handler => handler.Id)
                 .Returns(inputEventCallV2.HandlerId);
-
-            this.eventHandlerMock.SetupGet(handler => handler.Name)
-                .Returns(randomHandlerName);
 
             this.eventHandlerMock
                 .Setup(handler =>
@@ -309,9 +294,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerBrokerMock.VerifyNoOtherCalls();
 
             this.eventHandlerMock.VerifyGet(handler => handler.Id,
-                Times.AtLeastOnce);
-
-            this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
             this.eventHandlerMock.Verify(handler =>

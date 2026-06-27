@@ -67,6 +67,9 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 _ => EventTypeV2.Scheduled,
             };
 
+            eventV2 = await this.eventV2OrchestrationService
+                .StampContentHashAsync(eventV2, cancellationToken);
+
             bool isLoop = await this.eventV2OrchestrationService
                 .IsLoopDetectedAsync(eventV2, cancellationToken);
 
