@@ -2,14 +2,16 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
+
 namespace EventHighway.ClientV2.SubstrateApp.Brokers.EventSubstrates
 {
-    /// <summary>
-    /// Abstracts the EventHighway dependency behind a single broker so the application never
-    /// talks to <c>EventHighwayClient</c> directly. Swap this implementation to retarget the app
-    /// at a different event substrate without touching the application code.
-    /// </summary>
     public partial interface IEventSubstrateBroker
     {
+        ValueTask<EventParticipantSecretV2> AddParticipantSecretAsync(
+            EventParticipantSecretV2 participantSecret,
+            CancellationToken cancellationToken = default);
     }
 }
