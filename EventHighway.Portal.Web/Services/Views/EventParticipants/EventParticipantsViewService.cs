@@ -40,7 +40,14 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
         public ValueTask<EventParticipantView> RetrieveParticipantByIdAsync(
             System.Guid participantId,
             CancellationToken cancellationToken = default) =>
-            throw new System.NotImplementedException();
+        TryCatch(async () =>
+        {
+            EventParticipantV2 participant =
+                await this.eventHighwayBroker.RetrieveEventParticipantV2ByIdAsync(
+                    participantId, cancellationToken);
+
+            return AsView(participant);
+        });
 
         private static EventParticipantView AsView(EventParticipantV2 participant) =>
             new EventParticipantView
