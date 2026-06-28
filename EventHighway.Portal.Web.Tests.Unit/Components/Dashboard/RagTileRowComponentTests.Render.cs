@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Bunit;
+using EventHighway.Portal.Web.Components.CoreUI;
 using EventHighway.Portal.Web.Components.Dashboard;
 using EventHighway.Portal.Web.Models.Views.HealthDashboards;
 using EventHighway.Portal.Web.Models.Views.HealthDashboards.Exceptions;
@@ -75,6 +76,46 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Dashboard
             // then
             renderedRagTileRow.Instance.State.Should().Be(RagTileRowState.Error);
             renderedRagTileRow.FindAll("div.alert-danger").Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public void ShouldGroupTilesByGroupingWithHeadings()
+        {
+            // given
+            var tiles = new List<HealthRagTile>
+            {
+                new HealthRagTile
+                {
+                    Grouping = "Event Addresses", Label = "Total",
+                    Value = "3", Variant = StatTileVariant.Na
+                },
+                new HealthRagTile
+                {
+                    Grouping = "Active Events", Label = "Total",
+                    Value = "7", Variant = StatTileVariant.Na
+                },
+                new HealthRagTile
+                {
+                    Grouping = "Active Events", Label = "Immediate",
+                    Value = "1", Variant = StatTileVariant.Na
+                },
+            };
+
+            this.healthViewServiceMock.Setup(service =>
+                service.RetrieveHealthRagTilesAsync(It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(tiles);
+
+            // when
+            IRenderedComponent<RagTileRow> renderedRagTileRow = Render<RagTileRow>();
+
+            // then
+            var headings = renderedRagTileRow.FindAll("h6.rag-group-title");
+
+            headings.Should().HaveCount(2);
+
+            System.Linq.Enumerable
+                .Select(headings, heading => heading.TextContent.Trim())
+                .Should().ContainInOrder("Event Addresses", "Active Events");
         }
     }
 }
