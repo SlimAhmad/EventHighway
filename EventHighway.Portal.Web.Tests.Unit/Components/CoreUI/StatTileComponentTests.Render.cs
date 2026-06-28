@@ -20,5 +20,18 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             renderedStatTile.Instance.Variant.Should().Be(StatTileVariant.Na);
             renderedStatTile.Instance.Value.Should().BeNull();
         }
+
+        [Theory]
+        [MemberData(nameof(VariantCssClasses))]
+        public void ShouldApplyVariantCssClass(StatTileVariant variant, string expectedCssClass)
+        {
+            // given . when
+            IRenderedComponent<StatTile> renderedStatTile =
+                Render<StatTile>(parameters =>
+                    parameters.Add(statTile => statTile.Variant, variant));
+
+            // then
+            renderedStatTile.Find("div.stat-tile").ClassList.Should().Contain(expectedCssClass);
+        }
     }
 }
