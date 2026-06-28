@@ -44,5 +44,17 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             buttonElement.GetAttribute("type").Should().Be("submit");
             buttonElement.TextContent.Trim().Should().Be(randomLabel);
         }
+
+        [Fact]
+        public void ShouldDisableButtonWhenDisabledIsTrue()
+        {
+            // given . when
+            IRenderedComponent<Button> renderedButton =
+                Render<Button>(parameters =>
+                    parameters.Add(button => button.Disabled, true));
+
+            // then
+            renderedButton.Find("button").HasAttribute("disabled").Should().BeTrue();
+        }
     }
 }
