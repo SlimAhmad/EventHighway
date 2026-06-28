@@ -170,9 +170,12 @@ namespace EventHighway.Core.Clients.Events.V2
         /// occurs during removal.</exception>
         /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
         /// signaled.</exception>
-        public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        public async ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return await this.eventV2CoordinationService
+                .RetrieveAllEventV2sAsync(cancellationToken);
+        }
 
         public ValueTask<EventV2> RetrieveEventV2ByIdAsync(
             Guid eventV2Id,
