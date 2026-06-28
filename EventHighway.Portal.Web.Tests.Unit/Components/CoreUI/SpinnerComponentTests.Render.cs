@@ -1,0 +1,24 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using Bunit;
+using EventHighway.Portal.Web.Components.CoreUI;
+using FluentAssertions;
+
+namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
+{
+    public partial class SpinnerComponentTests
+    {
+        [Fact]
+        public void ShouldInitializeComponent()
+        {
+            // given . when
+            IRenderedComponent<Spinner> renderedSpinner = Render<Spinner>();
+
+            // then
+            renderedSpinner.Instance.Visible.Should().BeTrue();
+            renderedSpinner.Find("div.spinner-border").Should().NotBeNull();
+        }
+    }
+}
