@@ -95,10 +95,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             // then
             actualResult.Should().HaveCount(22);
 
-            actualResult.Single(i => i.Grouping == "Event Addresses" && i.Item == "Total")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Total Addresses")
                 .Value.Should().Be(expectedTotalAddresses.ToString());
 
-            actualResult.Single(i => i.Grouping == "Event Listeners" && i.Item == "Total")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Total Listeners")
                 .Value.Should().Be(expectedTotalListeners.ToString());
 
             actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Total Events")
@@ -143,10 +143,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Archived Listener Errors")
                 .Value.Should().Be(expectedArchivedListenerErrors.ToString());
 
-            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Registered Handlers")
                 .Value.Should().Be(expectedHandlerCount.ToString());
 
-            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Registered Handlers")
                 .StatusCode.Should().Be((int)HealthStatusV2.Green);
 
             actualResult.Single(i => i.Grouping == "Loop Detection" && i.Item == "Quarantined Events")
@@ -773,7 +773,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
-            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Registered Handlers")
                 .StatusCode.Should().Be((int)HealthStatusV2.Red);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
@@ -1087,7 +1087,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
-            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Registered Handlers")
                 .StatusCode.Should().Be((int)HealthStatusV2.NA);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
