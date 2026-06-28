@@ -38,5 +38,23 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             renderedFormText.Find("label").TextContent.Should().Contain(randomLabel);
             renderedFormText.Find("input").GetAttribute("value").Should().Be(randomValue);
         }
+
+        [Fact]
+        public void ShouldInvokeValueChangedOnInput()
+        {
+            // given
+            string? boundValue = null;
+            string randomValue = GetRandomString();
+
+            IRenderedComponent<FormText> renderedFormText =
+                Render<FormText>(parameters => parameters
+                    .Add(formText => formText.ValueChanged, value => boundValue = value));
+
+            // when
+            renderedFormText.Find("input").Input(randomValue);
+
+            // then
+            boundValue.Should().Be(randomValue);
+        }
     }
 }
