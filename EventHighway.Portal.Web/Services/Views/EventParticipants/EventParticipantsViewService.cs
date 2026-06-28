@@ -37,6 +37,11 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
             return participants.Select(AsView).ToList();
         });
 
+        public ValueTask<EventParticipantView> RetrieveParticipantByIdAsync(
+            System.Guid participantId,
+            CancellationToken cancellationToken = default) =>
+            throw new System.NotImplementedException();
+
         private static EventParticipantView AsView(EventParticipantV2 participant) =>
             new EventParticipantView
             {

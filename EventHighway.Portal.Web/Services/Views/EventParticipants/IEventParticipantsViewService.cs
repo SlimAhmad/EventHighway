@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,10 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
     public interface IEventParticipantsViewService
     {
         ValueTask<List<EventParticipantView>> RetrieveAllParticipantsAsync(
+            CancellationToken cancellationToken = default);
+
+        ValueTask<EventParticipantView> RetrieveParticipantByIdAsync(
+            Guid participantId,
             CancellationToken cancellationToken = default);
     }
 }
