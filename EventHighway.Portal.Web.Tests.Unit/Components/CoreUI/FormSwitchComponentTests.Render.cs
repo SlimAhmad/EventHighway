@@ -38,5 +38,23 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             renderedFormSwitch.Find("input[type=checkbox]").HasAttribute("checked")
                 .Should().BeTrue();
         }
+
+        [Fact]
+        public void ShouldInvokeValueChangedOnToggle()
+        {
+            // given
+            bool? boundValue = null;
+
+            IRenderedComponent<FormSwitch> renderedFormSwitch =
+                Render<FormSwitch>(parameters => parameters
+                    .Add(formSwitch => formSwitch.Value, false)
+                    .Add(formSwitch => formSwitch.ValueChanged, value => boundValue = value));
+
+            // when
+            renderedFormSwitch.Find("input[type=checkbox]").Change(true);
+
+            // then
+            boundValue.Should().BeTrue();
+        }
     }
 }
