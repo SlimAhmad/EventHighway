@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Portal.Web.Models.Views.HealthDashboards;
@@ -23,8 +24,16 @@ namespace EventHighway.Portal.Web.Components.Dashboard
 
         protected override async Task OnInitializedAsync()
         {
-            Tiles = await this.HealthViewService.RetrieveHealthRagTilesAsync();
-            State = RagTileRowState.Content;
+            try
+            {
+                Tiles = await this.HealthViewService.RetrieveHealthRagTilesAsync();
+                State = RagTileRowState.Content;
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "Unable to load health status. Please try again.";
+                State = RagTileRowState.Error;
+            }
         }
     }
 }

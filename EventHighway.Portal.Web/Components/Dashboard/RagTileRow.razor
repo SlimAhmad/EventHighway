@@ -19,3 +19,9 @@ else if (State == RagTileRowState.Content)
         }
     </div>
 }
+else if (State == RagTileRowState.Error)
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+}
