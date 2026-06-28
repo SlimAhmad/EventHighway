@@ -1,0 +1,83 @@
+@page "/admin/participants/{ParticipantId:guid}"
+@using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.EventParticipants
+@using EventHighway.Portal.Web.Services.Views.EventParticipants
+@inject IEventParticipantsViewService ParticipantsViewService
+
+<PageTitle>Participant</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center py-3">
+    <h2 class="mb-0">Event Participant</h2>
+    <a class="btn btn-outline-secondary btn-sm" href="admin/participants">Back to list</a>
+</div>
+
+@if (isLoading)
+{
+    <Spinner />
+}
+else if (errorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+else if (participant is not null)
+{
+    <Card Title="@participant.Name">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@participant.Id</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@participant.Description</dd>
+
+            <dt class="col-sm-3">Contact Email</dt>
+            <dd class="col-sm-9">@participant.ContactEmail</dd>
+
+            <dt class="col-sm-3">Contact Phone</dt>
+            <dd class="col-sm-9">@participant.ContactPhone</dd>
+
+            <dt class="col-sm-3">Active</dt>
+            <dd class="col-sm-9">
+                <span class="badge @(participant.IsActive ? "text-bg-success" : "text-bg-secondary")">
+                    @(participant.IsActive ? "Active" : "Inactive")
+                </span>
+            </dd>
+
+            <dt class="col-sm-3">Active Window</dt>
+            <dd class="col-sm-9">
+                @(participant.ActiveFrom?.ToString("u") ?? "—") &mdash;
+                @(participant.ActiveTo?.ToString("u") ?? "—")
+            </dd>
+        </dl>
+    </Card>
+
+    <Card Title="Event Participant Secrets" CssClass="mt-4">
+        <p class="text-body-secondary mb-0">
+            Secrets management for this participant is coming next.
+        </p>
+    </Card>
+}
+
+@code {
+    [Parameter]
+    public Guid ParticipantId { get; set; }
+
+    private bool isLoading = true;
+    private string? errorMessage;
+    private EventParticipantView? participant;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            participant = await ParticipantsViewService.RetrieveParticipantByIdAsync(ParticipantId);
+        }
+        catch
+        {
+            errorMessage = "Unable to load this participant. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
