@@ -48,7 +48,7 @@ namespace EventHighway.Core.Services.Processings.Events.V2
         public ValueTask<EventV2> RetrieveEventV2ByIdAsync(
             Guid eventV2Id,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            this.eventV2Service.RetrieveEventV2ByIdAsync(eventV2Id, cancellationToken);
 
         public ValueTask<EventV2> AddEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
