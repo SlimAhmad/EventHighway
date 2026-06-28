@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
+using EventHighway.Portal.Web.Brokers.DateTimes;
 using EventHighway.Portal.Web.Brokers.EventHighways;
 using EventHighway.Portal.Web.Brokers.Loggings;
 using EventHighway.Portal.Web.Models.Views.EventParticipants;
@@ -16,13 +17,16 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
     public partial class EventParticipantsViewService : IEventParticipantsViewService
     {
         private readonly IEventHighwayBroker eventHighwayBroker;
+        private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventParticipantsViewService(
             IEventHighwayBroker eventHighwayBroker,
+            IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventHighwayBroker = eventHighwayBroker;
+            this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
         }
 
@@ -48,6 +52,11 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
 
             return AsView(participant);
         });
+
+        public ValueTask<EventParticipantView> AddParticipantAsync(
+            EventParticipantView participant,
+            CancellationToken cancellationToken = default) =>
+            throw new System.NotImplementedException();
 
         private static EventParticipantView AsView(EventParticipantV2 participant) =>
             new EventParticipantView

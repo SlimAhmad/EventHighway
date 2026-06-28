@@ -12,6 +12,12 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
 {
     public sealed partial class EventHighwayBroker
     {
+        public async ValueTask<EventParticipantV2> AddEventParticipantV2Async(
+            EventParticipantV2 eventParticipantV2,
+            CancellationToken cancellationToken = default) =>
+            await this.clientV2.EventParticipantV2Client
+                .AddEventParticipantV2Async(eventParticipantV2, cancellationToken);
+
         public async ValueTask<IEnumerable<EventParticipantV2>>
             RetrieveAllEventParticipantV2sAsync(
                 CancellationToken cancellationToken = default) =>

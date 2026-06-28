@@ -18,5 +18,9 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
         ValueTask<EventParticipantView> RetrieveParticipantByIdAsync(
             Guid participantId,
             CancellationToken cancellationToken = default);
+
+        ValueTask<EventParticipantView> AddParticipantAsync(
+            EventParticipantView participant,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
+using EventHighway.Portal.Web.Brokers.DateTimes;
 using EventHighway.Portal.Web.Brokers.EventHighways;
 using EventHighway.Portal.Web.Brokers.Loggings;
 using EventHighway.Portal.Web.Models.Views.EventParticipants;
@@ -18,21 +19,39 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventParticipants
     public partial class EventParticipantsViewServiceTests
     {
         private readonly Mock<IEventHighwayBroker> eventHighwayBrokerMock;
+        private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
         private readonly IEventParticipantsViewService eventParticipantsViewService;
 
         public EventParticipantsViewServiceTests()
         {
             this.eventHighwayBrokerMock = new Mock<IEventHighwayBroker>();
+            this.dateTimeBrokerMock = new Mock<IDateTimeBroker>();
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
 
             this.eventParticipantsViewService = new EventParticipantsViewService(
                 eventHighwayBroker: this.eventHighwayBrokerMock.Object,
+                dateTimeBroker: this.dateTimeBrokerMock.Object,
                 loggingBroker: this.loggingBrokerMock.Object);
         }
 
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
+
+        private static DateTimeOffset GetRandomDateTimeOffset() =>
+            new DateTimeRange(earliestDate: new DateTime()).GetValue();
+
+        private static EventParticipantView CreateRandomParticipantView() =>
+            new EventParticipantView
+            {
+                Name = GetRandomString(),
+                Description = GetRandomString(),
+                ContactEmail = GetRandomString(),
+                ContactPhone = GetRandomString(),
+                IsActive = true,
+                ActiveFrom = null,
+                ActiveTo = null
+            };
 
         private static List<EventParticipantV2> CreateRandomParticipants() =>
             Enumerable.Range(0, 3).Select(_ => new EventParticipantV2
