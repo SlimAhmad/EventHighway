@@ -62,7 +62,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
         public ValueTask<EventV2> RetrieveEventV2ByIdAsync(
             Guid eventV2Id,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            this.storageBroker.SelectEventV2ByIdAsync(eventV2Id, cancellationToken);
 
         public ValueTask<EventV2> ModifyEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
