@@ -1,0 +1,82 @@
+@page "/admin/participants"
+@using System.Collections.Generic
+@using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.EventParticipants
+@using EventHighway.Portal.Web.Services.Views.EventParticipants
+@inject IEventParticipantsViewService ParticipantsViewService
+@inject NavigationManager Navigation
+
+<PageTitle>Event Participants</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center py-3">
+    <h2 class="mb-0">Event Participants</h2>
+</div>
+
+@if (isLoading)
+{
+    <Spinner />
+}
+else if (errorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+else
+{
+    <Card>
+        <DataTable TItem="EventParticipantView" Items="participants" Columns="columns">
+            <RowActions Context="participant">
+                <Button Color="primary"
+                        CssClass="btn-sm"
+                        OnClick="@(() => ViewParticipant(participant.Id))">
+                    VIEW
+                </Button>
+            </RowActions>
+        </DataTable>
+    </Card>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? errorMessage;
+    private List<EventParticipantView> participants = new();
+    private List<DataTableColumn<EventParticipantView>> columns = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        columns = new List<DataTableColumn<EventParticipantView>>
+        {
+            new DataTableColumn<EventParticipantView>
+            {
+                Title = "Name", Value = participant => participant.Name
+            },
+            new DataTableColumn<EventParticipantView>
+            {
+                Title = "Description", Value = participant => participant.Description
+            },
+            new DataTableColumn<EventParticipantView>
+            {
+                Title = "Contact Email", Value = participant => participant.ContactEmail
+            },
+            new DataTableColumn<EventParticipantView>
+            {
+                Title = "Active", Value = participant => participant.IsActive ? "Yes" : "No"
+            },
+        };
+
+        try
+        {
+            participants = await ParticipantsViewService.RetrieveAllParticipantsAsync();
+        }
+        catch
+        {
+            errorMessage = "Unable to load participants. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ViewParticipant(Guid participantId) =>
+        Navigation.NavigateTo($"/admin/participants/{participantId}");
+}
