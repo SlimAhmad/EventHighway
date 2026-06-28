@@ -14,10 +14,10 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
 {
     public partial class EventParticipantsViewService
     {
-        private delegate ValueTask<List<EventParticipantView>> ReturningParticipantsFunction();
+        private delegate ValueTask<T> ReturningParticipantsFunction<T>();
 
-        private async ValueTask<List<EventParticipantView>> TryCatch(
-            ReturningParticipantsFunction returningParticipantsFunction)
+        private async ValueTask<T> TryCatch<T>(
+            ReturningParticipantsFunction<T> returningParticipantsFunction)
         {
             try
             {
