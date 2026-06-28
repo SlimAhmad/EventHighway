@@ -1,4 +1,18 @@
 @namespace EventHighway.Portal.Web.Components.Navigation
+@using EventHighway.Portal.Web.Models.Views.Navigations
 
 <ul class="sidebar-nav">
+    @foreach (NavItem item in Items)
+    {
+        @if (item.Roles is null || item.Roles.Length == 0)
+        {
+            <li class="nav-item">
+                <NavLink class="nav-link"
+                         href="@item.Href"
+                         Match="@(item.Href == "" ? NavLinkMatch.All : NavLinkMatch.Prefix)">
+                    <i class="nav-icon @item.Icon"></i> @item.Title
+                </NavLink>
+            </li>
+        }
+    }
 </ul>
