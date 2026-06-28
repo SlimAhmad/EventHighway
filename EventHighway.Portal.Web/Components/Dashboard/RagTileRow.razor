@@ -6,3 +6,16 @@
 {
     <Spinner />
 }
+else if (State == RagTileRowState.Content)
+{
+    <div class="row g-3 mb-4">
+        @foreach (HealthRagTile tile in Tiles)
+        {
+            <div class="col-sm-6 col-lg-3">
+                <StatTile Variant="tile.Variant"
+                          Value="@tile.Value"
+                          Label="@tile.Label" />
+            </div>
+        }
+    </div>
+}

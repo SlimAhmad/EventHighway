@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using EventHighway.Portal.Web.Models.Views.HealthDashboards;
 using EventHighway.Portal.Web.Services.Views.HealthDashboards;
 using Microsoft.AspNetCore.Components;
@@ -19,5 +20,11 @@ namespace EventHighway.Portal.Web.Components.Dashboard
         public List<HealthRagTile> Tiles { get; private set; } = new();
 
         public string? ErrorMessage { get; private set; }
+
+        protected override async Task OnInitializedAsync()
+        {
+            Tiles = await this.HealthViewService.RetrieveHealthRagTilesAsync();
+            State = RagTileRowState.Content;
+        }
     }
 }
