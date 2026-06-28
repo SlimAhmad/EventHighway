@@ -27,6 +27,16 @@ namespace EventHighway.Portal.Web.Services.Views.HealthDashboards
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     healthStatusClientValidationException);
             }
+            catch (HealthStatusClientV2DependencyException healthStatusClientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    healthStatusClientDependencyException);
+            }
+            catch (HealthStatusClientV2ServiceException healthStatusClientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    healthStatusClientServiceException);
+            }
         }
 
         private async ValueTask<HealthViewDependencyValidationException>
@@ -38,6 +48,17 @@ namespace EventHighway.Portal.Web.Services.Views.HealthDashboards
             await this.loggingBroker.LogErrorAsync(healthViewDependencyValidationException);
 
             return healthViewDependencyValidationException;
+        }
+
+        private async ValueTask<HealthViewDependencyException>
+            CreateAndLogDependencyExceptionAsync(Xeption exception)
+        {
+            var healthViewDependencyException =
+                new HealthViewDependencyException(innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(healthViewDependencyException);
+
+            return healthViewDependencyException;
         }
     }
 }
