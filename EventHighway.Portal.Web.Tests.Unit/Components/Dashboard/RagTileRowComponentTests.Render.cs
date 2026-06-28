@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using Bunit;
 using EventHighway.Portal.Web.Components.Dashboard;
 using EventHighway.Portal.Web.Models.Views.HealthDashboards;
+using EventHighway.Portal.Web.Models.Views.HealthDashboards.Exceptions;
 using FluentAssertions;
 using Moq;
+using Xeptions;
 
 namespace EventHighway.Portal.Web.Tests.Unit.Components.Dashboard
 {
@@ -53,6 +55,26 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Dashboard
             this.healthViewServiceMock.Verify(service =>
                 service.RetrieveHealthRagTilesAsync(It.IsAny<CancellationToken>()),
                     Times.Once);
+        }
+
+        [Fact]
+        public void ShouldRenderErrorWhenViewServiceThrowsDependencyException()
+        {
+            // given
+            var dependencyException =
+                new HealthViewDependencyException(
+                    innerException: new Xeption(message: GetRandomString()));
+
+            this.healthViewServiceMock.Setup(service =>
+                service.RetrieveHealthRagTilesAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(dependencyException);
+
+            // when
+            IRenderedComponent<RagTileRow> renderedRagTileRow = Render<RagTileRow>();
+
+            // then
+            renderedRagTileRow.Instance.State.Should().Be(RagTileRowState.Error);
+            renderedRagTileRow.FindAll("div.alert-danger").Should().NotBeEmpty();
         }
     }
 }
