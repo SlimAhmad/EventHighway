@@ -1,0 +1,65 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Clients.HealthChecks.V2.Exceptions;
+using EventHighway.Portal.Web.Models.Views.HealthDashboards.Exceptions;
+using FluentAssertions;
+using Moq;
+using Xeptions;
+
+namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.HealthDashboards
+{
+    public partial class HealthViewServiceTests
+    {
+        [Fact]
+        public async Task ShouldThrowDependencyValidationExceptionOnRetrieveIfDependencyValidationErrorOccursAndLogItAsync()
+        {
+            // given
+            var someInnerException = new Xeption(message: GetRandomString());
+
+            var clientValidationException =
+                new HealthStatusClientV2ValidationException(
+                    message: GetRandomString(),
+                    innerException: someInnerException,
+                    data: new Hashtable());
+
+            var expectedHealthViewDependencyValidationException =
+                new HealthViewDependencyValidationException(
+                    innerException: clientValidationException);
+
+            this.eventHighwayBrokerMock.Setup(broker =>
+                broker.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(clientValidationException);
+
+            // when
+            ValueTask<System.Collections.Generic.List<
+                EventHighway.Portal.Web.Models.Views.HealthDashboards.HealthRagTile>>
+                    retrieveTask =
+                        this.healthViewService.RetrieveHealthRagTilesAsync(
+                            TestContext.Current.CancellationToken);
+
+            HealthViewDependencyValidationException actualException =
+                await Assert.ThrowsAsync<HealthViewDependencyValidationException>(
+                    async () => await retrieveTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(
+                expectedHealthViewDependencyValidationException);
+
+            this.eventHighwayBrokerMock.Verify(broker =>
+                broker.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Once);
+
+            this.eventHighwayBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+    }
+}
