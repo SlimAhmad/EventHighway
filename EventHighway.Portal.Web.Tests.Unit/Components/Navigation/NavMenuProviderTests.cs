@@ -24,5 +24,30 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Navigation
             navMenu[0].Href.Should().Be("");
             navMenu[0].Roles.Should().BeNull();
         }
+
+        [Fact]
+        public void ShouldGateAdminGroupToAdministrators()
+        {
+            // given . when
+            IReadOnlyList<NavItem> navMenu = NavMenuProvider.GetNavMenu();
+
+            // then
+            NavItem adminGroup =
+                navMenu.Single(item => item.Title == "Admin");
+
+            adminGroup.Roles.Should().Contain("Administrators");
+            adminGroup.Children.Should().NotBeNullOrEmpty();
+
+            adminGroup.Children!.Select(child => child.Href).Should().Contain(new[]
+            {
+                "admin/participants",
+                "admin/event-addresses",
+                "admin/event-listeners",
+                "admin/events",
+                "admin/event-archives",
+                "admin/replay",
+                "admin/users"
+            });
+        }
     }
 }
