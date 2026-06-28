@@ -87,5 +87,21 @@ namespace EventHighway.Portal.Web.Components.CoreUI
 
             CurrentPage = 1;
         }
+
+        private void PreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+            }
+        }
+
+        private void NextPage()
+        {
+            if (CurrentPage < PageCount)
+            {
+                CurrentPage++;
+            }
+        }
     }
 }

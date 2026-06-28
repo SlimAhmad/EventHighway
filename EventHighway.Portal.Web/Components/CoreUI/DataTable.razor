@@ -55,4 +55,25 @@
             }
         </tbody>
     </table>
+
+    @if (PageCount > 1)
+    {
+        <nav class="d-flex justify-content-between align-items-center datatable-pager">
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary datatable-prev"
+                    disabled="@(CurrentPage <= 1)"
+                    @onclick="PreviousPage">
+                Previous
+            </button>
+
+            <span class="small">Page @CurrentPage of @PageCount</span>
+
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary datatable-next"
+                    disabled="@(CurrentPage >= PageCount)"
+                    @onclick="NextPage">
+                Next
+            </button>
+        </nav>
+    }
 </div>
