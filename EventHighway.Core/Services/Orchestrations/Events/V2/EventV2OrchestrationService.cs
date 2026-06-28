@@ -55,6 +55,7 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2Id(eventV2Id);
 
             return await this.eventV2ProcessingService
