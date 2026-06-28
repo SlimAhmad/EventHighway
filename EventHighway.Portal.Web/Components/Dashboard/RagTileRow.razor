@@ -1,4 +1,5 @@
 @namespace EventHighway.Portal.Web.Components.Dashboard
+@using System.Linq
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Models.Views.HealthDashboards
 
@@ -8,16 +9,22 @@
 }
 else if (State == RagTileRowState.Content)
 {
-    <div class="row g-3 mb-4">
-        @foreach (HealthRagTile tile in Tiles)
-        {
-            <div class="col-sm-6 col-lg-3">
-                <StatTile Variant="tile.Variant"
-                          Value="@tile.Value"
-                          Label="@tile.Label" />
-            </div>
-        }
-    </div>
+    @foreach (IGrouping<string, HealthRagTile> group in Tiles.GroupBy(tile => tile.Grouping))
+    {
+        <h6 class="rag-group-title text-body-secondary text-uppercase small fw-semibold mt-4 mb-2">
+            @group.Key
+        </h6>
+        <div class="row g-3">
+            @foreach (HealthRagTile tile in group)
+            {
+                <div class="col-sm-6 col-lg-3">
+                    <StatTile Variant="tile.Variant"
+                              Value="@tile.Value"
+                              Label="@tile.Label" />
+                </div>
+            }
+        </div>
+    }
 }
 else if (State == RagTileRowState.Error)
 {
