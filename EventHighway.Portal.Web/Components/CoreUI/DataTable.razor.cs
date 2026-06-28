@@ -72,5 +72,20 @@ namespace EventHighway.Portal.Web.Components.CoreUI
             SearchTerm = args.Value?.ToString() ?? string.Empty;
             CurrentPage = 1;
         }
+
+        private void ToggleSort(DataTableColumn<TItem> column)
+        {
+            if (SortColumn == column)
+            {
+                SortAscending = !SortAscending;
+            }
+            else
+            {
+                SortColumn = column;
+                SortAscending = true;
+            }
+
+            CurrentPage = 1;
+        }
     }
 }

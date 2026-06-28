@@ -18,7 +18,20 @@
             <tr>
                 @foreach (DataTableColumn<TItem> column in Columns)
                 {
-                    <th>@column.Title</th>
+                    @if (column.Sortable)
+                    {
+                        <th role="button" class="user-select-none" @onclick="() => ToggleSort(column)">
+                            @column.Title
+                            @if (SortColumn == column)
+                            {
+                                <i class="ms-1 @(SortAscending ? "cil-arrow-top" : "cil-arrow-bottom")"></i>
+                            }
+                        </th>
+                    }
+                    else
+                    {
+                        <th>@column.Title</th>
+                    }
                 }
                 @if (RowActions is not null)
                 {
