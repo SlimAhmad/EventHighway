@@ -4,6 +4,7 @@
 
 using System.Linq;
 using Bunit;
+using Bunit.TestDoubles;
 using EventHighway.Portal.Web.Components.Navigation;
 using FluentAssertions;
 
@@ -26,6 +27,27 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Navigation
                 .Should().Contain("");
 
             renderedNavMenu.Markup.Should().Contain("Dashboard");
+        }
+
+        [Fact]
+        public void ShouldRenderAdminGroupForAdministrators()
+        {
+            // given
+            BunitAuthorizationContext authorizationContext = AddAuthorization();
+            authorizationContext.SetAuthorized("admin");
+            authorizationContext.SetRoles("Administrators");
+
+            // when
+            IRenderedComponent<NavMenu> renderedNavMenu = Render<NavMenu>();
+
+            // then
+            renderedNavMenu.FindAll("a")
+                .Select(anchor => anchor.GetAttribute("href"))
+                .Should().Contain(new[]
+                {
+                    "admin/participants",
+                    "admin/users"
+                });
         }
     }
 }
