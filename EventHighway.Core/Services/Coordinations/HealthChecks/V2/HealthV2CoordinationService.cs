@@ -81,9 +81,13 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             int totalAddresses = allAddresses.Count();
             int totalListeners = allListeners.Count();
             int totalEvents = allEvents.Count();
-            int immediateEvents = allEvents.Count(e => e.Type == EventTypeV2.Immediate);
-            int scheduledEvents = allEvents.Count(e => e.Type == EventTypeV2.Scheduled);
-            int deadEvents = allEvents.Count(e => e.RemainingRetryAttempts == 0);
+            int activeEvents = allEvents.Count(e => e.Status == EventStatusV2.Active);
+            int immediateEvents = allEvents.Count(e =>
+                e.Status == EventStatusV2.Active && e.Type == EventTypeV2.Immediate);
+            int scheduledEvents = allEvents.Count(e =>
+                e.Status == EventStatusV2.Active && e.Type == EventTypeV2.Scheduled);
+            int deadEvents = allEvents.Count(e =>
+                e.Status == EventStatusV2.Active && e.RemainingRetryAttempts == 0);
             int totalListenerEvents = allListenerEvents.Count();
             int pendingListenerEvents = allListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Pending);
             int successListenerEvents = allListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Success);
@@ -150,6 +154,8 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 CreateItem("Event Addresses", "Total", totalAddresses.ToString(), HealthStatusV2.NA),
                 CreateItem("Event Listeners", "Total", totalListeners.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Total", totalEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Active Events", "Active Events", activeEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Active Events", "Quarantined Events", quarantinedEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Immediate", immediateEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Scheduled", scheduledEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Dead (0 retries)", deadEvents.ToString(), deadEventsStatus),
