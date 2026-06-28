@@ -153,9 +153,8 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             {
                 CreateItem("Event Addresses", "Total", totalAddresses.ToString(), HealthStatusV2.NA),
                 CreateItem("Event Listeners", "Total", totalListeners.ToString(), HealthStatusV2.NA),
-                CreateItem("Active Events", "Total", totalEvents.ToString(), HealthStatusV2.NA),
+                CreateItem("Active Events", "Total Events", totalEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Active Events", activeEvents.ToString(), HealthStatusV2.NA),
-                CreateItem("Active Events", "Quarantined Events", quarantinedEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Immediate", immediateEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Scheduled", scheduledEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Dead (0 retries)", deadEvents.ToString(), deadEventsStatus),
