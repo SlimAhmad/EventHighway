@@ -1,0 +1,46 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using EventHighway.Core.Clients.EventHighways;
+using EventHighway.Core.Clients.EventHighways.V2;
+using EventHighway.Core.Models.Configurations;
+using EventHighway.Portal.Web.Brokers.DateTimes;
+using EventHighway.Portal.Web.Brokers.EventHighways;
+using EventHighway.Portal.Web.Brokers.Loggings;
+
+namespace EventHighway.Portal.Web.Infrastructure
+{
+    public static class PortalRegistration
+    {
+        public static IServiceCollection AddPortalBrokers(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.AddSingleton(_ => CreateClientV2(configuration));
+            services.AddSingleton<IEventHighwayBroker, EventHighwayBroker>();
+            services.AddTransient<IDateTimeBroker, DateTimeBroker>();
+            services.AddTransient<ILoggingBroker, LoggingBroker>();
+
+            return services;
+        }
+
+        // The EventHighway V2 client is constructed once (it builds its own in-process
+        // service provider and migrates the Core database) and registered as a singleton,
+        // mirroring SubstrateAppRegistration.CreateEventSubstrateBroker.
+        private static IClientV2 CreateClientV2(IConfiguration configuration)
+        {
+            string connectionString =
+                configuration.GetConnectionString("EventHighwayCoreConnection")
+                    ?? throw new InvalidOperationException(
+                        "Missing connection string 'EventHighwayCoreConnection'.");
+
+            var eventHighwayConfiguration = new EventHighwayConfiguration();
+
+            var eventHighwayClient =
+                new EventHighwayClient(connectionString, eventHighwayConfiguration);
+
+            return eventHighwayClient.V2;
+        }
+    }
+}
