@@ -114,5 +114,30 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             renderedDataTable.Instance.SortAscending.Should().BeFalse();
             renderedDataTable.FindAll("tbody tr td")[0].TextContent.Trim().Should().Be("Charlie");
         }
+
+        [Fact]
+        public void ShouldPageRowsWhenItemsExceedPageSize()
+        {
+            // given
+            List<Sample> samples = CreateSamples(count: 5);
+            List<DataTableColumn<Sample>> columns = CreateColumns();
+
+            IRenderedComponent<DataTable<Sample>> renderedDataTable =
+                Render<DataTable<Sample>>(parameters => parameters
+                    .Add(dataTable => dataTable.Items, samples)
+                    .Add(dataTable => dataTable.Columns, columns)
+                    .Add(dataTable => dataTable.PageSize, 2));
+
+            // then (first page)
+            renderedDataTable.FindAll("tbody tr").Should().HaveCount(2);
+            renderedDataTable.Instance.PageCount.Should().Be(3);
+
+            // when (next page)
+            renderedDataTable.Find("button.datatable-next").Click();
+
+            // then
+            renderedDataTable.Instance.CurrentPage.Should().Be(2);
+            renderedDataTable.FindAll("tbody tr").Should().HaveCount(2);
+        }
     }
 }
