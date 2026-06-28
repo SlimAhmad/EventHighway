@@ -104,7 +104,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
         public ValueTask<EventV2> RetrieveEventV2ByIdAsync(
             Guid eventV2Id,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            this.eventV2OrchestrationService.RetrieveEventV2ByIdAsync(eventV2Id, cancellationToken);
 
         public ValueTask FireScheduledPendingEventV2sAsync(
             CancellationToken cancellationToken = default) =>
