@@ -16,6 +16,11 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
         ValueTask<EventV2> AddEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default);
         ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
             CancellationToken cancellationToken = default);
+
+        ValueTask<EventV2> RetrieveEventV2ByIdAsync(
+            Guid eventV2Id,
+            CancellationToken cancellationToken = default);
+
         ValueTask<EventV2> ModifyEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default);
         ValueTask<EventV2> RemoveEventV2ByIdAsync(Guid eventV2Id, CancellationToken cancellationToken = default);
 

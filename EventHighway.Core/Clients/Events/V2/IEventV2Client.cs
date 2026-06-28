@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -53,6 +54,46 @@ namespace EventHighway.Core.Clients.Events.V2
         /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
         /// signaled.</exception>
         ValueTask FireScheduledPendingEventV2sAsync(
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retrieves all events asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{IQueryable}"/> representing the asynchronous operation
+        /// that returns all events.</returns>
+        /// <exception cref="EventV2ClientValidationException">Thrown when validation errors
+        /// occur.</exception>
+        /// <exception cref="EventV2ClientDependencyException">Thrown when dependency or
+        /// service errors occur.</exception>
+        /// <exception cref="EventV2ClientServiceException">Thrown when an unexpected error
+        /// occurs during retrieval.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
+        ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retrieves an event by its identifier asynchronously.
+        /// </summary>
+        /// <param name="eventV2Id">The identifier of the event to retrieve.</param>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{EventV2}"/> representing the asynchronous operation
+        /// that returns the retrieved event.</returns>
+        /// <exception cref="EventV2ClientValidationException">Thrown when validation errors
+        /// occur.</exception>
+        /// <exception cref="EventV2ClientDependencyException">Thrown when dependency or
+        /// service errors occur.</exception>
+        /// <exception cref="EventV2ClientServiceException">Thrown when an unexpected error
+        /// occurs during retrieval.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
+        ValueTask<EventV2> RetrieveEventV2ByIdAsync(
+            Guid eventV2Id,
             CancellationToken cancellationToken = default);
 
         /// <summary>

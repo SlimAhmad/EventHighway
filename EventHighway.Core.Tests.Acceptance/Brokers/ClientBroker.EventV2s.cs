@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 
@@ -12,6 +13,12 @@ namespace EventHighway.Core.Tests.Acceptance.Brokers
     {
         public async ValueTask<EventV2> SubmitEventV2Async(EventV2 eventV2) =>
             await this.eventHighwayClient.V2.EventV2Client.SubmitEventV2Async(eventV2);
+
+        public async ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync() =>
+            await this.eventHighwayClient.V2.EventV2Client.RetrieveAllEventV2sAsync();
+
+        public async ValueTask<EventV2> RetrieveEventV2ByIdAsync(Guid eventV2Id) =>
+            await this.eventHighwayClient.V2.EventV2Client.RetrieveEventV2ByIdAsync(eventV2Id);
 
         public async ValueTask FireScheduledPendingEventV2sAsync() =>
             await this.eventHighwayClient.V2.EventV2Client.FireScheduledPendingEventV2sAsync();

@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.Events.V2.Exceptions;
@@ -169,6 +170,91 @@ namespace EventHighway.Core.Clients.Events.V2
         /// occurs during removal.</exception>
         /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
         /// signaled.</exception>
+        public async ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventV2CoordinationService
+                    .RetrieveAllEventV2sAsync(cancellationToken);
+            }
+            catch (EventV2CoordinationValidationException
+                eventV2CoordinationValidationException)
+            {
+                throw CreateEventV2ClientValidationException(
+                    eventV2CoordinationValidationException.InnerException as Xeption);
+            }
+            catch (EventV2CoordinationDependencyValidationException
+                eventV2CoordinationDependencyValidationException)
+            {
+                throw CreateEventV2ClientValidationException(
+                    eventV2CoordinationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventV2CoordinationDependencyException
+                eventV2CoordinationDependencyException)
+            {
+                throw CreateEventV2ClientDependencyException(
+                    eventV2CoordinationDependencyException.InnerException as Xeption);
+            }
+            catch (EventV2CoordinationServiceException
+                eventV2CoordinationServiceException)
+            {
+                throw CreateEventV2ClientDependencyException(
+                    eventV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventV2ClientServiceException(exception as Xeption);
+            }
+        }
+
+        public async ValueTask<EventV2> RetrieveEventV2ByIdAsync(
+            Guid eventV2Id,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventV2CoordinationService
+                    .RetrieveEventV2ByIdAsync(eventV2Id, cancellationToken);
+            }
+            catch (EventV2CoordinationValidationException
+                eventV2CoordinationValidationException)
+            {
+                throw CreateEventV2ClientValidationException(
+                    eventV2CoordinationValidationException.InnerException as Xeption);
+            }
+            catch (EventV2CoordinationDependencyValidationException
+                eventV2CoordinationDependencyValidationException)
+            {
+                throw CreateEventV2ClientValidationException(
+                    eventV2CoordinationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventV2CoordinationDependencyException
+                eventV2CoordinationDependencyException)
+            {
+                throw CreateEventV2ClientDependencyException(
+                    eventV2CoordinationDependencyException.InnerException as Xeption);
+            }
+            catch (EventV2CoordinationServiceException
+                eventV2CoordinationServiceException)
+            {
+                throw CreateEventV2ClientDependencyException(
+                    eventV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventV2ClientServiceException(exception as Xeption);
+            }
+        }
+
         public async ValueTask<EventV2> RemoveEventV2ByIdAsync(
             Guid eventV2Id,
             CancellationToken cancellationToken = default)

@@ -94,6 +94,28 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             return submittedEventV2;
         });
 
+        public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.eventV2OrchestrationService
+                .RetrieveAllEventV2sAsync(cancellationToken);
+        });
+
+        public ValueTask<EventV2> RetrieveEventV2ByIdAsync(
+            Guid eventV2Id,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventV2Id(eventV2Id);
+
+            return await this.eventV2OrchestrationService
+                .RetrieveEventV2ByIdAsync(eventV2Id, cancellationToken);
+        });
+
         public ValueTask FireScheduledPendingEventV2sAsync(
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
