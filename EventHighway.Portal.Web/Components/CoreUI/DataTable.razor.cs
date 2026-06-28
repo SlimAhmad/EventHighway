@@ -1,0 +1,36 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Components;
+
+namespace EventHighway.Portal.Web.Components.CoreUI
+{
+    public partial class DataTable<TItem>
+    {
+        [Parameter]
+        public IEnumerable<TItem> Items { get; set; } = new List<TItem>();
+
+        [Parameter]
+        public IReadOnlyList<DataTableColumn<TItem>> Columns { get; set; } =
+            new List<DataTableColumn<TItem>>();
+
+        [Parameter]
+        public bool Searchable { get; set; } = true;
+
+        [Parameter]
+        public int PageSize { get; set; } = 10;
+
+        [Parameter]
+        public RenderFragment<TItem>? RowActions { get; set; }
+
+        public string SearchTerm { get; private set; } = string.Empty;
+
+        public DataTableColumn<TItem>? SortColumn { get; private set; }
+
+        public bool SortAscending { get; private set; } = true;
+
+        public int CurrentPage { get; private set; } = 1;
+    }
+}
