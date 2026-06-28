@@ -27,15 +27,16 @@ namespace EventHighway.Portal.Web.Services.Views.HealthDashboards
             this.loggingBroker = loggingBroker;
         }
 
-        public async ValueTask<List<HealthRagTile>> RetrieveHealthRagTilesAsync(
-            CancellationToken cancellationToken = default)
+        public ValueTask<List<HealthRagTile>> RetrieveHealthRagTilesAsync(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
             IEnumerable<HealthCheckItemV2> healthCheckItems =
                 await this.eventHighwayBroker.RetrieveHealthRagStatusV2Async(
                     cancellationToken);
 
             return healthCheckItems.Select(AsRagTile).ToList();
-        }
+        });
 
         private static HealthRagTile AsRagTile(HealthCheckItemV2 healthCheckItem) =>
             new HealthRagTile
