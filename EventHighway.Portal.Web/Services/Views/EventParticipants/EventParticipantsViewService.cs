@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -56,7 +57,30 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
         public ValueTask<EventParticipantView> AddParticipantAsync(
             EventParticipantView participant,
             CancellationToken cancellationToken = default) =>
-            throw new System.NotImplementedException();
+        TryCatch(async () =>
+        {
+            DateTimeOffset now =
+                await this.dateTimeBroker.GetCurrentDateTimeOffsetAsync();
+
+            var participantToAdd = new EventParticipantV2
+            {
+                Name = participant.Name,
+                Description = participant.Description,
+                ContactEmail = participant.ContactEmail,
+                ContactPhone = participant.ContactPhone,
+                IsActive = participant.IsActive,
+                ActiveFrom = participant.ActiveFrom,
+                ActiveTo = participant.ActiveTo,
+                CreatedDate = now,
+                UpdatedDate = now
+            };
+
+            EventParticipantV2 addedParticipant =
+                await this.eventHighwayBroker.AddEventParticipantV2Async(
+                    participantToAdd, cancellationToken);
+
+            return AsView(addedParticipant);
+        });
 
         private static EventParticipantView AsView(EventParticipantV2 participant) =>
             new EventParticipantView
