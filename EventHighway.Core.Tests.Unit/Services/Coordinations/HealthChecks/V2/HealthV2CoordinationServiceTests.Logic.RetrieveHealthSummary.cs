@@ -47,7 +47,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             int expectedTotalListeners = randomEventListenerV2s.Count();
             int expectedTotalEvents = randomEventV2s.Count();
             int expectedActiveEvents = 5;
-            int expectedQuarantinedEvents = 0;
             int expectedImmediateEvents = 3;
             int expectedScheduledEvents = 2;
             int expectedDeadEvents = 0;
@@ -94,7 +93,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
-            actualResult.Should().HaveCount(23);
+            actualResult.Should().HaveCount(22);
 
             actualResult.Single(i => i.Grouping == "Event Addresses" && i.Item == "Total")
                 .Value.Should().Be(expectedTotalAddresses.ToString());
@@ -102,14 +101,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             actualResult.Single(i => i.Grouping == "Event Listeners" && i.Item == "Total")
                 .Value.Should().Be(expectedTotalListeners.ToString());
 
-            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Total")
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Total Events")
                 .Value.Should().Be(expectedTotalEvents.ToString());
 
             actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Active Events")
                 .Value.Should().Be(expectedActiveEvents.ToString());
-
-            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Quarantined Events")
-                .Value.Should().Be(expectedQuarantinedEvents.ToString());
 
             actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Immediate")
                 .Value.Should().Be(expectedImmediateEvents.ToString());
@@ -247,7 +243,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 
             int expectedTotalEvents = randomEventV2s.Count();
             int expectedActiveEvents = 8;
-            int expectedQuarantinedEvents = 4;
             int expectedImmediateEvents = 5;
             int expectedScheduledEvents = 3;
             int expectedDeadEvents = 4;
@@ -286,14 +281,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
-            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Total")
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Total Events")
                 .Value.Should().Be(expectedTotalEvents.ToString());
 
             actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Active Events")
                 .Value.Should().Be(expectedActiveEvents.ToString());
-
-            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Quarantined Events")
-                .Value.Should().Be(expectedQuarantinedEvents.ToString());
 
             actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Immediate")
                 .Value.Should().Be(expectedImmediateEvents.ToString());

@@ -40,5 +40,23 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             renderedModal.Find("div.modal-title").TextContent.Should().Contain(randomTitle);
             renderedModal.Find("div.modal-body").TextContent.Should().Contain(randomBody);
         }
+
+        [Fact]
+        public void ShouldInvokeOnCloseWhenCloseButtonClicked()
+        {
+            // given
+            bool wasClosed = false;
+
+            IRenderedComponent<Modal> renderedModal =
+                Render<Modal>(parameters => parameters
+                    .Add(modal => modal.Visible, true)
+                    .Add(modal => modal.OnClose, () => wasClosed = true));
+
+            // when
+            renderedModal.Find("button.btn-close").Click();
+
+            // then
+            wasClosed.Should().BeTrue();
+        }
     }
 }
