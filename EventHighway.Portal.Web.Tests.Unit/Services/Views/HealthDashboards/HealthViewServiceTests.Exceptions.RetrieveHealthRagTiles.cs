@@ -113,5 +113,43 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.HealthDashboards
             this.eventHighwayBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRetrieveIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            var serviceException = new System.Exception(message: GetRandomString());
+
+            var failedHealthViewServiceException =
+                new FailedHealthViewServiceException(innerException: serviceException);
+
+            var expectedHealthViewServiceException =
+                new HealthViewServiceException(
+                    innerException: failedHealthViewServiceException);
+
+            this.eventHighwayBrokerMock.Setup(broker =>
+                broker.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(serviceException);
+
+            // when
+            HealthViewServiceException actualException =
+                await Assert.ThrowsAsync<HealthViewServiceException>(
+                    async () => await this.healthViewService.RetrieveHealthRagTilesAsync(
+                        TestContext.Current.CancellationToken));
+
+            // then
+            actualException.Should().BeEquivalentTo(expectedHealthViewServiceException);
+
+            this.eventHighwayBrokerMock.Verify(broker =>
+                broker.RetrieveHealthRagStatusV2Async(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Once);
+
+            this.eventHighwayBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
