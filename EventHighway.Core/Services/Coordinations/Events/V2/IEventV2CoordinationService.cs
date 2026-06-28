@@ -19,6 +19,10 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
         ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
             CancellationToken cancellationToken = default);
 
+        ValueTask<EventV2> RetrieveEventV2ByIdAsync(
+            Guid eventV2Id,
+            CancellationToken cancellationToken = default);
+
         ValueTask FireScheduledPendingEventV2sAsync(
             CancellationToken cancellationToken = default);
 
