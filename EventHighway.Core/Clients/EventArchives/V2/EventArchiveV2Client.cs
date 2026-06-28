@@ -6,8 +6,11 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Clients.EventArchives.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
 using EventHighway.Core.Services.Foundations.EventArchives.V2;
+using Xeptions;
 
 namespace EventHighway.Core.Clients.EventArchives.V2
 {
@@ -30,13 +33,75 @@ namespace EventHighway.Core.Clients.EventArchives.V2
         public async ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default)
         {
-            return await this.eventArchiveV2Service
-                .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+            try
+            {
+                return await this.eventArchiveV2Service
+                    .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+            }
+            catch (EventArchiveV2ValidationException
+                eventArchiveV2ValidationException)
+            {
+                throw CreateEventArchiveV2ClientValidationException(
+                    eventArchiveV2ValidationException.InnerException as Xeption);
+            }
+            catch (EventArchiveV2DependencyValidationException
+                eventArchiveV2DependencyValidationException)
+            {
+                throw CreateEventArchiveV2ClientValidationException(
+                    eventArchiveV2DependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventArchiveV2DependencyException
+                eventArchiveV2DependencyException)
+            {
+                throw CreateEventArchiveV2ClientDependencyException(
+                    eventArchiveV2DependencyException.InnerException as Xeption);
+            }
+            catch (EventArchiveV2ServiceException
+                eventArchiveV2ServiceException)
+            {
+                throw CreateEventArchiveV2ClientDependencyException(
+                    eventArchiveV2ServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventArchiveV2ClientServiceException(exception as Xeption);
+            }
         }
 
         public ValueTask<EventArchiveV2> RetrieveEventArchiveV2ByIdAsync(
             Guid eventArchiveV2Id,
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
+
+        private static EventArchiveV2ClientValidationException
+            CreateEventArchiveV2ClientValidationException(Xeption innerException)
+        {
+            return new EventArchiveV2ClientValidationException(
+                message: "Event archive client validation error occurred, fix the errors and try again.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
+
+        private static EventArchiveV2ClientDependencyException
+            CreateEventArchiveV2ClientDependencyException(Xeption innerException)
+        {
+            return new EventArchiveV2ClientDependencyException(
+                message: "Event archive client dependency error occurred, contact support.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
+
+        private static EventArchiveV2ClientServiceException
+            CreateEventArchiveV2ClientServiceException(Xeption innerException)
+        {
+            return new EventArchiveV2ClientServiceException(
+                message: "Event archive client service error occurred, contact support.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
     }
 }
