@@ -120,5 +120,44 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventParticipants
             this.eventHighwayBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRetrieveAllIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            var serviceException = new System.Exception(message: GetRandomString());
+
+            var failedServiceException =
+                new FailedEventParticipantsViewServiceException(
+                    innerException: serviceException);
+
+            var expectedViewServiceException =
+                new EventParticipantsViewServiceException(
+                    innerException: failedServiceException);
+
+            this.eventHighwayBrokerMock.Setup(broker =>
+                broker.RetrieveAllEventParticipantV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(serviceException);
+
+            // when
+            EventParticipantsViewServiceException actualException =
+                await Assert.ThrowsAsync<EventParticipantsViewServiceException>(
+                    async () => await this.eventParticipantsViewService
+                        .RetrieveAllParticipantsAsync(TestContext.Current.CancellationToken));
+
+            // then
+            actualException.Should().BeEquivalentTo(expectedViewServiceException);
+
+            this.eventHighwayBrokerMock.Verify(broker =>
+                broker.RetrieveAllEventParticipantV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Once);
+
+            this.eventHighwayBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
