@@ -66,5 +66,11 @@ namespace EventHighway.Portal.Web.Components.CoreUI
 
         public int PageCount =>
             Math.Max(1, (int)Math.Ceiling(FilteredItems.Count() / (double)PageSize));
+
+        private void OnSearchChanged(ChangeEventArgs args)
+        {
+            SearchTerm = args.Value?.ToString() ?? string.Empty;
+            CurrentPage = 1;
+        }
     }
 }

@@ -2,6 +2,17 @@
 @typeparam TItem
 
 <div class="datatable">
+    @if (Searchable)
+    {
+        <div class="mb-3">
+            <input type="search"
+                   class="form-control datatable-search"
+                   placeholder="Search..."
+                   value="@SearchTerm"
+                   @oninput="OnSearchChanged" />
+        </div>
+    }
+
     <table class="table table-hover align-middle">
         <thead>
             <tr>
