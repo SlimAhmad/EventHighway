@@ -53,5 +53,32 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
 
             renderedDataTable.Markup.Should().Contain(samples[0].Name);
         }
+
+        [Fact]
+        public void ShouldFilterRowsWhenSearching()
+        {
+            // given
+            var samples = new List<Sample>
+            {
+                new Sample("Alpha", 1),
+                new Sample("Beta", 2),
+                new Sample("Gamma", 3),
+            };
+
+            List<DataTableColumn<Sample>> columns = CreateColumns();
+
+            IRenderedComponent<DataTable<Sample>> renderedDataTable =
+                Render<DataTable<Sample>>(parameters => parameters
+                    .Add(dataTable => dataTable.Items, samples)
+                    .Add(dataTable => dataTable.Columns, columns));
+
+            // when
+            renderedDataTable.Find("input.datatable-search").Input("Beta");
+
+            // then
+            renderedDataTable.FindAll("tbody tr").Should().HaveCount(1);
+            renderedDataTable.Markup.Should().Contain("Beta");
+            renderedDataTable.Instance.SearchTerm.Should().Be("Beta");
+        }
     }
 }
