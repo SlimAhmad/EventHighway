@@ -27,9 +27,12 @@ namespace EventHighway.Core.Clients.EventArchives.V2
         public EventArchiveV2Client(IEventArchiveV2Service eventArchiveV2Service) =>
             this.eventArchiveV2Service = eventArchiveV2Service;
 
-        public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        public async ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return await this.eventArchiveV2Service
+                .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+        }
 
         public ValueTask<EventArchiveV2> RetrieveEventArchiveV2ByIdAsync(
             Guid eventArchiveV2Id,
