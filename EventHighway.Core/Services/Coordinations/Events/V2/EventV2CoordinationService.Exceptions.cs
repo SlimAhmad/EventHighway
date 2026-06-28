@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -16,7 +17,120 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
     internal partial class EventV2CoordinationService
     {
         private delegate ValueTask<EventV2> ReturningEventV2Function();
+        private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
         private delegate ValueTask ReturningNothingFunction();
+
+        private async ValueTask<IQueryable<EventV2>> TryCatch(
+            ReturningEventV2sFunction returningEventV2sFunction)
+        {
+            try
+            {
+                return await returningEventV2sFunction();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventV2CoordinationException =
+                    new TimeoutEventV2CoordinationException(
+                        message: "Failed event coordination timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventV2CoordinationDependencyException =
+                    new EventV2CoordinationDependencyException(
+                        message: "Event dependency error occurred, contact support.",
+                        innerException: timeoutEventV2CoordinationException);
+
+                await this.loggingBroker.LogErrorAsync(eventV2CoordinationDependencyException);
+                throw eventV2CoordinationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (EventV2OrchestrationValidationException eventV2OrchestrationValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventV2OrchestrationValidationException);
+            }
+            catch (EventV2OrchestrationDependencyValidationException
+                eventV2OrchestrationDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventV2OrchestrationDependencyValidationException);
+            }
+            catch (EventListenerV2OrchestrationValidationException
+                eventListenerV2OrchestrationValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventListenerV2OrchestrationValidationException);
+            }
+            catch (EventListenerV2OrchestrationDependencyValidationException
+                eventListenerV2OrchestrationDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventListenerV2OrchestrationDependencyValidationException);
+            }
+            catch (EventParticipantV2OrchestrationValidationException
+                eventParticipantV2OrchestrationValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventParticipantV2OrchestrationValidationException);
+            }
+            catch (EventParticipantV2OrchestrationDependencyValidationException
+                eventParticipantV2OrchestrationDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventParticipantV2OrchestrationDependencyValidationException);
+            }
+            catch (EventV2OrchestrationDependencyException eventV2OrchestrationDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventV2OrchestrationDependencyException);
+            }
+            catch (EventV2OrchestrationServiceException eventV2OrchestrationServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventV2OrchestrationServiceException);
+            }
+            catch (EventListenerV2OrchestrationDependencyException
+                eventListenerV2OrchestrationDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventListenerV2OrchestrationDependencyException);
+            }
+            catch (EventListenerV2OrchestrationServiceException
+                eventListenerV2OrchestrationServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventListenerV2OrchestrationServiceException);
+            }
+            catch (EventParticipantV2OrchestrationDependencyException
+                eventParticipantV2OrchestrationDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventParticipantV2OrchestrationDependencyException);
+            }
+            catch (EventParticipantV2OrchestrationServiceException
+                eventParticipantV2OrchestrationServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventParticipantV2OrchestrationServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventV2CoordinationServiceException =
+                    new FailedEventV2CoordinationServiceException(
+                        message: "Failed event service error occurred, contact support.",
+                        innerException: exception);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedEventV2CoordinationServiceException);
+            }
+        }
 
         private async ValueTask<EventV2> TryCatch(ReturningEventV2Function returningEventV2Function)
         {
