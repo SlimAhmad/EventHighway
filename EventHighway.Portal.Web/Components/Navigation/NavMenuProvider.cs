@@ -16,7 +16,37 @@ namespace EventHighway.Portal.Web.Components.Navigation
                 new NavItem(
                     Title: "Dashboard",
                     Icon: "cil-speedometer",
-                    Href: "")
+                    Href: ""),
+
+                new NavItem(
+                    Title: "Admin",
+                    Icon: "cil-settings",
+                    Href: "",
+                    Roles: new[] { "Administrators" },
+                    RequiresAuth: true,
+                    Children: new[]
+                    {
+                        new NavItem("Event Participants", "cil-people", "admin/participants",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Event Address", "cil-location-pin", "admin/event-addresses",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Event Listeners", "cil-headphones", "admin/event-listeners",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("EventsV2", "cil-bolt", "admin/events",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("EventArchivesV2", "cil-storage", "admin/event-archives",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Replay", "cil-loop-circular", "admin/replay",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Users", "cil-user", "admin/users",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+                    })
             };
     }
 }
