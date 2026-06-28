@@ -11,4 +11,8 @@
     <ProjectReference Include="..\EventHighway.Core\EventHighway.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Xeption" Version="2.9.0" />
+  </ItemGroup>
+
 </Project>
