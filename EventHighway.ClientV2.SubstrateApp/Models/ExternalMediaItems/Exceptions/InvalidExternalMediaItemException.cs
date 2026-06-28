@@ -2,11 +2,14 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-namespace EventHighway.ClientV2.SubstrateApp.Brokers.Serializations
+using Xeptions;
+
+namespace EventHighway.ClientV2.SubstrateApp.Models.ExternalMediaItems.Exceptions
 {
-    public interface IJsonSerializationBroker
+    public class InvalidExternalMediaItemException : Xeption
     {
-        ValueTask<string> SerializeAsync<T>(T value);
-        ValueTask<T> DeserializeAsync<T>(string value);
+        public InvalidExternalMediaItemException(string message)
+            : base(message)
+        { }
     }
 }

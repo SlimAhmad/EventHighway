@@ -7,6 +7,7 @@ using EventHighway.ClientV2.SubstrateApp.Brokers.DateTimes;
 using EventHighway.ClientV2.SubstrateApp.Brokers.EventSubstrates;
 using EventHighway.ClientV2.SubstrateApp.Brokers.Loggings;
 using EventHighway.ClientV2.SubstrateApp.Brokers.Serializations;
+using EventHighway.ClientV2.SubstrateApp.Services.Foundations.ExternalMediaItems;
 using EventHighway.ClientV2.SubstrateApp.Services.Foundations.MediaItems;
 using EventHighway.Core.Models.Configurations;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,9 +36,7 @@ namespace EventHighway.ClientV2.SubstrateApp.Infrastructure
 
             // Foundation services
             services.AddSingleton<IMediaItemService, MediaItemService>();
-
-            // Application
-            services.AddSingleton<NFlixSample>();
+            services.AddSingleton<IExternalMediaItemService, ExternalMediaItemService>();
 
             return services;
         }

@@ -43,16 +43,9 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.MediaItems
             // MediaItem addedMediaItem =
             //     await this.storageBroker.InsertMediaItemAsync(mediaItem);
 
-            // Emit to the public releases channel...
+            // Emit to the public releases channel, which fans out to the listeners.
             await EmitMediaItemEventAsync(
                 eventAddressName: "NFlix-NewReleases",
-                eventName: "MediaItem Added",
-                mediaItem: mediaItem,
-                now: now);
-
-            // ...and to the internal "media item added" channel.
-            await EmitMediaItemEventAsync(
-                eventAddressName: "NFlix-MediaItemAdded",
                 eventName: "MediaItem Added",
                 mediaItem: mediaItem,
                 now: now);

@@ -72,7 +72,9 @@ no unit tests of their own.)
 
 ### Composition with a DI container
 
-`Program.cs` is a thin composition root, like a web app's:
+`Program.cs` is a thin composition root, like a web app's. It builds the container, then
+drives the sequence: set up participants and their secrets, set up the event addresses,
+set up the listeners and their handlers, and finally submit contributions:
 
 ```csharp
 IServiceCollection services = new ServiceCollection();
@@ -81,19 +83,45 @@ services.AddSubstrateApp();
 
 IServiceProvider serviceProvider = services.BuildServiceProvider();
 
-await serviceProvider
-    .GetRequiredService<NFlixSample>()
-    .RunAsync();
+IExternalMediaItemService externalMediaItemService =
+    serviceProvider.GetRequiredService<IExternalMediaItemService>();
+
+// ...resolve broker, handlers, IMediaItemService, then:
+await SetupParticipantsAndSecretsAsync();
+await SetupEventAddressesAsync();
+await SetupEventListenersAsync();
+
+await externalMediaItemService.AddExternalMediaItemAsync(externalMediaItem);
 ```
 
 Registration lives in
 [`SubstrateAppRegistration.AddSubstrateApp`](Infrastructure/SubstrateAppRegistration.cs),
 which wires the configuration, the WireMock server, the brokers
 (`IDateTimeBroker`, `ILoggingBroker`, `IJsonSerializationBroker`, `IEventSubstrateBroker`),
-the foundation services (`IMediaItemService`), and the `NFlixSample` runner — and registers
-the event handlers on the substrate broker as it is built. The end-to-end story itself lives
-in [`NFlixSample.RunAsync`](NFlixSample.cs), which only depends on the abstractions it is
-handed.
+and the foundation services (`IMediaItemService`, `IExternalMediaItemService`) — and registers
+the event handlers on the substrate broker as it is built. The end-to-end story itself is
+orchestrated in [`Program.cs`](Program.cs), which only depends on the abstractions it
+resolves from the container.
+
+### Two foundation services, bridged by the substrate
+
+`ExternalMediaItemService` is the authenticated public intake: it receives an
+`ExternalMediaItem` (a media item plus a **mandatory** participant id and secret), validates
+the credentials are present, and submits the item onto the **`ExternalMediaContributions`**
+address carrying those credentials. Because they are present, EventHighway.Core verifies they
+are valid — no extra work is needed.
+
+A listener on `ExternalMediaContributions` hands each contribution to
+`MediaItemService.AddMediaItemAsync`, which submits it onto **`NFlix-NewReleases`**, where the
+BingeBox / Joe / Ann listeners deliver it to their participants:
+
+```
+ExternalMediaItemService (participantId + secret)
+   └─submit→ [ExternalMediaContributions]
+                └─listener→ MediaItemService.AddMediaItemAsync
+                               └─submit→ [NFlix-NewReleases]
+                                            └─listeners→ BingeBox / Joe / Ann
+```
 
 ---
 
