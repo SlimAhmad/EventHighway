@@ -5,6 +5,7 @@
 using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Clients.ArchivingEvents.V2;
 using EventHighway.Core.Clients.EventAddresses.V2;
+using EventHighway.Core.Clients.EventArchives.V2;
 using EventHighway.Core.Clients.EventListeners.V2;
 using EventHighway.Core.Clients.EventParticipantSecrets.V2;
 using EventHighway.Core.Clients.EventParticipants.V2;
@@ -35,6 +36,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         /// Gets the client for managing archived events in V2 API.
         /// </summary>
         IArchivingEventV2Client ArchivingEventV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for retrieving archived events in V2 API.
+        /// </summary>
+        IEventArchiveV2Client EventArchiveV2Client { get; }
 
         /// <summary>
         /// Gets the client for managing event addresses in V2 API.
