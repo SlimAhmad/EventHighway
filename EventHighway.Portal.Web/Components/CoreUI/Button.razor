@@ -1,5 +1,8 @@
 @namespace EventHighway.Portal.Web.Components.CoreUI
 
-<button type="@Type" class="btn @($"btn-{Color}") @CssClass" disabled="@Disabled">
+<button type="@Type"
+        class="btn @($"btn-{Color}") @CssClass"
+        disabled="@Disabled"
+        @onclick="OnClick">
     @ChildContent
 </button>
