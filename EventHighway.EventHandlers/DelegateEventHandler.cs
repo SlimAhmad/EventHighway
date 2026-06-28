@@ -25,18 +25,24 @@ namespace EventHighway.EventHandlers
         /// <param name="handler">An asynchronous delegate that processes event content and
         /// parameters, accepting content, handler parameters, and a cancellation token, and returning
         /// an <see cref="EventHandlerResult"/>.</param>
+        /// <param name="name">An optional unique name for this handler. Defaults to
+        /// <c>nameof(DelegateEventHandler)</c>. Supply a distinct name when registering more than one
+        /// delegate handler with the same client.</param>
         public DelegateEventHandler(
             Guid Id,
-            Func<string, CancellationToken, ValueTask<EventHandlerResult>> handler)
+            Func<string, CancellationToken, ValueTask<EventHandlerResult>> handler,
+            string name = null)
         {
             this.Id = Id;
             this.delegateService = new DelegateService(handler);
+            this.Name = string.IsNullOrWhiteSpace(name) ? nameof(DelegateEventHandler) : name;
         }
 
-        internal DelegateEventHandler(Guid Id, IDelegateService delegateService)
+        internal DelegateEventHandler(Guid Id, IDelegateService delegateService, string name = null)
         {
             this.Id = Id;
             this.delegateService = delegateService;
+            this.Name = string.IsNullOrWhiteSpace(name) ? nameof(DelegateEventHandler) : name;
         }
 
         /// <summary>
@@ -45,9 +51,11 @@ namespace EventHighway.EventHandlers
         public Guid Id { get; }
 
         /// <summary>
-        /// Gets the name of this event handler.
+        /// Gets the name of this event handler. Defaults to <c>nameof(DelegateEventHandler)</c>
+        /// when no name is supplied. Each handler registered with the client must have a unique
+        /// name, so supply a distinct name when registering more than one delegate handler.
         /// </summary>
-        public string Name => nameof(DelegateEventHandler);
+        public string Name { get; }
 
         public async ValueTask<EventHandlerResult> HandleAsync(
             string content,

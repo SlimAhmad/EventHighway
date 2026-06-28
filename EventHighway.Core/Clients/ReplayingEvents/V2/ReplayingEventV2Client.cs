@@ -69,6 +69,58 @@ namespace EventHighway.Core.Clients.ReplayingEvents.V2
         }
 
         /// <inheritdoc/>
+        public async ValueTask ReplayEventArchiveV2sAsync(
+            Guid eventV2Id,
+            Guid? eventAddressId,
+            IEnumerable<Guid> eventListenerIds,
+            bool allowReplayOfQuarantinedItem = false,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await this.replayingEventV2CoordinationService
+                    .ReplayEventArchiveV2sAsync(
+                        eventV2Id,
+                        eventAddressId,
+                        eventListenerIds,
+                        allowReplayOfQuarantinedItem,
+                        cancellationToken);
+            }
+            catch (ReplayingEventV2CoordinationValidationException
+                replayingEventV2CoordinationValidationException)
+            {
+                throw CreateReplayingEventV2ClientValidationException(
+                    replayingEventV2CoordinationValidationException.InnerException as Xeption);
+            }
+            catch (ReplayingEventV2CoordinationDependencyValidationException
+                replayingEventV2CoordinationDependencyValidationException)
+            {
+                throw CreateReplayingEventV2ClientValidationException(
+                    replayingEventV2CoordinationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (ReplayingEventV2CoordinationDependencyException
+                replayingEventV2CoordinationDependencyException)
+            {
+                throw CreateReplayingEventV2ClientDependencyException(
+                    replayingEventV2CoordinationDependencyException.InnerException as Xeption);
+            }
+            catch (ReplayingEventV2CoordinationServiceException
+                replayingEventV2CoordinationServiceException)
+            {
+                throw CreateReplayingEventV2ClientDependencyException(
+                    replayingEventV2CoordinationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw CreateReplayingEventV2ClientServiceException(exception as Xeption);
+            }
+        }
+
+        /// <inheritdoc/>
         public async ValueTask ProcessReplayedListenerEventV2sAsync(
             CancellationToken cancellationToken = default)
         {

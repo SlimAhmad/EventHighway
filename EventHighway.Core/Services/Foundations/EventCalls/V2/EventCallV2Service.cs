@@ -52,6 +52,8 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                     "Check that the event listener is correctly configured. " +
                     "Promoted properties must match property names in the event content. (Case Sensitive)";
 
+                eventCallV2.Response = eventCallV2.ResponseMessage;
+
                 return eventCallV2;
             }
 
@@ -73,6 +75,8 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                         "See the Dynamic Expresso documentation for more details - " +
                         "https://github.com/dynamicexpresso/DynamicExpresso";
 
+                    eventCallV2.Response = eventCallV2.ResponseMessage;
+
                     return eventCallV2;
                 }
 
@@ -82,6 +86,8 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                     eventCallV2.ResponseCode = "SkippedNotMatchingFilter";
                     eventCallV2.ResponseMessage =
                         "Event was not handled because it did not match the listener's filter criteria.";
+
+                    eventCallV2.Response = eventCallV2.ResponseMessage;
 
                     return eventCallV2;
                 }

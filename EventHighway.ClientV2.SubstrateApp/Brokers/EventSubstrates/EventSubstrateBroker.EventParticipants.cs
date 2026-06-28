@@ -1,0 +1,19 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
+
+namespace EventHighway.ClientV2.SubstrateApp.Brokers.EventSubstrates
+{
+    public sealed partial class EventSubstrateBroker
+    {
+        public ValueTask<EventParticipantV2> AddParticipantAsync(
+            EventParticipantV2 participant,
+            CancellationToken cancellationToken = default) =>
+            this.eventHighwayClient.V2.EventParticipantV2Client
+                .AddEventParticipantV2Async(participant, cancellationToken);
+    }
+}

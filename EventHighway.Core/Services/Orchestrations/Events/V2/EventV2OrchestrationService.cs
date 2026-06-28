@@ -78,6 +78,18 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 maybeEventAddressV2,
                 eventV2.EventAddressId);
 
+            return await this.eventV2ProcessingService
+                .AddEventV2Async(eventV2, cancellationToken);
+        });
+
+        public ValueTask<EventV2> StampContentHashAsync(
+            EventV2 eventV2,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventV2IsNotNull(eventV2);
+
             string cleanedContent =
                 await this.eventV2ProcessingService
                     .RemoveVolatilePathsAsync(eventV2, cancellationToken);
@@ -87,8 +99,7 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             eventV2.ContentHash =
                 this.hashBroker.GenerateSha256Hash(cleanedContent);
 
-            return await this.eventV2ProcessingService
-                .AddEventV2Async(eventV2, cancellationToken);
+            return eventV2;
         });
 
         public ValueTask<IQueryable<EventV2>> RetrieveScheduledPendingEventV2sAsync(

@@ -1,0 +1,112 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Orchestrations.RestoringEvents.V2.Exceptions;
+using FluentAssertions;
+using Moq;
+
+namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V2
+{
+    public partial class RestoringEventV2OrchestrationServiceTests
+    {
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnGenerateReplayForListenersIfEventArchiveV2sIsNullAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            List<EventArchiveV2> nullEventArchiveV2s = null;
+            List<Guid> someEventListenerIds = new List<Guid> { GetRandomId() };
+
+            var nullRestoringEventV2OrchestrationException =
+                new NullRestoringEventV2OrchestrationException(
+                    message: "Event archives are null.");
+
+            var expectedException =
+                new RestoringEventV2OrchestrationValidationException(
+                    message: "Restoring event validation error occurred, fix the errors and try again.",
+                    innerException: nullRestoringEventV2OrchestrationException);
+
+            // when
+            ValueTask generateReplayTask =
+                this.restoringEventV2OrchestrationService.GenerateReplayForListenersAsync(
+                    nullEventArchiveV2s,
+                    someEventListenerIds,
+                    randomCancellationToken);
+
+            RestoringEventV2OrchestrationValidationException actualException =
+                await Assert.ThrowsAsync<RestoringEventV2OrchestrationValidationException>(
+                    generateReplayTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(expectedException);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(expectedException))),
+                    Times.Once);
+
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Never);
+
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnGenerateReplayForListenersIfEventListenerIdsIsNullAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            List<EventArchiveV2> someEventArchiveV2s = CreateRandomEventArchiveV2s();
+            List<Guid> nullEventListenerIds = null;
+
+            var nullRestoringEventV2OrchestrationException =
+                new NullRestoringEventV2OrchestrationException(
+                    message: "Event listener ids are null.");
+
+            var expectedException =
+                new RestoringEventV2OrchestrationValidationException(
+                    message: "Restoring event validation error occurred, fix the errors and try again.",
+                    innerException: nullRestoringEventV2OrchestrationException);
+
+            // when
+            ValueTask generateReplayTask =
+                this.restoringEventV2OrchestrationService.GenerateReplayForListenersAsync(
+                    someEventArchiveV2s,
+                    nullEventListenerIds,
+                    randomCancellationToken);
+
+            RestoringEventV2OrchestrationValidationException actualException =
+                await Assert.ThrowsAsync<RestoringEventV2OrchestrationValidationException>(
+                    generateReplayTask.AsTask);
+
+            // then
+            actualException.Should().BeEquivalentTo(expectedException);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(expectedException))),
+                    Times.Once);
+
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Never);
+
+            this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+    }
+}

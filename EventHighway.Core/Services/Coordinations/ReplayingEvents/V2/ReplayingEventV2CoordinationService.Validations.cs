@@ -3,6 +3,8 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using EventHighway.Core.Models.Coordinations.ReplayingEvents.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
@@ -16,6 +18,27 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
             Validate(
                 (Rule: IsAfter(startDate, endDate), Parameter: "startDate"));
         }
+
+        private static void ValidateOnTargetedReplay(
+            Guid eventV2Id,
+            IEnumerable<Guid> eventListenerIds)
+        {
+            Validate(
+                (Rule: IsInvalid(eventV2Id), Parameter: "eventV2Id"),
+                (Rule: IsInvalid(eventListenerIds), Parameter: "eventListenerIds"));
+        }
+
+        private static dynamic IsInvalid(Guid id) => new
+        {
+            Condition = id == Guid.Empty,
+            Message = "Id is required"
+        };
+
+        private static dynamic IsInvalid(IEnumerable<Guid> eventListenerIds) => new
+        {
+            Condition = eventListenerIds is null || eventListenerIds.Any() is false,
+            Message = "Event listener ids are required"
+        };
 
         private static dynamic IsAfter(DateTimeOffset? startDate, DateTimeOffset? endDate) => new
         {

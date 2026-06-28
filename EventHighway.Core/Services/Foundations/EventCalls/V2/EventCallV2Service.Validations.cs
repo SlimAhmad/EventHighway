@@ -33,7 +33,7 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
                 Parameter: nameof(EventCallV2.Content),
                 Message: "Payload required"));
 
-            ValidateHandlerCount(eventCallV2.HandlerName);
+            ValidateHandlerCount(eventCallV2.HandlerId);
         }
 
         private static void ValidateEventCallV2IsNotNull(EventCallV2 eventCallV2)
@@ -54,23 +54,23 @@ namespace EventHighway.Core.Services.Foundations.EventCalls.V2
             }
         }
 
-        private void ValidateHandlerCount(string handlerName)
+        private void ValidateHandlerCount(Guid handlerId)
         {
             int count =
                 this.eventHandlerBroker.GetAll()
-                    .Count(h => h.Name == handlerName);
+                    .Count(h => h.Id == handlerId);
 
             Validate(
                 message: "EventHandlerBrokers on event call is invalid, fix the errors and try again.",
 
                 (Rule: count == 0,
-                Parameter: nameof(EventCallV2.HandlerName),
-                Message: $"No handler found that matches '{handlerName}', " +
+                Parameter: nameof(EventCallV2.HandlerId),
+                Message: $"No handler found that matches '{handlerId}', " +
                     $"fix registrations and try again."),
 
                 (Rule: count > 1,
-                Parameter: nameof(EventCallV2.HandlerName),
-                Message: $"Multiple providers found that matches '{handlerName}', " +
+                Parameter: nameof(EventCallV2.HandlerId),
+                Message: $"Multiple providers found that matches '{handlerId}', " +
                     $"fix registrations and try again."));
         }
 

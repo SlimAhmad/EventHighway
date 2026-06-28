@@ -48,6 +48,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
+                    service.StampContentHashAsync(
+                        inputImmediateEventV2,
+                        randomCancellationToken))
+                            .ReturnsAsync(inputImmediateEventV2);
+
+            this.eventV2OrchestrationServiceMock
+                .InSequence(mockSequence).Setup(service =>
                     service.IsLoopDetectedAsync(
                         inputImmediateEventV2,
                         randomCancellationToken))
@@ -80,6 +87,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
                     Times.Once);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.StampContentHashAsync(
+                    inputImmediateEventV2,
+                    randomCancellationToken),
+                        Times.Once);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
                 service.IsLoopDetectedAsync(

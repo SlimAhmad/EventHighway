@@ -49,8 +49,11 @@ namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
         public string PromotedProperties { get; set; }
 
         /// <summary>
-        /// Gets or sets the filter criteria as a serialized string, which determines which
-        /// events this listener will process.
+        /// Gets or sets the filter criteria as a C# boolean expression string, which determines which
+        /// events this listener will process. The expression is evaluated using DynamicExpresso and can
+        /// reference promoted properties via the <c>meta("propertyName")</c> function.
+        /// For syntax documentation, see https://github.com/dynamicexpresso/DynamicExpresso.
+        /// Example: <c>meta("Genre") == "Action" &amp;&amp; meta("ReleaseYear") &gt; "2020"</c>
         /// </summary>
         public string FilterCriteria { get; set; }
 

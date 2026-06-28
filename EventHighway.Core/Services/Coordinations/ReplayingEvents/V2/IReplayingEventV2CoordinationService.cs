@@ -18,6 +18,13 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
             DateTimeOffset? endDate,
             CancellationToken cancellationToken = default);
 
+        ValueTask ReplayEventArchiveV2sAsync(
+            Guid eventV2Id,
+            Guid? eventAddressId,
+            IEnumerable<Guid> eventListenerIds,
+            bool allowReplayOfQuarantinedItem = false,
+            CancellationToken cancellationToken = default);
+
         ValueTask ProcessReplayedListenerEventV2sAsync(
             CancellationToken cancellationToken = default);
     }

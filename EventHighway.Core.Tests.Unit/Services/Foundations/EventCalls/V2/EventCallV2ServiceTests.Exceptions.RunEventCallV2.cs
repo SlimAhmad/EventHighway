@@ -34,9 +34,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Id)
                 .Returns(someEventCallV2.HandlerId);
 
-            this.eventHandlerMock.SetupGet(handler => handler.Name)
-                .Returns(someEventCallV2.HandlerName);
-
             this.eventHandlerMock
                 .Setup(handler =>
                     handler.HandleAsync(
@@ -75,9 +72,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Id,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.Name,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
@@ -111,9 +105,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             this.eventHandlerMock.SetupGet(handler => handler.Id)
                 .Returns(someEventCallV2.HandlerId);
-
-            this.eventHandlerMock.SetupGet(handler => handler.Name)
-                .Returns(someEventCallV2.HandlerName);
 
             this.eventHandlerMock.Setup(handler =>
                 handler.HandleAsync(
@@ -154,9 +145,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.VerifyGet(handler => handler.Id,
                 Times.AtLeastOnce);
 
-            this.eventHandlerMock.VerifyGet(handler => handler.Name,
-                Times.AtLeastOnce);
-
             this.eventHandlerMock.Verify(handler =>
                 handler.HandleAsync(
                     It.IsAny<string>(),
@@ -190,9 +178,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
 
             this.eventHandlerMock.SetupGet(handler => handler.Id)
                 .Returns(someEventCallV2.HandlerId);
-
-            this.eventHandlerMock.SetupGet(handler => handler.Name)
-                .Returns(someEventCallV2.HandlerName);
 
             this.eventHandlerMock
                 .Setup(handler =>
@@ -230,9 +215,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerBrokerMock.VerifyNoOtherCalls();
 
             this.eventHandlerMock.VerifyGet(handler => handler.Id,
-                Times.AtLeastOnce);
-
-            this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
             this.eventHandlerMock.Verify(handler =>
@@ -354,9 +336,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerMock.SetupGet(handler => handler.Id)
                 .Returns(someEventCallV2.HandlerId);
 
-            this.eventHandlerMock.SetupGet(handler => handler.Name)
-                .Returns(someEventCallV2.HandlerName);
-
             this.eventHandlerMock
                 .Setup(handler => handler.HandleAsync(
                     It.IsAny<string>(),
@@ -392,9 +371,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventCalls.V2
             this.eventHandlerBrokerMock.VerifyNoOtherCalls();
 
             this.eventHandlerMock.VerifyGet(handler => handler.Id,
-                Times.AtLeastOnce);
-
-            this.eventHandlerMock.VerifyGet(handler => handler.Name,
                 Times.AtLeastOnce);
 
             this.eventHandlerMock.Verify(handler =>
