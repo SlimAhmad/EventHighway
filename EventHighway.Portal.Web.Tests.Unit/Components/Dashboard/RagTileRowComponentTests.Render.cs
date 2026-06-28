@@ -32,5 +32,27 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Dashboard
             renderedRagTileRow.Instance.State.Should().Be(RagTileRowState.Loading);
             renderedRagTileRow.FindAll("div.spinner-border").Should().NotBeEmpty();
         }
+
+        [Fact]
+        public void ShouldRenderTilesWhenLoaded()
+        {
+            // given
+            List<HealthRagTile> randomTiles = CreateRandomRagTiles();
+
+            this.healthViewServiceMock.Setup(service =>
+                service.RetrieveHealthRagTilesAsync(It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(randomTiles);
+
+            // when
+            IRenderedComponent<RagTileRow> renderedRagTileRow = Render<RagTileRow>();
+
+            // then
+            renderedRagTileRow.Instance.State.Should().Be(RagTileRowState.Content);
+            renderedRagTileRow.FindAll("div.stat-tile").Should().HaveCount(randomTiles.Count);
+
+            this.healthViewServiceMock.Verify(service =>
+                service.RetrieveHealthRagTilesAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+        }
     }
 }
