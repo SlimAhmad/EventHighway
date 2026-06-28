@@ -212,10 +212,13 @@ namespace EventHighway.Core.Clients.Events.V2
             }
         }
 
-        public ValueTask<EventV2> RetrieveEventV2ByIdAsync(
+        public async ValueTask<EventV2> RetrieveEventV2ByIdAsync(
             Guid eventV2Id,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            return await this.eventV2CoordinationService
+                .RetrieveEventV2ByIdAsync(eventV2Id, cancellationToken);
+        }
 
         public async ValueTask<EventV2> RemoveEventV2ByIdAsync(
             Guid eventV2Id,
