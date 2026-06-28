@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.EventParticipants.V2.Exceptions;
@@ -41,6 +42,14 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
             {
                 throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
             }
+            catch (Exception exception)
+            {
+                var failedServiceException =
+                    new FailedEventParticipantsViewServiceException(
+                        innerException: exception);
+
+                throw await CreateAndLogServiceExceptionAsync(failedServiceException);
+            }
         }
 
         private async ValueTask<EventParticipantsViewDependencyValidationException>
@@ -65,6 +74,17 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
             await this.loggingBroker.LogErrorAsync(eventParticipantsViewDependencyException);
 
             return eventParticipantsViewDependencyException;
+        }
+
+        private async ValueTask<EventParticipantsViewServiceException>
+            CreateAndLogServiceExceptionAsync(Xeption exception)
+        {
+            var eventParticipantsViewServiceException =
+                new EventParticipantsViewServiceException(innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(eventParticipantsViewServiceException);
+
+            return eventParticipantsViewServiceException;
         }
     }
 }
