@@ -80,5 +80,39 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             renderedDataTable.Markup.Should().Contain("Beta");
             renderedDataTable.Instance.SearchTerm.Should().Be("Beta");
         }
+
+        [Fact]
+        public void ShouldSortRowsWhenSortableHeaderClicked()
+        {
+            // given
+            var samples = new List<Sample>
+            {
+                new Sample("Charlie", 3),
+                new Sample("Alice", 1),
+                new Sample("Bob", 2),
+            };
+
+            List<DataTableColumn<Sample>> columns = CreateColumns();
+
+            IRenderedComponent<DataTable<Sample>> renderedDataTable =
+                Render<DataTable<Sample>>(parameters => parameters
+                    .Add(dataTable => dataTable.Items, samples)
+                    .Add(dataTable => dataTable.Columns, columns));
+
+            // when (ascending)
+            renderedDataTable.FindAll("thead th")[0].Click();
+
+            // then
+            renderedDataTable.Instance.SortColumn!.Title.Should().Be("Name");
+            renderedDataTable.Instance.SortAscending.Should().BeTrue();
+            renderedDataTable.FindAll("tbody tr td")[0].TextContent.Trim().Should().Be("Alice");
+
+            // when (toggle to descending)
+            renderedDataTable.FindAll("thead th")[0].Click();
+
+            // then
+            renderedDataTable.Instance.SortAscending.Should().BeFalse();
+            renderedDataTable.FindAll("tbody tr td")[0].TextContent.Trim().Should().Be("Charlie");
+        }
     }
 }
