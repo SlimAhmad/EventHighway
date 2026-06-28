@@ -33,6 +33,14 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     clientDependencyValidationException);
             }
+            catch (EventParticipantV2ClientDependencyException clientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
+            }
+            catch (EventParticipantV2ClientServiceException clientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
+            }
         }
 
         private async ValueTask<EventParticipantsViewDependencyValidationException>
@@ -46,6 +54,17 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
                 eventParticipantsViewDependencyValidationException);
 
             return eventParticipantsViewDependencyValidationException;
+        }
+
+        private async ValueTask<EventParticipantsViewDependencyException>
+            CreateAndLogDependencyExceptionAsync(Xeption exception)
+        {
+            var eventParticipantsViewDependencyException =
+                new EventParticipantsViewDependencyException(innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(eventParticipantsViewDependencyException);
+
+            return eventParticipantsViewDependencyException;
         }
     }
 }
