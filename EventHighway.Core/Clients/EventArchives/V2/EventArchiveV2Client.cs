@@ -76,8 +76,43 @@ namespace EventHighway.Core.Clients.EventArchives.V2
             Guid eventArchiveV2Id,
             CancellationToken cancellationToken = default)
         {
-            return await this.eventArchiveV2Service
-                .RetrieveEventArchiveV2ByIdAsync(eventArchiveV2Id, cancellationToken);
+            try
+            {
+                return await this.eventArchiveV2Service
+                    .RetrieveEventArchiveV2ByIdAsync(eventArchiveV2Id, cancellationToken);
+            }
+            catch (EventArchiveV2ValidationException
+                eventArchiveV2ValidationException)
+            {
+                throw CreateEventArchiveV2ClientValidationException(
+                    eventArchiveV2ValidationException.InnerException as Xeption);
+            }
+            catch (EventArchiveV2DependencyValidationException
+                eventArchiveV2DependencyValidationException)
+            {
+                throw CreateEventArchiveV2ClientValidationException(
+                    eventArchiveV2DependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventArchiveV2DependencyException
+                eventArchiveV2DependencyException)
+            {
+                throw CreateEventArchiveV2ClientDependencyException(
+                    eventArchiveV2DependencyException.InnerException as Xeption);
+            }
+            catch (EventArchiveV2ServiceException
+                eventArchiveV2ServiceException)
+            {
+                throw CreateEventArchiveV2ClientDependencyException(
+                    eventArchiveV2ServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw CreateEventArchiveV2ClientServiceException(exception as Xeption);
+            }
         }
 
         private static EventArchiveV2ClientValidationException
