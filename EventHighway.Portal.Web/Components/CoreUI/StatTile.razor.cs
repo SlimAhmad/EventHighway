@@ -19,5 +19,14 @@ namespace EventHighway.Portal.Web.Components.CoreUI
 
         [Parameter]
         public string? Icon { get; set; }
+
+        public string VariantCssClass =>
+            Variant switch
+            {
+                StatTileVariant.Green => "text-bg-success",
+                StatTileVariant.Amber => "text-bg-warning",
+                StatTileVariant.Red => "text-bg-danger",
+                _ => "text-bg-secondary"
+            };
     }
 }
