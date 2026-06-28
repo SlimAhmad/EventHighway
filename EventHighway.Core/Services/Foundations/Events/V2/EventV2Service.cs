@@ -66,7 +66,12 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
         {
             ValidateEventV2Id(eventV2Id);
 
-            return await this.storageBroker.SelectEventV2ByIdAsync(eventV2Id, cancellationToken);
+            EventV2 maybeEventV2 =
+                await this.storageBroker.SelectEventV2ByIdAsync(eventV2Id, cancellationToken);
+
+            ValidateEventV2Exists(maybeEventV2, eventV2Id);
+
+            return maybeEventV2;
         });
 
         public ValueTask<EventV2> ModifyEventV2Async(EventV2 eventV2, CancellationToken cancellationToken = default) =>
