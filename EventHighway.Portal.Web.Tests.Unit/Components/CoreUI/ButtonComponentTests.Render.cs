@@ -56,5 +56,22 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             // then
             renderedButton.Find("button").HasAttribute("disabled").Should().BeTrue();
         }
+
+        [Fact]
+        public void ShouldInvokeOnClickWhenButtonIsClicked()
+        {
+            // given
+            bool wasClicked = false;
+
+            IRenderedComponent<Button> renderedButton =
+                Render<Button>(parameters =>
+                    parameters.Add(button => button.OnClick, () => wasClicked = true));
+
+            // when
+            renderedButton.Find("button").Click();
+
+            // then
+            wasClicked.Should().BeTrue();
+        }
     }
 }
