@@ -63,5 +63,55 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
             this.storageBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnRetrieveByIdIfEventV2IsNotFoundAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid nonExistingEventV2Id = GetRandomId();
+            EventV2 nullEventV2 = null;
+
+            var notFoundEventV2Exception =
+                new NotFoundEventV2Exception(
+                    message: $"Could not find event with id: {nonExistingEventV2Id}.");
+
+            var expectedEventV2ValidationException =
+                new EventV2ValidationException(
+                    message: "Event validation error occurred, fix the errors and try again.",
+                    innerException: notFoundEventV2Exception);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectEventV2ByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(nullEventV2);
+
+            // when
+            ValueTask<EventV2> retrieveEventV2ByIdTask =
+                this.eventV2Service.RetrieveEventV2ByIdAsync(nonExistingEventV2Id, randomCancellationToken);
+
+            EventV2ValidationException actualEventV2ValidationException =
+                await Assert.ThrowsAsync<EventV2ValidationException>(
+                    retrieveEventV2ByIdTask.AsTask);
+
+            // then
+            actualEventV2ValidationException.Should()
+                .BeEquivalentTo(expectedEventV2ValidationException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectEventV2ByIdAsync(
+                    It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventV2ValidationException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
