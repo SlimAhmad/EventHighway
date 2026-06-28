@@ -151,8 +151,8 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
             return new List<HealthCheckItemV2>
             {
-                CreateItem("Event Addresses", "Total", totalAddresses.ToString(), HealthStatusV2.NA),
-                CreateItem("Event Listeners", "Total", totalListeners.ToString(), HealthStatusV2.NA),
+                CreateItem("Event Addresses / Event Listeners / Handlers", "Total Addresses", totalAddresses.ToString(), HealthStatusV2.NA),
+                CreateItem("Event Addresses / Event Listeners / Handlers", "Total Listeners", totalListeners.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Total Events", totalEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Active Events", activeEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Active Events", "Immediate", immediateEvents.ToString(), HealthStatusV2.NA),
@@ -166,7 +166,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 CreateItem("Event Archives", "Total Archived Events", totalArchivedEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Event Archives", "Total Archived Listener Events", totalArchivedListenerEvents.ToString(), HealthStatusV2.NA),
                 CreateItem("Event Archives", "Archived Listener Errors", archivedListenerErrors.ToString(), HealthStatusV2.NA),
-                CreateItem("Event Handlers", "Registered Handlers", handlerCount.ToString(), handlerStatus),
+                CreateItem("Event Addresses / Event Listeners / Handlers", "Registered Handlers", handlerCount.ToString(), handlerStatus),
                 CreateItem("Loop Detection", "Quarantined Events", quarantinedEvents.ToString(), loopsDetectedStatus),
                 CreateItem("Loop Detection", "Quarantined Archives", quarantinedArchives.ToString(), HealthStatusV2.NA),
                 CreateItem("Listener Events", "Pending Listener Events", pendingListenerEvents.ToString(), pendingBacklogStatus),
