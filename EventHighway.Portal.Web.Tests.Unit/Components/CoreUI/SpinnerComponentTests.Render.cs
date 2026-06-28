@@ -20,5 +20,17 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             renderedSpinner.Instance.Visible.Should().BeTrue();
             renderedSpinner.Find("div.spinner-border").Should().NotBeNull();
         }
+
+        [Fact]
+        public void ShouldNotRenderSpinnerWhenVisibleIsFalse()
+        {
+            // given . when
+            IRenderedComponent<Spinner> renderedSpinner =
+                Render<Spinner>(parameters =>
+                    parameters.Add(spinner => spinner.Visible, false));
+
+            // then
+            renderedSpinner.FindAll("div.spinner-border").Should().BeEmpty();
+        }
     }
 }
