@@ -2,6 +2,8 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
+using System.Threading;
 using EventHighway.Core.Clients.EventHighways;
 using EventHighway.Core.Clients.EventHighways.V2;
 using EventHighway.Core.Models.Configurations;
@@ -19,7 +21,13 @@ namespace EventHighway.Portal.Web.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddSingleton(_ => CreateClientV2(configuration));
+            // PublicationOnly so a failed first attempt (e.g. database unavailable) is not cached
+            // permanently — the next request retries construction and the portal recovers once the
+            // Core database is reachable, without an app restart.
+            services.AddSingleton(_ => new Lazy<IClientV2>(
+                valueFactory: () => CreateClientV2(configuration),
+                mode: LazyThreadSafetyMode.PublicationOnly));
+
             services.AddSingleton<IEventHighwayBroker, EventHighwayBroker>();
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
             services.AddTransient<ILoggingBroker, LoggingBroker>();
