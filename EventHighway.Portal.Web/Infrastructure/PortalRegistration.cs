@@ -8,6 +8,7 @@ using EventHighway.Core.Models.Configurations;
 using EventHighway.Portal.Web.Brokers.DateTimes;
 using EventHighway.Portal.Web.Brokers.EventHighways;
 using EventHighway.Portal.Web.Brokers.Loggings;
+using EventHighway.Portal.Web.Services.Views.HealthDashboards;
 
 namespace EventHighway.Portal.Web.Infrastructure
 {
@@ -21,6 +22,14 @@ namespace EventHighway.Portal.Web.Infrastructure
             services.AddSingleton<IEventHighwayBroker, EventHighwayBroker>();
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
             services.AddTransient<ILoggingBroker, LoggingBroker>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddPortalViewServices(
+            this IServiceCollection services)
+        {
+            services.AddTransient<IHealthViewService, HealthViewService>();
 
             return services;
         }

@@ -16,6 +16,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, DevelopmentAuthenticationStateProvider>();
 
 builder.Services.AddPortalBrokers(builder.Configuration);
+builder.Services.AddPortalViewServices();
 
 var app = builder.Build();
 
