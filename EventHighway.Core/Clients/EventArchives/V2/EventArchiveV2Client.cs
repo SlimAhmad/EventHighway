@@ -72,10 +72,13 @@ namespace EventHighway.Core.Clients.EventArchives.V2
             }
         }
 
-        public ValueTask<EventArchiveV2> RetrieveEventArchiveV2ByIdAsync(
+        public async ValueTask<EventArchiveV2> RetrieveEventArchiveV2ByIdAsync(
             Guid eventArchiveV2Id,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            return await this.eventArchiveV2Service
+                .RetrieveEventArchiveV2ByIdAsync(eventArchiveV2Id, cancellationToken);
+        }
 
         private static EventArchiveV2ClientValidationException
             CreateEventArchiveV2ClientValidationException(Xeption innerException)
