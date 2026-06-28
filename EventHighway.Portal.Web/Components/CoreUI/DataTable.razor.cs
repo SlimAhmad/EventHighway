@@ -2,7 +2,9 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Components;
 
 namespace EventHighway.Portal.Web.Components.CoreUI
@@ -32,5 +34,37 @@ namespace EventHighway.Portal.Web.Components.CoreUI
         public bool SortAscending { get; private set; } = true;
 
         public int CurrentPage { get; private set; } = 1;
+
+        private IEnumerable<TItem> FilteredItems =>
+            string.IsNullOrWhiteSpace(SearchTerm)
+                ? Items
+                : Items.Where(item =>
+                    Columns.Any(column =>
+                        (column.Value(item)?.ToString() ?? string.Empty)
+                            .Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)));
+
+        private IEnumerable<TItem> SortedItems
+        {
+            get
+            {
+                if (SortColumn is null)
+                {
+                    return FilteredItems;
+                }
+
+                return SortAscending
+                    ? FilteredItems.OrderBy(item => SortColumn.Value(item))
+                    : FilteredItems.OrderByDescending(item => SortColumn.Value(item));
+            }
+        }
+
+        public IReadOnlyList<TItem> PagedItems =>
+            SortedItems
+                .Skip((CurrentPage - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+
+        public int PageCount =>
+            Math.Max(1, (int)Math.Ceiling(FilteredItems.Count() / (double)PageSize));
     }
 }

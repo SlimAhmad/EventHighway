@@ -1,4 +1,34 @@
 @namespace EventHighway.Portal.Web.Components.CoreUI
 @typeparam TItem
 
-<div class="datatable"></div>
+<div class="datatable">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                @foreach (DataTableColumn<TItem> column in Columns)
+                {
+                    <th>@column.Title</th>
+                }
+                @if (RowActions is not null)
+                {
+                    <th class="text-end"></th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (TItem item in PagedItems)
+            {
+                <tr>
+                    @foreach (DataTableColumn<TItem> column in Columns)
+                    {
+                        <td>@column.Value(item)</td>
+                    }
+                    @if (RowActions is not null)
+                    {
+                        <td class="text-end">@RowActions(item)</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
