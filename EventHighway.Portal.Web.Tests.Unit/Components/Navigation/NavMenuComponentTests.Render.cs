@@ -49,5 +49,20 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Navigation
                     "admin/users"
                 });
         }
+
+        [Fact]
+        public void ShouldHideAdminGroupForAnonymousUser()
+        {
+            // given
+            AddAuthorization();
+
+            // when
+            IRenderedComponent<NavMenu> renderedNavMenu = Render<NavMenu>();
+
+            // then
+            renderedNavMenu.FindAll("a")
+                .Select(anchor => anchor.GetAttribute("href"))
+                .Should().NotContain("admin/participants");
+        }
     }
 }
