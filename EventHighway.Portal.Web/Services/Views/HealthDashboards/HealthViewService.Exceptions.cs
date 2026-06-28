@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.HealthChecks.V2.Exceptions;
@@ -37,6 +38,14 @@ namespace EventHighway.Portal.Web.Services.Views.HealthDashboards
                 throw await CreateAndLogDependencyExceptionAsync(
                     healthStatusClientServiceException);
             }
+            catch (Exception exception)
+            {
+                var failedHealthViewServiceException =
+                    new FailedHealthViewServiceException(innerException: exception);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedHealthViewServiceException);
+            }
         }
 
         private async ValueTask<HealthViewDependencyValidationException>
@@ -59,6 +68,17 @@ namespace EventHighway.Portal.Web.Services.Views.HealthDashboards
             await this.loggingBroker.LogErrorAsync(healthViewDependencyException);
 
             return healthViewDependencyException;
+        }
+
+        private async ValueTask<HealthViewServiceException>
+            CreateAndLogServiceExceptionAsync(Xeption exception)
+        {
+            var healthViewServiceException =
+                new HealthViewServiceException(innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(healthViewServiceException);
+
+            return healthViewServiceException;
         }
     }
 }
