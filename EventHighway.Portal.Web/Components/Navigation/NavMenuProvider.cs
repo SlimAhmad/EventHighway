@@ -11,6 +11,12 @@ namespace EventHighway.Portal.Web.Components.Navigation
     public static class NavMenuProvider
     {
         public static IReadOnlyList<NavItem> GetNavMenu() =>
-            Array.Empty<NavItem>();
+            new[]
+            {
+                new NavItem(
+                    Title: "Dashboard",
+                    Icon: "cil-speedometer",
+                    Href: "")
+            };
     }
 }
