@@ -20,5 +20,25 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
             renderedModal.Instance.Visible.Should().BeFalse();
             renderedModal.FindAll("div.modal").Should().BeEmpty();
         }
+
+        [Fact]
+        public void ShouldRenderModalWithTitleAndBodyWhenVisible()
+        {
+            // given
+            string randomTitle = GetRandomString();
+            string randomBody = GetRandomString();
+
+            // when
+            IRenderedComponent<Modal> renderedModal =
+                Render<Modal>(parameters => parameters
+                    .Add(modal => modal.Visible, true)
+                    .Add(modal => modal.Title, randomTitle)
+                    .AddChildContent(randomBody));
+
+            // then
+            renderedModal.Find("div.modal").Should().NotBeNull();
+            renderedModal.Find("div.modal-title").TextContent.Should().Contain(randomTitle);
+            renderedModal.Find("div.modal-body").TextContent.Should().Contain(randomBody);
+        }
     }
 }
