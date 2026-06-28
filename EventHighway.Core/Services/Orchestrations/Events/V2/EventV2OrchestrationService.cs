@@ -53,7 +53,7 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         public ValueTask<EventV2> RetrieveEventV2ByIdAsync(
             Guid eventV2Id,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            this.eventV2ProcessingService.RetrieveEventV2ByIdAsync(eventV2Id, cancellationToken);
 
         public ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync(
             CancellationToken cancellationToken = default) =>
