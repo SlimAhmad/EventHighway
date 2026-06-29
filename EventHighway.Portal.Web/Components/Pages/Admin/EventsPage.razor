@@ -2,8 +2,11 @@
 @using System.Collections.Generic
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Models.Views.ListenerEvents
+@using EventHighway.Portal.Web.Services.Views.EventArchives
 @using EventHighway.Portal.Web.Services.Views.ListenerEvents
 @inject IListenerEventsViewService ListenerEventsViewService
+@inject IEventArchivesViewService EventArchivesViewService
+@inject NavigationManager Navigation
 
 <PageTitle>Events</PageTitle>
 
@@ -27,59 +30,43 @@ else
 {
     <Card CssClass="mb-4">
         <HeaderContent>
-            <span class="fw-semibold">Purge old events</span>
+            <span class="fw-semibold">Archive processed events</span>
         </HeaderContent>
         <ChildContent>
-            @if (purgeMessage is not null)
+            @if (archiveMessage is not null)
             {
-                <div class="alert @purgeAlertClass" role="alert">@purgeMessage</div>
+                <div class="alert @archiveAlertClass" role="alert">@archiveMessage</div>
             }
-            <div class="d-flex flex-wrap align-items-end gap-3">
-                <div style="min-width: 14rem;">
-                    <FormDate Label="Purge items older than" @bind-Value="purgeOlderThan" />
-                </div>
-                <div class="mb-3">
-                    <Button Color="danger" OnClick="RequestPurge" Disabled="@(purgeOlderThan is null)">
-                        Purge
-                    </Button>
-                </div>
-            </div>
+            <p class="text-body-secondary">
+                Move processed events out of the live tables and into the archive.
+            </p>
+            <Button Color="primary" OnClick="ArchiveAsync" Disabled="@isWorking">
+                Archive now
+            </Button>
         </ChildContent>
     </Card>
 
     <Card>
         <DataTable TItem="ListenerEventView" Items="listenerEvents" Columns="columns" Searchable="false">
             <RowActions Context="listenerEvent">
-                <Button Color="danger" CssClass="btn-sm"
-                        OnClick="@(() => RequestDeleteEvent(listenerEvent))">
-                    Delete
+                <Button Color="primary" CssClass="btn-sm"
+                        OnClick="@(() => ViewEvent(listenerEvent.Id))">
+                    VIEW
                 </Button>
             </RowActions>
         </DataTable>
     </Card>
 }
 
-<ConfirmDialog Visible="confirmVisible"
-               Title="Confirm"
-               Message="@confirmMessage"
-               ConfirmText="OK"
-               CancelText="Cancel"
-               OnConfirm="ConfirmYesAsync"
-               OnCancel="ConfirmNo" />
-
 @code {
     private bool isLoading = true;
+    private bool isWorking;
     private string? errorMessage;
     private List<ListenerEventView> listenerEvents = new();
     private List<DataTableColumn<ListenerEventView>> columns = new();
 
-    private DateTimeOffset? purgeOlderThan;
-    private string? purgeMessage;
-    private string purgeAlertClass = "alert-info";
-
-    private bool confirmVisible;
-    private string? confirmMessage;
-    private Func<Task>? pendingConfirm;
+    private string? archiveMessage;
+    private string archiveAlertClass = "alert-info";
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,74 +101,29 @@ else
         }
     }
 
-    private void RequestPurge()
+    private async Task ArchiveAsync()
     {
-        if (purgeOlderThan is null)
-        {
-            return;
-        }
+        isWorking = true;
+        archiveMessage = null;
 
-        confirmMessage =
-            $"Purge all listener events created before {purgeOlderThan:yyyy-MM-dd}? This cannot be undone.";
-
-        pendingConfirm = PurgeAsync;
-        confirmVisible = true;
-    }
-
-    private async Task PurgeAsync()
-    {
         try
         {
-            int purgedCount =
-                await ListenerEventsViewService.PurgeListenerEventsOlderThanAsync(
-                    purgeOlderThan!.Value);
-
-            purgeAlertClass = "alert-success";
-            purgeMessage = $"Purged {purgedCount} event(s).";
+            await EventArchivesViewService.ArchiveProcessedEventsAsync();
+            archiveAlertClass = "alert-success";
+            archiveMessage = "Processed events archived.";
             await LoadAsync();
         }
         catch
         {
-            purgeAlertClass = "alert-danger";
-            purgeMessage = "Unable to purge events. Please try again.";
+            archiveAlertClass = "alert-danger";
+            archiveMessage = "Unable to archive events. Please try again.";
         }
-    }
-
-    private void RequestDeleteEvent(ListenerEventView listenerEvent)
-    {
-        confirmMessage = "Deleting this event is permanent and cannot be undone.";
-        pendingConfirm = () => DeleteEventAsync(listenerEvent.Id);
-        confirmVisible = true;
-    }
-
-    private async Task DeleteEventAsync(Guid listenerEventId)
-    {
-        try
+        finally
         {
-            await ListenerEventsViewService.RemoveListenerEventByIdAsync(listenerEventId);
-            await LoadAsync();
-        }
-        catch
-        {
-            errorMessage = "Unable to delete this event. Please try again.";
+            isWorking = false;
         }
     }
 
-    private async Task ConfirmYesAsync()
-    {
-        confirmVisible = false;
-        Func<Task>? action = pendingConfirm;
-        pendingConfirm = null;
-
-        if (action is not null)
-        {
-            await action();
-        }
-    }
-
-    private void ConfirmNo()
-    {
-        confirmVisible = false;
-        pendingConfirm = null;
-    }
+    private void ViewEvent(Guid listenerEventId) =>
+        Navigation.NavigateTo($"/admin/events/{listenerEventId}");
 }

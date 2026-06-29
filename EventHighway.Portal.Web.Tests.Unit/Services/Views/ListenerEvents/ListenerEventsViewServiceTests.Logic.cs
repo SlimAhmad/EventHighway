@@ -53,6 +53,44 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.ListenerEvents
         }
 
         [Fact]
+        public async Task ShouldRetrieveListenerEventByIdAsync()
+        {
+            // given
+            DateTimeOffset baseDate = GetRandomDateTimeOffset();
+
+            ListenerEventV2 targetListenerEvent = CreateRandomListenerEvent(baseDate);
+            Guid listenerEventId = targetListenerEvent.Id;
+
+            IQueryable<ListenerEventV2> storageListenerEvents = new[]
+            {
+                CreateRandomListenerEvent(baseDate.AddDays(-1)),
+                targetListenerEvent,
+                CreateRandomListenerEvent(baseDate.AddDays(-2))
+            }.AsQueryable();
+
+            ListenerEventView expectedView = MapToView(targetListenerEvent);
+
+            this.eventHighwayBrokerMock.Setup(broker =>
+                broker.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(storageListenerEvents);
+
+            // when
+            ListenerEventView actualView =
+                await this.listenerEventsViewService.RetrieveListenerEventByIdAsync(
+                    listenerEventId, TestContext.Current.CancellationToken);
+
+            // then
+            actualView.Should().BeEquivalentTo(expectedView);
+
+            this.eventHighwayBrokerMock.Verify(broker =>
+                broker.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.eventHighwayBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldRemoveListenerEventByIdAsync()
         {
             // given

@@ -3,14 +3,14 @@
 @using EventHighway.Portal.Web.Services.Views.EventArchives
 @inject IEventArchivesViewService EventArchivesViewService
 
-<PageTitle>Event Archives</PageTitle>
+<PageTitle>Archived Events</PageTitle>
 
 <div class="d-flex justify-content-between align-items-center py-3">
-    <h2 class="mb-0">Event Archives</h2>
+    <h2 class="mb-0">Archived Events</h2>
 </div>
 
 <p class="text-body-secondary">
-    Archive maintenance operations. Live archive counts are shown on the Health Dashboard.
+    Archived event maintenance. Live archive counts are shown on the Health Dashboard.
 </p>
 
 @if (message is not null)
@@ -18,28 +18,17 @@
     <div class="alert @alertClass" role="alert">@message</div>
 }
 
-<Card CssClass="mb-4">
+<Card>
     <HeaderContent>
-        <span class="fw-semibold">Archive processed events</span>
+        <span class="fw-semibold">Purge old events</span>
     </HeaderContent>
     <ChildContent>
         <p class="text-body-secondary">
-            Move processed events out of the live tables and into the archive.
+            Permanently remove archived events older than the chosen date.
         </p>
-        <Button Color="primary" OnClick="ArchiveNowAsync" Disabled="@isWorking">
-            Archive now
-        </Button>
-    </ChildContent>
-</Card>
-
-<Card>
-    <HeaderContent>
-        <span class="fw-semibold">Purge old archives</span>
-    </HeaderContent>
-    <ChildContent>
         <div class="d-flex flex-wrap align-items-end gap-3">
             <div style="min-width: 14rem;">
-                <FormDate Label="Purge archives older than" @bind-Value="purgeOlderThan" />
+                <FormDate Label="Purge events older than" @bind-Value="purgeOlderThan" />
             </div>
             <div class="mb-3">
                 <Button Color="danger" OnClick="RequestPurge"
@@ -68,28 +57,6 @@
     private bool confirmVisible;
     private string? confirmMessage;
 
-    private async Task ArchiveNowAsync()
-    {
-        isWorking = true;
-        message = null;
-
-        try
-        {
-            await EventArchivesViewService.ArchiveProcessedEventsAsync();
-            alertClass = "alert-success";
-            message = "Processed events archived.";
-        }
-        catch
-        {
-            alertClass = "alert-danger";
-            message = "Unable to archive events. Please try again.";
-        }
-        finally
-        {
-            isWorking = false;
-        }
-    }
-
     private void RequestPurge()
     {
         if (purgeOlderThan is null)
@@ -98,7 +65,7 @@
         }
 
         confirmMessage =
-            $"Purge all archives created before {purgeOlderThan:yyyy-MM-dd}? This cannot be undone.";
+            $"Purge all archived events created before {purgeOlderThan:yyyy-MM-dd}? This cannot be undone.";
 
         confirmVisible = true;
     }
@@ -113,12 +80,12 @@
         {
             await EventArchivesViewService.PurgeArchivesOlderThanAsync(purgeOlderThan!.Value);
             alertClass = "alert-success";
-            message = "Old archives purged.";
+            message = "Old archived events purged.";
         }
         catch
         {
             alertClass = "alert-danger";
-            message = "Unable to purge archives. Please try again.";
+            message = "Unable to purge archived events. Please try again.";
         }
         finally
         {

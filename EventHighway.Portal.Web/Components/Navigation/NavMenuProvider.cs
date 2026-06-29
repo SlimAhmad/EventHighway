@@ -32,10 +32,10 @@ namespace EventHighway.Portal.Web.Components.Navigation
                         new NavItem("Event Address", "cil-location-pin", "admin/event-addresses",
                             Roles: new[] { "Administrators" }, RequiresAuth: true),
 
-                        new NavItem("EventsV2", "cil-bolt", "admin/events",
+                        new NavItem("Events", "cil-bolt", "admin/events",
                             Roles: new[] { "Administrators" }, RequiresAuth: true),
 
-                        new NavItem("EventArchivesV2", "cil-storage", "admin/event-archives",
+                        new NavItem("Archived Events", "cil-storage", "admin/event-archives",
                             Roles: new[] { "Administrators" }, RequiresAuth: true),
 
                         new NavItem("Replay", "cil-loop-circular", "admin/replay",

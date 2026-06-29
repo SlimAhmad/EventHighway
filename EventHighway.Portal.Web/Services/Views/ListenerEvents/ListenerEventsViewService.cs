@@ -41,6 +41,21 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEvents
                 .ToList();
         });
 
+        public ValueTask<ListenerEventView> RetrieveListenerEventByIdAsync(
+            Guid listenerEventId,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            IQueryable<ListenerEventV2> listenerEvents =
+                await this.eventHighwayBroker.RetrieveAllListenerEventV2sAsync(
+                    cancellationToken);
+
+            ListenerEventV2 listenerEvent = listenerEvents
+                .FirstOrDefault(retrievedEvent => retrievedEvent.Id == listenerEventId);
+
+            return listenerEvent is null ? null : AsView(listenerEvent);
+        });
+
         public ValueTask<ListenerEventView> RemoveListenerEventByIdAsync(
             Guid listenerEventId,
             CancellationToken cancellationToken = default) =>
