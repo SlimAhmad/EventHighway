@@ -11,6 +11,7 @@ using EventHighway.Portal.Web.Brokers.DateTimes;
 using EventHighway.Portal.Web.Brokers.EventHighways;
 using EventHighway.Portal.Web.Brokers.Loggings;
 using EventHighway.Portal.Web.Services.Views.EventAddresses;
+using EventHighway.Portal.Web.Services.Views.EventListeners;
 using EventHighway.Portal.Web.Services.Views.EventParticipants;
 using EventHighway.Portal.Web.Services.Views.EventParticipantSecrets;
 using EventHighway.Portal.Web.Services.Views.HealthDashboards;
@@ -46,6 +47,7 @@ namespace EventHighway.Portal.Web.Infrastructure
                 IEventParticipantSecretsViewService,
                 EventParticipantSecretsViewService>();
             services.AddTransient<IEventAddressesViewService, EventAddressesViewService>();
+            services.AddTransient<IEventListenersViewService, EventListenersViewService>();
 
             return services;
         }
