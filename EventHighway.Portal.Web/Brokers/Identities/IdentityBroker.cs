@@ -49,6 +49,44 @@ namespace EventHighway.Portal.Web.Brokers.Identities
         public async ValueTask<IList<AppUser>> SelectUsersInRoleAsync(string roleName) =>
             await this.userManager.GetUsersInRoleAsync(roleName);
 
+        public async ValueTask<IdentityResult> UpdateUserAsync(AppUser user) =>
+            await this.userManager.UpdateAsync(user);
+
+        public async ValueTask<IdentityResult> SetUserNameAsync(AppUser user, string userName) =>
+            await this.userManager.SetUserNameAsync(user, userName);
+
+        public async ValueTask<IdentityResult> SetEmailAsync(AppUser user, string email) =>
+            await this.userManager.SetEmailAsync(user, email);
+
+        public async ValueTask<IdentityResult> SetPhoneNumberAsync(
+            AppUser user, string phoneNumber) =>
+            await this.userManager.SetPhoneNumberAsync(user, phoneNumber);
+
+        public async ValueTask<string> GenerateEmailConfirmationTokenAsync(AppUser user) =>
+            await this.userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        public async ValueTask<IdentityResult> ConfirmEmailAsync(AppUser user, string token) =>
+            await this.userManager.ConfirmEmailAsync(user, token);
+
+        public async ValueTask<string> GeneratePasswordResetTokenAsync(AppUser user) =>
+            await this.userManager.GeneratePasswordResetTokenAsync(user);
+
+        public async ValueTask<IdentityResult> SetLockoutEnabledAsync(AppUser user, bool enabled) =>
+            await this.userManager.SetLockoutEnabledAsync(user, enabled);
+
+        public async ValueTask<IdentityResult> SetLockoutEndDateAsync(
+            AppUser user, DateTimeOffset? lockoutEnd) =>
+            await this.userManager.SetLockoutEndDateAsync(user, lockoutEnd);
+
+        public async ValueTask<IdentityResult> ResetAccessFailedCountAsync(AppUser user) =>
+            await this.userManager.ResetAccessFailedCountAsync(user);
+
+        public async ValueTask<IdentityResult> SetTwoFactorEnabledAsync(AppUser user, bool enabled) =>
+            await this.userManager.SetTwoFactorEnabledAsync(user, enabled);
+
+        public async ValueTask<IdentityResult> ResetAuthenticatorKeyAsync(AppUser user) =>
+            await this.userManager.ResetAuthenticatorKeyAsync(user);
+
         public IQueryable<AppRole> SelectAllRoles() =>
             this.roleManager.Roles;
     }

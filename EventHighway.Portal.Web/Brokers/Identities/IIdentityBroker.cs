@@ -32,6 +32,32 @@ namespace EventHighway.Portal.Web.Brokers.Identities
 
         ValueTask<IList<AppUser>> SelectUsersInRoleAsync(string roleName);
 
+        ValueTask<IdentityResult> UpdateUserAsync(AppUser user);
+
+        ValueTask<IdentityResult> SetUserNameAsync(AppUser user, string userName);
+
+        ValueTask<IdentityResult> SetEmailAsync(AppUser user, string email);
+
+        ValueTask<IdentityResult> SetPhoneNumberAsync(AppUser user, string phoneNumber);
+
+        ValueTask<string> GenerateEmailConfirmationTokenAsync(AppUser user);
+
+        ValueTask<IdentityResult> ConfirmEmailAsync(AppUser user, string token);
+
+        ValueTask<string> GeneratePasswordResetTokenAsync(AppUser user);
+
+        ValueTask<IdentityResult> SetLockoutEnabledAsync(AppUser user, bool enabled);
+
+        ValueTask<IdentityResult> SetLockoutEndDateAsync(
+            AppUser user,
+            DateTimeOffset? lockoutEnd);
+
+        ValueTask<IdentityResult> ResetAccessFailedCountAsync(AppUser user);
+
+        ValueTask<IdentityResult> SetTwoFactorEnabledAsync(AppUser user, bool enabled);
+
+        ValueTask<IdentityResult> ResetAuthenticatorKeyAsync(AppUser user);
+
         IQueryable<AppRole> SelectAllRoles();
     }
 }
