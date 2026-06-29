@@ -8,7 +8,15 @@ using EventHighway.Core.Clients.EventHighways.V2;
 using EventHighway.Core.Models.Configurations;
 using EventHighway.Portal.Web.Brokers.DateTimes;
 using EventHighway.Portal.Web.Brokers.EventHighways;
+using EventHighway.Portal.Web.Brokers.Identities;
 using EventHighway.Portal.Web.Brokers.Loggings;
+using EventHighway.Portal.Web.Components.Account;
+using EventHighway.Portal.Web.Data;
+using EventHighway.Portal.Web.Models.Foundations.Roles;
+using EventHighway.Portal.Web.Models.Foundations.Users;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using EventHighway.Portal.Web.Services.Views.EventAddresses;
 using EventHighway.Portal.Web.Services.Views.EventListeners;
 using EventHighway.Portal.Web.Services.Views.EventParticipants;
@@ -33,6 +41,55 @@ namespace EventHighway.Portal.Web.Infrastructure
             services.AddSingleton<IEventHighwayBroker, EventHighwayBroker>();
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
             services.AddTransient<ILoggingBroker, LoggingBroker>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddPortalIdentity(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            string securityConnectionString =
+                configuration.GetConnectionString("EventHighwaySecurityConnection")
+                    ?? throw new InvalidOperationException(
+                        "Missing connection string 'EventHighwaySecurityConnection'.");
+
+            services.AddCascadingAuthenticationState();
+            services.AddScoped<IdentityRedirectManager>();
+
+            services.AddScoped<
+                AuthenticationStateProvider,
+                IdentityRevalidatingAuthenticationStateProvider>();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+            })
+                .AddIdentityCookies();
+
+            services.AddDbContext<SecurityDbContext>(options =>
+                options.UseSqlServer(securityConnectionString));
+
+            services.AddIdentityCore<AppUser>(options =>
+            {
+                // Default credentials are intentionally weak for first-run/demo (Spec Section 6.3).
+                options.SignIn.RequireConfirmedAccount = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 4;
+                options.Password.RequiredUniqueChars = 1;
+            })
+                .AddRoles<AppRole>()
+                .AddEntityFrameworkStores<SecurityDbContext>()
+                .AddSignInManager()
+                .AddDefaultTokenProviders();
+
+            services.AddSingleton<IEmailSender<AppUser>, IdentityNoOpEmailSender>();
+
+            services.AddTransient<IIdentityBroker, IdentityBroker>();
 
             return services;
         }

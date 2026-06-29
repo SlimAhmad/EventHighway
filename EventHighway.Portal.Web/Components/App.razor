@@ -12,16 +12,29 @@
     <link rel="stylesheet" href="@Assets["EventHighway.Portal.Web.styles.css"]" />
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
-    <HeadOutlet @rendermode="InteractiveServer" />
+    <HeadOutlet @rendermode="@PageRenderMode" />
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveServer" />
+    <Routes @rendermode="@PageRenderMode" />
     <ReconnectModal />
     <script src="vendors/@@coreui/coreui/js/coreui.bundle.min.js"></script>
     <script src="vendors/chart.js/js/chart.umd.js"></script>
     <script src="js/eventHighwayCharts.js"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="@Assets["Components/Account/Shared/PasskeySubmit.razor.js"]" type="module"></script>
 </body>
 
 </html>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    // Identity Account pages carry [ExcludeFromInteractiveRouting], so they are reached via a
+    // full page load and render statically (HttpContext present) — required for cookie sign-in.
+    // Every other page is reached through interactive routing (HttpContext null) and runs on the
+    // InteractiveServer circuit, preserving the dashboard/admin interactivity.
+    private IComponentRenderMode? PageRenderMode =>
+        HttpContext is null ? InteractiveServer : null;
+}
