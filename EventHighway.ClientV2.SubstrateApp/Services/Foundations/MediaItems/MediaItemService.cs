@@ -31,6 +31,11 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.MediaItems
             this.loggingBroker = loggingBroker;
         }
 
+        // The participant this internal service publishes on behalf of (NFlix). Set after the
+        // participant is created so emitted release events are attributed to NFlix rather than
+        // appearing as an Unknown participant on the health dashboard.
+        public Guid? PublisherParticipantId { get; set; }
+
         public ValueTask<MediaItem> AddMediaItemAsync(MediaItem mediaItem) =>
         TryCatch(async () =>
         {
@@ -155,6 +160,7 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.MediaItems
                 Content = content,
                 EventName = eventName,
                 EventAddressId = eventAddress.Id,
+                ParticipantId = this.PublisherParticipantId,
                 CreatedDate = now,
                 UpdatedDate = now
             };

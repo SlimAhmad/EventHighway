@@ -40,6 +40,8 @@ public partial class Program
         IMediaItemService mediaItemService =
             serviceProvider.GetRequiredService<IMediaItemService>();
 
+        var mediaItemServiceImpl = (MediaItemService)mediaItemService;
+
         IExternalMediaItemService externalMediaItemService =
             serviceProvider.GetRequiredService<IExternalMediaItemService>();
 
@@ -51,6 +53,10 @@ public partial class Program
             EventParticipantV2 bingeBox,
             EventParticipantV2 joe) =
                 await SetupParticipantsAndSecretsAsync();
+
+        // Attribute the internal release events MediaItemService emits to NFlix so they are not
+        // reported as an Unknown participant on the health dashboard.
+        mediaItemServiceImpl.PublisherParticipantId = nflix.Id;
 
         // =========================================================
         // 3) Event addresses
