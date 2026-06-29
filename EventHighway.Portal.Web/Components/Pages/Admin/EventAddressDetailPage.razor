@@ -2,8 +2,11 @@
 @using System.Linq
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Models.Views.EventAddresses
+@using EventHighway.Portal.Web.Models.Views.EventListeners
 @using EventHighway.Portal.Web.Services.Views.EventAddresses
+@using EventHighway.Portal.Web.Services.Views.EventListeners
 @inject IEventAddressesViewService AddressesViewService
+@inject IEventListenersViewService ListenersViewService
 
 <PageTitle>Event Address</PageTitle>
 
@@ -33,9 +36,19 @@ else if (address is not null)
     </Card>
 
     <Card Title="Event Listeners" CssClass="mt-4">
-        <p class="text-body-secondary mb-0">
-            Listeners associated with this address are coming next.
-        </p>
+        @if (listenersError is not null)
+        {
+            <div class="alert alert-danger" role="alert">@listenersError</div>
+        }
+        else if (listeners.Count == 0)
+        {
+            <p class="text-body-secondary mb-0">No listeners registered for this address.</p>
+        }
+        else
+        {
+            <DataTable TItem="EventListenerView" Items="listeners" Columns="listenerColumns"
+                       Searchable="false" />
+        }
     </Card>
 }
 else
@@ -51,12 +64,28 @@ else
     private string? errorMessage;
     private EventAddressView? address;
 
+    private List<EventListenerView> listeners = new();
+    private string? listenersError;
+    private List<DataTableColumn<EventListenerView>> listenerColumns = new();
+
     protected override async Task OnInitializedAsync()
     {
+        listenerColumns = new List<DataTableColumn<EventListenerView>>
+        {
+            new DataTableColumn<EventListenerView> { Title = "Name", Value = l => l.Name },
+            new DataTableColumn<EventListenerView> { Title = "Description", Value = l => l.Description },
+            new DataTableColumn<EventListenerView> { Title = "Handler", Value = l => l.HandlerName },
+        };
+
         try
         {
             var addresses = await AddressesViewService.RetrieveAllAddressesAsync();
             address = addresses.FirstOrDefault(item => item.Id == AddressId);
+
+            if (address is not null)
+            {
+                await LoadListenersAsync();
+            }
         }
         catch
         {
@@ -65,6 +94,19 @@ else
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private async Task LoadListenersAsync()
+    {
+        try
+        {
+            listeners = await ListenersViewService.RetrieveListenersByAddressAsync(AddressId);
+            listenersError = null;
+        }
+        catch
+        {
+            listenersError = "Unable to load listeners.";
         }
     }
 }
