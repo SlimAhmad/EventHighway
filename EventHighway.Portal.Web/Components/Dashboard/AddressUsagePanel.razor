@@ -1,0 +1,57 @@
+@namespace EventHighway.Portal.Web.Components.Dashboard
+@using EventHighway.Core.Models.Coordinations.HealthChecks.V2
+@using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Services.Views.HealthDashboards
+@inject IHealthViewService HealthViewService
+
+<Card CssClass="mb-4">
+    <HeaderContent><span class="fw-semibold">Usage by Address</span></HeaderContent>
+    <ChildContent>
+        @if (isLoading)
+        {
+            <Spinner />
+        }
+        else if (errorMessage is not null)
+        {
+            <div class="alert alert-danger mb-0" role="alert">@errorMessage</div>
+        }
+        else
+        {
+            <DataTable TItem="EventAddressSummaryV2" Items="summaries" Columns="columns" />
+        }
+    </ChildContent>
+</Card>
+
+@code {
+    private bool isLoading = true;
+    private string? errorMessage;
+    private List<EventAddressSummaryV2> summaries = new();
+    private List<DataTableColumn<EventAddressSummaryV2>> columns = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        columns = new List<DataTableColumn<EventAddressSummaryV2>>
+        {
+            new DataTableColumn<EventAddressSummaryV2> { Title = "Address", Value = s => s.Name },
+            new DataTableColumn<EventAddressSummaryV2> { Title = "Events", Value = s => s.TotalActiveEvents + s.TotalArchivedEvents },
+            new DataTableColumn<EventAddressSummaryV2> { Title = "Listener Events", Value = s => s.TotalListenerEvents + s.TotalArchivedListenerEvents },
+            new DataTableColumn<EventAddressSummaryV2> { Title = "Error %", Value = s => s.ErrorRate.ToString("0.00") },
+            new DataTableColumn<EventAddressSummaryV2> { Title = "Loops", Value = s => s.LoopsDetected },
+            new DataTableColumn<EventAddressSummaryV2> { Title = "Last Activity", Value = s => s.LastActivity?.ToString("u") ?? "—" },
+        };
+
+        try
+        {
+            summaries = await HealthViewService.RetrieveAddressSummariesAsync(
+                TrafficPeriodV2.Day, DateTimeOffset.MinValue);
+        }
+        catch
+        {
+            errorMessage = "Unable to load address usage.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

@@ -47,10 +47,10 @@ namespace EventHighway.Portal.Web.Components.CoreUI
                     {
                         label = dataset.Label,
                         data = dataset.Data,
-                        backgroundColor = (object)(dataset.Colors.Count > 0
-                            ? dataset.Colors
-                            : (object?)null),
-                        borderColor = dataset.Colors.Count > 0 ? dataset.Colors[0] : null,
+                        backgroundColor = dataset.Colors,
+                        borderColor = dataset.Colors.Count > 0
+                            ? dataset.Colors[0]
+                            : "#321fdb",
                         fill = ChartType == "line",
                         tension = 0.4
                     })
