@@ -34,6 +34,15 @@ app.MapRazorComponents<App>()
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 
-await SeedData.SeedAsync(app.Services);
+// A seed failure (e.g. a transient database error on a cold start) is logged but must not stop
+// the app from serving; the seed is idempotent and re-runs on the next start.
+try
+{
+    await SeedData.SeedAsync(app.Services);
+}
+catch (Exception seedException)
+{
+    app.Logger.LogError(seedException, "Identity seed failed at startup; continuing.");
+}
 
 app.Run();
