@@ -64,6 +64,7 @@ else
     {
         columns = new List<DataTableColumn<EventAddressView>>
         {
+            new DataTableColumn<EventAddressView> { Title = "Id", Value = a => a.Id },
             new DataTableColumn<EventAddressView> { Title = "Name", Value = a => a.Name },
             new DataTableColumn<EventAddressView> { Title = "Description", Value = a => a.Description },
         };
