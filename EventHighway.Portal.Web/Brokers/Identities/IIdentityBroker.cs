@@ -32,6 +32,8 @@ namespace EventHighway.Portal.Web.Brokers.Identities
 
         ValueTask<IList<AppUser>> SelectUsersInRoleAsync(string roleName);
 
+        ValueTask<bool> SelectIsLockedOutAsync(AppUser user);
+
         ValueTask<IdentityResult> UpdateUserAsync(AppUser user);
 
         ValueTask<IdentityResult> SetUserNameAsync(AppUser user, string userName);

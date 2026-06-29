@@ -12,6 +12,12 @@ namespace EventHighway.Portal.Web.Models.Views.Users
         public Guid Id { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public bool EmailConfirmed { get; set; }
+        public bool IsLockedOut { get; set; }
+        public int AccessFailedCount { get; set; }
+        public bool TwoFactorEnabled { get; set; }
+        public bool IsDisabled { get; set; }
         public List<string> Roles { get; set; } = new List<string>();
     }
 }

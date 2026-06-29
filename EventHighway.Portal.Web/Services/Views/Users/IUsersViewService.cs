@@ -24,6 +24,47 @@ namespace EventHighway.Portal.Web.Services.Views.Users
             string password,
             CancellationToken cancellationToken = default);
 
+        ValueTask<UserView> ModifyUserAsync(
+            UserView user,
+            CancellationToken cancellationToken = default);
+
+        ValueTask ConfirmUserEmailAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<string> GenerateEmailConfirmationTokenAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<string> GeneratePasswordResetTokenAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask LockUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask UnlockUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask ResetAccessFailedCountAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask SetTwoFactorEnabledAsync(
+            Guid userId,
+            bool enabled,
+            CancellationToken cancellationToken = default);
+
+        ValueTask DisableUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask EnableUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default);
+
         ValueTask RemoveUserByIdAsync(
             Guid userId,
             CancellationToken cancellationToken = default);

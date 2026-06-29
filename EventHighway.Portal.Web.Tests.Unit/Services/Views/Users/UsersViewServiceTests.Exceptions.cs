@@ -107,6 +107,70 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.Users
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnLockUserWhenLastAdministrator()
+        {
+            // given
+            AppUser randomUser = CreateRandomUsers(count: 1)[0];
+            Guid inputUserId = randomUser.Id;
+
+            this.identityBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(inputUserId))
+                    .ReturnsAsync(randomUser);
+
+            this.identityBrokerMock.Setup(broker =>
+                broker.SelectUserRolesAsync(randomUser))
+                    .ReturnsAsync(new List<string> { "Administrators" });
+
+            this.identityBrokerMock.Setup(broker =>
+                broker.SelectUsersInRoleAsync("Administrators"))
+                    .ReturnsAsync(new List<AppUser> { randomUser });
+
+            // when
+            ValueTask lockTask =
+                this.usersViewService.LockUserAsync(
+                    inputUserId, TestContext.Current.CancellationToken);
+
+            await Assert.ThrowsAsync<UsersViewValidationException>(lockTask.AsTask);
+
+            // then
+            this.identityBrokerMock.Verify(broker =>
+                broker.SetLockoutEndDateAsync(
+                    It.IsAny<AppUser>(), It.IsAny<DateTimeOffset?>()),
+                        Times.Never);
+        }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnDisableUserWhenLastAdministrator()
+        {
+            // given
+            AppUser randomUser = CreateRandomUsers(count: 1)[0];
+            Guid inputUserId = randomUser.Id;
+
+            this.identityBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(inputUserId))
+                    .ReturnsAsync(randomUser);
+
+            this.identityBrokerMock.Setup(broker =>
+                broker.SelectUserRolesAsync(randomUser))
+                    .ReturnsAsync(new List<string> { "Administrators" });
+
+            this.identityBrokerMock.Setup(broker =>
+                broker.SelectUsersInRoleAsync("Administrators"))
+                    .ReturnsAsync(new List<AppUser> { randomUser });
+
+            // when
+            ValueTask disableTask =
+                this.usersViewService.DisableUserAsync(
+                    inputUserId, TestContext.Current.CancellationToken);
+
+            await Assert.ThrowsAsync<UsersViewValidationException>(disableTask.AsTask);
+
+            // then
+            this.identityBrokerMock.Verify(broker =>
+                broker.UpdateUserAsync(It.IsAny<AppUser>()), Times.Never);
+        }
+
         private static System.Linq.Expressions.Expression<Func<Xeption, bool>>
             SameExceptionAs(Xeption expectedException) =>
             actualException =>

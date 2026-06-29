@@ -133,6 +133,57 @@ namespace EventHighway.Portal.Web.Services.Views.Users
             return new ValueTask<List<string>>(roleNames);
         });
 
+        public ValueTask<UserView> ModifyUserAsync(
+            UserView user,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask ConfirmUserEmailAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask<string> GenerateEmailConfirmationTokenAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask<string> GeneratePasswordResetTokenAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask LockUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask UnlockUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask ResetAccessFailedCountAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask SetTwoFactorEnabledAsync(
+            Guid userId,
+            bool enabled,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask DisableUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+        public ValueTask EnableUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         private async ValueTask EnsureNotLastAdministratorAsync()
         {
             IList<AppUser> administrators =
