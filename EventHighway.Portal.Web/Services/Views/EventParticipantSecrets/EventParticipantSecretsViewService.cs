@@ -31,10 +31,11 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
             this.loggingBroker = loggingBroker;
         }
 
-        public async ValueTask<List<EventParticipantSecretView>>
+        public ValueTask<List<EventParticipantSecretView>>
             RetrieveSecretsByParticipantAsync(
                 Guid participantId,
-                CancellationToken cancellationToken = default)
+                CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
             IEnumerable<EventParticipantSecretV2> secrets =
                 await this.eventHighwayBroker.RetrieveAllEventParticipantSecretV2sAsync(
@@ -44,11 +45,12 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
                 .Where(secret => secret.ParticipantId == participantId)
                 .Select(AsView)
                 .ToList();
-        }
+        });
 
-        public async ValueTask<EventParticipantSecretView> AddSecretAsync(
+        public ValueTask<EventParticipantSecretView> AddSecretAsync(
             EventParticipantSecretView secret,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
             DateTimeOffset now =
                 await this.dateTimeBroker.GetCurrentDateTimeOffsetAsync();
@@ -69,7 +71,7 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
                     secretToAdd, cancellationToken);
 
             return AsView(addedSecret);
-        }
+        });
 
         private static EventParticipantSecretView AsView(EventParticipantSecretV2 secret) =>
             new EventParticipantSecretView
