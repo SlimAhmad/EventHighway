@@ -31,7 +31,7 @@ namespace EventHighway.Core.Brokers.Storages
             model.HasOne(eventV2 => eventV2.EventAddressV2)
                 .WithMany(eventAddressV2 => eventAddressV2.Events)
                 .HasForeignKey(eventV2 => eventV2.EventAddressId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

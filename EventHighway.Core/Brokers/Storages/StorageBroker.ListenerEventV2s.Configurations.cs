@@ -22,17 +22,17 @@ namespace EventHighway.Core.Brokers.Storages
             model.HasOne(listenerEventV2 => listenerEventV2.Event)
                 .WithMany(eventV2 => eventV2.ListenerEventV2s)
                 .HasForeignKey(listenerEventV2 => listenerEventV2.EventId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
 
             model.HasOne(listenerEventV2 => listenerEventV2.EventAddress)
                 .WithMany(eventAddressV2 => eventAddressV2.ListenerEventV2s)
                 .HasForeignKey(listenerEventV2 => listenerEventV2.EventAddressId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
 
             model.HasOne(listenerEventV2 => listenerEventV2.EventListener)
                 .WithMany(eventListenerV2 => eventListenerV2.ListenerEventV2s)
                 .HasForeignKey(listenerEventV2 => listenerEventV2.EventListenerId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
