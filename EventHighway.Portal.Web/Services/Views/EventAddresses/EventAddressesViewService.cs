@@ -31,14 +31,37 @@ namespace EventHighway.Portal.Web.Services.Views.EventAddresses
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<List<EventAddressView>> RetrieveAllAddressesAsync(
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        public async ValueTask<List<EventAddressView>> RetrieveAllAddressesAsync(
+            CancellationToken cancellationToken = default)
+        {
+            IQueryable<EventAddressV2> addresses =
+                await this.eventHighwayBroker.RetrieveAllEventAddressV2sAsync(
+                    cancellationToken);
 
-        public ValueTask<EventAddressView> RegisterAddressAsync(
+            return addresses.Select(AsView).ToList();
+        }
+
+        public async ValueTask<EventAddressView> RegisterAddressAsync(
             EventAddressView address,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            DateTimeOffset now = await this.dateTimeBroker.GetCurrentDateTimeOffsetAsync();
+
+            var addressToRegister = new EventAddressV2
+            {
+                Id = Guid.NewGuid(),
+                Name = address.Name,
+                Description = address.Description,
+                CreatedDate = now,
+                UpdatedDate = now
+            };
+
+            EventAddressV2 registeredAddress =
+                await this.eventHighwayBroker.RegisterEventAddressV2Async(
+                    addressToRegister, cancellationToken);
+
+            return AsView(registeredAddress);
+        }
 
         private static EventAddressView AsView(EventAddressV2 address) =>
             new EventAddressView
