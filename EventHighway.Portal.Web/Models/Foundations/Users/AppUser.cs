@@ -9,5 +9,8 @@ namespace EventHighway.Portal.Web.Models.Foundations.Users
 {
     public class AppUser : IdentityUser<Guid>
     {
+        // Soft-delete / disable flag (Spec Section 11.9): a disabled account is locked out and
+        // hidden from normal use but retained, preferred over a hard delete.
+        public bool IsDisabled { get; set; }
     }
 }
