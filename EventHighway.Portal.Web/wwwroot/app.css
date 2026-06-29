@@ -58,3 +58,29 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+/* Health dashboard RAG tiles — vibrant CoreUI palette with white text on every variant
+   (Bootstrap's text-bg-warning otherwise renders dull yellow with dark text). */
+.stat-tile {
+    border: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 21, 0.08);
+}
+
+.stat-tile.text-bg-success {
+    background-color: #2eb85c !important;
+    color: #fff !important;
+}
+
+.stat-tile.text-bg-warning {
+    background-color: #f9b115 !important;
+    color: #fff !important;
+}
+
+.stat-tile.text-bg-danger {
+    background-color: #e55353 !important;
+    color: #fff !important;
+}
+
+.stat-tile.text-bg-secondary {
+    background-color: #636f83 !important;
+    color: #fff !important;
+}
