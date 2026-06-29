@@ -1,0 +1,187 @@
+@page "/admin/events"
+@using System.Collections.Generic
+@using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.ListenerEvents
+@using EventHighway.Portal.Web.Services.Views.ListenerEvents
+@inject IListenerEventsViewService ListenerEventsViewService
+
+<PageTitle>Events</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center py-3">
+    <h2 class="mb-0">Events</h2>
+</div>
+
+<p class="text-body-secondary">
+    Listener events queued for delivery, most recent first. Each row is one event dispatched to a listener.
+</p>
+
+@if (isLoading)
+{
+    <Spinner />
+}
+else if (errorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+else
+{
+    <Card CssClass="mb-4">
+        <HeaderContent>
+            <span class="fw-semibold">Purge old events</span>
+        </HeaderContent>
+        <ChildContent>
+            @if (purgeMessage is not null)
+            {
+                <div class="alert @purgeAlertClass" role="alert">@purgeMessage</div>
+            }
+            <div class="d-flex flex-wrap align-items-end gap-3">
+                <div style="min-width: 14rem;">
+                    <FormDate Label="Purge items older than" @bind-Value="purgeOlderThan" />
+                </div>
+                <div class="mb-3">
+                    <Button Color="danger" OnClick="RequestPurge" Disabled="@(purgeOlderThan is null)">
+                        Purge
+                    </Button>
+                </div>
+            </div>
+        </ChildContent>
+    </Card>
+
+    <Card>
+        <DataTable TItem="ListenerEventView" Items="listenerEvents" Columns="columns" Searchable="false">
+            <RowActions Context="listenerEvent">
+                <Button Color="danger" CssClass="btn-sm"
+                        OnClick="@(() => RequestDeleteEvent(listenerEvent))">
+                    Delete
+                </Button>
+            </RowActions>
+        </DataTable>
+    </Card>
+}
+
+<ConfirmDialog Visible="confirmVisible"
+               Title="Confirm"
+               Message="@confirmMessage"
+               ConfirmText="OK"
+               CancelText="Cancel"
+               OnConfirm="ConfirmYesAsync"
+               OnCancel="ConfirmNo" />
+
+@code {
+    private bool isLoading = true;
+    private string? errorMessage;
+    private List<ListenerEventView> listenerEvents = new();
+    private List<DataTableColumn<ListenerEventView>> columns = new();
+
+    private DateTimeOffset? purgeOlderThan;
+    private string? purgeMessage;
+    private string purgeAlertClass = "alert-info";
+
+    private bool confirmVisible;
+    private string? confirmMessage;
+    private Func<Task>? pendingConfirm;
+
+    protected override async Task OnInitializedAsync()
+    {
+        columns = new List<DataTableColumn<ListenerEventView>>
+        {
+            new DataTableColumn<ListenerEventView> { Title = "Status", Value = e => e.Status },
+            new DataTableColumn<ListenerEventView> { Title = "Response Code", Value = e => e.ResponseCode },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Listener", Value = e => e.EventListenerId
+            },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Created", Value = e => e.CreatedDate.ToString("u")
+            },
+        };
+
+        await LoadAsync();
+        isLoading = false;
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            listenerEvents = await ListenerEventsViewService.RetrieveAllListenerEventsAsync();
+            errorMessage = null;
+        }
+        catch
+        {
+            errorMessage = "Unable to load events. Please try again.";
+        }
+    }
+
+    private void RequestPurge()
+    {
+        if (purgeOlderThan is null)
+        {
+            return;
+        }
+
+        confirmMessage =
+            $"Purge all listener events created before {purgeOlderThan:yyyy-MM-dd}? This cannot be undone.";
+
+        pendingConfirm = PurgeAsync;
+        confirmVisible = true;
+    }
+
+    private async Task PurgeAsync()
+    {
+        try
+        {
+            int purgedCount =
+                await ListenerEventsViewService.PurgeListenerEventsOlderThanAsync(
+                    purgeOlderThan!.Value);
+
+            purgeAlertClass = "alert-success";
+            purgeMessage = $"Purged {purgedCount} event(s).";
+            await LoadAsync();
+        }
+        catch
+        {
+            purgeAlertClass = "alert-danger";
+            purgeMessage = "Unable to purge events. Please try again.";
+        }
+    }
+
+    private void RequestDeleteEvent(ListenerEventView listenerEvent)
+    {
+        confirmMessage = "Deleting this event is permanent and cannot be undone.";
+        pendingConfirm = () => DeleteEventAsync(listenerEvent.Id);
+        confirmVisible = true;
+    }
+
+    private async Task DeleteEventAsync(Guid listenerEventId)
+    {
+        try
+        {
+            await ListenerEventsViewService.RemoveListenerEventByIdAsync(listenerEventId);
+            await LoadAsync();
+        }
+        catch
+        {
+            errorMessage = "Unable to delete this event. Please try again.";
+        }
+    }
+
+    private async Task ConfirmYesAsync()
+    {
+        confirmVisible = false;
+        Func<Task>? action = pendingConfirm;
+        pendingConfirm = null;
+
+        if (action is not null)
+        {
+            await action();
+        }
+    }
+
+    private void ConfirmNo()
+    {
+        confirmVisible = false;
+        pendingConfirm = null;
+    }
+}
