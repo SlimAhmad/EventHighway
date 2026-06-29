@@ -31,19 +31,21 @@ namespace EventHighway.Portal.Web.Services.Views.EventAddresses
             this.loggingBroker = loggingBroker;
         }
 
-        public async ValueTask<List<EventAddressView>> RetrieveAllAddressesAsync(
-            CancellationToken cancellationToken = default)
+        public ValueTask<List<EventAddressView>> RetrieveAllAddressesAsync(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
             IQueryable<EventAddressV2> addresses =
                 await this.eventHighwayBroker.RetrieveAllEventAddressV2sAsync(
                     cancellationToken);
 
             return addresses.Select(AsView).ToList();
-        }
+        });
 
-        public async ValueTask<EventAddressView> RegisterAddressAsync(
+        public ValueTask<EventAddressView> RegisterAddressAsync(
             EventAddressView address,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
             DateTimeOffset now = await this.dateTimeBroker.GetCurrentDateTimeOffsetAsync();
 
@@ -61,7 +63,7 @@ namespace EventHighway.Portal.Web.Services.Views.EventAddresses
                     addressToRegister, cancellationToken);
 
             return AsView(registeredAddress);
-        }
+        });
 
         private static EventAddressView AsView(EventAddressV2 address) =>
             new EventAddressView
