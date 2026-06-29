@@ -13,6 +13,7 @@ using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Clients.ArchivingEvents.V2;
+using EventHighway.Core.Clients.EventArchives.V2;
 using EventHighway.Core.Clients.EventAddresses.V2;
 using EventHighway.Core.Clients.EventListeners.V2;
 using EventHighway.Core.Clients.EventParticipantSecrets.V2;
@@ -105,6 +106,11 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         public IArchivingEventV2Client ArchivingEventV2Client { get; private set; }
 
         /// <summary>
+        /// Gets the client for retrieving archived events in V2 API.
+        /// </summary>
+        public IEventArchiveV2Client EventArchiveV2Client { get; private set; }
+
+        /// <summary>
         /// Gets the client for managing event addresses in V2 API.
         /// </summary>
         public IEventAddressV2Client EventAddressV2Client { get; private set; }
@@ -187,6 +193,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
 
             this.ArchivingEventV2Client =
                 serviceProvider.GetRequiredService<IArchivingEventV2Client>();
+
+            this.EventArchiveV2Client =
+                serviceProvider.GetRequiredService<IEventArchiveV2Client>();
 
             this.EventAddressV2Client =
                 serviceProvider.GetRequiredService<IEventAddressV2Client>();
@@ -377,6 +386,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IArchivingEventV2Client,
                 ArchivingEventV2Client>();
+
+            services.AddTransient<
+                IEventArchiveV2Client,
+                EventArchiveV2Client>();
 
             services.AddTransient<
                 IHealthStatusClientV2,

@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using EventHighway.Core.Clients.Events.V2;
 using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -49,6 +50,12 @@ namespace EventHighway.Core.Tests.Unit.Clients.Events.V2
 
         private static Guid GetRandomId() =>
             Guid.NewGuid();
+
+        private static int GetRandomNumber() =>
+            new IntRange(min: 2, max: 9).GetValue();
+
+        private static IQueryable<EventV2> CreateRandomEventV2s() =>
+            CreateEventV2Filler().Create(count: GetRandomNumber()).AsQueryable();
 
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
