@@ -19,5 +19,9 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
         ValueTask<EventParticipantSecretView> AddSecretAsync(
             EventParticipantSecretView secret,
             CancellationToken cancellationToken = default);
+
+        ValueTask<EventParticipantSecretView> ModifySecretAsync(
+            EventParticipantSecretView secret,
+            CancellationToken cancellationToken = default);
     }
 }

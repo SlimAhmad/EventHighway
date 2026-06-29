@@ -22,5 +22,9 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
         ValueTask<EventParticipantView> AddParticipantAsync(
             EventParticipantView participant,
             CancellationToken cancellationToken = default);
+
+        ValueTask<EventParticipantView> ModifyParticipantAsync(
+            EventParticipantView participant,
+            CancellationToken cancellationToken = default);
     }
 }

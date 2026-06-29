@@ -82,6 +82,33 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
             return AsView(addedParticipant);
         });
 
+        public ValueTask<EventParticipantView> ModifyParticipantAsync(
+            EventParticipantView participant,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            EventParticipantV2 existingParticipant =
+                await this.eventHighwayBroker.RetrieveEventParticipantV2ByIdAsync(
+                    participant.Id, cancellationToken);
+
+            existingParticipant.Name = participant.Name;
+            existingParticipant.Description = participant.Description;
+            existingParticipant.ContactEmail = participant.ContactEmail;
+            existingParticipant.ContactPhone = participant.ContactPhone;
+            existingParticipant.IsActive = participant.IsActive;
+            existingParticipant.ActiveFrom = participant.ActiveFrom;
+            existingParticipant.ActiveTo = participant.ActiveTo;
+
+            existingParticipant.UpdatedDate =
+                await this.dateTimeBroker.GetCurrentDateTimeOffsetAsync();
+
+            EventParticipantV2 modifiedParticipant =
+                await this.eventHighwayBroker.ModifyEventParticipantV2Async(
+                    existingParticipant, cancellationToken);
+
+            return AsView(modifiedParticipant);
+        });
+
         private static EventParticipantView AsView(EventParticipantV2 participant) =>
             new EventParticipantView
             {
