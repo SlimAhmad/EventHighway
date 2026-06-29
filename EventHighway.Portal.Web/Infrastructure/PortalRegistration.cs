@@ -24,12 +24,13 @@ namespace EventHighway.Portal.Web.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            // PublicationOnly so a failed first attempt (e.g. database unavailable) is not cached
-            // permanently — the next request retries construction and the portal recovers once the
-            // Core database is reachable, without an app restart.
+            // ExecutionAndPublication so the EventHighwayClient is constructed EXACTLY ONCE, even
+            // when many dashboard panels first-touch the broker concurrently during interactive
+            // prerender. PublicationOnly would let several constructions race, each running
+            // Database.Migrate() on the same Core database simultaneously, which fails every call.
             services.AddSingleton(_ => new Lazy<IClientV2>(
                 valueFactory: () => CreateClientV2(configuration),
-                mode: LazyThreadSafetyMode.PublicationOnly));
+                mode: LazyThreadSafetyMode.ExecutionAndPublication));
 
             services.AddSingleton<IEventHighwayBroker, EventHighwayBroker>();
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
