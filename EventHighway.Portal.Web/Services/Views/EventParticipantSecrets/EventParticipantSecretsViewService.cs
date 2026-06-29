@@ -31,10 +31,20 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<List<EventParticipantSecretView>> RetrieveSecretsByParticipantAsync(
-            Guid participantId,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        public async ValueTask<List<EventParticipantSecretView>>
+            RetrieveSecretsByParticipantAsync(
+                Guid participantId,
+                CancellationToken cancellationToken = default)
+        {
+            IEnumerable<EventParticipantSecretV2> secrets =
+                await this.eventHighwayBroker.RetrieveAllEventParticipantSecretV2sAsync(
+                    cancellationToken);
+
+            return secrets
+                .Where(secret => secret.ParticipantId == participantId)
+                .Select(AsView)
+                .ToList();
+        }
 
         public ValueTask<EventParticipantSecretView> AddSecretAsync(
             EventParticipantSecretView secret,
