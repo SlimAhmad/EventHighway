@@ -1,8 +1,11 @@
 @page "/admin/participants/{ParticipantId:guid}"
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Models.Views.EventParticipants
+@using EventHighway.Portal.Web.Models.Views.EventParticipantSecrets
 @using EventHighway.Portal.Web.Services.Views.EventParticipants
+@using EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
 @inject IEventParticipantsViewService ParticipantsViewService
+@inject IEventParticipantSecretsViewService SecretsViewService
 
 <PageTitle>Participant</PageTitle>
 
@@ -41,21 +44,43 @@ else if (participant is not null)
                     @(participant.IsActive ? "Active" : "Inactive")
                 </span>
             </dd>
-
-            <dt class="col-sm-3">Active Window</dt>
-            <dd class="col-sm-9">
-                @(participant.ActiveFrom?.ToString("u") ?? "—") &mdash;
-                @(participant.ActiveTo?.ToString("u") ?? "—")
-            </dd>
         </dl>
     </Card>
 
-    <Card Title="Event Participant Secrets" CssClass="mt-4">
-        <p class="text-body-secondary mb-0">
-            Secrets management for this participant is coming next.
-        </p>
+    <Card CssClass="mt-4">
+        <HeaderContent>
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <span class="fw-semibold">Event Participant Secrets</span>
+                <Button Color="primary" CssClass="btn-sm" OnClick="OpenAddSecretModal">
+                    Add Secret
+                </Button>
+            </div>
+        </HeaderContent>
+        <ChildContent>
+            @if (secretsError is not null)
+            {
+                <div class="alert alert-danger" role="alert">@secretsError</div>
+            }
+            <DataTable TItem="EventParticipantSecretView" Items="secrets" Columns="secretColumns"
+                       Searchable="false" />
+        </ChildContent>
     </Card>
 }
+
+<Modal Title="Add Secret" Visible="showAddSecretModal" OnClose="CloseAddSecretModal">
+    <ChildContent>
+        @if (addSecretError is not null)
+        {
+            <div class="alert alert-danger" role="alert">@addSecretError</div>
+        }
+        <FormText Label="Secret" @bind-Value="newSecret.Secret" />
+        <FormSwitch Label="Active" @bind-Value="newSecret.IsActive" />
+    </ChildContent>
+    <FooterContent>
+        <Button Color="secondary" OnClick="CloseAddSecretModal">Cancel</Button>
+        <Button Color="primary" OnClick="SubmitAddSecretAsync">Save</Button>
+    </FooterContent>
+</Modal>
 
 @code {
     [Parameter]
@@ -65,11 +90,40 @@ else if (participant is not null)
     private string? errorMessage;
     private EventParticipantView? participant;
 
+    private List<EventParticipantSecretView> secrets = new();
+    private string? secretsError;
+    private List<DataTableColumn<EventParticipantSecretView>> secretColumns = new();
+
+    private bool showAddSecretModal;
+    private string? addSecretError;
+    private EventParticipantSecretView newSecret = new();
+
     protected override async Task OnInitializedAsync()
     {
+        secretColumns = new List<DataTableColumn<EventParticipantSecretView>>
+        {
+            new DataTableColumn<EventParticipantSecretView>
+            {
+                Title = "Secret", Value = secret => Mask(secret.Secret), Sortable = false
+            },
+            new DataTableColumn<EventParticipantSecretView>
+            {
+                Title = "Active", Value = secret => secret.IsActive ? "Yes" : "No"
+            },
+            new DataTableColumn<EventParticipantSecretView>
+            {
+                Title = "Active From", Value = secret => secret.ActiveFrom?.ToString("u") ?? "—"
+            },
+            new DataTableColumn<EventParticipantSecretView>
+            {
+                Title = "Active To", Value = secret => secret.ActiveTo?.ToString("u") ?? "—"
+            },
+        };
+
         try
         {
             participant = await ParticipantsViewService.RetrieveParticipantByIdAsync(ParticipantId);
+            await LoadSecretsAsync();
         }
         catch
         {
@@ -78,6 +132,46 @@ else if (participant is not null)
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private async Task LoadSecretsAsync()
+    {
+        try
+        {
+            secrets = await SecretsViewService.RetrieveSecretsByParticipantAsync(ParticipantId);
+            secretsError = null;
+        }
+        catch
+        {
+            secretsError = "Unable to load secrets.";
+        }
+    }
+
+    private static string Mask(string secret) =>
+        string.IsNullOrEmpty(secret) ? string.Empty : new string('•', 8);
+
+    private void OpenAddSecretModal()
+    {
+        newSecret = new EventParticipantSecretView { ParticipantId = ParticipantId, IsActive = true };
+        addSecretError = null;
+        showAddSecretModal = true;
+    }
+
+    private void CloseAddSecretModal() =>
+        showAddSecretModal = false;
+
+    private async Task SubmitAddSecretAsync()
+    {
+        try
+        {
+            await SecretsViewService.AddSecretAsync(newSecret);
+            showAddSecretModal = false;
+            await LoadSecretsAsync();
+        }
+        catch
+        {
+            addSecretError = "Unable to add the secret. Please try again.";
         }
     }
 }
