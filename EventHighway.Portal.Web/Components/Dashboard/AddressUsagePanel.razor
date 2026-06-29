@@ -1,11 +1,20 @@
 @namespace EventHighway.Portal.Web.Components.Dashboard
+@inherits PeriodAwarePanelBase
 @using EventHighway.Core.Models.Coordinations.HealthChecks.V2
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Services.Views.HealthDashboards
 @inject IHealthViewService HealthViewService
 
 <Card CssClass="mb-4">
-    <HeaderContent><span class="fw-semibold">Usage by Address</span></HeaderContent>
+    <HeaderContent>
+        <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <span class="fw-semibold">Usage by Address</span>
+            <PeriodNavigator Period="EffectivePeriod" WindowStart="EffectiveWindowStart"
+                             Disabled="NavDisabled" CanGoNext="CanGoNext"
+                             PeriodChanged="OnPeriodChanged" PreviousRequested="OnPrevious"
+                             NextRequested="OnNext" CurrentRequested="OnCurrent" />
+        </div>
+    </HeaderContent>
     <ChildContent>
         @if (isLoading)
         {
@@ -23,39 +32,26 @@
 </Card>
 
 @code {
-    [Parameter] public TrafficPeriodV2 Period { get; set; } = TrafficPeriodV2.Day;
-    [Parameter] public DateTimeOffset WindowStart { get; set; } = DateTimeOffset.MinValue;
-    [Parameter] public int RefreshToken { get; set; }
-
     private bool isLoading = true;
     private string? errorMessage;
     private List<EventAddressSummaryV2> summaries = new();
-    private List<DataTableColumn<EventAddressSummaryV2>> columns = new();
-    private (TrafficPeriodV2, DateTimeOffset, int)? loadedKey;
 
-    protected override void OnInitialized()
+    private readonly List<DataTableColumn<EventAddressSummaryV2>> columns = new()
     {
-        columns = new List<DataTableColumn<EventAddressSummaryV2>>
-        {
-            new DataTableColumn<EventAddressSummaryV2> { Title = "Address", Value = s => s.Name },
-            new DataTableColumn<EventAddressSummaryV2> { Title = "Events", Value = s => s.TotalActiveEvents + s.TotalArchivedEvents },
-            new DataTableColumn<EventAddressSummaryV2> { Title = "Listener Events", Value = s => s.TotalListenerEvents + s.TotalArchivedListenerEvents },
-            new DataTableColumn<EventAddressSummaryV2> { Title = "Error %", Value = s => s.ErrorRate.ToString("0.00") },
-            new DataTableColumn<EventAddressSummaryV2> { Title = "Loops", Value = s => s.LoopsDetected },
-            new DataTableColumn<EventAddressSummaryV2> { Title = "Last Activity", Value = s => s.LastActivity?.ToString("u") ?? "—" },
-        };
-    }
+        new DataTableColumn<EventAddressSummaryV2> { Title = "Address", Value = s => s.Name },
+        new DataTableColumn<EventAddressSummaryV2> { Title = "Events", Value = s => s.TotalActiveEvents + s.TotalArchivedEvents },
+        new DataTableColumn<EventAddressSummaryV2> { Title = "Listener Events", Value = s => s.TotalListenerEvents + s.TotalArchivedListenerEvents },
+        new DataTableColumn<EventAddressSummaryV2> { Title = "Error %", Value = s => s.ErrorRate.ToString("0.00") },
+        new DataTableColumn<EventAddressSummaryV2> { Title = "Loops", Value = s => s.LoopsDetected },
+        new DataTableColumn<EventAddressSummaryV2> { Title = "Last Activity", Value = s => s.LastActivity?.ToString("u") ?? "—" },
+    };
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task LoadAsync(TrafficPeriodV2 period, DateTimeOffset windowStart)
     {
-        var key = (Period, WindowStart, RefreshToken);
-        if (loadedKey == key) return;
-        loadedKey = key;
-
         try
         {
-            summaries = await HealthViewService.RetrieveAddressSummariesAsync(
-                Period, WindowStart);
+            summaries = await HealthViewService.RetrieveAddressSummariesAsync(period, windowStart);
+            errorMessage = null;
         }
         catch
         {
@@ -64,6 +60,7 @@
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 }

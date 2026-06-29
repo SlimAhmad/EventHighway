@@ -1,4 +1,5 @@
 @namespace EventHighway.Portal.Web.Components.Dashboard
+@inherits PeriodAwarePanelBase
 @using System.Linq
 @using EventHighway.Core.Models.Coordinations.HealthChecks.V2
 @using EventHighway.Portal.Web.Components.CoreUI
@@ -7,9 +8,12 @@
 
 <Card CssClass="mb-4">
     <HeaderContent>
-        <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
             <span class="fw-semibold">Duplicate Detection</span>
-            <span class="text-body-secondary small">@(summary?.WindowLabel)</span>
+            <PeriodNavigator Period="EffectivePeriod" WindowStart="EffectiveWindowStart"
+                             Disabled="NavDisabled" CanGoNext="CanGoNext"
+                             PeriodChanged="OnPeriodChanged" PreviousRequested="OnPrevious"
+                             NextRequested="OnNext" CurrentRequested="OnCurrent" />
         </div>
     </HeaderContent>
     <ChildContent>
@@ -40,42 +44,28 @@
 </Card>
 
 @code {
-    [Parameter] public TrafficPeriodV2 Period { get; set; } = TrafficPeriodV2.Day;
-    [Parameter] public DateTimeOffset WindowStart { get; set; } = DateTimeOffset.MinValue;
-    [Parameter] public int RefreshToken { get; set; }
-
     private bool isLoading = true;
     private string? errorMessage;
     private DuplicateDetectionSummaryV2? summary;
     private List<DuplicateDetailV2> details = new();
-    private List<string> doughnutLabels = new() { "Unique", "Duplicates" };
+    private readonly List<string> doughnutLabels = new() { "Unique", "Duplicates" };
     private List<ChartDataset> doughnutDatasets = new();
-    private List<DataTableColumn<DuplicateDetailV2>> columns = new();
-    private (TrafficPeriodV2, DateTimeOffset, int)? loadedKey;
 
-    protected override void OnInitialized()
+    private readonly List<DataTableColumn<DuplicateDetailV2>> columns = new()
     {
-        columns = new List<DataTableColumn<DuplicateDetailV2>>
-        {
-            new DataTableColumn<DuplicateDetailV2> { Title = "Address", Value = d => d.AddressName },
-            new DataTableColumn<DuplicateDetailV2> { Title = "Participant", Value = d => d.ParticipantName ?? "Unknown" },
-            new DataTableColumn<DuplicateDetailV2> { Title = "Total", Value = d => d.TotalEvents },
-            new DataTableColumn<DuplicateDetailV2> { Title = "Duplicates", Value = d => d.Duplicates },
-            new DataTableColumn<DuplicateDetailV2> { Title = "Rate %", Value = d => d.DuplicateRate.ToString("0.00") },
-            new DataTableColumn<DuplicateDetailV2> { Title = "Last Seen", Value = d => d.LastDuplicateSeen?.ToString("u") ?? "—" },
-        };
-    }
+        new DataTableColumn<DuplicateDetailV2> { Title = "Address", Value = d => d.AddressName },
+        new DataTableColumn<DuplicateDetailV2> { Title = "Participant", Value = d => d.ParticipantName ?? "Unknown" },
+        new DataTableColumn<DuplicateDetailV2> { Title = "Total", Value = d => d.TotalEvents },
+        new DataTableColumn<DuplicateDetailV2> { Title = "Duplicates", Value = d => d.Duplicates },
+        new DataTableColumn<DuplicateDetailV2> { Title = "Rate %", Value = d => d.DuplicateRate.ToString("0.00") },
+        new DataTableColumn<DuplicateDetailV2> { Title = "Last Seen", Value = d => d.LastDuplicateSeen?.ToString("u") ?? "—" },
+    };
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task LoadAsync(TrafficPeriodV2 period, DateTimeOffset windowStart)
     {
-        var key = (Period, WindowStart, RefreshToken);
-        if (loadedKey == key) return;
-        loadedKey = key;
-
         try
         {
-            summary = await HealthViewService.RetrieveDuplicateSummaryAsync(
-                Period, WindowStart);
+            summary = await HealthViewService.RetrieveDuplicateSummaryAsync(period, windowStart);
 
             details = (summary.ByAddress ?? Enumerable.Empty<DuplicateDetailV2>()).ToList();
             doughnutDatasets = new List<ChartDataset>
@@ -87,6 +77,8 @@
                     Colors = new List<string> { "#2eb85c", "#e55353" }
                 }
             };
+
+            errorMessage = null;
         }
         catch
         {
@@ -95,6 +87,7 @@
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 }

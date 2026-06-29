@@ -1,12 +1,20 @@
 @namespace EventHighway.Portal.Web.Components.Dashboard
-@using System.Linq
+@inherits PeriodAwarePanelBase
 @using EventHighway.Core.Models.Coordinations.HealthChecks.V2
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Services.Views.HealthDashboards
 @inject IHealthViewService HealthViewService
 
 <Card CssClass="mb-4">
-    <HeaderContent><span class="fw-semibold">Usage by Participant</span></HeaderContent>
+    <HeaderContent>
+        <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+            <span class="fw-semibold">Usage by Participant</span>
+            <PeriodNavigator Period="EffectivePeriod" WindowStart="EffectiveWindowStart"
+                             Disabled="NavDisabled" CanGoNext="CanGoNext"
+                             PeriodChanged="OnPeriodChanged" PreviousRequested="OnPrevious"
+                             NextRequested="OnNext" CurrentRequested="OnCurrent" />
+        </div>
+    </HeaderContent>
     <ChildContent>
         @if (isLoading)
         {
@@ -24,40 +32,27 @@
 </Card>
 
 @code {
-    [Parameter] public TrafficPeriodV2 Period { get; set; } = TrafficPeriodV2.Day;
-    [Parameter] public DateTimeOffset WindowStart { get; set; } = DateTimeOffset.MinValue;
-    [Parameter] public int RefreshToken { get; set; }
-
     private bool isLoading = true;
     private string? errorMessage;
     private List<ParticipantSummaryV2> summaries = new();
-    private List<DataTableColumn<ParticipantSummaryV2>> columns = new();
-    private (TrafficPeriodV2, DateTimeOffset, int)? loadedKey;
 
-    protected override void OnInitialized()
+    private readonly List<DataTableColumn<ParticipantSummaryV2>> columns = new()
     {
-        columns = new List<DataTableColumn<ParticipantSummaryV2>>
-        {
-            new DataTableColumn<ParticipantSummaryV2> { Title = "Participant", Value = p => string.IsNullOrEmpty(p.Name) ? "Unknown" : p.Name },
-            new DataTableColumn<ParticipantSummaryV2> { Title = "Addresses", Value = p => p.ActiveEventAddressNames is null ? "—" : string.Join(", ", p.ActiveEventAddressNames) },
-            new DataTableColumn<ParticipantSummaryV2> { Title = "Submitted", Value = p => p.TotalEventsSubmitted },
-            new DataTableColumn<ParticipantSummaryV2> { Title = "Received", Value = p => p.TotalListenerEvents },
-            new DataTableColumn<ParticipantSummaryV2> { Title = "Pub Err %", Value = p => p.PublisherErrorRate.ToString("0.00") },
-            new DataTableColumn<ParticipantSummaryV2> { Title = "Lis Err %", Value = p => p.ListenerErrorRate.ToString("0.00") },
-            new DataTableColumn<ParticipantSummaryV2> { Title = "Last Activity", Value = p => p.LastActivity?.ToString("u") ?? "—" },
-        };
-    }
+        new DataTableColumn<ParticipantSummaryV2> { Title = "Participant", Value = p => string.IsNullOrEmpty(p.Name) ? "Unknown" : p.Name },
+        new DataTableColumn<ParticipantSummaryV2> { Title = "Addresses", Value = p => p.ActiveEventAddressNames is null ? "—" : string.Join(", ", p.ActiveEventAddressNames) },
+        new DataTableColumn<ParticipantSummaryV2> { Title = "Submitted", Value = p => p.TotalEventsSubmitted },
+        new DataTableColumn<ParticipantSummaryV2> { Title = "Received", Value = p => p.TotalListenerEvents },
+        new DataTableColumn<ParticipantSummaryV2> { Title = "Pub Err %", Value = p => p.PublisherErrorRate.ToString("0.00") },
+        new DataTableColumn<ParticipantSummaryV2> { Title = "Lis Err %", Value = p => p.ListenerErrorRate.ToString("0.00") },
+        new DataTableColumn<ParticipantSummaryV2> { Title = "Last Activity", Value = p => p.LastActivity?.ToString("u") ?? "—" },
+    };
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task LoadAsync(TrafficPeriodV2 period, DateTimeOffset windowStart)
     {
-        var key = (Period, WindowStart, RefreshToken);
-        if (loadedKey == key) return;
-        loadedKey = key;
-
         try
         {
-            summaries = await HealthViewService.RetrieveParticipantSummariesAsync(
-                Period, WindowStart);
+            summaries = await HealthViewService.RetrieveParticipantSummariesAsync(period, windowStart);
+            errorMessage = null;
         }
         catch
         {
@@ -66,6 +61,7 @@
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 }

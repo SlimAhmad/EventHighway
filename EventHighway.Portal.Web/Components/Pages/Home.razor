@@ -26,12 +26,12 @@
             SyncChanged="OnSyncChanged"
             AutoRefreshChanged="OnAutoRefreshChanged" />
 
-<TrafficPanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
-<AddressUsagePanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
-<LoopPanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
-<DuplicatePanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
+<TrafficPanel GlobalPeriod="period" GlobalWindowStart="windowStart" SyncEnabled="syncEnabled" RefreshToken="refreshToken" />
+<AddressUsagePanel GlobalPeriod="period" GlobalWindowStart="windowStart" SyncEnabled="syncEnabled" RefreshToken="refreshToken" />
+<LoopPanel GlobalPeriod="period" GlobalWindowStart="windowStart" SyncEnabled="syncEnabled" RefreshToken="refreshToken" />
+<DuplicatePanel GlobalPeriod="period" GlobalWindowStart="windowStart" SyncEnabled="syncEnabled" RefreshToken="refreshToken" />
 <RetryPanel RefreshToken="refreshToken" />
-<ParticipantPanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
+<ParticipantPanel GlobalPeriod="period" GlobalWindowStart="windowStart" SyncEnabled="syncEnabled" RefreshToken="refreshToken" />
 
 @code {
     private TrafficPeriodV2 period = TrafficPeriodV2.Day;
@@ -44,11 +44,6 @@
     private System.Timers.Timer? timer;
 
     private static DateTimeOffset Now => DateTimeOffset.UtcNow;
-
-    private TrafficPeriodV2 EffectivePeriod => syncEnabled ? period : TrafficPeriodV2.Day;
-
-    private DateTimeOffset EffectiveWindowStart =>
-        syncEnabled ? windowStart : DateTimeOffset.MinValue;
 
     private bool CanGoNext => WindowNavigator.CanGoNext(period, windowStart, Now);
 
