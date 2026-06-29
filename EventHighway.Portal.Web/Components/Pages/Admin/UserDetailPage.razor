@@ -1,0 +1,159 @@
+@page "/admin/users/{UserId:guid}"
+@attribute [Authorize(Roles = "Administrators")]
+@using System.Collections.Generic
+@using System.Linq
+@using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.Users
+@using EventHighway.Portal.Web.Services.Views.Users
+@inject IUsersViewService UsersViewService
+@inject NavigationManager Navigation
+
+<PageTitle>User</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center py-3">
+    <h2 class="mb-0">User</h2>
+    <Button Color="secondary" OnClick="GoBack">Back to Users</Button>
+</div>
+
+@if (isLoading)
+{
+    <Spinner />
+}
+else if (errorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+else if (user is not null)
+{
+    @if (actionError is not null)
+    {
+        <div class="alert alert-danger" role="alert">@actionError</div>
+    }
+
+    <Card>
+        <HeaderContent>User Details</HeaderContent>
+        <ChildContent>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Username</dt>
+                <dd class="col-sm-9">@user.UserName</dd>
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@user.Email</dd>
+            </dl>
+        </ChildContent>
+    </Card>
+
+    <Card>
+        <HeaderContent>Roles</HeaderContent>
+        <ChildContent>
+            @if (user.Roles.Any())
+            {
+                <ul class="list-group mb-3">
+                    @foreach (string role in user.Roles)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @role
+                            <Button Color="danger"
+                                    CssClass="btn-sm"
+                                    OnClick="@(() => RemoveRoleAsync(role))">
+                                Remove
+                            </Button>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-body-secondary">This user has no roles assigned.</p>
+            }
+
+            <div class="d-flex gap-2 align-items-end">
+                <div class="flex-grow-1">
+                    <FormSelect Label="Add Role"
+                                Options="availableRoleOptions"
+                                @bind-Value="selectedRoleToAdd" />
+                </div>
+                <Button Color="primary" OnClick="AddRoleAsync">Add</Button>
+            </div>
+        </ChildContent>
+    </Card>
+}
+
+@code {
+    [Parameter]
+    public Guid UserId { get; set; }
+
+    private bool isLoading = true;
+    private string? errorMessage;
+    private string? actionError;
+    private UserView? user;
+    private List<string> allRoleNames = new();
+    private List<SelectOption> availableRoleOptions = new();
+    private string? selectedRoleToAdd = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            allRoleNames = await UsersViewService.RetrieveAllRoleNamesAsync();
+            await ReloadUserAsync();
+        }
+        catch
+        {
+            errorMessage = "Unable to load the user. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ReloadUserAsync()
+    {
+        user = await UsersViewService.RetrieveUserByIdAsync(UserId);
+
+        availableRoleOptions = allRoleNames
+            .Where(role => !user.Roles.Contains(role))
+            .Select(role => new SelectOption { Text = role, Value = role })
+            .ToList();
+
+        selectedRoleToAdd = availableRoleOptions.FirstOrDefault()?.Value ?? string.Empty;
+    }
+
+    private async Task AddRoleAsync()
+    {
+        if (string.IsNullOrWhiteSpace(selectedRoleToAdd))
+        {
+            return;
+        }
+
+        actionError = null;
+
+        try
+        {
+            await UsersViewService.AddUserToRoleAsync(UserId, selectedRoleToAdd);
+            await ReloadUserAsync();
+        }
+        catch
+        {
+            actionError = "Unable to add the role. Please try again.";
+        }
+    }
+
+    private async Task RemoveRoleAsync(string role)
+    {
+        actionError = null;
+
+        try
+        {
+            await UsersViewService.RemoveUserFromRoleAsync(UserId, role);
+            await ReloadUserAsync();
+        }
+        catch
+        {
+            actionError = "Unable to remove the role. The last administrator cannot be removed.";
+        }
+    }
+
+    private void GoBack() =>
+        Navigation.NavigateTo("/admin/users");
+}
