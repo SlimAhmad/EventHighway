@@ -50,7 +50,7 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.ExternalMediaI
                 await this.eventSubstrateBroker.RetrieveOrRegisterAddressAsync(
                     new EventAddressV2
                     {
-                        Id = Guid.NewGuid(),
+                        Id = SeedIdentifiers.StableId("address:" + NewReleasesAddressName),
                         Name = NewReleasesAddressName,
                         Description = NewReleasesAddressName,
                         CreatedDate = now,

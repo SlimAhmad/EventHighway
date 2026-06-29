@@ -158,6 +158,7 @@ public partial class Program
             await broker.AddParticipantAsync(
                 new EventParticipantV2
                 {
+                    Id = SeedIdentifiers.StableId("participant:Ann"),
                     Name = "Ann",
                     Description = "Ann",
                     IsActive = true,
@@ -169,7 +170,7 @@ public partial class Program
             await broker.RegisterListenerAsync(
                 new EventListenerV2
                 {
-                    Id = Guid.NewGuid(),
+                    Id = SeedIdentifiers.StableId("listener:Ann New Releases Listener"),
                     Name = "Ann New Releases Listener",
                     Description = "Ann, a late joiner who wants the back-catalogue.",
                     HandlerId = handlers.Ann.Id,
@@ -214,6 +215,7 @@ public partial class Program
                 await broker.AddParticipantAsync(
                     new EventParticipantV2
                     {
+                        Id = SeedIdentifiers.StableId("participant:NFlix"),
                         Name = "NFlix",
                         Description = "NFlix streaming platform.",
                         IsActive = true,
@@ -224,6 +226,7 @@ public partial class Program
             await broker.AddParticipantSecretAsync(
                 new EventParticipantSecretV2
                 {
+                    Id = SeedIdentifiers.StableId("secret:NFlix"),
                     Secret = "NFlix",
                     ParticipantId = nflixParticipant.Id,
                     IsActive = true,
@@ -235,6 +238,7 @@ public partial class Program
                 await broker.AddParticipantAsync(
                     new EventParticipantV2
                     {
+                        Id = SeedIdentifiers.StableId("participant:MediaItemService"),
                         Name = "MediaItemService",
                         Description = "Internal service that ingests external contributions.",
                         IsActive = true,
@@ -246,6 +250,7 @@ public partial class Program
                 await broker.AddParticipantAsync(
                     new EventParticipantV2
                     {
+                        Id = SeedIdentifiers.StableId("participant:BingeBox"),
                         Name = "BingeBox",
                         Description = "BingeBox a NFlix affiliate",
                         IsActive = true,
@@ -257,6 +262,7 @@ public partial class Program
                 await broker.AddParticipantAsync(
                     new EventParticipantV2
                     {
+                        Id = SeedIdentifiers.StableId("participant:Joe"),
                         Name = "Joe",
                         Description = "Joe, a movie buff.",
                         IsActive = true,
@@ -275,7 +281,7 @@ public partial class Program
                 await broker.RetrieveOrRegisterAddressAsync(
                     new EventAddressV2
                     {
-                        Id = Guid.NewGuid(),
+                        Id = SeedIdentifiers.StableId("address:NFlix-NewReleases"),
                         Name = "NFlix-NewReleases",
                         Description = "NFlix New Releases",
                         CreatedDate = now,
@@ -300,7 +306,7 @@ public partial class Program
             await broker.RegisterListenerAsync(
                 new EventListenerV2
                 {
-                    Id = Guid.NewGuid(),
+                    Id = SeedIdentifiers.StableId("listener:MediaItemService Internal Listener"),
                     Name = "MediaItemService Internal Listener",
                     Description = "Internal process that receives every NFlix new release.",
                     HandlerId = mediaItemReceivedHandler.Id,
@@ -315,7 +321,7 @@ public partial class Program
                 await broker.RegisterListenerAsync(
                     new EventListenerV2
                     {
-                        Id = Guid.NewGuid(),
+                        Id = SeedIdentifiers.StableId("listener:BingeBox New Releases Listener"),
                         Name = "BingeBox New Releases Listener",
                         Description = "Receives every NFlix new release.",
                         HandlerId = handlers.BingeBox.Id,
@@ -330,7 +336,7 @@ public partial class Program
                 await broker.RegisterListenerAsync(
                     new EventListenerV2
                     {
-                        Id = Guid.NewGuid(),
+                        Id = SeedIdentifiers.StableId("listener:Joe Good Movies Listener"),
                         Name = "Joe Good Movies Listener",
                         Description = "Forwards movies rated 8.0 or higher to Joe's API.",
                         HandlerId = handlers.Joe.Id,

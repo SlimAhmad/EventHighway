@@ -10,10 +10,12 @@ namespace EventHighway.ClientV2.SubstrateApp.Brokers.EventSubstrates
 {
     public sealed partial class EventSubstrateBroker
     {
+        // Idempotent on the listener's (stable) Id: RetrieveOrRegister reuses an existing row with
+        // the same Id, so re-running the seed does not insert duplicate listeners.
         public ValueTask<EventListenerV2> RegisterListenerAsync(
             EventListenerV2 eventListener,
             CancellationToken cancellationToken = default) =>
             this.eventHighwayClient.V2.EventListenerV2Client
-                .RegisterEventListenerV2Async(eventListener, cancellationToken);
+                .RetrieveOrRegisterEventListenerV2Async(eventListener, cancellationToken);
     }
 }
