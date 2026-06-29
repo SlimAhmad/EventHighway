@@ -26,8 +26,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             EventParticipantSecretV2 randomEventParticipantSecretV2 =
                 CreateRandomEventParticipantSecretV2(randomDateTimeOffset);
-
-            randomEventParticipantSecretV2.Id = Guid.Empty;
+
             EventParticipantSecretV2 inputEventParticipantSecretV2 = randomEventParticipantSecretV2;
             EventParticipantSecretV2 insertedEventParticipantSecretV2 = inputEventParticipantSecretV2;
 
