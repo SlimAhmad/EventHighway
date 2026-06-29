@@ -2,7 +2,6 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using EventHighway.Core.Clients.EventHighways.V2;
 using EventHighway.Portal.Web.Infrastructure;
 
 namespace EventHighway.Portal.Web.Brokers.EventHighways
@@ -14,10 +13,10 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
         public EventHighwayBroker(ClientV2Provider clientV2Provider) =>
             this.clientV2Provider = clientV2Provider;
 
-        // The underlying V2 client opens and migrates the Core database on construction. Resolving
-        // it on first actual use inside a broker method (via the provider, which builds it once and
-        // retries after failure) means a database outage surfaces as an exception the calling view
-        // service can catch and report, rather than crashing the app during DI resolution.
-        private IClientV2 clientV2 => this.clientV2Provider.GetClient();
+        // Every database call is routed through clientV2Provider.ExecuteAsync, which builds the V2
+        // client once (retrying after a failed cold-start) and then serializes all access to its single
+        // non-thread-safe EF DbContext — the dashboard fans its panels out concurrently, so without this
+        // gate they collide on the shared context. A database outage still surfaces as an exception the
+        // calling view service can catch and report, rather than crashing the app during DI resolution.
     }
 }

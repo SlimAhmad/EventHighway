@@ -12,52 +12,66 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
 {
     public sealed partial class EventHighwayBroker
     {
-        public async ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthRagStatusV2Async(
+        public ValueTask<IEnumerable<HealthCheckItemV2>> RetrieveHealthRagStatusV2Async(
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.HealthStatusClientV2
-                .RetrieveHealthRagStatusV2Async(cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.HealthStatusClientV2
+                    .RetrieveHealthRagStatusV2Async(cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<TrafficSnapshotV2> RetrieveTrafficSnapshotV2Async(
+        public ValueTask<TrafficSnapshotV2> RetrieveTrafficSnapshotV2Async(
             TrafficPeriodV2 period,
             DateTimeOffset windowStart,
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.HealthTrafficClientV2
-                .RetrieveTrafficSnapshotV2Async(period, windowStart, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.HealthTrafficClientV2
+                    .RetrieveTrafficSnapshotV2Async(period, windowStart, cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<IEnumerable<EventAddressSummaryV2>>
+        public ValueTask<IEnumerable<EventAddressSummaryV2>>
             RetrieveEventAddressSummaryV2Async(
                 TrafficPeriodV2 period,
                 DateTimeOffset windowStart,
                 CancellationToken cancellationToken = default) =>
-            await this.clientV2.HealthAddressClientV2
-                .RetrieveEventAddressSummaryV2Async(period, windowStart, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.HealthAddressClientV2
+                    .RetrieveEventAddressSummaryV2Async(period, windowStart, cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<LoopDetectionSummaryV2> RetrieveLoopDetectionSummaryV2Async(
+        public ValueTask<LoopDetectionSummaryV2> RetrieveLoopDetectionSummaryV2Async(
             TrafficPeriodV2 period,
             DateTimeOffset windowStart,
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.HealthLoopClientV2
-                .RetrieveLoopDetectionSummaryV2Async(period, windowStart, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.HealthLoopClientV2
+                    .RetrieveLoopDetectionSummaryV2Async(period, windowStart, cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<DuplicateDetectionSummaryV2>
+        public ValueTask<DuplicateDetectionSummaryV2>
             RetrieveDuplicateDetectionSummaryV2Async(
                 TrafficPeriodV2 period,
                 DateTimeOffset windowStart,
                 CancellationToken cancellationToken = default) =>
-            await this.clientV2.HealthDuplicateClientV2
-                .RetrieveDuplicateDetectionSummaryV2Async(period, windowStart, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.HealthDuplicateClientV2
+                    .RetrieveDuplicateDetectionSummaryV2Async(period, windowStart, cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<RetryHealthSummaryV2> RetrieveRetryHealthV2Async(
+        public ValueTask<RetryHealthSummaryV2> RetrieveRetryHealthV2Async(
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.HealthRetryClientV2
-                .RetrieveRetryHealthV2Async(cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.HealthRetryClientV2
+                    .RetrieveRetryHealthV2Async(cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<IEnumerable<ParticipantSummaryV2>>
+        public ValueTask<IEnumerable<ParticipantSummaryV2>>
             RetrieveParticipantSummaryV2Async(
                 TrafficPeriodV2 period,
                 DateTimeOffset windowStart,
                 CancellationToken cancellationToken = default) =>
-            await this.clientV2.HealthParticipantClientV2
-                .RetrieveParticipantSummaryV2Async(period, windowStart, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.HealthParticipantClientV2
+                    .RetrieveParticipantSummaryV2Async(period, windowStart, cancellationToken),
+                cancellationToken);
     }
 }

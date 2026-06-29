@@ -12,21 +12,32 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
 {
     public sealed partial class EventHighwayBroker
     {
-        public async ValueTask<EventAddressV2> RegisterEventAddressV2Async(
+        public ValueTask<EventAddressV2> RegisterEventAddressV2Async(
             EventAddressV2 eventAddressV2,
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.EventAddressV2Client
-                .RegisterEventAddressV2Async(eventAddressV2, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.EventAddressV2Client
+                    .RegisterEventAddressV2Async(eventAddressV2, cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync(
+        // The deferred IQueryable is materialized inside the database gate (ToList) so its enumeration
+        // never escapes the lock and hits the shared DbContext concurrently; callers then run their
+        // paging/filtering in memory over the returned snapshot.
+        public ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync(
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.EventAddressV2Client
-                .RetrieveAllEventAddressV2sAsync(cancellationToken);
+            this.clientV2Provider.ExecuteAsync(async client =>
+                (await client.EventAddressV2Client
+                    .RetrieveAllEventAddressV2sAsync(cancellationToken))
+                    .ToList()
+                    .AsQueryable(),
+                cancellationToken);
 
-        public async ValueTask<EventAddressV2> RemoveEventAddressV2ByIdAsync(
+        public ValueTask<EventAddressV2> RemoveEventAddressV2ByIdAsync(
             Guid eventAddressV2Id,
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.EventAddressV2Client
-                .RemoveEventAddressV2ByIdAsync(eventAddressV2Id, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.EventAddressV2Client
+                    .RemoveEventAddressV2ByIdAsync(eventAddressV2Id, cancellationToken),
+                cancellationToken);
     }
 }

@@ -12,34 +12,44 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
 {
     public sealed partial class EventHighwayBroker
     {
-        public async ValueTask<EventParticipantV2> AddEventParticipantV2Async(
+        public ValueTask<EventParticipantV2> AddEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.EventParticipantV2Client
-                .AddEventParticipantV2Async(eventParticipantV2, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.EventParticipantV2Client
+                    .AddEventParticipantV2Async(eventParticipantV2, cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<IEnumerable<EventParticipantV2>>
+        public ValueTask<IEnumerable<EventParticipantV2>>
             RetrieveAllEventParticipantV2sAsync(
                 CancellationToken cancellationToken = default) =>
-            await this.clientV2.EventParticipantV2Client
-                .RetrieveAllEventParticipantV2sAsync(cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.EventParticipantV2Client
+                    .RetrieveAllEventParticipantV2sAsync(cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<EventParticipantV2> RetrieveEventParticipantV2ByIdAsync(
+        public ValueTask<EventParticipantV2> RetrieveEventParticipantV2ByIdAsync(
             Guid eventParticipantV2Id,
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.EventParticipantV2Client
-                .RetrieveEventParticipantV2ByIdAsync(eventParticipantV2Id, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.EventParticipantV2Client
+                    .RetrieveEventParticipantV2ByIdAsync(eventParticipantV2Id, cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<EventParticipantV2> ModifyEventParticipantV2Async(
+        public ValueTask<EventParticipantV2> ModifyEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.EventParticipantV2Client
-                .ModifyEventParticipantV2Async(eventParticipantV2, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.EventParticipantV2Client
+                    .ModifyEventParticipantV2Async(eventParticipantV2, cancellationToken),
+                cancellationToken);
 
-        public async ValueTask<EventParticipantV2> RemoveEventParticipantV2ByIdAsync(
+        public ValueTask<EventParticipantV2> RemoveEventParticipantV2ByIdAsync(
             Guid eventParticipantV2Id,
             CancellationToken cancellationToken = default) =>
-            await this.clientV2.EventParticipantV2Client
-                .RemoveEventParticipantV2ByIdAsync(eventParticipantV2Id, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.EventParticipantV2Client
+                    .RemoveEventParticipantV2ByIdAsync(eventParticipantV2Id, cancellationToken),
+                cancellationToken);
     }
 }

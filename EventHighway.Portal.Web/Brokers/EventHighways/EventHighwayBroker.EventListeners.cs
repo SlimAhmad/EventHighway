@@ -12,12 +12,18 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
 {
     public sealed partial class EventHighwayBroker
     {
-        public async ValueTask<IQueryable<EventListenerV2>>
+        // The deferred IQueryable is materialized inside the database gate (ToList) so its enumeration
+        // never escapes the lock and hits the shared DbContext concurrently.
+        public ValueTask<IQueryable<EventListenerV2>>
             RetrieveEventListenerV2sByEventAddressIdAsync(
                 Guid eventAddressV2Id,
                 CancellationToken cancellationToken = default) =>
-            await this.clientV2.EventListenerV2Client
-                .RetrieveEventListenerV2sByEventAddressIdAsync(
-                    eventAddressV2Id, cancellationToken);
+            this.clientV2Provider.ExecuteAsync(async client =>
+                (await client.EventListenerV2Client
+                    .RetrieveEventListenerV2sByEventAddressIdAsync(
+                        eventAddressV2Id, cancellationToken))
+                    .ToList()
+                    .AsQueryable(),
+                cancellationToken);
     }
 }
