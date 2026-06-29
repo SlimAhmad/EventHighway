@@ -14,10 +14,10 @@ else if (State == RagTileRowState.Content)
         <h6 class="rag-group-title text-body-secondary text-uppercase small fw-semibold mt-4 mb-2">
             @group.Key
         </h6>
-        <div class="row g-3">
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
             @foreach (HealthRagTile tile in group)
             {
-                <div class="col-sm-6 col-lg-3">
+                <div class="col">
                     <StatTile Variant="tile.Variant"
                               Value="@tile.Value"
                               Label="@tile.Label" />

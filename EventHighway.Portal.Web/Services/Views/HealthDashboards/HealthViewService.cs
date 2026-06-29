@@ -98,12 +98,19 @@ namespace EventHighway.Portal.Web.Services.Views.HealthDashboards
             new HealthRagTile
             {
                 Grouping = healthCheckItem.Grouping,
-                Label = healthCheckItem.Item,
+                Label = ShortenLabel(healthCheckItem.Grouping, healthCheckItem.Item),
                 Value = healthCheckItem.Value,
                 Description = healthCheckItem.Description,
                 StatusCode = healthCheckItem.StatusCode,
                 Variant = AsVariant(healthCheckItem.Status)
             };
+
+        // The "Event Archives" group header already says these are archived, so drop the
+        // redundant "Archived" from each tile label (e.g. "Total Archived Events" -> "Total Events").
+        private static string ShortenLabel(string grouping, string item) =>
+            grouping == "Event Archives"
+                ? item.Replace("Archived ", string.Empty).Replace(" Archived", string.Empty)
+                : item;
 
         private static StatTileVariant AsVariant(string status) =>
             status switch
