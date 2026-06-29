@@ -90,7 +90,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventParticipantSecrets.V2
 
             filler.Setup()
                 .OnProperty(eventParticipantSecretV2 =>
-                    eventParticipantSecretV2.Id).Use(Guid.Empty)
+                    eventParticipantSecretV2.Id).Use(() => Guid.NewGuid())
 
                 .OnProperty(eventParticipantSecretV2 =>
                     eventParticipantSecretV2.ParticipantId).Use(participantId)
@@ -119,7 +119,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventParticipantSecrets.V2
 
             filler.Setup()
                 .OnProperty(eventParticipantV2 =>
-                    eventParticipantV2.Id).Use(Guid.Empty)
+                    eventParticipantV2.Id).Use(() => Guid.NewGuid())
 
                 .OnProperty(eventParticipantV2 =>
                     eventParticipantV2.IsActive).Use(true)
