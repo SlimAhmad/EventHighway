@@ -3,20 +3,14 @@
 // ----------------------------------------------------------------------------------
 
 using EventHighway.Abstractions.EventHandlers;
-using EventHighway.ClientV2.SubstrateApp.Models.MediaItems;
 
 namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.MediaItems
 {
     public interface IMediaItemService
     {
-        // Delegate event handler that bridges the ExternalMediaContributions listener
-        // into this service: it ingests each external contribution via AddMediaItemAsync.
-        IEventHandler ExternalContributionsEventHandler { get; }
-
-        ValueTask<MediaItem> AddMediaItemAsync(MediaItem mediaItem);
-        ValueTask<IQueryable<MediaItem>> RetrieveAllMediaItemsAsync();
-        ValueTask<MediaItem> RetrieveMediaItemByIdAsync(Guid mediaItemId);
-        ValueTask<MediaItem> UpdateMediaItemAsync(MediaItem mediaItem);
-        ValueTask<MediaItem> RemoveMediaItemByIdAsync(Guid mediaItemId);
+        // A sample internal subscriber: this delegate event handler is wired to a listener on the
+        // "NFlix-NewReleases" address, showing how an internal service consumes events off the
+        // substrate. It receives only the event content — never the publisher's credentials.
+        IEventHandler MediaItemReceivedEventHandler { get; }
     }
 }

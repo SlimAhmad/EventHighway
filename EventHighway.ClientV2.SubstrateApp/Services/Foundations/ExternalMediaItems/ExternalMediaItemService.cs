@@ -14,12 +14,12 @@ using EventHighway.Core.Models.Services.Foundations.Events.V2;
 namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.ExternalMediaItems
 {
     // The authenticated public intake. A media item arrives with the contributing
-    // participant's id and secret; once validated as present, it is submitted onto the
-    // "ExternalMediaContributions" address (carrying those credentials, which
-    // EventHighway.Core verifies) where MediaItemService picks it up via a listener.
+    // participant's id and secret; once validated as present, it is published directly onto the
+    // "NFlix-NewReleases" address carrying those credentials (which EventHighway.Core verifies).
+    // The participant attribution lives on that EventV2 record — no downstream handler needs it.
     public partial class ExternalMediaItemService : IExternalMediaItemService
     {
-        private const string ExternalMediaContributionsAddressName = "ExternalMediaContributions";
+        private const string NewReleasesAddressName = "NFlix-NewReleases";
 
         private readonly IEventSubstrateBroker eventSubstrateBroker;
         private readonly IJsonSerializationBroker jsonSerializationBroker;
@@ -38,8 +38,8 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.ExternalMediaI
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<MediaItem> AddExternalMediaItemAsync(ExternalMediaItem externalMediaItem) =>
-        TryCatch(async () =>
+        public async ValueTask AddExternalMediaItemAsync(ExternalMediaItem externalMediaItem) =>
+        await TryCatch(async () =>
         {
             ValidateExternalMediaItemOnAdd(externalMediaItem);
 
@@ -51,8 +51,8 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.ExternalMediaI
                     new EventAddressV2
                     {
                         Id = Guid.NewGuid(),
-                        Name = ExternalMediaContributionsAddressName,
-                        Description = ExternalMediaContributionsAddressName,
+                        Name = NewReleasesAddressName,
+                        Description = NewReleasesAddressName,
                         CreatedDate = now,
                         UpdatedDate = now
                     });
@@ -64,7 +64,7 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.ExternalMediaI
             {
                 Id = Guid.NewGuid(),
                 Content = content,
-                EventName = "External MediaItem Contributed",
+                EventName = "MediaItem Added",
                 EventAddressId = eventAddress.Id,
                 ParticipantId = externalMediaItem.ParticipantId,
                 ParticipantSecret = externalMediaItem.Secret,

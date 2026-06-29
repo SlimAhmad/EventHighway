@@ -40,8 +40,6 @@ public partial class Program
         IMediaItemService mediaItemService =
             serviceProvider.GetRequiredService<IMediaItemService>();
 
-        var mediaItemServiceImpl = (MediaItemService)mediaItemService;
-
         IExternalMediaItemService externalMediaItemService =
             serviceProvider.GetRequiredService<IExternalMediaItemService>();
 
@@ -54,15 +52,10 @@ public partial class Program
             EventParticipantV2 joe) =
                 await SetupParticipantsAndSecretsAsync();
 
-        // Attribute the internal release events MediaItemService emits to NFlix so they are not
-        // reported as an Unknown participant on the health dashboard.
-        mediaItemServiceImpl.PublisherParticipantId = nflix.Id;
-
         // =========================================================
         // 3) Event addresses
         // =========================================================
-        (EventAddressV2 externalContributions, EventAddressV2 newReleases) =
-            await SetupEventAddressesAsync();
+        EventAddressV2 newReleases = await SetupEventAddressesAsync();
 
         // =========================================================
         // 4) Event listeners and their handlers
@@ -274,21 +267,9 @@ public partial class Program
             return (nflixParticipant, mediaServiceParticipant, bingeBoxParticipant, joeParticipant);
         }
 
-        async Task<(EventAddressV2 ExternalContributions, EventAddressV2 NewReleases)>
-            SetupEventAddressesAsync()
+        async Task<EventAddressV2> SetupEventAddressesAsync()
         {
             DateTimeOffset now = DateTimeOffset.UtcNow;
-
-            EventAddressV2 externalContributionsAddress =
-                await broker.RetrieveOrRegisterAddressAsync(
-                    new EventAddressV2
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "ExternalMediaContributions",
-                        Description = "External media contributions intake.",
-                        CreatedDate = now,
-                        UpdatedDate = now
-                    });
 
             EventAddressV2 newReleasesAddress =
                 await broker.RetrieveOrRegisterAddressAsync(
@@ -301,7 +282,7 @@ public partial class Program
                         UpdatedDate = now
                     });
 
-            return (externalContributionsAddress, newReleasesAddress);
+            return newReleasesAddress;
         }
 
         async Task<(EventListenerV2 BingeBoxListener, EventListenerV2 JoeListener)>
@@ -309,21 +290,22 @@ public partial class Program
         {
             DateTimeOffset now = DateTimeOffset.UtcNow;
 
-            // Bridge: external contributions are handled by MediaItemService (via its own
-            // substrate delegate), which in turn submits the media item onto NFlix-NewReleases.
-            IEventHandler contributionsHandler = mediaItemService.ExternalContributionsEventHandler;
+            // A sample internal subscriber: MediaItemService listens on NFlix-NewReleases and
+            // reports each received media item — demonstrating how an internal service consumes
+            // events off the substrate (it never sees the publisher's credentials).
+            IEventHandler mediaItemReceivedHandler = mediaItemService.MediaItemReceivedEventHandler;
 
-            broker.RegisterEventHandler(contributionsHandler);
+            broker.RegisterEventHandler(mediaItemReceivedHandler);
 
             await broker.RegisterListenerAsync(
                 new EventListenerV2
                 {
                     Id = Guid.NewGuid(),
-                    Name = "MediaItemService Contributions Listener",
-                    Description = "Ingests external contributions into MediaItemService.",
-                    HandlerId = contributionsHandler.Id,
-                    HandlerName = contributionsHandler.Name,
-                    EventAddressId = externalContributions.Id,
+                    Name = "MediaItemService Internal Listener",
+                    Description = "Internal process that receives every NFlix new release.",
+                    HandlerId = mediaItemReceivedHandler.Id,
+                    HandlerName = mediaItemReceivedHandler.Name,
+                    EventAddressId = newReleases.Id,
                     ParticipantId = mediaService.Id,
                     CreatedDate = now,
                     UpdatedDate = now
