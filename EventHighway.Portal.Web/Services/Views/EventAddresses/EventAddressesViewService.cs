@@ -65,6 +65,18 @@ namespace EventHighway.Portal.Web.Services.Views.EventAddresses
             return AsView(registeredAddress);
         });
 
+        public ValueTask<EventAddressView> RemoveAddressByIdAsync(
+            Guid addressId,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            EventAddressV2 removedAddress =
+                await this.eventHighwayBroker.RemoveEventAddressV2ByIdAsync(
+                    addressId, cancellationToken);
+
+            return AsView(removedAddress);
+        });
+
         private static EventAddressView AsView(EventAddressV2 address) =>
             new EventAddressView
             {

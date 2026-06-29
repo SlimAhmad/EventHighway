@@ -7,6 +7,7 @@
 @using EventHighway.Portal.Web.Services.Views.EventListeners
 @inject IEventAddressesViewService AddressesViewService
 @inject IEventListenersViewService ListenersViewService
+@inject NavigationManager Navigation
 
 <PageTitle>Event Address</PageTitle>
 
@@ -25,14 +26,28 @@ else if (errorMessage is not null)
 }
 else if (address is not null)
 {
-    <Card Title="@address.Name">
-        <dl class="row mb-0">
-            <dt class="col-sm-3">Id</dt>
-            <dd class="col-sm-9">@address.Id</dd>
+    <Card>
+        <HeaderContent>
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <span class="fw-semibold">@address.Name</span>
+                <Button Color="danger" CssClass="btn-sm" OnClick="RequestDeleteAddress">
+                    Delete
+                </Button>
+            </div>
+        </HeaderContent>
+        <ChildContent>
+            @if (deleteError is not null)
+            {
+                <div class="alert alert-danger" role="alert">@deleteError</div>
+            }
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Id</dt>
+                <dd class="col-sm-9">@address.Id</dd>
 
-            <dt class="col-sm-3">Description</dt>
-            <dd class="col-sm-9">@address.Description</dd>
-        </dl>
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@address.Description</dd>
+            </dl>
+        </ChildContent>
     </Card>
 
     <Card Title="Event Listeners" CssClass="mt-4">
@@ -56,6 +71,14 @@ else
     <div class="alert alert-warning" role="alert">Address not found.</div>
 }
 
+<ConfirmDialog Visible="confirmVisible"
+               Title="Confirm delete"
+               Message="Deleting this address is permanent and cannot be undone."
+               ConfirmText="OK"
+               CancelText="Cancel"
+               OnConfirm="DeleteAddressAsync"
+               OnCancel="CancelDelete" />
+
 @code {
     [Parameter]
     public Guid AddressId { get; set; }
@@ -67,6 +90,9 @@ else
     private List<EventListenerView> listeners = new();
     private string? listenersError;
     private List<DataTableColumn<EventListenerView>> listenerColumns = new();
+
+    private bool confirmVisible;
+    private string? deleteError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,6 +133,31 @@ else
         catch
         {
             listenersError = "Unable to load listeners.";
+        }
+    }
+
+    private void RequestDeleteAddress()
+    {
+        deleteError = null;
+        confirmVisible = true;
+    }
+
+    private void CancelDelete() =>
+        confirmVisible = false;
+
+    private async Task DeleteAddressAsync()
+    {
+        confirmVisible = false;
+
+        try
+        {
+            await AddressesViewService.RemoveAddressByIdAsync(AddressId);
+            Navigation.NavigateTo("admin/event-addresses");
+        }
+        catch
+        {
+            deleteError =
+                "Unable to delete this address. It may still have events or listeners associated with it.";
         }
     }
 }
