@@ -32,9 +32,6 @@ namespace EventHighway.Portal.Web.Components.Navigation
                         new NavItem("Event Address", "cil-location-pin", "admin/event-addresses",
                             Roles: new[] { "Administrators" }, RequiresAuth: true),
 
-                        new NavItem("Event Listeners", "cil-headphones", "admin/event-listeners",
-                            Roles: new[] { "Administrators" }, RequiresAuth: true),
-
                         new NavItem("EventsV2", "cil-bolt", "admin/events",
                             Roles: new[] { "Administrators" }, RequiresAuth: true),
 

@@ -42,7 +42,6 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Navigation
             {
                 "admin/participants",
                 "admin/event-addresses",
-                "admin/event-listeners",
                 "admin/events",
                 "admin/event-archives",
                 "admin/replay",
