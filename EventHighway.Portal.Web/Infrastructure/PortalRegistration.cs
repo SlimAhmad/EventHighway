@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Threading;
 using EventHighway.Core.Clients.EventHighways;
 using EventHighway.Core.Clients.EventHighways.V2;
 using EventHighway.Core.Models.Configurations;
@@ -24,13 +23,9 @@ namespace EventHighway.Portal.Web.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            // ExecutionAndPublication so the EventHighwayClient is constructed EXACTLY ONCE, even
-            // when many dashboard panels first-touch the broker concurrently during interactive
-            // prerender. PublicationOnly would let several constructions race, each running
-            // Database.Migrate() on the same Core database simultaneously, which fails every call.
-            services.AddSingleton(_ => new Lazy<IClientV2>(
-                valueFactory: () => CreateClientV2(configuration),
-                mode: LazyThreadSafetyMode.ExecutionAndPublication));
+            // Serialized single construction (no migration race) that retries after a failed first
+            // attempt (recovers from a LocalDB cold start without an app restart). See ClientV2Provider.
+            services.AddSingleton(_ => new ClientV2Provider(() => CreateClientV2(configuration)));
 
             services.AddSingleton<IEventHighwayBroker, EventHighwayBroker>();
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
