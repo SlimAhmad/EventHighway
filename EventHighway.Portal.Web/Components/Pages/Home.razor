@@ -37,8 +37,8 @@
     private TrafficPeriodV2 period = TrafficPeriodV2.Day;
     private DateTimeOffset windowStart;
     private bool syncEnabled = true;
-    private int autoRefreshSeconds;
-    private int countdown;
+    private int autoRefreshSeconds = 60;
+    private int countdown = 60;
     private int refreshToken;
 
     private System.Timers.Timer? timer;

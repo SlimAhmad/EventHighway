@@ -12,11 +12,11 @@
     <link rel="stylesheet" href="@Assets["EventHighway.Portal.Web.styles.css"]" />
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
-    <HeadOutlet />
+    <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 
 <body>
-    <Routes />
+    <Routes @rendermode="InteractiveServer" />
     <ReconnectModal />
     <script src="vendors/@@coreui/coreui/js/coreui.bundle.min.js"></script>
     <script src="vendors/chart.js/js/chart.umd.js"></script>
