@@ -29,12 +29,15 @@
 
 @code {
     [CascadingParameter]
-    private HttpContext? HttpContext { get; set; }
+    private HttpContext HttpContext { get; set; } = default!;
 
-    // Identity Account pages carry [ExcludeFromInteractiveRouting], so they are reached via a
-    // full page load and render statically (HttpContext present) — required for cookie sign-in.
-    // Every other page is reached through interactive routing (HttpContext null) and runs on the
-    // InteractiveServer circuit, preserving the dashboard/admin interactivity.
+    // The Identity Account pages must render with static SSR so cookie sign-in/out works against
+    // HttpContext. Every other page (dashboard, admin) runs on the InteractiveServer circuit so
+    // buttons, modals and navigation are live. The decision is keyed off the request path because
+    // HttpContext is always present during the initial server render — a "HttpContext is null"
+    // check would render every page statically on first load and never start the circuit.
     private IComponentRenderMode? PageRenderMode =>
-        HttpContext is null ? InteractiveServer : null;
+        HttpContext.Request.Path.StartsWithSegments("/Account")
+            ? null
+            : InteractiveServer;
 }
