@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -36,6 +37,61 @@ namespace EventHighway.Portal.Web.Services.Views.HealthDashboards
                     cancellationToken);
 
             return healthCheckItems.Select(AsRagTile).ToList();
+        });
+
+        public ValueTask<TrafficSnapshotV2> RetrieveTrafficSnapshotAsync(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+            await this.eventHighwayBroker.RetrieveTrafficSnapshotV2Async(
+                period, windowStart, cancellationToken));
+
+        public ValueTask<List<EventAddressSummaryV2>> RetrieveAddressSummariesAsync(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            IEnumerable<EventAddressSummaryV2> summaries =
+                await this.eventHighwayBroker.RetrieveEventAddressSummaryV2Async(
+                    period, windowStart, cancellationToken);
+
+            return summaries.ToList();
+        });
+
+        public ValueTask<LoopDetectionSummaryV2> RetrieveLoopSummaryAsync(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+            await this.eventHighwayBroker.RetrieveLoopDetectionSummaryV2Async(
+                period, windowStart, cancellationToken));
+
+        public ValueTask<DuplicateDetectionSummaryV2> RetrieveDuplicateSummaryAsync(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+            await this.eventHighwayBroker.RetrieveDuplicateDetectionSummaryV2Async(
+                period, windowStart, cancellationToken));
+
+        public ValueTask<RetryHealthSummaryV2> RetrieveRetryHealthAsync(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+            await this.eventHighwayBroker.RetrieveRetryHealthV2Async(cancellationToken));
+
+        public ValueTask<List<ParticipantSummaryV2>> RetrieveParticipantSummariesAsync(
+            TrafficPeriodV2 period,
+            DateTimeOffset windowStart,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            IEnumerable<ParticipantSummaryV2> summaries =
+                await this.eventHighwayBroker.RetrieveParticipantSummaryV2Async(
+                    period, windowStart, cancellationToken);
+
+            return summaries.ToList();
         });
 
         private static HealthRagTile AsRagTile(HealthCheckItemV2 healthCheckItem) =>
