@@ -30,11 +30,30 @@ namespace EventHighway.Portal.Web.Components.CoreUI
 
         public string ElementId { get; } = "chart-" + Guid.NewGuid().ToString("N");
 
+        private string? lastRenderedSignature;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            // Only (re)draw the underlying Chart.js chart when the data actually changes. The
+            // dashboard re-renders this component every second (auto-refresh countdown); without
+            // this guard the chart would be destroyed and rebuilt on every tick, causing flicker.
+            string signature = ComputeSignature();
+
+            if (signature == lastRenderedSignature)
+            {
+                return;
+            }
+
+            lastRenderedSignature = signature;
+
             await this.JSRuntime.InvokeVoidAsync(
                 "eventHighwayCharts.render", ElementId, BuildConfig());
         }
+
+        private string ComputeSignature() =>
+            ChartType + "|" + string.Join(",", Labels) + "|" + string.Join(";",
+                Datasets.Select(dataset =>
+                    dataset.Label + ":" + string.Join(",", dataset.Data)));
 
         private object BuildConfig() =>
             new
@@ -47,18 +66,38 @@ namespace EventHighway.Portal.Web.Components.CoreUI
                     {
                         label = dataset.Label,
                         data = dataset.Data,
+                        borderColor = dataset.Colors.Count > 0 ? dataset.Colors[0] : "#321fdb",
                         backgroundColor = dataset.Colors,
-                        borderColor = dataset.Colors.Count > 0
-                            ? dataset.Colors[0]
-                            : "#321fdb",
-                        fill = ChartType == "line",
-                        tension = 0.4
+                        borderDash = dataset.Dashed ? new[] { 6, 4 } : Array.Empty<int>(),
+                        borderWidth = 2,
+                        fill = ChartType == "line" && dataset.Fill,
+                        tension = 0.4,
+                        pointRadius = ChartType == "line" ? 3 : 0,
+                        pointHoverRadius = 5,
+                        pointBackgroundColor = "#fff",
+                        pointBorderColor = dataset.Colors.Count > 0 ? dataset.Colors[0] : "#321fdb",
+                        pointBorderWidth = 2
                     })
                 },
                 options = new
                 {
                     responsive = true,
-                    maintainAspectRatio = false
+                    maintainAspectRatio = false,
+                    interaction = new { intersect = false, mode = "index" },
+                    plugins = new
+                    {
+                        legend = new
+                        {
+                            display = Datasets.Count > 1,
+                            position = "top",
+                            labels = new { usePointStyle = true, boxWidth = 8 }
+                        }
+                    },
+                    scales = new
+                    {
+                        x = new { grid = new { display = false } },
+                        y = new { beginAtZero = true, grid = new { color = "rgba(0,0,0,0.05)" } }
+                    }
                 }
             };
 

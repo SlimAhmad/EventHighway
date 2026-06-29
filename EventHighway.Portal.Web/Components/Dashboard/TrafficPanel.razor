@@ -73,7 +73,9 @@
                 {
                     Label = "Listener Events",
                     Data = buckets.Select(bucket => (double)bucket.ListenerEvents).ToList(),
-                    Colors = new List<string> { "#2eb85c" }
+                    Colors = new List<string> { "#2eb85c" },
+                    Dashed = true,
+                    Fill = false
                 },
             };
         }
