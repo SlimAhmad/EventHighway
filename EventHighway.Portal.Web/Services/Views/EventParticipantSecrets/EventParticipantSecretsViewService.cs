@@ -99,6 +99,18 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
             return AsView(modifiedSecret);
         });
 
+        public ValueTask<EventParticipantSecretView> RemoveSecretByIdAsync(
+            Guid secretId,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            EventParticipantSecretV2 removedSecret =
+                await this.eventHighwayBroker.RemoveEventParticipantSecretV2ByIdAsync(
+                    secretId, cancellationToken);
+
+            return AsView(removedSecret);
+        });
+
         private static EventParticipantSecretView AsView(EventParticipantSecretV2 secret) =>
             new EventParticipantSecretView
             {

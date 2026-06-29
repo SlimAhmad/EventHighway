@@ -109,6 +109,18 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
             return AsView(modifiedParticipant);
         });
 
+        public ValueTask<EventParticipantView> RemoveParticipantByIdAsync(
+            Guid participantId,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            EventParticipantV2 removedParticipant =
+                await this.eventHighwayBroker.RemoveEventParticipantV2ByIdAsync(
+                    participantId, cancellationToken);
+
+            return AsView(removedParticipant);
+        });
+
         private static EventParticipantView AsView(EventParticipantV2 participant) =>
             new EventParticipantView
             {

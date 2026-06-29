@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,10 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
 
         ValueTask<EventParticipantSecretV2> ModifyEventParticipantSecretV2Async(
             EventParticipantSecretV2 eventParticipantSecretV2,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<EventParticipantSecretV2> RemoveEventParticipantSecretV2ByIdAsync(
+            Guid eventParticipantSecretV2Id,
             CancellationToken cancellationToken = default);
     }
 }

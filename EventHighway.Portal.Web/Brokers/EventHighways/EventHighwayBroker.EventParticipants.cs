@@ -35,5 +35,11 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
             CancellationToken cancellationToken = default) =>
             await this.clientV2.EventParticipantV2Client
                 .ModifyEventParticipantV2Async(eventParticipantV2, cancellationToken);
+
+        public async ValueTask<EventParticipantV2> RemoveEventParticipantV2ByIdAsync(
+            Guid eventParticipantV2Id,
+            CancellationToken cancellationToken = default) =>
+            await this.clientV2.EventParticipantV2Client
+                .RemoveEventParticipantV2ByIdAsync(eventParticipantV2Id, cancellationToken);
     }
 }

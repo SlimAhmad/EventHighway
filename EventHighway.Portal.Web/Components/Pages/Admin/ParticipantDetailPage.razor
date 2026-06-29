@@ -6,6 +6,7 @@
 @using EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
 @inject IEventParticipantsViewService ParticipantsViewService
 @inject IEventParticipantSecretsViewService SecretsViewService
+@inject NavigationManager Navigation
 
 <PageTitle>Participant</PageTitle>
 
@@ -28,9 +29,14 @@ else if (participant is not null)
         <HeaderContent>
             <div class="d-flex justify-content-between align-items-center w-100">
                 <span class="fw-semibold">@participant.Name</span>
-                <Button Color="primary" CssClass="btn-sm" OnClick="OpenEditParticipantModal">
-                    Edit
-                </Button>
+                <div class="d-flex gap-2">
+                    <Button Color="primary" CssClass="btn-sm" OnClick="OpenEditParticipantModal">
+                        Edit
+                    </Button>
+                    <Button Color="danger" CssClass="btn-sm" OnClick="RequestDeleteParticipant">
+                        Delete
+                    </Button>
+                </div>
             </div>
         </HeaderContent>
         <ChildContent>
@@ -76,10 +82,10 @@ else if (participant is not null)
                     <thead>
                         <tr>
                             <th>Secret</th>
-                            <th style="width: 7rem;">Active</th>
+                            <th style="width: 8rem;">Active</th>
                             <th style="width: 12rem;">Active From</th>
                             <th style="width: 12rem;">Active To</th>
-                            <th class="text-end" style="width: 7rem;">Actions</th>
+                            <th class="text-end" style="width: 12rem;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -112,30 +118,57 @@ else if (participant is not null)
                                         </button>
                                     </div>
                                 </td>
-                                <td>
-                                    <input type="checkbox"
-                                           class="form-check-input"
-                                           @bind="secret.IsActive" />
-                                </td>
-                                <td>
-                                    <input type="date"
-                                           class="form-control form-control-sm"
-                                           value="@FormatDate(secret.ActiveFrom)"
-                                           @onchange="args => secret.ActiveFrom = ParseDate(args.Value?.ToString())" />
-                                </td>
-                                <td>
-                                    <input type="date"
-                                           class="form-control form-control-sm"
-                                           value="@FormatDate(secret.ActiveTo)"
-                                           @onchange="args => secret.ActiveTo = ParseDate(args.Value?.ToString())" />
-                                </td>
-                                <td class="text-end">
-                                    <Button Color="primary"
-                                            CssClass="btn-sm"
-                                            OnClick="() => SaveSecretAsync(secret)">
-                                        Save
-                                    </Button>
-                                </td>
+                                @if (IsEditing(secret.Id))
+                                {
+                                    <td>
+                                        <input type="checkbox"
+                                               class="form-check-input"
+                                               @bind="secret.IsActive" />
+                                    </td>
+                                    <td>
+                                        <input type="date"
+                                               class="form-control form-control-sm"
+                                               value="@FormatDate(secret.ActiveFrom)"
+                                               @onchange="args => secret.ActiveFrom = ParseDate(args.Value?.ToString())" />
+                                    </td>
+                                    <td>
+                                        <input type="date"
+                                               class="form-control form-control-sm"
+                                               value="@FormatDate(secret.ActiveTo)"
+                                               @onchange="args => secret.ActiveTo = ParseDate(args.Value?.ToString())" />
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <Button Color="primary"
+                                                    CssClass="btn-sm"
+                                                    OnClick="() => SaveSecretAsync(secret)">
+                                                Save
+                                            </Button>
+                                            <Button Color="danger"
+                                                    CssClass="btn-sm"
+                                                    OnClick="() => RequestDeleteSecret(secret)">
+                                                Delete
+                                            </Button>
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <span class="badge @(secret.IsActive ? "text-bg-success" : "text-bg-secondary")">
+                                            @(secret.IsActive ? "Yes" : "No")
+                                        </span>
+                                    </td>
+                                    <td>@DisplayDate(secret.ActiveFrom)</td>
+                                    <td>@DisplayDate(secret.ActiveTo)</td>
+                                    <td class="text-end">
+                                        <Button Color="outline-primary"
+                                                CssClass="btn-sm"
+                                                OnClick="() => EnterEdit(secret.Id)">
+                                            Edit
+                                        </Button>
+                                    </td>
+                                }
                             </tr>
                         }
                     </tbody>
@@ -170,6 +203,8 @@ else if (participant is not null)
             <div class="alert alert-danger" role="alert">@addSecretError</div>
         }
         <FormText Label="Secret" @bind-Value="newSecret.Secret" />
+        <FormDate Label="Active From" @bind-Value="newSecret.ActiveFrom" />
+        <FormDate Label="Active To" @bind-Value="newSecret.ActiveTo" />
         <FormSwitch Label="Active" @bind-Value="newSecret.IsActive" />
     </ChildContent>
     <FooterContent>
@@ -177,6 +212,14 @@ else if (participant is not null)
         <Button Color="primary" OnClick="SubmitAddSecretAsync">Save</Button>
     </FooterContent>
 </Modal>
+
+<ConfirmDialog Visible="confirmVisible"
+               Title="Confirm delete"
+               Message="@confirmMessage"
+               ConfirmText="OK"
+               CancelText="Cancel"
+               OnConfirm="ConfirmYesAsync"
+               OnCancel="ConfirmNo" />
 
 @code {
     [Parameter]
@@ -189,6 +232,7 @@ else if (participant is not null)
     private List<EventParticipantSecretView> secrets = new();
     private string? secretsError;
     private readonly HashSet<Guid> revealedSecretIds = new();
+    private readonly HashSet<Guid> editingSecretIds = new();
 
     private bool showEditParticipantModal;
     private string? editParticipantError;
@@ -197,6 +241,10 @@ else if (participant is not null)
     private bool showAddSecretModal;
     private string? addSecretError;
     private EventParticipantSecretView newSecret = new();
+
+    private bool confirmVisible;
+    private string? confirmMessage;
+    private Func<Task>? pendingConfirm;
 
     protected override async Task OnInitializedAsync()
     {
@@ -231,6 +279,9 @@ else if (participant is not null)
     private static string FormatDate(DateTimeOffset? value) =>
         value?.ToString("yyyy-MM-dd") ?? string.Empty;
 
+    private static string DisplayDate(DateTimeOffset? value) =>
+        value?.ToString("yyyy-MM-dd") ?? "—";
+
     private static DateTimeOffset? ParseDate(string? raw) =>
         DateTimeOffset.TryParse(
             raw,
@@ -258,6 +309,45 @@ else if (participant is not null)
 
     private static string Mask(string? secret) =>
         string.IsNullOrEmpty(secret) ? string.Empty : new string('•', 8);
+
+    private bool IsEditing(Guid secretId) =>
+        editingSecretIds.Contains(secretId);
+
+    private void EnterEdit(Guid secretId) =>
+        editingSecretIds.Add(secretId);
+
+    private async Task SaveSecretAsync(EventParticipantSecretView secret)
+    {
+        try
+        {
+            await SecretsViewService.ModifySecretAsync(secret);
+            editingSecretIds.Remove(secret.Id);
+            await LoadSecretsAsync();
+        }
+        catch
+        {
+            secretsError = "Unable to save the secret. Please try again.";
+        }
+    }
+
+    private void RequestDeleteSecret(EventParticipantSecretView secret) =>
+        RequestConfirm(
+            "Deleting this secret is permanent and cannot be undone.",
+            () => DeleteSecretAsync(secret.Id));
+
+    private async Task DeleteSecretAsync(Guid secretId)
+    {
+        try
+        {
+            await SecretsViewService.RemoveSecretByIdAsync(secretId);
+            editingSecretIds.Remove(secretId);
+            await LoadSecretsAsync();
+        }
+        catch
+        {
+            secretsError = "Unable to delete the secret. Please try again.";
+        }
+    }
 
     private void OpenEditParticipantModal()
     {
@@ -293,16 +383,21 @@ else if (participant is not null)
         }
     }
 
-    private async Task SaveSecretAsync(EventParticipantSecretView secret)
+    private void RequestDeleteParticipant() =>
+        RequestConfirm(
+            "Deleting this participant is permanent and cannot be undone.",
+            DeleteParticipantAsync);
+
+    private async Task DeleteParticipantAsync()
     {
         try
         {
-            await SecretsViewService.ModifySecretAsync(secret);
-            await LoadSecretsAsync();
+            await ParticipantsViewService.RemoveParticipantByIdAsync(ParticipantId);
+            Navigation.NavigateTo("admin/participants");
         }
         catch
         {
-            secretsError = "Unable to save the secret. Please try again.";
+            errorMessage = "Unable to delete this participant. Please try again.";
         }
     }
 
@@ -328,6 +423,31 @@ else if (participant is not null)
         {
             addSecretError = "Unable to add the secret. Please try again.";
         }
+    }
+
+    private void RequestConfirm(string message, Func<Task> action)
+    {
+        confirmMessage = message;
+        pendingConfirm = action;
+        confirmVisible = true;
+    }
+
+    private async Task ConfirmYesAsync()
+    {
+        confirmVisible = false;
+        Func<Task>? action = pendingConfirm;
+        pendingConfirm = null;
+
+        if (action is not null)
+        {
+            await action();
+        }
+    }
+
+    private void ConfirmNo()
+    {
+        confirmVisible = false;
+        pendingConfirm = null;
     }
 
     private static readonly RenderFragment EyeIcon = builder =>

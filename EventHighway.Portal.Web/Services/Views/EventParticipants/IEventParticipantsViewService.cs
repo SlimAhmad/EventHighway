@@ -26,5 +26,9 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipants
         ValueTask<EventParticipantView> ModifyParticipantAsync(
             EventParticipantView participant,
             CancellationToken cancellationToken = default);
+
+        ValueTask<EventParticipantView> RemoveParticipantByIdAsync(
+            Guid participantId,
+            CancellationToken cancellationToken = default);
     }
 }

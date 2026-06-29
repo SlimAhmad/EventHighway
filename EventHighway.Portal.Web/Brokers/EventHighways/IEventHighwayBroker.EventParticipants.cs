@@ -26,5 +26,9 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
         ValueTask<EventParticipantV2> ModifyEventParticipantV2Async(
             EventParticipantV2 eventParticipantV2,
             CancellationToken cancellationToken = default);
+
+        ValueTask<EventParticipantV2> RemoveEventParticipantV2ByIdAsync(
+            Guid eventParticipantV2Id,
+            CancellationToken cancellationToken = default);
     }
 }
