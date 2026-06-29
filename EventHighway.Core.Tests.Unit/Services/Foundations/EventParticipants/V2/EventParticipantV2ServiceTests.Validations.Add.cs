@@ -79,7 +79,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
             EventParticipantV2 invalidEventParticipantV2 =
                 CreateRandomEventParticipantV2(randomDateTimeOffset);
 
-            invalidEventParticipantV2.Id = default;
             invalidEventParticipantV2.UpdatedDate = anotherRandomDateTimeOffset;
 
             var invalidEventParticipantV2Exception =
@@ -146,7 +145,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
             EventParticipantV2 invalidEventParticipantV2 =
                 CreateRandomEventParticipantV2(invalidDateTimeOffset);
 
-            invalidEventParticipantV2.Id = default;
 
             var invalidEventParticipantV2Exception =
                 new InvalidEventParticipantV2Exception(
@@ -210,7 +208,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
 
             var invalidEventParticipantV2 = new EventParticipantV2
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Empty,
                 Name = invalidText,
             };
 
@@ -220,7 +218,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
 
             invalidEventParticipantV2Exception.AddData(
                 key: nameof(EventParticipantV2.Id),
-                values: "Not required");
+                values: "Required");
 
             invalidEventParticipantV2Exception.AddData(
                 key: nameof(EventParticipantV2.Name),
@@ -283,7 +281,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
             EventParticipantV2 invalidEventParticipantV2 =
                 CreateRandomEventParticipantV2(randomDateTimeOffset);
 
-            invalidEventParticipantV2.Id = default;
             invalidEventParticipantV2.ActiveFrom = default(DateTimeOffset);
 
             var invalidEventParticipantV2Exception =
@@ -347,7 +344,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
             EventParticipantV2 invalidEventParticipantV2 =
                 CreateRandomEventParticipantV2(randomDateTimeOffset);
 
-            invalidEventParticipantV2.Id = default;
             invalidEventParticipantV2.ActiveTo = default(DateTimeOffset);
 
             var invalidEventParticipantV2Exception =
@@ -415,7 +411,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
             EventParticipantV2 invalidEventParticipantV2 =
                 CreateRandomEventParticipantV2(randomDateTimeOffset);
 
-            invalidEventParticipantV2.Id = default;
             invalidEventParticipantV2.ActiveFrom = activeFrom;
             invalidEventParticipantV2.ActiveTo = activeTo;
 

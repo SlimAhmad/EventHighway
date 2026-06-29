@@ -76,7 +76,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             var invalidEventParticipantSecretV2 = new EventParticipantSecretV2
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Empty,
                 Secret = invalidText,
             };
 
@@ -86,7 +86,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             invalidEventParticipantSecretV2Exception.AddData(
                 key: nameof(EventParticipantSecretV2.Id),
-                values: "Not required");
+                values: "Required");
 
             invalidEventParticipantSecretV2Exception.AddData(
                 key: nameof(EventParticipantSecretV2.Secret),
