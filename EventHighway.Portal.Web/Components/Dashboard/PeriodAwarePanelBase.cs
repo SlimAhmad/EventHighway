@@ -42,6 +42,15 @@ namespace EventHighway.Portal.Web.Components.Dashboard
 
         protected override async Task OnParametersSetAsync()
         {
+            // While synced, keep the panel's own cursor mirroring the global one. This means that
+            // when sync is turned off the panel stays exactly where it was (e.g. on Year), instead
+            // of snapping back to an independent default — the user can then adjust it from there.
+            if (SyncEnabled)
+            {
+                LocalPeriod = GlobalPeriod;
+                LocalWindowStart = GlobalWindowStart;
+            }
+
             var key = (EffectivePeriod, EffectiveWindowStart, RefreshToken, SyncEnabled);
 
             if (loadedKey.HasValue && loadedKey.Value == key)
