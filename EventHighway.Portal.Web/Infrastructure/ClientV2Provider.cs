@@ -64,5 +64,23 @@ namespace EventHighway.Portal.Web.Infrastructure
                 this.databaseGate.Release();
             }
         }
+
+        public async ValueTask ExecuteAsync(
+            Func<IClientV2, ValueTask> operation,
+            CancellationToken cancellationToken = default)
+        {
+            IClientV2 currentClient = GetClient();
+
+            await this.databaseGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+            try
+            {
+                await operation(currentClient).ConfigureAwait(false);
+            }
+            finally
+            {
+                this.databaseGate.Release();
+            }
+        }
     }
 }

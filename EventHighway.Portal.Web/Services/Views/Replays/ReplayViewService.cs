@@ -1,0 +1,44 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Portal.Web.Brokers.EventHighways;
+using EventHighway.Portal.Web.Brokers.Loggings;
+using EventHighway.Portal.Web.Models.Views.Replays;
+
+namespace EventHighway.Portal.Web.Services.Views.Replays
+{
+    public partial class ReplayViewService : IReplayViewService
+    {
+        private readonly IEventHighwayBroker eventHighwayBroker;
+        private readonly ILoggingBroker loggingBroker;
+
+        public ReplayViewService(
+            IEventHighwayBroker eventHighwayBroker,
+            ILoggingBroker loggingBroker)
+        {
+            this.eventHighwayBroker = eventHighwayBroker;
+            this.loggingBroker = loggingBroker;
+        }
+
+        public ValueTask ReplayAsync(
+            ReplayRequestView replayRequest,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            await this.eventHighwayBroker.ReplayEventArchiveV2sAsync(
+                eventAddressId: replayRequest.EventAddressId,
+                eventListenerIds: Array.Empty<Guid>(),
+                startDate: replayRequest.StartDate,
+                endDate: replayRequest.EndDate,
+                cancellationToken: cancellationToken);
+
+            await this.eventHighwayBroker.ProcessReplayedListenerEventV2sAsync(
+                cancellationToken);
+        });
+    }
+}

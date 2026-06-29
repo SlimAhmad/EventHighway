@@ -13,8 +13,10 @@ using EventHighway.Portal.Web.Services.Views.EventAddresses;
 using EventHighway.Portal.Web.Services.Views.EventListeners;
 using EventHighway.Portal.Web.Services.Views.EventParticipants;
 using EventHighway.Portal.Web.Services.Views.EventParticipantSecrets;
+using EventHighway.Portal.Web.Services.Views.EventArchives;
 using EventHighway.Portal.Web.Services.Views.HealthDashboards;
 using EventHighway.Portal.Web.Services.Views.ListenerEvents;
+using EventHighway.Portal.Web.Services.Views.Replays;
 
 namespace EventHighway.Portal.Web.Infrastructure
 {
@@ -46,6 +48,8 @@ namespace EventHighway.Portal.Web.Infrastructure
             services.AddTransient<IEventAddressesViewService, EventAddressesViewService>();
             services.AddTransient<IEventListenersViewService, EventListenersViewService>();
             services.AddTransient<IListenerEventsViewService, ListenerEventsViewService>();
+            services.AddTransient<IEventArchivesViewService, EventArchivesViewService>();
+            services.AddTransient<IReplayViewService, ReplayViewService>();
 
             return services;
         }
