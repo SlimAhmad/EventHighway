@@ -30,7 +30,7 @@ else if (user is not null)
         <div class="alert alert-danger" role="alert">@actionError</div>
     }
 
-    <Card>
+    <Card CssClass="mb-4">
         <HeaderContent>User Details</HeaderContent>
         <ChildContent>
             <dl class="row mb-0">
@@ -66,12 +66,10 @@ else if (user is not null)
                 <p class="text-body-secondary">This user has no roles assigned.</p>
             }
 
-            <div class="d-flex gap-2 align-items-end">
-                <div class="flex-grow-1">
-                    <FormSelect Label="Add Role"
-                                Options="availableRoleOptions"
-                                @bind-Value="selectedRoleToAdd" />
-                </div>
+            <div class="d-flex gap-2 align-items-center">
+                <FormSelect Label="Add Role"
+                            Options="availableRoleOptions"
+                            @bind-Value="selectedRoleToAdd" />
                 <Button Color="primary" OnClick="AddRoleAsync">Add</Button>
             </div>
         </ChildContent>

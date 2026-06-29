@@ -3,7 +3,7 @@
 <div class="d-inline-flex align-items-center gap-2">
     @if (!string.IsNullOrEmpty(Label))
     {
-        <label class="form-label mb-0 small">@Label</label>
+        <label class="form-label mb-0 small text-nowrap">@Label</label>
     }
     <select class="form-select form-select-sm" value="@Value" @onchange="OnChangeAsync">
         @foreach (SelectOption option in Options)
