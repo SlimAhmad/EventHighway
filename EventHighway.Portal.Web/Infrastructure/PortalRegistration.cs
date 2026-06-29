@@ -74,6 +74,10 @@ namespace EventHighway.Portal.Web.Infrastructure
 
             services.AddIdentityCore<AppUser>(options =>
             {
+                // Schema Version3 adds the passkey store the Manage > Passkeys page requires
+                // (without it the page throws because IdentityUserPasskey is not in the model).
+                options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
+
                 // Default credentials are intentionally weak for first-run/demo (Spec Section 6.3).
                 options.SignIn.RequireConfirmedAccount = false;
                 options.Password.RequireDigit = false;
