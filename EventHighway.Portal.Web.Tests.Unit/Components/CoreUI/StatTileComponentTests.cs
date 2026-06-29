@@ -16,10 +16,10 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.CoreUI
         public static TheoryData<StatTileVariant, string> VariantCssClasses() =>
             new TheoryData<StatTileVariant, string>
             {
-                { StatTileVariant.Green, "text-bg-success" },
-                { StatTileVariant.Amber, "text-bg-warning" },
-                { StatTileVariant.Red, "text-bg-danger" },
-                { StatTileVariant.Na, "text-bg-secondary" },
+                { StatTileVariant.Green, "bg-success" },
+                { StatTileVariant.Amber, "bg-warning" },
+                { StatTileVariant.Red, "bg-danger" },
+                { StatTileVariant.Na, "bg-secondary" },
             };
     }
 }
