@@ -1,0 +1,70 @@
+@page "/admin/event-addresses/{AddressId:guid}"
+@using System.Linq
+@using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.EventAddresses
+@using EventHighway.Portal.Web.Services.Views.EventAddresses
+@inject IEventAddressesViewService AddressesViewService
+
+<PageTitle>Event Address</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center py-3">
+    <h2 class="mb-0">Event Address</h2>
+    <a class="btn btn-outline-secondary btn-sm" href="admin/event-addresses">Back to list</a>
+</div>
+
+@if (isLoading)
+{
+    <Spinner />
+}
+else if (errorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+else if (address is not null)
+{
+    <Card Title="@address.Name">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@address.Id</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@address.Description</dd>
+        </dl>
+    </Card>
+
+    <Card Title="Event Listeners" CssClass="mt-4">
+        <p class="text-body-secondary mb-0">
+            Listeners associated with this address are coming next.
+        </p>
+    </Card>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">Address not found.</div>
+}
+
+@code {
+    [Parameter]
+    public Guid AddressId { get; set; }
+
+    private bool isLoading = true;
+    private string? errorMessage;
+    private EventAddressView? address;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var addresses = await AddressesViewService.RetrieveAllAddressesAsync();
+            address = addresses.FirstOrDefault(item => item.Id == AddressId);
+        }
+        catch
+        {
+            errorMessage = "Unable to load this address. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
