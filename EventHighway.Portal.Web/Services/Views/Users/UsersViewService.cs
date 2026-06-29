@@ -52,6 +52,7 @@ namespace EventHighway.Portal.Web.Services.Views.Users
 
             UserView view = AsView(user);
             view.Roles = roles.ToList();
+            view.IsLockedOut = await this.identityBroker.SelectIsLockedOutAsync(user);
 
             return view;
         });
@@ -136,53 +137,137 @@ namespace EventHighway.Portal.Web.Services.Views.Users
         public ValueTask<UserView> ModifyUserAsync(
             UserView user,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser existingUser = await this.identityBroker.SelectUserByIdAsync(user.Id);
+
+            await this.identityBroker.SetUserNameAsync(existingUser, user.UserName);
+            await this.identityBroker.SetEmailAsync(existingUser, user.Email);
+            await this.identityBroker.SetPhoneNumberAsync(existingUser, user.PhoneNumber);
+
+            return AsView(existingUser);
+        });
 
         public ValueTask ConfirmUserEmailAsync(
             Guid userId,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser user = await this.identityBroker.SelectUserByIdAsync(userId);
+
+            string token =
+                await this.identityBroker.GenerateEmailConfirmationTokenAsync(user);
+
+            await this.identityBroker.ConfirmEmailAsync(user, token);
+        });
 
         public ValueTask<string> GenerateEmailConfirmationTokenAsync(
             Guid userId,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser user = await this.identityBroker.SelectUserByIdAsync(userId);
+
+            return await this.identityBroker.GenerateEmailConfirmationTokenAsync(user);
+        });
 
         public ValueTask<string> GeneratePasswordResetTokenAsync(
             Guid userId,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser user = await this.identityBroker.SelectUserByIdAsync(userId);
+
+            return await this.identityBroker.GeneratePasswordResetTokenAsync(user);
+        });
 
         public ValueTask LockUserAsync(
             Guid userId,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser user = await this.identityBroker.SelectUserByIdAsync(userId);
+
+            await EnsureNotLastAdministratorWhenInRoleAsync(user);
+
+            await this.identityBroker.SetLockoutEnabledAsync(user, true);
+            await this.identityBroker.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+        });
 
         public ValueTask UnlockUserAsync(
             Guid userId,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser user = await this.identityBroker.SelectUserByIdAsync(userId);
+
+            await this.identityBroker.SetLockoutEndDateAsync(user, null);
+        });
 
         public ValueTask ResetAccessFailedCountAsync(
             Guid userId,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser user = await this.identityBroker.SelectUserByIdAsync(userId);
+
+            await this.identityBroker.ResetAccessFailedCountAsync(user);
+        });
 
         public ValueTask SetTwoFactorEnabledAsync(
             Guid userId,
             bool enabled,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser user = await this.identityBroker.SelectUserByIdAsync(userId);
+
+            await this.identityBroker.SetTwoFactorEnabledAsync(user, enabled);
+
+            if (enabled is false)
+            {
+                await this.identityBroker.ResetAuthenticatorKeyAsync(user);
+            }
+        });
 
         public ValueTask DisableUserAsync(
             Guid userId,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser user = await this.identityBroker.SelectUserByIdAsync(userId);
+
+            await EnsureNotLastAdministratorWhenInRoleAsync(user);
+
+            user.IsDisabled = true;
+            await this.identityBroker.UpdateUserAsync(user);
+
+            await this.identityBroker.SetLockoutEnabledAsync(user, true);
+            await this.identityBroker.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+        });
 
         public ValueTask EnableUserAsync(
             Guid userId,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            AppUser user = await this.identityBroker.SelectUserByIdAsync(userId);
+
+            user.IsDisabled = false;
+            await this.identityBroker.UpdateUserAsync(user);
+
+            await this.identityBroker.SetLockoutEndDateAsync(user, null);
+        });
+
+        private async ValueTask EnsureNotLastAdministratorWhenInRoleAsync(AppUser user)
+        {
+            IList<string> roles = await this.identityBroker.SelectUserRolesAsync(user);
+
+            if (roles.Contains(AdministratorsRole))
+            {
+                await EnsureNotLastAdministratorAsync();
+            }
+        }
 
         private async ValueTask EnsureNotLastAdministratorAsync()
         {
@@ -201,6 +286,11 @@ namespace EventHighway.Portal.Web.Services.Views.Users
                 Id = user.Id,
                 UserName = user.UserName ?? string.Empty,
                 Email = user.Email ?? string.Empty,
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
+                EmailConfirmed = user.EmailConfirmed,
+                AccessFailedCount = user.AccessFailedCount,
+                TwoFactorEnabled = user.TwoFactorEnabled,
+                IsDisabled = user.IsDisabled,
                 Roles = new List<string>()
             };
     }
