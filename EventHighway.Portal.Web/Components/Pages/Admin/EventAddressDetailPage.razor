@@ -50,20 +50,37 @@ else if (address is not null)
         </ChildContent>
     </Card>
 
-    <Card Title="Event Listeners" CssClass="mt-4">
-        @if (listenersError is not null)
-        {
-            <div class="alert alert-danger" role="alert">@listenersError</div>
-        }
-        else if (listeners.Count == 0)
-        {
-            <p class="text-body-secondary mb-0">No listeners registered for this address.</p>
-        }
-        else
-        {
-            <DataTable TItem="EventListenerView" Items="listeners" Columns="listenerColumns"
-                       Searchable="false" />
-        }
+    <Card CssClass="mt-4">
+        <HeaderContent>
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <span class="fw-semibold">Event Listeners</span>
+                <Button Color="primary" CssClass="btn-sm" OnClick="OpenRegisterListenerModal">
+                    Register Listener
+                </Button>
+            </div>
+        </HeaderContent>
+        <ChildContent>
+            @if (listenersError is not null)
+            {
+                <div class="alert alert-danger" role="alert">@listenersError</div>
+            }
+            else if (listeners.Count == 0)
+            {
+                <p class="text-body-secondary mb-0">No listeners registered for this address.</p>
+            }
+            else
+            {
+                <DataTable TItem="EventListenerView" Items="listeners" Columns="listenerColumns"
+                           Searchable="false">
+                    <RowActions Context="listener">
+                        <Button Color="danger" CssClass="btn-sm"
+                                OnClick="@(() => RequestDeleteListener(listener))">
+                            Delete
+                        </Button>
+                    </RowActions>
+                </DataTable>
+            }
+        </ChildContent>
     </Card>
 }
 else
@@ -71,13 +88,31 @@ else
     <div class="alert alert-warning" role="alert">Address not found.</div>
 }
 
+<Modal Title="Register Listener" Visible="showRegisterListenerModal" OnClose="CloseRegisterListenerModal">
+    <ChildContent>
+        @if (registerListenerError is not null)
+        {
+            <div class="alert alert-danger" role="alert">@registerListenerError</div>
+        }
+        <FormText Label="Name" @bind-Value="newListener.Name" />
+        <FormText Label="Description" @bind-Value="newListener.Description" />
+        <FormText Label="Handler Name" @bind-Value="newListener.HandlerName" />
+        <FormText Label="Handler Id" @bind-Value="newListenerHandlerId"
+                  Placeholder="00000000-0000-0000-0000-000000000000" />
+    </ChildContent>
+    <FooterContent>
+        <Button Color="secondary" OnClick="CloseRegisterListenerModal">Cancel</Button>
+        <Button Color="primary" OnClick="SubmitRegisterListenerAsync">Save</Button>
+    </FooterContent>
+</Modal>
+
 <ConfirmDialog Visible="confirmVisible"
                Title="Confirm delete"
-               Message="Deleting this address is permanent and cannot be undone."
+               Message="@confirmMessage"
                ConfirmText="OK"
                CancelText="Cancel"
-               OnConfirm="DeleteAddressAsync"
-               OnCancel="CancelDelete" />
+               OnConfirm="ConfirmYesAsync"
+               OnCancel="ConfirmNo" />
 
 @code {
     [Parameter]
@@ -91,8 +126,16 @@ else
     private string? listenersError;
     private List<DataTableColumn<EventListenerView>> listenerColumns = new();
 
-    private bool confirmVisible;
+    private bool showRegisterListenerModal;
+    private string? registerListenerError;
+    private EventListenerView newListener = new();
+    private string? newListenerHandlerId;
+
     private string? deleteError;
+
+    private bool confirmVisible;
+    private string? confirmMessage;
+    private Func<Task>? pendingConfirm;
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,19 +179,65 @@ else
         }
     }
 
-    private void RequestDeleteAddress()
+    private void OpenRegisterListenerModal()
     {
-        deleteError = null;
-        confirmVisible = true;
+        newListener = new EventListenerView { EventAddressId = AddressId };
+        newListenerHandlerId = null;
+        registerListenerError = null;
+        showRegisterListenerModal = true;
     }
 
-    private void CancelDelete() =>
-        confirmVisible = false;
+    private void CloseRegisterListenerModal() =>
+        showRegisterListenerModal = false;
+
+    private async Task SubmitRegisterListenerAsync()
+    {
+        if (!Guid.TryParse(newListenerHandlerId, out Guid handlerId))
+        {
+            registerListenerError = "Handler Id must be a valid GUID.";
+            return;
+        }
+
+        newListener.HandlerId = handlerId;
+
+        try
+        {
+            await ListenersViewService.RegisterListenerAsync(newListener);
+            showRegisterListenerModal = false;
+            await LoadListenersAsync();
+        }
+        catch
+        {
+            registerListenerError = "Unable to register the listener. Please try again.";
+        }
+    }
+
+    private void RequestDeleteListener(EventListenerView listener) =>
+        RequestConfirm(
+            "Deleting this listener is permanent and cannot be undone.",
+            () => DeleteListenerAsync(listener.Id));
+
+    private async Task DeleteListenerAsync(Guid listenerId)
+    {
+        try
+        {
+            await ListenersViewService.RemoveListenerByIdAsync(listenerId);
+            await LoadListenersAsync();
+        }
+        catch
+        {
+            listenersError =
+                "Unable to delete this listener. It may still have events associated with it.";
+        }
+    }
+
+    private void RequestDeleteAddress() =>
+        RequestConfirm(
+            "Deleting this address is permanent and cannot be undone.",
+            DeleteAddressAsync);
 
     private async Task DeleteAddressAsync()
     {
-        confirmVisible = false;
-
         try
         {
             await AddressesViewService.RemoveAddressByIdAsync(AddressId);
@@ -159,5 +248,30 @@ else
             deleteError =
                 "Unable to delete this address. It may still have events or listeners associated with it.";
         }
+    }
+
+    private void RequestConfirm(string message, Func<Task> action)
+    {
+        confirmMessage = message;
+        pendingConfirm = action;
+        confirmVisible = true;
+    }
+
+    private async Task ConfirmYesAsync()
+    {
+        confirmVisible = false;
+        Func<Task>? action = pendingConfirm;
+        pendingConfirm = null;
+
+        if (action is not null)
+        {
+            await action();
+        }
+    }
+
+    private void ConfirmNo()
+    {
+        confirmVisible = false;
+        pendingConfirm = null;
     }
 }

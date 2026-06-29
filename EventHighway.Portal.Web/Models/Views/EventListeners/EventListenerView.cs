@@ -12,6 +12,7 @@ namespace EventHighway.Portal.Web.Models.Views.EventListeners
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string HandlerName { get; set; } = string.Empty;
+        public Guid HandlerId { get; set; }
         public Guid EventAddressId { get; set; }
         public Guid? ParticipantId { get; set; }
     }

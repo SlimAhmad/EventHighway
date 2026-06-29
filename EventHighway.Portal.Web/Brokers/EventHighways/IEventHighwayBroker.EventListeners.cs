@@ -12,8 +12,16 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
 {
     public partial interface IEventHighwayBroker
     {
+        ValueTask<EventListenerV2> RegisterEventListenerV2Async(
+            EventListenerV2 eventListenerV2,
+            CancellationToken cancellationToken = default);
+
         ValueTask<IQueryable<EventListenerV2>> RetrieveEventListenerV2sByEventAddressIdAsync(
             Guid eventAddressV2Id,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<EventListenerV2> RemoveEventListenerV2ByIdAsync(
+            Guid eventListenerV2Id,
             CancellationToken cancellationToken = default);
     }
 }
