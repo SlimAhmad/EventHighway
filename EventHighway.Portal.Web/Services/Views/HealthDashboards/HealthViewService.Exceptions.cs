@@ -14,29 +14,98 @@ namespace EventHighway.Portal.Web.Services.Views.HealthDashboards
 {
     public partial class HealthViewService
     {
-        private delegate ValueTask<List<HealthRagTile>> ReturningHealthRagTilesFunction();
+        private delegate ValueTask<T> ReturningHealthFunction<T>();
 
-        private async ValueTask<List<HealthRagTile>> TryCatch(
-            ReturningHealthRagTilesFunction returningHealthRagTilesFunction)
+        private async ValueTask<T> TryCatch<T>(
+            ReturningHealthFunction<T> returningHealthFunction)
         {
             try
             {
-                return await returningHealthRagTilesFunction();
+                return await returningHealthFunction();
             }
-            catch (HealthStatusClientV2ValidationException healthStatusClientValidationException)
+            catch (HealthStatusClientV2ValidationException clientValidationException)
             {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    healthStatusClientValidationException);
+                throw await CreateAndLogDependencyValidationExceptionAsync(clientValidationException);
             }
-            catch (HealthStatusClientV2DependencyException healthStatusClientDependencyException)
+            catch (HealthTrafficClientV2ValidationException clientValidationException)
             {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    healthStatusClientDependencyException);
+                throw await CreateAndLogDependencyValidationExceptionAsync(clientValidationException);
             }
-            catch (HealthStatusClientV2ServiceException healthStatusClientServiceException)
+            catch (HealthAddressClientV2ValidationException clientValidationException)
             {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    healthStatusClientServiceException);
+                throw await CreateAndLogDependencyValidationExceptionAsync(clientValidationException);
+            }
+            catch (HealthLoopClientV2ValidationException clientValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(clientValidationException);
+            }
+            catch (HealthDuplicateClientV2ValidationException clientValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(clientValidationException);
+            }
+            catch (HealthRetryClientV2ValidationException clientValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(clientValidationException);
+            }
+            catch (HealthParticipantClientV2ValidationException clientValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(clientValidationException);
+            }
+            catch (HealthStatusClientV2DependencyException clientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
+            }
+            catch (HealthTrafficClientV2DependencyException clientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
+            }
+            catch (HealthAddressClientV2DependencyException clientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
+            }
+            catch (HealthLoopClientV2DependencyException clientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
+            }
+            catch (HealthDuplicateClientV2DependencyException clientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
+            }
+            catch (HealthRetryClientV2DependencyException clientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
+            }
+            catch (HealthParticipantClientV2DependencyException clientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
+            }
+            catch (HealthStatusClientV2ServiceException clientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
+            }
+            catch (HealthTrafficClientV2ServiceException clientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
+            }
+            catch (HealthAddressClientV2ServiceException clientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
+            }
+            catch (HealthLoopClientV2ServiceException clientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
+            }
+            catch (HealthDuplicateClientV2ServiceException clientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
+            }
+            catch (HealthRetryClientV2ServiceException clientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
+            }
+            catch (HealthParticipantClientV2ServiceException clientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
             }
             catch (Exception exception)
             {
