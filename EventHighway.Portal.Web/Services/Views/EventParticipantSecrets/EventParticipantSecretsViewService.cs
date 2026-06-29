@@ -46,10 +46,30 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
                 .ToList();
         }
 
-        public ValueTask<EventParticipantSecretView> AddSecretAsync(
+        public async ValueTask<EventParticipantSecretView> AddSecretAsync(
             EventParticipantSecretView secret,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            DateTimeOffset now =
+                await this.dateTimeBroker.GetCurrentDateTimeOffsetAsync();
+
+            var secretToAdd = new EventParticipantSecretV2
+            {
+                Secret = secret.Secret,
+                IsActive = secret.IsActive,
+                ActiveFrom = secret.ActiveFrom,
+                ActiveTo = secret.ActiveTo,
+                ParticipantId = secret.ParticipantId,
+                CreatedDate = now,
+                UpdatedDate = now
+            };
+
+            EventParticipantSecretV2 addedSecret =
+                await this.eventHighwayBroker.AddEventParticipantSecretV2Async(
+                    secretToAdd, cancellationToken);
+
+            return AsView(addedSecret);
+        }
 
         private static EventParticipantSecretView AsView(EventParticipantSecretV2 secret) =>
             new EventParticipantSecretView
