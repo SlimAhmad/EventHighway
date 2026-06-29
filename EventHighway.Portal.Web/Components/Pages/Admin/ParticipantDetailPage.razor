@@ -1,4 +1,5 @@
 @page "/admin/participants/{ParticipantId:guid}"
+@attribute [Authorize(Roles = "Administrators")]
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Models.Views.EventParticipants
 @using EventHighway.Portal.Web.Models.Views.EventParticipantSecrets
