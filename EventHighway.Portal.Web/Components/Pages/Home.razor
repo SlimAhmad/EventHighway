@@ -1,4 +1,7 @@
 @page "/"
+@implements IDisposable
+@using EventHighway.Core.Models.Coordinations.HealthChecks.V2
+@using EventHighway.Portal.Web.Components.Dashboard
 
 <PageTitle>Health Dashboard</PageTitle>
 
@@ -7,11 +10,116 @@
     <span class="badge text-bg-secondary">EventHighway</span>
 </div>
 
-<RagTileRow />
+<RagTileRow RefreshToken="refreshToken" />
 
-<TrafficPanel />
-<AddressUsagePanel />
-<LoopPanel />
-<DuplicatePanel />
-<RetryPanel />
-<ParticipantPanel />
+<ControlBar Period="period"
+            WindowStart="windowStart"
+            SyncEnabled="syncEnabled"
+            AutoRefreshSeconds="autoRefreshSeconds"
+            CountdownSeconds="countdown"
+            CanGoNext="CanGoNext"
+            PeriodChanged="OnPeriodChanged"
+            PreviousRequested="OnPrevious"
+            NextRequested="OnNext"
+            CurrentRequested="OnCurrent"
+            ForceRefreshRequested="OnForceRefresh"
+            SyncChanged="OnSyncChanged"
+            AutoRefreshChanged="OnAutoRefreshChanged" />
+
+<TrafficPanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
+<AddressUsagePanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
+<LoopPanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
+<DuplicatePanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
+<RetryPanel RefreshToken="refreshToken" />
+<ParticipantPanel Period="EffectivePeriod" WindowStart="EffectiveWindowStart" RefreshToken="refreshToken" />
+
+@code {
+    private TrafficPeriodV2 period = TrafficPeriodV2.Day;
+    private DateTimeOffset windowStart;
+    private bool syncEnabled = true;
+    private int autoRefreshSeconds;
+    private int countdown;
+    private int refreshToken;
+
+    private System.Timers.Timer? timer;
+
+    private static DateTimeOffset Now => DateTimeOffset.UtcNow;
+
+    private TrafficPeriodV2 EffectivePeriod => syncEnabled ? period : TrafficPeriodV2.Day;
+
+    private DateTimeOffset EffectiveWindowStart =>
+        syncEnabled ? windowStart : DateTimeOffset.MinValue;
+
+    private bool CanGoNext => WindowNavigator.CanGoNext(period, windowStart, Now);
+
+    protected override void OnInitialized()
+    {
+        windowStart = WindowNavigator.Current(period, Now);
+
+        timer = new System.Timers.Timer(1000) { AutoReset = true };
+        timer.Elapsed += OnTick;
+        timer.Start();
+    }
+
+    private void OnTick(object? sender, System.Timers.ElapsedEventArgs args)
+    {
+        if (autoRefreshSeconds <= 0)
+        {
+            return;
+        }
+
+        _ = InvokeAsync(() =>
+        {
+            countdown--;
+
+            if (countdown <= 0)
+            {
+                refreshToken++;
+                countdown = autoRefreshSeconds;
+            }
+
+            StateHasChanged();
+        });
+    }
+
+    private void OnPeriodChanged(TrafficPeriodV2 newPeriod)
+    {
+        period = newPeriod;
+        windowStart = WindowNavigator.Current(period, Now);
+    }
+
+    private void OnPrevious() => windowStart = WindowNavigator.Previous(period, windowStart);
+
+    private void OnNext()
+    {
+        if (CanGoNext)
+        {
+            windowStart = WindowNavigator.Next(period, windowStart);
+        }
+    }
+
+    private void OnCurrent() => windowStart = WindowNavigator.Current(period, Now);
+
+    private void OnForceRefresh()
+    {
+        refreshToken++;
+        countdown = autoRefreshSeconds;
+    }
+
+    private void OnSyncChanged(bool value) => syncEnabled = value;
+
+    private void OnAutoRefreshChanged(int seconds)
+    {
+        autoRefreshSeconds = seconds;
+        countdown = seconds;
+    }
+
+    public void Dispose()
+    {
+        if (timer is not null)
+        {
+            timer.Elapsed -= OnTick;
+            timer.Dispose();
+        }
+    }
+}

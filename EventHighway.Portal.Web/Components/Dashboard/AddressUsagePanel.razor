@@ -23,12 +23,17 @@
 </Card>
 
 @code {
+    [Parameter] public TrafficPeriodV2 Period { get; set; } = TrafficPeriodV2.Day;
+    [Parameter] public DateTimeOffset WindowStart { get; set; } = DateTimeOffset.MinValue;
+    [Parameter] public int RefreshToken { get; set; }
+
     private bool isLoading = true;
     private string? errorMessage;
     private List<EventAddressSummaryV2> summaries = new();
     private List<DataTableColumn<EventAddressSummaryV2>> columns = new();
+    private (TrafficPeriodV2, DateTimeOffset, int)? loadedKey;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         columns = new List<DataTableColumn<EventAddressSummaryV2>>
         {
@@ -39,11 +44,18 @@
             new DataTableColumn<EventAddressSummaryV2> { Title = "Loops", Value = s => s.LoopsDetected },
             new DataTableColumn<EventAddressSummaryV2> { Title = "Last Activity", Value = s => s.LastActivity?.ToString("u") ?? "—" },
         };
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var key = (Period, WindowStart, RefreshToken);
+        if (loadedKey == key) return;
+        loadedKey = key;
 
         try
         {
             summaries = await HealthViewService.RetrieveAddressSummariesAsync(
-                TrafficPeriodV2.Day, DateTimeOffset.MinValue);
+                Period, WindowStart);
         }
         catch
         {

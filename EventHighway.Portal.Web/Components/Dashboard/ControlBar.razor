@@ -1,0 +1,92 @@
+@namespace EventHighway.Portal.Web.Components.Dashboard
+@using EventHighway.Core.Models.Coordinations.HealthChecks.V2
+@using EventHighway.Portal.Web.Components.CoreUI
+
+<Card CssClass="mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <FormSwitch Label="Sync time periods" Value="SyncEnabled" ValueChanged="OnSyncChanged" />
+        </div>
+
+        <div class="d-flex align-items-center gap-2 @(SyncEnabled ? "" : "opacity-50")">
+            <div class="btn-group btn-group-sm" role="group">
+                @foreach (TrafficPeriodV2 candidate in Periods)
+                {
+                    <Button Color="@(candidate == Period ? "primary" : "outline-secondary")"
+                            CssClass="btn-sm"
+                            OnClick="@(() => OnPeriodChanged(candidate))">
+                        @candidate.ToString()
+                    </Button>
+                }
+            </div>
+
+            <Button Color="outline-secondary" CssClass="btn-sm" OnClick="OnPrevious">‹</Button>
+            <span class="small text-nowrap">@WindowNavigator.Label(Period, WindowStart)</span>
+            <Button Color="outline-secondary" CssClass="btn-sm" Disabled="!CanGoNext" OnClick="OnNext">›</Button>
+            <Button Color="outline-secondary" CssClass="btn-sm" OnClick="OnCurrent">Current</Button>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <FormSelect Label="Auto refresh"
+                        Options="refreshOptions"
+                        Value="@AutoRefreshSeconds.ToString()"
+                        ValueChanged="OnAutoRefreshSelected" />
+            <span class="small font-monospace">@CountdownLabel</span>
+            <Button Color="outline-secondary" CssClass="btn-sm" OnClick="OnForceRefresh">↻</Button>
+        </div>
+    </div>
+</Card>
+
+@code {
+    [Parameter] public TrafficPeriodV2 Period { get; set; }
+    [Parameter] public DateTimeOffset WindowStart { get; set; }
+    [Parameter] public bool SyncEnabled { get; set; }
+    [Parameter] public int AutoRefreshSeconds { get; set; }
+    [Parameter] public int CountdownSeconds { get; set; }
+    [Parameter] public bool CanGoNext { get; set; }
+
+    [Parameter] public EventCallback<TrafficPeriodV2> PeriodChanged { get; set; }
+    [Parameter] public EventCallback PreviousRequested { get; set; }
+    [Parameter] public EventCallback NextRequested { get; set; }
+    [Parameter] public EventCallback CurrentRequested { get; set; }
+    [Parameter] public EventCallback ForceRefreshRequested { get; set; }
+    [Parameter] public EventCallback<bool> SyncChanged { get; set; }
+    [Parameter] public EventCallback<int> AutoRefreshChanged { get; set; }
+
+    private static readonly TrafficPeriodV2[] Periods =
+    {
+        TrafficPeriodV2.Day, TrafficPeriodV2.Week, TrafficPeriodV2.Month, TrafficPeriodV2.Year
+    };
+
+    private readonly List<SelectOption> refreshOptions = new()
+    {
+        new SelectOption { Value = "0", Text = "Off" },
+        new SelectOption { Value = "60", Text = "1 min" },
+        new SelectOption { Value = "120", Text = "2 min" },
+        new SelectOption { Value = "300", Text = "5 min" },
+        new SelectOption { Value = "600", Text = "10 min" },
+        new SelectOption { Value = "900", Text = "15 min" },
+        new SelectOption { Value = "1800", Text = "30 min" },
+    };
+
+    private string CountdownLabel =>
+        AutoRefreshSeconds > 0
+            ? $"{CountdownSeconds / 60:00}:{CountdownSeconds % 60:00}"
+            : string.Empty;
+
+    private async Task OnPeriodChanged(TrafficPeriodV2 period) =>
+        await PeriodChanged.InvokeAsync(period);
+
+    private async Task OnPrevious() => await PreviousRequested.InvokeAsync();
+
+    private async Task OnNext() => await NextRequested.InvokeAsync();
+
+    private async Task OnCurrent() => await CurrentRequested.InvokeAsync();
+
+    private async Task OnForceRefresh() => await ForceRefreshRequested.InvokeAsync();
+
+    private async Task OnSyncChanged(bool value) => await SyncChanged.InvokeAsync(value);
+
+    private async Task OnAutoRefreshSelected(string? value) =>
+        await AutoRefreshChanged.InvokeAsync(int.TryParse(value, out int seconds) ? seconds : 0);
+}

@@ -36,18 +36,27 @@
 </Card>
 
 @code {
+    [Parameter] public TrafficPeriodV2 Period { get; set; } = TrafficPeriodV2.Day;
+    [Parameter] public DateTimeOffset WindowStart { get; set; } = DateTimeOffset.MinValue;
+    [Parameter] public int RefreshToken { get; set; }
+
     private bool isLoading = true;
     private string? errorMessage;
     private TrafficSnapshotV2? snapshot;
     private List<string> labels = new();
     private List<ChartDataset> datasets = new();
+    private (TrafficPeriodV2, DateTimeOffset, int)? loadedKey;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        var key = (Period, WindowStart, RefreshToken);
+        if (loadedKey == key) return;
+        loadedKey = key;
+
         try
         {
             snapshot = await HealthViewService.RetrieveTrafficSnapshotAsync(
-                TrafficPeriodV2.Day, DateTimeOffset.MinValue);
+                Period, WindowStart);
 
             var buckets = (snapshot.Buckets ?? Enumerable.Empty<TrafficBucketV2>()).ToList();
             labels = buckets.Select(bucket => bucket.Label).ToList();

@@ -37,6 +37,10 @@
 </Card>
 
 @code {
+    [Parameter] public TrafficPeriodV2 Period { get; set; } = TrafficPeriodV2.Day;
+    [Parameter] public DateTimeOffset WindowStart { get; set; } = DateTimeOffset.MinValue;
+    [Parameter] public int RefreshToken { get; set; }
+
     private bool isLoading = true;
     private string? errorMessage;
     private LoopDetectionSummaryV2? summary;
@@ -44,8 +48,9 @@
     private List<string> labels = new();
     private List<ChartDataset> datasets = new();
     private List<DataTableColumn<LoopDetailV2>> columns = new();
+    private (TrafficPeriodV2, DateTimeOffset, int)? loadedKey;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         columns = new List<DataTableColumn<LoopDetailV2>>
         {
@@ -55,11 +60,18 @@
             new DataTableColumn<LoopDetailV2> { Title = "In Window", Value = d => d.InWindow },
             new DataTableColumn<LoopDetailV2> { Title = "Most Recent", Value = d => d.MostRecentDetection?.ToString("u") ?? "—" },
         };
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var key = (Period, WindowStart, RefreshToken);
+        if (loadedKey == key) return;
+        loadedKey = key;
 
         try
         {
             summary = await HealthViewService.RetrieveLoopSummaryAsync(
-                TrafficPeriodV2.Day, DateTimeOffset.MinValue);
+                Period, WindowStart);
 
             details = (summary.ByAddress ?? Enumerable.Empty<LoopDetailV2>()).ToList();
             labels = details.Select(d => d.AddressName).ToList();

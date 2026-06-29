@@ -22,8 +22,20 @@ namespace EventHighway.Portal.Web.Components.Dashboard
 
         public string? ErrorMessage { get; private set; }
 
-        protected override async Task OnInitializedAsync()
+        [Parameter]
+        public int RefreshToken { get; set; }
+
+        private int? loadedToken;
+
+        protected override async Task OnParametersSetAsync()
         {
+            if (loadedToken == RefreshToken)
+            {
+                return;
+            }
+
+            loadedToken = RefreshToken;
+
             try
             {
                 Tiles = await this.HealthViewService.RetrieveHealthRagTilesAsync();

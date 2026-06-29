@@ -33,6 +33,8 @@
 </Card>
 
 @code {
+    [Parameter] public int RefreshToken { get; set; }
+
     private bool isLoading = true;
     private string? errorMessage;
     private RetryHealthSummaryV2? summary;
@@ -40,8 +42,9 @@
     private List<string> labels = new();
     private List<ChartDataset> datasets = new();
     private List<DataTableColumn<RetryAddressDetailV2>> columns = new();
+    private int? loadedToken;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         columns = new List<DataTableColumn<RetryAddressDetailV2>>
         {
@@ -50,6 +53,12 @@
             new DataTableColumn<RetryAddressDetailV2> { Title = "Critical", Value = d => d.CriticalEvents },
             new DataTableColumn<RetryAddressDetailV2> { Title = "Total", Value = d => d.TotalEvents },
         };
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (loadedToken == RefreshToken) return;
+        loadedToken = RefreshToken;
 
         try
         {
