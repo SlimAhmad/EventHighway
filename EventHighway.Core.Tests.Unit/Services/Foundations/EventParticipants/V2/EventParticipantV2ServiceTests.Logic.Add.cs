@@ -28,7 +28,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipants.V2
                 CreateRandomEventParticipantV2(
                     dates: randomDateTimeOffset);
 
-            randomEventParticipantV2.Id = Guid.Empty;
             EventParticipantV2 inputEventParticipantV2 = randomEventParticipantV2;
             EventParticipantV2 insertedEventParticipantV2 = inputEventParticipantV2;
 

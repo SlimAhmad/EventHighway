@@ -77,7 +77,7 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
             Validate(
                 message: "Event participant is invalid, fix the errors and try again.",
 
-                (Rule: IsNotDefault(eventParticipantV2.Id),
+                (Rule: IsInvalid(eventParticipantV2.Id),
                 Parameter: nameof(EventParticipantV2.Id)),
 
                 (Rule: IsInvalid(eventParticipantV2.Name),
@@ -135,12 +135,6 @@ namespace EventHighway.Core.Services.Foundations.EventParticipants.V2
                     message: "Event participant is null.");
             }
         }
-
-        private static dynamic IsNotDefault(Guid id) => new
-        {
-            Condition = id != Guid.Empty,
-            Message = "Not required"
-        };
 
         private static dynamic IsInvalid(Guid id) => new
         {

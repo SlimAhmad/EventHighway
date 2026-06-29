@@ -76,7 +76,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             var invalidEventParticipantSecretV2 = new EventParticipantSecretV2
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Empty,
                 Secret = invalidText,
             };
 
@@ -86,7 +86,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             invalidEventParticipantSecretV2Exception.AddData(
                 key: nameof(EventParticipantSecretV2.Id),
-                values: "Not required");
+                values: "Required");
 
             invalidEventParticipantSecretV2Exception.AddData(
                 key: nameof(EventParticipantSecretV2.Secret),
@@ -156,8 +156,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             EventParticipantSecretV2 invalidEventParticipantSecretV2 =
                 CreateRandomEventParticipantSecretV2(invalidDateTimeOffset);
-
-            invalidEventParticipantSecretV2.Id = Guid.Empty;
+
 
             var invalidEventParticipantSecretV2Exception =
                 new InvalidEventParticipantSecretV2Exception(
@@ -224,8 +223,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             EventParticipantSecretV2 invalidEventParticipantSecretV2 =
                 CreateRandomEventParticipantSecretV2(randomDateTimeOffset);
-
-            invalidEventParticipantSecretV2.Id = Guid.Empty;
+
             invalidEventParticipantSecretV2.ActiveFrom = activeFrom;
             invalidEventParticipantSecretV2.ActiveTo = activeTo;
 
@@ -291,8 +289,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             EventParticipantSecretV2 invalidEventParticipantSecretV2 =
                 CreateRandomEventParticipantSecretV2(randomDateTimeOffset);
-
-            invalidEventParticipantSecretV2.Id = Guid.Empty;
+
             invalidEventParticipantSecretV2.ActiveTo = default(DateTimeOffset);
 
             var invalidEventParticipantSecretV2Exception =
@@ -357,8 +354,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             EventParticipantSecretV2 invalidEventParticipantSecretV2 =
                 CreateRandomEventParticipantSecretV2(randomDateTimeOffset);
-
-            invalidEventParticipantSecretV2.Id = Guid.Empty;
+
             invalidEventParticipantSecretV2.ActiveFrom = default(DateTimeOffset);
 
             var invalidEventParticipantSecretV2Exception =
@@ -426,8 +422,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
 
             EventParticipantSecretV2 invalidEventParticipantSecretV2 =
                 CreateRandomEventParticipantSecretV2(randomDateTimeOffset);
-
-            invalidEventParticipantSecretV2.Id = Guid.Empty;
+
             invalidEventParticipantSecretV2.UpdatedDate = anotherRandomDateTimeOffset;
 
             var invalidEventParticipantSecretV2Exception =

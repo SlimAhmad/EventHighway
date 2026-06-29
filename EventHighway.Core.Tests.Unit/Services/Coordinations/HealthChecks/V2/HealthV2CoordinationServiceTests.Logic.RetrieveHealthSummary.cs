@@ -46,6 +46,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             int expectedTotalAddresses = randomEventAddressV2s.Count();
             int expectedTotalListeners = randomEventListenerV2s.Count();
             int expectedTotalEvents = randomEventV2s.Count();
+            int expectedActiveEvents = 5;
             int expectedImmediateEvents = 3;
             int expectedScheduledEvents = 2;
             int expectedDeadEvents = 0;
@@ -92,16 +93,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
-            actualResult.Should().HaveCount(21);
+            actualResult.Should().HaveCount(22);
 
-            actualResult.Single(i => i.Grouping == "Event Addresses" && i.Item == "Total")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Total Addresses")
                 .Value.Should().Be(expectedTotalAddresses.ToString());
 
-            actualResult.Single(i => i.Grouping == "Event Listeners" && i.Item == "Total")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Total Listeners")
                 .Value.Should().Be(expectedTotalListeners.ToString());
 
-            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Total")
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Total Events")
                 .Value.Should().Be(expectedTotalEvents.ToString());
+
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Active Events")
+                .Value.Should().Be(expectedActiveEvents.ToString());
 
             actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Immediate")
                 .Value.Should().Be(expectedImmediateEvents.ToString());
@@ -139,10 +143,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Archived Listener Errors")
                 .Value.Should().Be(expectedArchivedListenerErrors.ToString());
 
-            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Registered Handlers")
                 .Value.Should().Be(expectedHandlerCount.ToString());
 
-            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Registered Handlers")
                 .StatusCode.Should().Be((int)HealthStatusV2.Green);
 
             actualResult.Single(i => i.Grouping == "Loop Detection" && i.Item == "Quarantined Events")
@@ -196,6 +200,122 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken),
                     Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
+            this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldRetrieveActiveEventCountsFilteredByStatusAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var randomEventAddressV2s = CreateRandomEventAddressV2s();
+            var randomEventListenerV2s = CreateRandomEventListenerV2s();
+
+            var randomEventV2s = CreateRandomEventV2s(
+                immediateCount: 1,
+                scheduledCount: 3,
+                deadCount: 4,
+                quarantinedCount: 4);
+
+            var randomListenerEventV2s = CreateRandomListenerEventV2s(
+                successCount: 1,
+                pendingCount: 0,
+                errorCount: 0,
+                replayCount: 0);
+
+            var randomHandlers = CreateRandomEventHandlers(count: 2);
+            var randomEventArchiveV2s = CreateRandomEventArchiveV2s();
+
+            var randomListenerEventArchiveV2s = CreateRandomListenerEventArchiveV2s(
+                successCount: 1,
+                errorCount: 0);
+
+            int expectedTotalEvents = randomEventV2s.Count();
+            int expectedActiveEvents = 8;
+            int expectedImmediateEvents = 5;
+            int expectedScheduledEvents = 3;
+            int expectedDeadEvents = 4;
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventV2s);
+
+            this.eventV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventAddressV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventListenerV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventV2s);
+
+            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomHandlers);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomEventArchiveV2s);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(randomListenerEventArchiveV2s);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.healthV2CoordinationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Total Events")
+                .Value.Should().Be(expectedTotalEvents.ToString());
+
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Active Events")
+                .Value.Should().Be(expectedActiveEvents.ToString());
+
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Immediate")
+                .Value.Should().Be(expectedImmediateEvents.ToString());
+
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Scheduled")
+                .Value.Should().Be(expectedScheduledEvents.ToString());
+
+            actualResult.Single(i => i.Grouping == "Active Events" && i.Item == "Dead (0 retries)")
+                .Value.Should().Be(expectedDeadEvents.ToString());
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventAddressV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventListenerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventHandlerV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
             this.configurationBrokerMock.Verify(broker =>
                 broker.GetHealthConfiguration(),
@@ -653,7 +773,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
-            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Registered Handlers")
                 .StatusCode.Should().Be((int)HealthStatusV2.Red);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>
@@ -967,7 +1087,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .RetrieveHealthRagStatusV2Async(randomCancellationToken);
 
             // then
-            actualResult.Single(i => i.Grouping == "Event Handlers" && i.Item == "Registered Handlers")
+            actualResult.Single(i => i.Grouping == "Event Addresses / Event Listeners / Handlers" && i.Item == "Registered Handlers")
                 .StatusCode.Should().Be((int)HealthStatusV2.NA);
 
             this.eventV2OrchestrationServiceMock.Verify(service =>

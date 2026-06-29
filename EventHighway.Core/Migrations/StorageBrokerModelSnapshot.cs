@@ -723,13 +723,13 @@ namespace EventHighway.Core.Migrations
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventAddresses.V2.EventAddressV2", "EventAddressV2")
                         .WithMany("EventListenerV2s")
                         .HasForeignKey("EventAddressId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.EventParticipantV2", "Participant")
                         .WithMany("EventListenerV2s")
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("EventAddressV2");
 
@@ -774,13 +774,13 @@ namespace EventHighway.Core.Migrations
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventAddresses.V2.EventAddressV2", "EventAddressV2")
                         .WithMany("Events")
                         .HasForeignKey("EventAddressId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.EventParticipantV2", "Participant")
                         .WithMany("EventV2s")
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("EventAddressV2");
 
@@ -792,7 +792,7 @@ namespace EventHighway.Core.Migrations
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.EventParticipantV2", "Participant")
                         .WithMany("EventArchiveV2s")
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Participant");
                 });
@@ -815,7 +815,7 @@ namespace EventHighway.Core.Migrations
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.EventParticipantV2", "Participant")
                         .WithMany("ListenerEventArchiveV2s")
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Participant");
                 });
@@ -879,25 +879,25 @@ namespace EventHighway.Core.Migrations
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventAddresses.V2.EventAddressV2", "EventAddress")
                         .WithMany("ListenerEventV2s")
                         .HasForeignKey("EventAddressId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.Events.V2.EventV2", "Event")
                         .WithMany("ListenerEventV2s")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventListeners.V2.EventListenerV2", "EventListener")
                         .WithMany("ListenerEventV2s")
                         .HasForeignKey("EventListenerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EventHighway.Core.Models.Services.Foundations.EventParticipants.V2.EventParticipantV2", "Participant")
                         .WithMany("ListenerEventV2s")
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Event");
 

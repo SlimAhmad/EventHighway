@@ -210,7 +210,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
             var filler = new Filler<EventParticipantV2>();
 
             filler.Setup()
-                .OnProperty(eventParticipantV2 => eventParticipantV2.Id).Use(Guid.Empty)
+                .OnProperty(eventParticipantV2 => eventParticipantV2.Id).Use(() => Guid.NewGuid())
                 .OnProperty(eventParticipantV2 => eventParticipantV2.IsActive).Use(true)
                 .OnProperty(eventParticipantV2 => eventParticipantV2.ActiveFrom).IgnoreIt()
                 .OnProperty(eventParticipantV2 => eventParticipantV2.ActiveTo).IgnoreIt()
@@ -232,7 +232,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
             var filler = new Filler<EventParticipantSecretV2>();
 
             filler.Setup()
-                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.Id).Use(Guid.Empty)
+                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.Id).Use(() => Guid.NewGuid())
                 .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.ParticipantId).Use(participantId)
                 .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.IsActive).Use(true)
                 .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.ActiveFrom).IgnoreIt()

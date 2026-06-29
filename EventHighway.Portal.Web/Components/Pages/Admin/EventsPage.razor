@@ -1,0 +1,129 @@
+@page "/admin/events"
+@using System.Collections.Generic
+@using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.ListenerEvents
+@using EventHighway.Portal.Web.Services.Views.EventArchives
+@using EventHighway.Portal.Web.Services.Views.ListenerEvents
+@inject IListenerEventsViewService ListenerEventsViewService
+@inject IEventArchivesViewService EventArchivesViewService
+@inject NavigationManager Navigation
+
+<PageTitle>Events</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center py-3">
+    <h2 class="mb-0">Events</h2>
+</div>
+
+<p class="text-body-secondary">
+    Listener events queued for delivery, most recent first. Each row is one event dispatched to a listener.
+</p>
+
+@if (isLoading)
+{
+    <Spinner />
+}
+else if (errorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+else
+{
+    <Card CssClass="mb-4">
+        <HeaderContent>
+            <span class="fw-semibold">Archive processed events</span>
+        </HeaderContent>
+        <ChildContent>
+            @if (archiveMessage is not null)
+            {
+                <div class="alert @archiveAlertClass" role="alert">@archiveMessage</div>
+            }
+            <p class="text-body-secondary">
+                Move processed events out of the live tables and into the archive.
+            </p>
+            <Button Color="primary" OnClick="ArchiveAsync" Disabled="@isWorking">
+                Archive now
+            </Button>
+        </ChildContent>
+    </Card>
+
+    <Card>
+        <DataTable TItem="ListenerEventView" Items="listenerEvents" Columns="columns" Searchable="false">
+            <RowActions Context="listenerEvent">
+                <Button Color="primary" CssClass="btn-sm"
+                        OnClick="@(() => ViewEvent(listenerEvent.Id))">
+                    VIEW
+                </Button>
+            </RowActions>
+        </DataTable>
+    </Card>
+}
+
+@code {
+    private bool isLoading = true;
+    private bool isWorking;
+    private string? errorMessage;
+    private List<ListenerEventView> listenerEvents = new();
+    private List<DataTableColumn<ListenerEventView>> columns = new();
+
+    private string? archiveMessage;
+    private string archiveAlertClass = "alert-info";
+
+    protected override async Task OnInitializedAsync()
+    {
+        columns = new List<DataTableColumn<ListenerEventView>>
+        {
+            new DataTableColumn<ListenerEventView> { Title = "Status", Value = e => e.Status },
+            new DataTableColumn<ListenerEventView> { Title = "Response Code", Value = e => e.ResponseCode },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Listener", Value = e => e.EventListenerId
+            },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Created", Value = e => e.CreatedDate.ToString("u")
+            },
+        };
+
+        await LoadAsync();
+        isLoading = false;
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            listenerEvents = await ListenerEventsViewService.RetrieveAllListenerEventsAsync();
+            errorMessage = null;
+        }
+        catch
+        {
+            errorMessage = "Unable to load events. Please try again.";
+        }
+    }
+
+    private async Task ArchiveAsync()
+    {
+        isWorking = true;
+        archiveMessage = null;
+
+        try
+        {
+            await EventArchivesViewService.ArchiveProcessedEventsAsync();
+            archiveAlertClass = "alert-success";
+            archiveMessage = "Processed events archived.";
+            await LoadAsync();
+        }
+        catch
+        {
+            archiveAlertClass = "alert-danger";
+            archiveMessage = "Unable to archive events. Please try again.";
+        }
+        finally
+        {
+            isWorking = false;
+        }
+    }
+
+    private void ViewEvent(Guid listenerEventId) =>
+        Navigation.NavigateTo($"/admin/events/{listenerEventId}");
+}

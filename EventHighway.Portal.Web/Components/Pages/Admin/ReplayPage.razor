@@ -1,0 +1,96 @@
+@page "/admin/replay"
+@using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.Replays
+@using EventHighway.Portal.Web.Services.Views.Replays
+@inject IReplayViewService ReplayViewService
+
+<PageTitle>Replay</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center py-3">
+    <h2 class="mb-0">Replay</h2>
+</div>
+
+<p class="text-body-secondary">
+    Replay archived events back onto the highway. Narrow the scope by event address and/or a date range,
+    then replay. Leave a field blank to leave that dimension unrestricted.
+</p>
+
+@if (message is not null)
+{
+    <div class="alert @alertClass" role="alert">@message</div>
+}
+
+<Card>
+    <HeaderContent>
+        <span class="fw-semibold">Replay archived events</span>
+    </HeaderContent>
+    <ChildContent>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <FormText Label="Event Address Id (optional)" @bind-Value="eventAddressId"
+                          Placeholder="00000000-0000-0000-0000-000000000000" />
+            </div>
+            <div class="col-md-3">
+                <FormDate Label="From (optional)" @bind-Value="startDate" />
+            </div>
+            <div class="col-md-3">
+                <FormDate Label="To (optional)" @bind-Value="endDate" />
+            </div>
+        </div>
+        <Button Color="primary" OnClick="ReplayAsync" Disabled="@isWorking">
+            Replay
+        </Button>
+    </ChildContent>
+</Card>
+
+@code {
+    private bool isWorking;
+    private string? message;
+    private string alertClass = "alert-info";
+
+    private string? eventAddressId;
+    private DateTimeOffset? startDate;
+    private DateTimeOffset? endDate;
+
+    private async Task ReplayAsync()
+    {
+        Guid? addressId = null;
+
+        if (!string.IsNullOrWhiteSpace(eventAddressId))
+        {
+            if (!Guid.TryParse(eventAddressId, out Guid parsedAddressId))
+            {
+                alertClass = "alert-danger";
+                message = "Event Address Id must be a valid GUID.";
+                return;
+            }
+
+            addressId = parsedAddressId;
+        }
+
+        isWorking = true;
+        message = null;
+
+        try
+        {
+            await ReplayViewService.ReplayAsync(new ReplayRequestView
+            {
+                EventAddressId = addressId,
+                StartDate = startDate,
+                EndDate = endDate
+            });
+
+            alertClass = "alert-success";
+            message = "Replay requested and replayed events processed.";
+        }
+        catch
+        {
+            alertClass = "alert-danger";
+            message = "Unable to replay events. Please try again.";
+        }
+        finally
+        {
+            isWorking = false;
+        }
+    }
+}

@@ -21,5 +21,10 @@
     <Project Path="EventHighway.ClientV2.BasicApp/EventHighway.ClientV2.BasicApp.csproj" />
     <Project Path="EventHighway.ClientV2.SubstrateApp/EventHighway.ClientV2.SubstrateApp.csproj" />
   </Folder>
+  <Folder Name="/Portal/">
+    <Project Path="EventHighway.Portal.Web/EventHighway.Portal.Web.csproj" />
+    <Project Path="EventHighway.Portal.Web.Tests.Unit/EventHighway.Portal.Web.Tests.Unit.csproj" />
+    <Project Path="EventHighway.Portal.Seed/EventHighway.Portal.Seed.csproj" />
+  </Folder>
   <Project Path="EventHighway.Infrastructure/EventHighway.Infrastructure.csproj" />
 </Solution>

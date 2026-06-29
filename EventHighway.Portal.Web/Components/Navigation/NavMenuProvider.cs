@@ -1,0 +1,49 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using EventHighway.Portal.Web.Models.Views.Navigations;
+
+namespace EventHighway.Portal.Web.Components.Navigation
+{
+    public static class NavMenuProvider
+    {
+        public static IReadOnlyList<NavItem> GetNavMenu() =>
+            new[]
+            {
+                new NavItem(
+                    Title: "Dashboard",
+                    Icon: "cil-speedometer",
+                    Href: ""),
+
+                new NavItem(
+                    Title: "Admin",
+                    Icon: "cil-settings",
+                    Href: "",
+                    Roles: new[] { "Administrators" },
+                    RequiresAuth: true,
+                    Children: new[]
+                    {
+                        new NavItem("Event Participants", "cil-people", "admin/participants",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Event Address", "cil-location-pin", "admin/event-addresses",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Events", "cil-bolt", "admin/events",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Archived Events", "cil-storage", "admin/event-archives",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Replay", "cil-loop-circular", "admin/replay",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Users", "cil-user", "admin/users",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+                    })
+            };
+    }
+}

@@ -1,0 +1,44 @@
+@namespace EventHighway.Portal.Web.Components.Dashboard
+@using EventHighway.Core.Models.Coordinations.HealthChecks.V2
+@using EventHighway.Portal.Web.Components.CoreUI
+
+<div class="d-flex align-items-center gap-2 @(Disabled ? "opacity-50" : "")">
+    <div class="btn-group btn-group-sm" role="group">
+        @foreach (TrafficPeriodV2 candidate in Periods)
+        {
+            <Button Color="@(candidate == Period ? "primary" : "outline-secondary")"
+                    CssClass="btn-sm"
+                    Disabled="Disabled"
+                    OnClick="@(() => OnPeriod(candidate))">
+                @candidate.ToString()
+            </Button>
+        }
+    </div>
+
+    <Button Color="outline-secondary" CssClass="btn-sm" Disabled="Disabled" OnClick="OnPrev">‹</Button>
+    <span class="small text-nowrap">@WindowNavigator.Label(Period, WindowStart)</span>
+    <Button Color="outline-secondary" CssClass="btn-sm" Disabled="@(Disabled || !CanGoNext)" OnClick="OnNext">›</Button>
+    <Button Color="outline-secondary" CssClass="btn-sm" Disabled="Disabled" OnClick="OnCurrent">Current</Button>
+</div>
+
+@code {
+    [Parameter] public TrafficPeriodV2 Period { get; set; }
+    [Parameter] public DateTimeOffset WindowStart { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool CanGoNext { get; set; }
+
+    [Parameter] public EventCallback<TrafficPeriodV2> PeriodChanged { get; set; }
+    [Parameter] public EventCallback PreviousRequested { get; set; }
+    [Parameter] public EventCallback NextRequested { get; set; }
+    [Parameter] public EventCallback CurrentRequested { get; set; }
+
+    private static readonly TrafficPeriodV2[] Periods =
+    {
+        TrafficPeriodV2.Day, TrafficPeriodV2.Week, TrafficPeriodV2.Month, TrafficPeriodV2.Year
+    };
+
+    private async Task OnPeriod(TrafficPeriodV2 period) => await PeriodChanged.InvokeAsync(period);
+    private async Task OnPrev() => await PreviousRequested.InvokeAsync();
+    private async Task OnNext() => await NextRequested.InvokeAsync();
+    private async Task OnCurrent() => await CurrentRequested.InvokeAsync();
+}

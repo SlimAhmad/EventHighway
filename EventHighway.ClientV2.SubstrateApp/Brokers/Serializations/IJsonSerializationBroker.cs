@@ -7,5 +7,6 @@ namespace EventHighway.ClientV2.SubstrateApp.Brokers.Serializations
     public interface IJsonSerializationBroker
     {
         ValueTask<string> SerializeAsync<T>(T value);
+        ValueTask<T> DeserializeAsync<T>(string value);
     }
 }

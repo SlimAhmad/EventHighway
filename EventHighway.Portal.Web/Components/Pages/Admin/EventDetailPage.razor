@@ -1,0 +1,105 @@
+@page "/admin/events/{ListenerEventId:guid}"
+@using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.ListenerEvents
+@using EventHighway.Portal.Web.Services.Views.ListenerEvents
+@inject IListenerEventsViewService ListenerEventsViewService
+
+<PageTitle>Event</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center py-3">
+    <h2 class="mb-0">Event</h2>
+    <a class="btn btn-outline-secondary btn-sm" href="admin/events">Back to list</a>
+</div>
+
+@if (isLoading)
+{
+    <Spinner />
+}
+else if (errorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+else if (listenerEvent is not null)
+{
+    <Card>
+        <HeaderContent>
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <span class="fw-semibold">Listener Event</span>
+                <span class="badge @StatusCssClass">@listenerEvent.Status</span>
+            </div>
+        </HeaderContent>
+        <ChildContent>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Id</dt>
+                <dd class="col-sm-9">@listenerEvent.Id</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">@listenerEvent.Status</dd>
+
+                <dt class="col-sm-3">Response Code</dt>
+                <dd class="col-sm-9">@DisplayOrDash(listenerEvent.ResponseCode)</dd>
+
+                <dt class="col-sm-3">Response Message</dt>
+                <dd class="col-sm-9">@DisplayOrDash(listenerEvent.ResponseMessage)</dd>
+
+                <dt class="col-sm-3">Event Id</dt>
+                <dd class="col-sm-9">@listenerEvent.EventId</dd>
+
+                <dt class="col-sm-3">Event Address Id</dt>
+                <dd class="col-sm-9">@listenerEvent.EventAddressId</dd>
+
+                <dt class="col-sm-3">Event Listener Id</dt>
+                <dd class="col-sm-9">@listenerEvent.EventListenerId</dd>
+
+                <dt class="col-sm-3">Participant Id</dt>
+                <dd class="col-sm-9">@(listenerEvent.ParticipantId?.ToString() ?? "—")</dd>
+
+                <dt class="col-sm-3">Created</dt>
+                <dd class="col-sm-9">@listenerEvent.CreatedDate.ToString("u")</dd>
+            </dl>
+        </ChildContent>
+    </Card>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">Event not found.</div>
+}
+
+@code {
+    [Parameter]
+    public Guid ListenerEventId { get; set; }
+
+    private bool isLoading = true;
+    private string? errorMessage;
+    private ListenerEventView? listenerEvent;
+
+    private string StatusCssClass =>
+        listenerEvent?.Status switch
+        {
+            "Success" => "text-bg-success",
+            "Error" => "text-bg-danger",
+            "Pending" => "text-bg-secondary",
+            "Replay" => "text-bg-info",
+            _ => "text-bg-secondary"
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            listenerEvent =
+                await ListenerEventsViewService.RetrieveListenerEventByIdAsync(ListenerEventId);
+        }
+        catch
+        {
+            errorMessage = "Unable to load this event. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string DisplayOrDash(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? "—" : value;
+}
