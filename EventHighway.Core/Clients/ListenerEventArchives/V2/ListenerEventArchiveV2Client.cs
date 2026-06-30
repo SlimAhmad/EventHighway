@@ -2,7 +2,6 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,8 +27,11 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
         public ListenerEventArchiveV2Client(IListenerEventArchiveV2Service listenerEventArchiveV2Service) =>
             this.listenerEventArchiveV2Service = listenerEventArchiveV2Service;
 
-        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        public async ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return await this.listenerEventArchiveV2Service
+                .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+        }
     }
 }
