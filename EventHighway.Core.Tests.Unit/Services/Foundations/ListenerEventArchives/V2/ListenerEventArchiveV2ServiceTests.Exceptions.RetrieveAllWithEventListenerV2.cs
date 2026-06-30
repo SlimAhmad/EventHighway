@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -67,6 +68,64 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEventArchive
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogCriticalAsync(It.Is(SameExceptionAs(
                     expectedListenerEventArchiveV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRetrieveAllWithEventListenerV2IfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var serviceException = new Exception();
+
+            serviceException.Data.Add(
+                "ErrorCode",
+                new List<string> { "ServiceError" });
+
+            var failedListenerEventArchiveV2ServiceException =
+                new FailedListenerEventArchiveV2ServiceException(
+                    message: "Failed listener event archive service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedListenerEventArchiveV2ServiceException =
+                new ListenerEventArchiveV2ServiceException(
+                    message: "Listener event archive service error occurred, contact support.",
+                    innerException: failedListenerEventArchiveV2ServiceException);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllListenerEventArchiveV2sWithEventListenerV2Async(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveAllTask =
+                this.listenerEventArchiveV2Service
+                    .RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(
+                        randomCancellationToken);
+
+            ListenerEventArchiveV2ServiceException actualListenerEventArchiveV2ServiceException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV2ServiceException>(
+                    retrieveAllTask.AsTask);
+
+            // then
+            actualListenerEventArchiveV2ServiceException.Should()
+                .BeEquivalentTo(expectedListenerEventArchiveV2ServiceException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllListenerEventArchiveV2sWithEventListenerV2Async(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventArchiveV2ServiceException))),
                         Times.Once);
 
             this.storageBrokerMock.VerifyNoOtherCalls();
