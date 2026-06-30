@@ -48,14 +48,14 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEventArchives
         TryCatch(async () =>
         {
             IQueryable<ListenerEventArchiveV2> listenerEventArchives =
-                await this.eventHighwayBroker.RetrieveAllListenerEventArchiveV2sAsync(
-                    cancellationToken);
+                await this.eventHighwayBroker
+                    .RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(cancellationToken);
 
             return listenerEventArchives
                 .Where(listenerEventArchive =>
                     listenerEventArchive.EventArchiveV2Id == eventArchiveId)
                 .OrderByDescending(listenerEventArchive => listenerEventArchive.CreatedDate)
-                .Select(AsView)
+                .Select(AsViewWithEventListener)
                 .ToList();
         });
 
@@ -86,6 +86,25 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEventArchives
                 EventId = listenerEventArchive.EventId,
                 EventAddressId = listenerEventArchive.EventAddressId,
                 EventListenerId = listenerEventArchive.EventListenerId,
+                EventArchiveV2Id = listenerEventArchive.EventArchiveV2Id,
+                ParticipantId = listenerEventArchive.ParticipantId,
+                CreatedDate = listenerEventArchive.CreatedDate,
+                ArchivedDate = listenerEventArchive.ArchivedDate
+            };
+
+        private static ListenerEventArchiveView AsViewWithEventListener(
+            ListenerEventArchiveV2 listenerEventArchive) =>
+            new ListenerEventArchiveView
+            {
+                Id = listenerEventArchive.Id,
+                Status = listenerEventArchive.Status.ToString(),
+                Response = listenerEventArchive.Response,
+                ResponseCode = listenerEventArchive.ResponseCode,
+                ResponseMessage = listenerEventArchive.ResponseMessage,
+                EventId = listenerEventArchive.EventId,
+                EventAddressId = listenerEventArchive.EventAddressId,
+                EventListenerId = listenerEventArchive.EventListenerId,
+                ListenerName = listenerEventArchive.EventListenerV2?.Name,
                 EventArchiveV2Id = listenerEventArchive.EventArchiveV2Id,
                 ParticipantId = listenerEventArchive.ParticipantId,
                 CreatedDate = listenerEventArchive.CreatedDate,

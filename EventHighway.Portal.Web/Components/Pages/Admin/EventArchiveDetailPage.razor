@@ -1,6 +1,7 @@
 @page "/admin/event-archives/{EventArchiveId:guid}"
 @attribute [Authorize(Roles = "Administrators")]
 @using System.Collections.Generic
+@using System.Linq
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Models.Views.EventArchives
 @using EventHighway.Portal.Web.Models.Views.ListenerEventArchives
@@ -82,8 +83,18 @@ else if (eventArchive is not null)
             }
             else
             {
-                <DataTable TItem="ListenerEventArchiveView" Items="listenerEventArchives"
-                           Columns="listenerColumns" Searchable="true" />
+                <DataTable TItem="ListenerEventArchiveView" Items="FilteredListenerEventArchives"
+                           Columns="listenerColumns" Searchable="true">
+                    <ExtraFilters>
+                        <select class="form-select w-auto" value="@selectedListenerStatus"
+                                @onchange="e => { selectedListenerStatus = e.Value?.ToString() ?? string.Empty; }">
+                            <option value="">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Success">Success</option>
+                            <option value="Error">Error</option>
+                        </select>
+                    </ExtraFilters>
+                </DataTable>
             }
         </ChildContent>
     </Card>
@@ -102,6 +113,12 @@ else
     private EventArchiveView? eventArchive;
     private List<ListenerEventArchiveView> listenerEventArchives = new();
     private List<DataTableColumn<ListenerEventArchiveView>> listenerColumns = new();
+    private string selectedListenerStatus = string.Empty;
+
+    private List<ListenerEventArchiveView> FilteredListenerEventArchives =>
+        string.IsNullOrEmpty(selectedListenerStatus)
+            ? listenerEventArchives
+            : listenerEventArchives.Where(l => l.Status == selectedListenerStatus).ToList();
 
     private string StatusCssClass =>
         eventArchive?.Status switch
@@ -128,6 +145,10 @@ else
             new DataTableColumn<ListenerEventArchiveView>
             {
                 Title = "Listener", Value = a => a.EventListenerId
+            },
+            new DataTableColumn<ListenerEventArchiveView>
+            {
+                Title = "Listener Name", Value = a => a.ListenerName ?? "—"
             },
             new DataTableColumn<ListenerEventArchiveView>
             {
