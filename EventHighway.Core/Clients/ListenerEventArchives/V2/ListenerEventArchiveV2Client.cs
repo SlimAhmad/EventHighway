@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,6 +63,10 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
                 throw CreateListenerEventArchiveV2ClientDependencyException(
                     listenerEventArchiveV2ServiceException.InnerException as Xeption);
             }
+            catch (Exception exception)
+            {
+                throw CreateListenerEventArchiveV2ClientServiceException(exception as Xeption);
+            }
         }
 
         private static ListenerEventArchiveV2ClientValidationException
@@ -78,6 +83,15 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
         {
             return new ListenerEventArchiveV2ClientDependencyException(
                 message: "Listener event archive client dependency error occurred, contact support.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
+
+        private static ListenerEventArchiveV2ClientServiceException
+            CreateListenerEventArchiveV2ClientServiceException(Xeption innerException)
+        {
+            return new ListenerEventArchiveV2ClientServiceException(
+                message: "Listener event archive client service error occurred, contact support.",
                 innerException: innerException,
                 data: innerException?.Data);
         }
