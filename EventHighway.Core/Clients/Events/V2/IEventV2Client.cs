@@ -75,6 +75,9 @@ namespace EventHighway.Core.Clients.Events.V2
         ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sAsync(
             CancellationToken cancellationToken = default);
 
+        ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sWithEventAddressV2Async(
+            CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Retrieves an event by its identifier asynchronously.
         /// </summary>
