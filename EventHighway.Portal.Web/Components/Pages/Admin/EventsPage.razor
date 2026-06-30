@@ -50,7 +50,25 @@ else
     </Card>
 
     <Card>
-        <DataTable TItem="EventView" Items="events" Columns="columns" Searchable="true">
+        <DataTable TItem="EventView" Items="FilteredEvents" Columns="columns" Searchable="true"
+                   RowClass="@(e => e.Status == "Quarantined" ? "table-danger"
+                       : e.Status == "Active" && e.RemainingRetryAttempts == 0 ? "table-warning"
+                       : null)">
+            <ExtraFilters>
+                <select class="form-select w-auto" value="@selectedType"
+                        @onchange="e => { selectedType = e.Value?.ToString() ?? string.Empty; }">
+                    <option value="">All Types</option>
+                    <option value="Immediate">Immediate</option>
+                    <option value="Scheduled">Scheduled</option>
+                </select>
+                <select class="form-select w-auto" value="@selectedStatus"
+                        @onchange="e => { selectedStatus = e.Value?.ToString() ?? string.Empty; }">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Dead">Dead</option>
+                    <option value="Quarantined">Quarantined</option>
+                </select>
+            </ExtraFilters>
             <RowActions Context="eventItem">
                 <Button Color="primary" CssClass="btn-sm"
                         OnClick="@(() => ViewEvent(eventItem.Id))">
@@ -68,6 +86,17 @@ else
     private int archivableCount;
     private List<EventView> events = new();
     private List<DataTableColumn<EventView>> columns = new();
+    private string selectedType = string.Empty;
+    private string selectedStatus = string.Empty;
+
+    private IEnumerable<EventView> FilteredEvents => events.Where(e =>
+        (string.IsNullOrEmpty(selectedType) || e.Type == selectedType) &&
+        (string.IsNullOrEmpty(selectedStatus) ||
+            (selectedStatus == "Dead"
+                ? e.Status == "Active" && e.RemainingRetryAttempts == 0
+                : selectedStatus == "Active"
+                    ? e.Status == "Active" && e.RemainingRetryAttempts > 0
+                    : e.Status == selectedStatus)));
 
     private string? archiveMessage;
     private string archiveAlertClass = "alert-info";
@@ -77,10 +106,24 @@ else
         columns = new List<DataTableColumn<EventView>>
         {
             new DataTableColumn<EventView> { Title = "Id", Value = e => e.Id },
+            new DataTableColumn<EventView> { Title = "Event Address", Value = e => e.EventAddressName },
             new DataTableColumn<EventView> { Title = "Event Name", Value = e => e.EventName },
-            new DataTableColumn<EventView> { Title = "Content", Value = e => e.Content },
             new DataTableColumn<EventView> { Title = "Type", Value = e => e.Type },
-            new DataTableColumn<EventView> { Title = "Status", Value = e => e.Status },
+            new DataTableColumn<EventView>
+            {
+                Title = "Status",
+                Value = e => e.Status,
+                CellTemplate = e =>
+                {
+                    var isDead = e.Status == "Active" && e.RemainingRetryAttempts == 0;
+                    var label = isDead ? "Dead" : e.Status;
+                    var color = e.Status == "Quarantined" ? "text-bg-danger"
+                        : isDead ? "text-bg-warning"
+                        : e.Status == "Active" ? "text-bg-success"
+                        : "text-bg-secondary";
+                    return @<span class="badge @color">@label</span>;
+                }
+            },
             new DataTableColumn<EventView>
             {
                 Title = "Retries Left", Value = e => e.RemainingRetryAttempts

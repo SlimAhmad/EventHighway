@@ -76,6 +76,9 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventAddresses.V2
                 .OnProperty(eventAddressV2 =>
                     eventAddressV2.ListenerEventV2s).IgnoreIt()
 
+                .OnProperty(eventAddressV2 =>
+                    eventAddressV2.EventArchiveV2s).IgnoreIt()
+
                 .OnType<DateTimeOffset>().Use(valueToUse: now);
 
             return filler;

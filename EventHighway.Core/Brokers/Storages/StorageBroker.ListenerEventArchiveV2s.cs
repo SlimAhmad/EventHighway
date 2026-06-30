@@ -24,6 +24,13 @@ namespace EventHighway.Core.Brokers.Storages
             CancellationToken cancellationToken = default) =>
             await SelectAllAsync<ListenerEventArchiveV2>(cancellationToken);
 
+        public async ValueTask<IQueryable<ListenerEventArchiveV2>> SelectAllListenerEventArchiveV2sWithListenerEventArchiveV2Async(
+            CancellationToken cancellationToken = default) =>
+            (await SelectAllAsync<ListenerEventArchiveV2>(cancellationToken))
+                .Include(listenerEventArchiveV2 => listenerEventArchiveV2.EventListenerV2);
+
+
+
         public async ValueTask BulkInsertListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
             CancellationToken cancellationToken = default) =>

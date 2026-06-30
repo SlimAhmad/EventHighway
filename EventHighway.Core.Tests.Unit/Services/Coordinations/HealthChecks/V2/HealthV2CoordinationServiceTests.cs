@@ -757,7 +757,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 
                 .OnProperty(e => e.Events).IgnoreIt()
                 .OnProperty(e => e.EventListenerV2s).IgnoreIt()
-                .OnProperty(e => e.ListenerEventV2s).IgnoreIt();
+                .OnProperty(e => e.ListenerEventV2s).IgnoreIt()
+                .OnProperty(e => e.EventArchiveV2s).IgnoreIt();
 
             return filler;
         }

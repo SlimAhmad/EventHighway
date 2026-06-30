@@ -114,6 +114,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
+
+                .OnProperty(listenerEventArchiveV2 => listenerEventArchiveV2.EventListenerV2)
+                    .IgnoreIt()
+
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;

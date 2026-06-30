@@ -45,7 +45,7 @@ namespace EventHighway.Portal.Web.Services.Views.Events
         TryCatch(async () =>
         {
             IQueryable<EventV2> events =
-                await this.eventHighwayBroker.RetrieveAllEventV2sAsync(cancellationToken);
+                await this.eventHighwayBroker.RetrieveAllEventV2sWithEventAddressV2Async(cancellationToken);
 
             return events
                 .OrderByDescending(@event => @event.CreatedDate)
@@ -59,7 +59,7 @@ namespace EventHighway.Portal.Web.Services.Views.Events
         TryCatch(async () =>
         {
             IQueryable<EventV2> events =
-                await this.eventHighwayBroker.RetrieveAllEventV2sAsync(cancellationToken);
+                await this.eventHighwayBroker.RetrieveAllEventV2sWithEventAddressV2Async(cancellationToken);
 
             EventV2 @event = events
                 .FirstOrDefault(retrievedEvent => retrievedEvent.Id == eventId);
@@ -77,6 +77,7 @@ namespace EventHighway.Portal.Web.Services.Views.Events
                 Status = @event.Status.ToString(),
                 RemainingRetryAttempts = @event.RemainingRetryAttempts,
                 EventAddressId = @event.EventAddressId,
+                EventAddressName = @event.EventAddressV2?.Name ?? string.Empty,
                 ParticipantId = @event.ParticipantId,
                 ScheduledDate = @event.ScheduledDate,
                 CreatedDate = @event.CreatedDate

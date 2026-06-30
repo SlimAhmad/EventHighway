@@ -11,6 +11,7 @@ using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Foundations.EventListeners.V2;
 using Microsoft.Data.SqlClient;
@@ -93,6 +94,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
 
                 .OnProperty(eventListenerV2 =>
                     eventListenerV2.ListenerEventV2s).IgnoreIt()
+
+                .OnProperty(eventListenerV2 =>
+                    eventListenerV2.ListenerEventArchiveV2s).IgnoreIt()
 
                 .OnProperty(eventListenerV2 =>
                     eventListenerV2.Participant).IgnoreIt()

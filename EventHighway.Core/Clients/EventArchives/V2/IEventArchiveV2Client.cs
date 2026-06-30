@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 
 namespace EventHighway.Core.Clients.EventArchives.V2
@@ -33,6 +34,9 @@ namespace EventHighway.Core.Clients.EventArchives.V2
         /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
         /// signaled.</exception>
         ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
+            CancellationToken cancellationToken = default);
+
+        ValueTask<IQueryable<EventV2>> RetrieveAllEventArchiveV2sWithEventAddressV2Async(
             CancellationToken cancellationToken = default);
 
         /// <summary>

@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 
 namespace EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2
@@ -66,6 +67,11 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2
         /// Gets or sets the identifier of the event listener that received the archived event.
         /// </summary>
         public Guid EventListenerId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="EventListenerV2"/> navigation property associated with this listener event archive.
+        /// </summary>
+        public EventListenerV2 EventListenerV2 { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the archived event.

@@ -180,7 +180,8 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
                 .OnType<DateTimeOffset>().Use(now)
                 .OnProperty(eventAddressV2 => eventAddressV2.Events).IgnoreIt()
                 .OnProperty(eventAddressV2 => eventAddressV2.EventListenerV2s).IgnoreIt()
-                .OnProperty(eventAddressV2 => eventAddressV2.ListenerEventV2s).IgnoreIt();
+                .OnProperty(eventAddressV2 => eventAddressV2.ListenerEventV2s).IgnoreIt()
+                .OnProperty(eventAddressV2 => eventAddressV2.EventArchiveV2s).IgnoreIt();
 
             return filler;
         }

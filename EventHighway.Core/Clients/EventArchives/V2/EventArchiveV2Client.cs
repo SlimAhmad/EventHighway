@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.EventArchives.V2.Exceptions;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2.Exceptions;
 using EventHighway.Core.Services.Foundations.EventArchives.V2;
@@ -71,6 +72,10 @@ namespace EventHighway.Core.Clients.EventArchives.V2
                 throw CreateEventArchiveV2ClientServiceException(exception as Xeption);
             }
         }
+
+        public async ValueTask<IQueryable<EventV2>> RetrieveAllEventArchiveV2sWithEventAddressV2Async(
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
 
         public async ValueTask<EventArchiveV2> RetrieveEventArchiveV2ByIdAsync(
             Guid eventArchiveV2Id,

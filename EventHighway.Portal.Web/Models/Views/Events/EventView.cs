@@ -11,6 +11,7 @@ namespace EventHighway.Portal.Web.Models.Views.Events
         public Guid Id { get; set; }
         public string EventName { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
+        public string EventAddressName { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public int RemainingRetryAttempts { get; set; }

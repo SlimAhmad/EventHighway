@@ -56,6 +56,9 @@ else if (eventView is not null)
                 <dt class="col-sm-3">Event Address Id</dt>
                 <dd class="col-sm-9">@eventView.EventAddressId</dd>
 
+                <dt class="col-sm-3">Event Address</dt>
+                <dd class="col-sm-9">@DisplayOrDash(eventView.EventAddressName)</dd>
+
                 <dt class="col-sm-3">Participant Id</dt>
                 <dd class="col-sm-9">@(eventView.ParticipantId?.ToString() ?? "—")</dd>
 
@@ -80,7 +83,10 @@ else if (eventView is not null)
             else
             {
                 <DataTable TItem="ListenerEventView" Items="listenerEvents"
-                           Columns="listenerColumns" Searchable="true" />
+                           Columns="listenerColumns" Searchable="true"
+                           RowClass="@(e => e.Status == "Success" ? "table-success"
+                               : e.Status == "Error" ? "table-danger"
+                               : null)" />
             }
         </ChildContent>
     </Card>
@@ -113,7 +119,15 @@ else
         listenerColumns = new List<DataTableColumn<ListenerEventView>>
         {
             new DataTableColumn<ListenerEventView> { Title = "Id", Value = e => e.Id },
-            new DataTableColumn<ListenerEventView> { Title = "Status", Value = e => e.Status },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Status",
+                Value = e => e.Status,
+                CellTemplate = e =>
+                    @<span class="badge @(e.Status == "Success" ? "text-bg-success"
+                        : e.Status == "Error" ? "text-bg-danger"
+                        : "text-bg-secondary")">@e.Status</span>
+            },
             new DataTableColumn<ListenerEventView>
             {
                 Title = "Response Code", Value = e => e.ResponseCode

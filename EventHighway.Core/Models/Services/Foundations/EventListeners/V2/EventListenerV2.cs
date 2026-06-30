@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 
 namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
@@ -83,6 +84,11 @@ namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
         /// listener.
         /// </summary>
         public IEnumerable<ListenerEventV2> ListenerEventV2s { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of archived listener events associated with this event listener.
+        /// </summary>
+        public IEnumerable<ListenerEventArchiveV2> ListenerEventArchiveV2s { get; set; }
 
         /// <summary>
         /// Gets or sets the unique identifier of the participant that owns this listener.
