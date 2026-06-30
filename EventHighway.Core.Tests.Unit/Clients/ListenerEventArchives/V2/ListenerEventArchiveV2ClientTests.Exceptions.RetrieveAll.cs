@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.ListenerEventArchives.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
 using FluentAssertions;
 using Moq;
 using Xeptions;
@@ -45,6 +46,55 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEventArchives.V2
             // then
             actualListenerEventArchiveV2ClientValidationException.Should()
                 .BeEquivalentTo(expectedListenerEventArchiveV2ClientValidationException);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveAllIfDependencyErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            string someMessage = GetRandomString();
+            var someInnerException = new Xeption(someMessage);
+            someInnerException.AddData(GetRandomString(), GetRandomString());
+
+            var listenerEventArchiveV2DependencyException =
+                new ListenerEventArchiveV2DependencyException(
+                    someMessage,
+                    someInnerException);
+
+            var expectedListenerEventArchiveV2ClientDependencyException =
+                new ListenerEventArchiveV2ClientDependencyException(
+                    message: "Listener event archive client dependency error occurred, contact support.",
+
+                    innerException: listenerEventArchiveV2DependencyException
+                        .InnerException as Xeption,
+
+                    data: (listenerEventArchiveV2DependencyException
+                        .InnerException as Xeption).Data);
+
+            this.listenerEventArchiveV2ServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(listenerEventArchiveV2DependencyException);
+
+            // when
+            ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveAllListenerEventArchiveV2sTask =
+                this.listenerEventArchiveV2Client.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken);
+
+            ListenerEventArchiveV2ClientDependencyException actualListenerEventArchiveV2ClientDependencyException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV2ClientDependencyException>(
+                    retrieveAllListenerEventArchiveV2sTask.AsTask);
+
+            // then
+            actualListenerEventArchiveV2ClientDependencyException.Should()
+                .BeEquivalentTo(expectedListenerEventArchiveV2ClientDependencyException);
 
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
