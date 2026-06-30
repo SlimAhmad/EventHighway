@@ -33,7 +33,12 @@ namespace EventHighway.ClientV2.Seed
 
         // Event addresses
         public static readonly Guid NFlixNewReleasesAddress =
-            new Guid("a1000000-0000-0000-0000-000000000001");
+            new Guid("be0dd6e0-b545-435d-9541-d1ac386469ce");
+
+        // A second address whose downstream is partially unreliable, used to seed
+        // partial-success events (one reliable listener + one always-failing listener).
+        public static readonly Guid NFlixPartnerFeedAddress =
+            new Guid("7abdf5a3-d099-41d8-9ec1-67f6d1580901");
 
         // Event listeners
         public static readonly Guid BingeBoxNewReleasesListener =
@@ -47,5 +52,12 @@ namespace EventHighway.ClientV2.Seed
 
         public static readonly Guid MediaItemServiceInternalListener =
             new Guid("a2000000-0000-0000-0000-000000000004");
+
+        // Listeners on the partner-feed address: one reliable, one always failing.
+        public static readonly Guid PartnerFeedReliableListener =
+            new Guid("b9171e0f-5cd0-489b-83e2-7dbd6626de28");
+
+        public static readonly Guid PartnerFeedFailingListener =
+            new Guid("64f7e061-34dc-4b30-b5c8-558bd3b8228e");
     }
 }

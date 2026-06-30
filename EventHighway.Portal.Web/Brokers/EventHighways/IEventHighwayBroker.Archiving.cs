@@ -3,8 +3,10 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 
 namespace EventHighway.Portal.Web.Brokers.EventHighways
 {
@@ -15,6 +17,9 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
 
         ValueTask PurgeEventArchiveV2sAsync(
             DateTimeOffset olderThan,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default);
     }
 }

@@ -1,6 +1,7 @@
 using EventHighway.Portal.Web.Components;
+using EventHighway.Portal.Web.Components.Account;
+using EventHighway.Portal.Web.Data;
 using EventHighway.Portal.Web.Infrastructure;
-using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,13 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Authorization: role-aware nav/pages are authored now and enforced for real in Phase 5.
-// Until ASP.NET Identity lands, a development authentication state provider authenticates a
-// user in both roles so the full menu and every page is reachable while building.
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<AuthenticationStateProvider, DevelopmentAuthenticationStateProvider>();
-
+builder.Services.AddPortalIdentity(builder.Configuration);
 builder.Services.AddPortalBrokers(builder.Configuration);
 builder.Services.AddPortalViewServices();
 
@@ -35,5 +30,19 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+// Add additional endpoints required by the Identity /Account Razor components.
+app.MapAdditionalIdentityEndpoints();
+
+// A seed failure (e.g. a transient database error on a cold start) is logged but must not stop
+// the app from serving; the seed is idempotent and re-runs on the next start.
+try
+{
+    await SeedData.SeedAsync(app.Services);
+}
+catch (Exception seedException)
+{
+    app.Logger.LogError(seedException, "Identity seed failed at startup; continuing.");
+}
 
 app.Run();

@@ -21,6 +21,7 @@ namespace EventHighway.ClientV2.SubstrateApp.Infrastructure
         public DelegateEventHandler BingeBox { get; }
         public DelegateEventHandler Joe { get; }
         public DelegateEventHandler Ann { get; }
+        public DelegateEventHandler FlakyBox { get; }
 
         public MediaEventHandlers(WireMockServer wireMock)
         {
@@ -43,6 +44,28 @@ namespace EventHighway.ClientV2.SubstrateApp.Infrastructure
                     });
                 },
                 name: "BingeBox");
+
+            // A downstream that is always unavailable. Used to seed partial-success events:
+            // the reliable listener succeeds while this one errors, leaving a mix of statuses.
+            this.FlakyBox = new DelegateEventHandler(
+                Guid.NewGuid(),
+                (content, cancellationToken) =>
+                {
+                    MediaItem item = MediaItemSerializer.Deserialize(content);
+
+                    Console.WriteLine(
+                        $"[FlakyBox] FAILED to deliver - {item.Title} " +
+                        $"({item.Type} with rating of {item.Rating})");
+
+                    return ValueTask.FromResult(new EventHandlerResult
+                    {
+                        IsSuccess = false,
+                        Response = "downstream unavailable",
+                        ResponseCode = "503",
+                        ResponseMessage = "Service Unavailable"
+                    });
+                },
+                name: "FlakyBox");
 
             this.Joe = CreateRestHandler("Joe", wireMock);
             this.Ann = CreateRestHandler("Ann", wireMock);

@@ -1,11 +1,12 @@
 @page "/admin/events"
+@attribute [Authorize(Roles = "Administrators")]
 @using System.Collections.Generic
 @using EventHighway.Portal.Web.Components.CoreUI
-@using EventHighway.Portal.Web.Models.Views.ListenerEvents
+@using EventHighway.Portal.Web.Models.Views.Events
 @using EventHighway.Portal.Web.Services.Views.EventArchives
-@using EventHighway.Portal.Web.Services.Views.ListenerEvents
-@inject IListenerEventsViewService ListenerEventsViewService
+@using EventHighway.Portal.Web.Services.Views.Events
 @inject IEventArchivesViewService EventArchivesViewService
+@inject IEventsViewService EventsViewService
 @inject NavigationManager Navigation
 
 <PageTitle>Events</PageTitle>
@@ -15,7 +16,7 @@
 </div>
 
 <p class="text-body-secondary">
-    Listener events queued for delivery, most recent first. Each row is one event dispatched to a listener.
+    Events queued for delivery, most recent first. Each row is one event submitted to the highway.
 </p>
 
 @if (isLoading)
@@ -38,7 +39,9 @@ else
                 <div class="alert @archiveAlertClass" role="alert">@archiveMessage</div>
             }
             <p class="text-body-secondary">
-                Move processed events out of the live tables and into the archive.
+                <strong>@archivableCount</strong>
+                @(archivableCount == 1 ? " event qualifies" : " events qualify")
+                for archiving and can be moved out of the live tables and into the archive.
             </p>
             <Button Color="primary" OnClick="ArchiveAsync" Disabled="@isWorking">
                 Archive now
@@ -47,10 +50,10 @@ else
     </Card>
 
     <Card>
-        <DataTable TItem="ListenerEventView" Items="listenerEvents" Columns="columns" Searchable="false">
-            <RowActions Context="listenerEvent">
+        <DataTable TItem="EventView" Items="events" Columns="columns" Searchable="true">
+            <RowActions Context="eventItem">
                 <Button Color="primary" CssClass="btn-sm"
-                        OnClick="@(() => ViewEvent(listenerEvent.Id))">
+                        OnClick="@(() => ViewEvent(eventItem.Id))">
                     VIEW
                 </Button>
             </RowActions>
@@ -62,23 +65,27 @@ else
     private bool isLoading = true;
     private bool isWorking;
     private string? errorMessage;
-    private List<ListenerEventView> listenerEvents = new();
-    private List<DataTableColumn<ListenerEventView>> columns = new();
+    private int archivableCount;
+    private List<EventView> events = new();
+    private List<DataTableColumn<EventView>> columns = new();
 
     private string? archiveMessage;
     private string archiveAlertClass = "alert-info";
 
     protected override async Task OnInitializedAsync()
     {
-        columns = new List<DataTableColumn<ListenerEventView>>
+        columns = new List<DataTableColumn<EventView>>
         {
-            new DataTableColumn<ListenerEventView> { Title = "Status", Value = e => e.Status },
-            new DataTableColumn<ListenerEventView> { Title = "Response Code", Value = e => e.ResponseCode },
-            new DataTableColumn<ListenerEventView>
+            new DataTableColumn<EventView> { Title = "Id", Value = e => e.Id },
+            new DataTableColumn<EventView> { Title = "Event Name", Value = e => e.EventName },
+            new DataTableColumn<EventView> { Title = "Content", Value = e => e.Content },
+            new DataTableColumn<EventView> { Title = "Type", Value = e => e.Type },
+            new DataTableColumn<EventView> { Title = "Status", Value = e => e.Status },
+            new DataTableColumn<EventView>
             {
-                Title = "Listener", Value = e => e.EventListenerId
+                Title = "Retries Left", Value = e => e.RemainingRetryAttempts
             },
-            new DataTableColumn<ListenerEventView>
+            new DataTableColumn<EventView>
             {
                 Title = "Created", Value = e => e.CreatedDate.ToString("u")
             },
@@ -92,7 +99,8 @@ else
     {
         try
         {
-            listenerEvents = await ListenerEventsViewService.RetrieveAllListenerEventsAsync();
+            events = await EventsViewService.RetrieveAllEventsAsync();
+            archivableCount = await EventsViewService.RetrieveArchivableEventCountAsync();
             errorMessage = null;
         }
         catch
@@ -124,6 +132,6 @@ else
         }
     }
 
-    private void ViewEvent(Guid listenerEventId) =>
-        Navigation.NavigateTo($"/admin/events/{listenerEventId}");
+    private void ViewEvent(Guid eventId) =>
+        Navigation.NavigateTo($"/admin/events/{eventId}");
 }

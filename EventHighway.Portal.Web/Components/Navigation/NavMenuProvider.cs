@@ -26,12 +26,6 @@ namespace EventHighway.Portal.Web.Components.Navigation
                     RequiresAuth: true,
                     Children: new[]
                     {
-                        new NavItem("Event Participants", "cil-people", "admin/participants",
-                            Roles: new[] { "Administrators" }, RequiresAuth: true),
-
-                        new NavItem("Event Address", "cil-location-pin", "admin/event-addresses",
-                            Roles: new[] { "Administrators" }, RequiresAuth: true),
-
                         new NavItem("Events", "cil-bolt", "admin/events",
                             Roles: new[] { "Administrators" }, RequiresAuth: true),
 
@@ -39,6 +33,12 @@ namespace EventHighway.Portal.Web.Components.Navigation
                             Roles: new[] { "Administrators" }, RequiresAuth: true),
 
                         new NavItem("Replay", "cil-loop-circular", "admin/replay",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Event Participants", "cil-people", "admin/participants",
+                            Roles: new[] { "Administrators" }, RequiresAuth: true),
+
+                        new NavItem("Event Address", "cil-location-pin", "admin/event-addresses",
                             Roles: new[] { "Administrators" }, RequiresAuth: true),
 
                         new NavItem("Users", "cil-user", "admin/users",

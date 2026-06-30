@@ -3,8 +3,10 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Portal.Web.Models.Views.EventArchives;
 
 namespace EventHighway.Portal.Web.Services.Views.EventArchives
 {
@@ -15,6 +17,13 @@ namespace EventHighway.Portal.Web.Services.Views.EventArchives
 
         ValueTask PurgeArchivesOlderThanAsync(
             DateTimeOffset olderThan,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<List<EventArchiveView>> RetrieveAllEventArchivesAsync(
+            CancellationToken cancellationToken = default);
+
+        ValueTask<EventArchiveView> RetrieveEventArchiveByIdAsync(
+            Guid eventArchiveId,
             CancellationToken cancellationToken = default);
     }
 }
