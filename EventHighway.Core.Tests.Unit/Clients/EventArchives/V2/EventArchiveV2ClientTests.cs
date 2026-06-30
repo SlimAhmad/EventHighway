@@ -78,6 +78,9 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventArchives.V2
                 .OnProperty(eventArchiveV2 => eventArchiveV2.ListenerEventArchiveV2s)
                     .IgnoreIt()
 
+                .OnProperty(eventArchiveV2 => eventArchiveV2.EventAddressV2)
+                    .IgnoreIt()
+
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;
