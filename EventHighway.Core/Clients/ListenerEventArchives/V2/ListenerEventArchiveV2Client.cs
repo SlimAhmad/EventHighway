@@ -50,6 +50,12 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
                 throw CreateListenerEventArchiveV2ClientValidationException(
                     listenerEventArchiveV2DependencyValidationException.InnerException as Xeption);
             }
+            catch (ListenerEventArchiveV2DependencyException
+                listenerEventArchiveV2DependencyException)
+            {
+                throw CreateListenerEventArchiveV2ClientDependencyException(
+                    listenerEventArchiveV2DependencyException.InnerException as Xeption);
+            }
         }
 
         private static ListenerEventArchiveV2ClientValidationException
@@ -57,6 +63,15 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
         {
             return new ListenerEventArchiveV2ClientValidationException(
                 message: "Listener event archive client validation error occurred, fix the errors and try again.",
+                innerException: innerException,
+                data: innerException?.Data);
+        }
+
+        private static ListenerEventArchiveV2ClientDependencyException
+            CreateListenerEventArchiveV2ClientDependencyException(Xeption innerException)
+        {
+            return new ListenerEventArchiveV2ClientDependencyException(
+                message: "Listener event archive client dependency error occurred, contact support.",
                 innerException: innerException,
                 data: innerException?.Data);
         }
