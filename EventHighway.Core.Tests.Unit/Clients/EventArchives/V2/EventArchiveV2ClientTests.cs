@@ -75,6 +75,9 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventArchives.V2
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
                 .OnType<DateTimeOffset?>().Use(GetRandomDateTimeOffset())
 
+                .OnProperty(eventArchiveV2 => eventArchiveV2.EventAddressV2)
+                    .IgnoreIt()
+
                 .OnProperty(eventArchiveV2 => eventArchiveV2.ListenerEventArchiveV2s)
                     .IgnoreIt()
 

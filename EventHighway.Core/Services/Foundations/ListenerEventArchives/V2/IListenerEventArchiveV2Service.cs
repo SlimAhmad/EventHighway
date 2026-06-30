@@ -19,6 +19,9 @@ namespace EventHighway.Core.Services.Foundations.ListenerEventArchives.V2
         ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default);
 
+        ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default);
+
         ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
             CancellationToken cancellationToken = default);
