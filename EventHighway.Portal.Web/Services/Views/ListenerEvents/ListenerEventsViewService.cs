@@ -47,13 +47,13 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEvents
         TryCatch(async () =>
         {
             IQueryable<ListenerEventV2> listenerEvents =
-                await this.eventHighwayBroker.RetrieveAllListenerEventV2sAsync(
-                    cancellationToken);
+                await this.eventHighwayBroker
+                    .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken);
 
             return listenerEvents
                 .Where(listenerEvent => listenerEvent.EventId == eventId)
                 .OrderByDescending(listenerEvent => listenerEvent.CreatedDate)
-                .Select(AsView)
+                .Select(AsViewWithEventListener)
                 .ToList();
         });
 
@@ -116,6 +116,21 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEvents
                 EventId = listenerEvent.EventId,
                 EventAddressId = listenerEvent.EventAddressId,
                 EventListenerId = listenerEvent.EventListenerId,
+                ParticipantId = listenerEvent.ParticipantId,
+                CreatedDate = listenerEvent.CreatedDate
+            };
+
+        private static ListenerEventView AsViewWithEventListener(ListenerEventV2 listenerEvent) =>
+            new ListenerEventView
+            {
+                Id = listenerEvent.Id,
+                Status = listenerEvent.Status.ToString(),
+                ResponseCode = listenerEvent.ResponseCode,
+                ResponseMessage = listenerEvent.ResponseMessage,
+                EventId = listenerEvent.EventId,
+                EventAddressId = listenerEvent.EventAddressId,
+                EventListenerId = listenerEvent.EventListenerId,
+                ListenerName = listenerEvent.EventListener?.Name,
                 ParticipantId = listenerEvent.ParticipantId,
                 CreatedDate = listenerEvent.CreatedDate
             };

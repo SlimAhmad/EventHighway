@@ -1,6 +1,7 @@
 @page "/admin/events/{EventId:guid}"
 @attribute [Authorize(Roles = "Administrators")]
 @using System.Collections.Generic
+@using System.Linq
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Models.Views.Events
 @using EventHighway.Portal.Web.Models.Views.ListenerEvents
@@ -82,11 +83,22 @@ else if (eventView is not null)
             }
             else
             {
-                <DataTable TItem="ListenerEventView" Items="listenerEvents"
+                <DataTable TItem="ListenerEventView" Items="FilteredListenerEvents"
                            Columns="listenerColumns" Searchable="true"
                            RowClass="@(e => e.Status == "Success" ? "table-success"
                                : e.Status == "Error" ? "table-danger"
-                               : null)" />
+                               : null)">
+                    <ExtraFilters>
+                        <select class="form-select w-auto" value="@selectedListenerStatus"
+                                @onchange="e => { selectedListenerStatus = e.Value?.ToString() ?? string.Empty; }">
+                            <option value="">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Success">Success</option>
+                            <option value="Error">Error</option>
+                            <option value="Replay">Replay</option>
+                        </select>
+                    </ExtraFilters>
+                </DataTable>
             }
         </ChildContent>
     </Card>
@@ -105,6 +117,12 @@ else
     private EventView? eventView;
     private List<ListenerEventView> listenerEvents = new();
     private List<DataTableColumn<ListenerEventView>> listenerColumns = new();
+    private string selectedListenerStatus = string.Empty;
+
+    private List<ListenerEventView> FilteredListenerEvents =>
+        string.IsNullOrEmpty(selectedListenerStatus)
+            ? listenerEvents
+            : listenerEvents.Where(e => e.Status == selectedListenerStatus).ToList();
 
     private string StatusCssClass =>
         eventView?.Status switch
@@ -139,6 +157,10 @@ else
             new DataTableColumn<ListenerEventView>
             {
                 Title = "Listener", Value = e => e.EventListenerId
+            },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Listener Name", Value = e => e.ListenerName ?? "—"
             },
             new DataTableColumn<ListenerEventView>
             {

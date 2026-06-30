@@ -23,6 +23,15 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
                     .AsQueryable(),
                 cancellationToken);
 
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default) =>
+            this.clientV2Provider.ExecuteAsync(async client =>
+                (await client.ListenerEventV2Client
+                    .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken))
+                    .ToList()
+                    .AsQueryable(),
+                cancellationToken);
+
         public ValueTask<ListenerEventV2> RemoveListenerEventV2ByIdAsync(
             Guid listenerEventV2Id,
             CancellationToken cancellationToken = default) =>
