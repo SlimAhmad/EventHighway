@@ -82,6 +82,16 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
                     cancellationToken);
         });
 
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventV2ProcessingService
+                .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken);
+        });
+
         public ValueTask<EventListenerV2> RemoveEventListenerV2ByIdAsync(
             Guid eventListenerV2Id,
             CancellationToken cancellationToken = default) =>
