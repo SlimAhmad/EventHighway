@@ -49,7 +49,13 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
 
         public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventV2Service
+                .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken);
+        });
 
         public ValueTask<IEnumerable<ListenerEventV2>> BulkRestoreListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
