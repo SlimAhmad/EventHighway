@@ -142,6 +142,7 @@ else
     {
         listenerColumns = new List<DataTableColumn<EventListenerView>>
         {
+            new DataTableColumn<EventListenerView> { Title = "Id", Value = l => l.Id },
             new DataTableColumn<EventListenerView> { Title = "Name", Value = l => l.Name },
             new DataTableColumn<EventListenerView> { Title = "Description", Value = l => l.Description },
             new DataTableColumn<EventListenerView> { Title = "Handler", Value = l => l.HandlerName },
