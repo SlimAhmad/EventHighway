@@ -5,8 +5,11 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Clients.ListenerEventArchives.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2.Exceptions;
 using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
+using Xeptions;
 
 namespace EventHighway.Core.Clients.ListenerEventArchives.V2
 {
@@ -30,8 +33,32 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
         public async ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default)
         {
-            return await this.listenerEventArchiveV2Service
-                .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+            try
+            {
+                return await this.listenerEventArchiveV2Service
+                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+            }
+            catch (ListenerEventArchiveV2ValidationException
+                listenerEventArchiveV2ValidationException)
+            {
+                throw CreateListenerEventArchiveV2ClientValidationException(
+                    listenerEventArchiveV2ValidationException.InnerException as Xeption);
+            }
+            catch (ListenerEventArchiveV2DependencyValidationException
+                listenerEventArchiveV2DependencyValidationException)
+            {
+                throw CreateListenerEventArchiveV2ClientValidationException(
+                    listenerEventArchiveV2DependencyValidationException.InnerException as Xeption);
+            }
+        }
+
+        private static ListenerEventArchiveV2ClientValidationException
+            CreateListenerEventArchiveV2ClientValidationException(Xeption innerException)
+        {
+            return new ListenerEventArchiveV2ClientValidationException(
+                message: "Listener event archive client validation error occurred, fix the errors and try again.",
+                innerException: innerException,
+                data: innerException?.Data);
         }
     }
 }
