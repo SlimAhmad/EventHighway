@@ -151,5 +151,43 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEventArchives.V2
 
             this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRetrieveAllIfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedListenerEventArchiveV2ClientServiceException =
+                new ListenerEventArchiveV2ClientServiceException(
+                    message: "Listener event archive client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.listenerEventArchiveV2ServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveAllListenerEventArchiveV2sTask =
+                this.listenerEventArchiveV2Client.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken);
+
+            ListenerEventArchiveV2ClientServiceException actualListenerEventArchiveV2ClientServiceException =
+                await Assert.ThrowsAsync<ListenerEventArchiveV2ClientServiceException>(
+                    retrieveAllListenerEventArchiveV2sTask.AsTask);
+
+            // then
+            actualListenerEventArchiveV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedListenerEventArchiveV2ClientServiceException);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
