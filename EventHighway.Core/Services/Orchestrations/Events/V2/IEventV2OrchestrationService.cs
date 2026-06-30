@@ -26,6 +26,9 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         ValueTask<IQueryable<EventAddressV2>> RetrieveAllEventAddressV2sAsync(
             CancellationToken cancellationToken = default);
 
+        ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sWithEventAddressV2Async(
+            CancellationToken cancellationToken = default);
+
         ValueTask<EventV2> SubmitEventV2Async(
             EventV2 eventV2,
             CancellationToken cancellationToken = default);
