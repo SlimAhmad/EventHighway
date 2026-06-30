@@ -155,5 +155,47 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventArchives.V2
 
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnRetrieveAllWithEventAddressV2IfUnexpectedErrorOccursAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var someXeption = new Xeption(message: GetRandomString());
+
+            var expectedEventArchiveV2ClientServiceException =
+                new EventArchiveV2ClientServiceException(
+                    message: "Event archive client service error occurred, contact support.",
+                    innerException: someXeption,
+                    data: someXeption.Data);
+
+            this.eventArchiveV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sWithEventAddressV2Async(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(someXeption);
+
+            // when
+            ValueTask<IQueryable<EventArchiveV2>> retrieveAllTask =
+                this.eventArchiveV2Client
+                    .RetrieveAllEventArchiveV2sWithEventAddressV2Async(
+                        randomCancellationToken);
+
+            EventArchiveV2ClientServiceException actualEventArchiveV2ClientServiceException =
+                await Assert.ThrowsAsync<EventArchiveV2ClientServiceException>(
+                    retrieveAllTask.AsTask);
+
+            // then
+            actualEventArchiveV2ClientServiceException.Should()
+                .BeEquivalentTo(expectedEventArchiveV2ClientServiceException);
+
+            this.eventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sWithEventAddressV2Async(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
