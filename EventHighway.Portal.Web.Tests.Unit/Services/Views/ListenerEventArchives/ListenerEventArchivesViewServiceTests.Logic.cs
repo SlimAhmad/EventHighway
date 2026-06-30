@@ -84,7 +84,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.ListenerEventArchive
                 new[] { newest, oldest }.Select(MapToView).ToList();
 
             this.eventHighwayBrokerMock.Setup(broker =>
-                broker.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
+                broker.RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(It.IsAny<CancellationToken>()))
                     .ReturnsAsync(storageListenerEventArchives);
 
             // when
@@ -98,7 +98,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.ListenerEventArchive
                 expectedViews, options => options.WithStrictOrdering());
 
             this.eventHighwayBrokerMock.Verify(broker =>
-                broker.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
+                broker.RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(It.IsAny<CancellationToken>()),
                     Times.Once);
 
             this.eventHighwayBrokerMock.VerifyNoOtherCalls();

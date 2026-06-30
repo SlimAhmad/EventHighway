@@ -129,6 +129,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
                     .IgnoreIt()
 
                 .OnProperty(eventArchiveV2 => eventArchiveV2.EventAddressV2)
+                    .IgnoreIt()
+
+                .OnProperty(eventArchiveV2 => eventArchiveV2.Participant)
                     .IgnoreIt();
 
             return filler;
