@@ -2,14 +2,18 @@
 @typeparam TItem
 
 <div class="datatable">
-    @if (Searchable)
+    @if (Searchable || ExtraFilters is not null)
     {
-        <div class="mb-3">
-            <input type="search"
-                   class="form-control datatable-search"
-                   placeholder="Search..."
-                   value="@SearchTerm"
-                   @oninput="OnSearchChanged" />
+        <div class="d-flex gap-2 mb-3">
+            @if (Searchable)
+            {
+                <input type="search"
+                       class="form-control datatable-search"
+                       placeholder="Search..."
+                       value="@SearchTerm"
+                       @oninput="OnSearchChanged" />
+            }
+            @ExtraFilters
         </div>
     }
 
@@ -42,10 +46,19 @@
         <tbody>
             @foreach (TItem item in PagedItems)
             {
-                <tr>
+                <tr class="@RowClass?.Invoke(item)">
                     @foreach (DataTableColumn<TItem> column in Columns)
                     {
-                        <td>@column.Value(item)</td>
+                        <td>
+                            @if (column.CellTemplate is not null)
+                            {
+                                @column.CellTemplate(item)
+                            }
+                            else
+                            {
+                                @column.Value(item)
+                            }
+                        </td>
                     }
                     @if (RowActions is not null)
                     {

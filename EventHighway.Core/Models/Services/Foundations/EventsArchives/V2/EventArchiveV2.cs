@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 
@@ -70,6 +71,11 @@ namespace EventHighway.Core.Models.Services.Foundations.EventsArchives.V2
         /// Gets or sets the identifier of the event address associated with this archived event.
         /// </summary>
         public Guid EventAddressId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="EventAddressV2"/> navigation property associated with this archived event.
+        /// </summary>
+        public EventAddressV2 EventAddressV2 { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of <see cref="ListenerEventArchiveV2"/> listener events associated with this archived event.

@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,11 @@ namespace EventHighway.Core.Brokers.Storages
                 .WithOne()
                 .HasForeignKey(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            model.HasOne<EventAddressV2>(eventArchiveV2 => eventArchiveV2.EventAddressV2)
+                .WithMany(eventAddressV2 => eventAddressV2.EventArchiveV2s)
+                .HasForeignKey(eventArchiveV2 => eventArchiveV2.EventAddressId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

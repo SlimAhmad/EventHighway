@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using Microsoft.AspNetCore.Components;
 
 namespace EventHighway.Portal.Web.Components.CoreUI
 {
@@ -13,5 +14,7 @@ namespace EventHighway.Portal.Web.Components.CoreUI
         public Func<TItem, object?> Value { get; set; } = _ => null;
 
         public bool Sortable { get; set; } = true;
+
+        public RenderFragment<TItem>? CellTemplate { get; set; }
     }
 }

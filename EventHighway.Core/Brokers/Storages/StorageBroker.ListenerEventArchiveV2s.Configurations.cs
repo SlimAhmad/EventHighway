@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -17,6 +18,11 @@ namespace EventHighway.Core.Brokers.Storages
 
             model.Property(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
                 .IsRequired();
+
+            model.HasOne<EventListenerV2>(listenerEventArchiveV2 => listenerEventArchiveV2.EventListenerV2)
+                .WithMany(eventListenerV2 => eventListenerV2.ListenerEventArchiveV2s)
+                .HasForeignKey(listenerEventArchiveV2 => listenerEventArchiveV2.EventListenerId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

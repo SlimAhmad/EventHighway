@@ -27,6 +27,12 @@ namespace EventHighway.Portal.Web.Components.CoreUI
         [Parameter]
         public RenderFragment<TItem>? RowActions { get; set; }
 
+        [Parameter]
+        public Func<TItem, string?>? RowClass { get; set; }
+
+        [Parameter]
+        public RenderFragment? ExtraFilters { get; set; }
+
         public string SearchTerm { get; private set; } = string.Empty;
 
         public DataTableColumn<TItem>? SortColumn { get; private set; }
