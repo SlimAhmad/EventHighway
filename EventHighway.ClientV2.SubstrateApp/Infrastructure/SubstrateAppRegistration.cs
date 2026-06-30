@@ -54,7 +54,8 @@ namespace EventHighway.ClientV2.SubstrateApp.Infrastructure
             broker
                 .RegisterEventHandler(handlers.BingeBox)
                 .RegisterEventHandler(handlers.Joe)
-                .RegisterEventHandler(handlers.Ann);
+                .RegisterEventHandler(handlers.Ann)
+                .RegisterEventHandler(handlers.FlakyBox);
 
             return broker;
         }

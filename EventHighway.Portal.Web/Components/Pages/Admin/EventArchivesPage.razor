@@ -1,8 +1,10 @@
 @page "/admin/event-archives"
 @attribute [Authorize(Roles = "Administrators")]
 @using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.EventArchives
 @using EventHighway.Portal.Web.Services.Views.EventArchives
 @inject IEventArchivesViewService EventArchivesViewService
+@inject NavigationManager Navigation
 
 <PageTitle>Archived Events</PageTitle>
 
@@ -49,6 +51,29 @@
                OnConfirm="PurgeAsync"
                OnCancel="@(() => confirmVisible = false)" />
 
+@if (isLoading)
+{
+    <Spinner />
+}
+else if (listErrorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@listErrorMessage</div>
+}
+else
+{
+    <Card CssClass="mt-4">
+        <DataTable TItem="EventArchiveView" Items="eventArchives"
+                   Columns="columns" Searchable="true">
+            <RowActions Context="eventArchive">
+                <Button Color="primary" CssClass="btn-sm"
+                        OnClick="@(() => ViewArchive(eventArchive.Id))">
+                    VIEW
+                </Button>
+            </RowActions>
+        </DataTable>
+    </Card>
+}
+
 @code {
     private bool isWorking;
     private string? message;
@@ -57,6 +82,44 @@
     private DateTimeOffset? purgeOlderThan;
     private bool confirmVisible;
     private string? confirmMessage;
+
+    private bool isLoading = true;
+    private string? listErrorMessage;
+    private List<EventArchiveView> eventArchives = new();
+    private List<DataTableColumn<EventArchiveView>> columns = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        columns = new List<DataTableColumn<EventArchiveView>>
+        {
+            new DataTableColumn<EventArchiveView> { Title = "Id", Value = a => a.Id },
+            new DataTableColumn<EventArchiveView> { Title = "Event Name", Value = a => a.EventName },
+            new DataTableColumn<EventArchiveView> { Title = "Content", Value = a => a.Content },
+            new DataTableColumn<EventArchiveView> { Title = "Type", Value = a => a.Type },
+            new DataTableColumn<EventArchiveView> { Title = "Status", Value = a => a.Status },
+            new DataTableColumn<EventArchiveView>
+            {
+                Title = "Archived", Value = a => a.ArchivedDate.ToString("u")
+            },
+        };
+
+        try
+        {
+            eventArchives =
+                await EventArchivesViewService.RetrieveAllEventArchivesAsync();
+        }
+        catch
+        {
+            listErrorMessage = "Unable to load archived events. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ViewArchive(Guid eventArchiveId) =>
+        Navigation.NavigateTo($"/admin/event-archives/{eventArchiveId}");
 
     private void RequestPurge()
     {

@@ -1,8 +1,12 @@
-@page "/admin/events/{ListenerEventId:guid}"
+@page "/admin/events/{EventId:guid}"
 @attribute [Authorize(Roles = "Administrators")]
+@using System.Collections.Generic
 @using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.Events
 @using EventHighway.Portal.Web.Models.Views.ListenerEvents
+@using EventHighway.Portal.Web.Services.Views.Events
 @using EventHighway.Portal.Web.Services.Views.ListenerEvents
+@inject IEventsViewService EventsViewService
 @inject IListenerEventsViewService ListenerEventsViewService
 
 <PageTitle>Event</PageTitle>
@@ -20,44 +24,64 @@ else if (errorMessage is not null)
 {
     <div class="alert alert-danger" role="alert">@errorMessage</div>
 }
-else if (listenerEvent is not null)
+else if (eventView is not null)
 {
     <Card>
         <HeaderContent>
             <div class="d-flex justify-content-between align-items-center w-100">
-                <span class="fw-semibold">Listener Event</span>
-                <span class="badge @StatusCssClass">@listenerEvent.Status</span>
+                <span class="fw-semibold">Event</span>
+                <span class="badge @StatusCssClass">@eventView.Status</span>
             </div>
         </HeaderContent>
         <ChildContent>
             <dl class="row mb-0">
                 <dt class="col-sm-3">Id</dt>
-                <dd class="col-sm-9">@listenerEvent.Id</dd>
+                <dd class="col-sm-9">@eventView.Id</dd>
+
+                <dt class="col-sm-3">Event Name</dt>
+                <dd class="col-sm-9">@DisplayOrDash(eventView.EventName)</dd>
+
+                <dt class="col-sm-3">Content</dt>
+                <dd class="col-sm-9"><pre class="mb-0 text-wrap">@DisplayOrDash(eventView.Content)</pre></dd>
+
+                <dt class="col-sm-3">Type</dt>
+                <dd class="col-sm-9">@eventView.Type</dd>
 
                 <dt class="col-sm-3">Status</dt>
-                <dd class="col-sm-9">@listenerEvent.Status</dd>
+                <dd class="col-sm-9">@eventView.Status</dd>
 
-                <dt class="col-sm-3">Response Code</dt>
-                <dd class="col-sm-9">@DisplayOrDash(listenerEvent.ResponseCode)</dd>
-
-                <dt class="col-sm-3">Response Message</dt>
-                <dd class="col-sm-9">@DisplayOrDash(listenerEvent.ResponseMessage)</dd>
-
-                <dt class="col-sm-3">Event Id</dt>
-                <dd class="col-sm-9">@listenerEvent.EventId</dd>
+                <dt class="col-sm-3">Retries Left</dt>
+                <dd class="col-sm-9">@eventView.RemainingRetryAttempts</dd>
 
                 <dt class="col-sm-3">Event Address Id</dt>
-                <dd class="col-sm-9">@listenerEvent.EventAddressId</dd>
-
-                <dt class="col-sm-3">Event Listener Id</dt>
-                <dd class="col-sm-9">@listenerEvent.EventListenerId</dd>
+                <dd class="col-sm-9">@eventView.EventAddressId</dd>
 
                 <dt class="col-sm-3">Participant Id</dt>
-                <dd class="col-sm-9">@(listenerEvent.ParticipantId?.ToString() ?? "—")</dd>
+                <dd class="col-sm-9">@(eventView.ParticipantId?.ToString() ?? "—")</dd>
+
+                <dt class="col-sm-3">Scheduled</dt>
+                <dd class="col-sm-9">@(eventView.ScheduledDate?.ToString("u") ?? "—")</dd>
 
                 <dt class="col-sm-3">Created</dt>
-                <dd class="col-sm-9">@listenerEvent.CreatedDate.ToString("u")</dd>
+                <dd class="col-sm-9">@eventView.CreatedDate.ToString("u")</dd>
             </dl>
+        </ChildContent>
+    </Card>
+
+    <Card CssClass="mt-4">
+        <HeaderContent>
+            <span class="fw-semibold">Dispatched listener events</span>
+        </HeaderContent>
+        <ChildContent>
+            @if (listenerEvents.Count == 0)
+            {
+                <p class="text-body-secondary mb-0">No events dispatched yet.</p>
+            }
+            else
+            {
+                <DataTable TItem="ListenerEventView" Items="listenerEvents"
+                           Columns="listenerColumns" Searchable="true" />
+            }
         </ChildContent>
     </Card>
 }
@@ -68,28 +92,55 @@ else
 
 @code {
     [Parameter]
-    public Guid ListenerEventId { get; set; }
+    public Guid EventId { get; set; }
 
     private bool isLoading = true;
     private string? errorMessage;
-    private ListenerEventView? listenerEvent;
+    private EventView? eventView;
+    private List<ListenerEventView> listenerEvents = new();
+    private List<DataTableColumn<ListenerEventView>> listenerColumns = new();
 
     private string StatusCssClass =>
-        listenerEvent?.Status switch
+        eventView?.Status switch
         {
-            "Success" => "text-bg-success",
-            "Error" => "text-bg-danger",
-            "Pending" => "text-bg-secondary",
-            "Replay" => "text-bg-info",
+            "Active" => "text-bg-success",
+            "Quarantined" => "text-bg-warning",
             _ => "text-bg-secondary"
         };
 
     protected override async Task OnInitializedAsync()
     {
+        listenerColumns = new List<DataTableColumn<ListenerEventView>>
+        {
+            new DataTableColumn<ListenerEventView> { Title = "Id", Value = e => e.Id },
+            new DataTableColumn<ListenerEventView> { Title = "Status", Value = e => e.Status },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Response Code", Value = e => e.ResponseCode
+            },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Response Message", Value = e => e.ResponseMessage
+            },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Listener", Value = e => e.EventListenerId
+            },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Created", Value = e => e.CreatedDate.ToString("u")
+            },
+        };
+
         try
         {
-            listenerEvent =
-                await ListenerEventsViewService.RetrieveListenerEventByIdAsync(ListenerEventId);
+            eventView = await EventsViewService.RetrieveEventByIdAsync(EventId);
+
+            if (eventView is not null)
+            {
+                listenerEvents =
+                    await ListenerEventsViewService.RetrieveListenerEventsByEventIdAsync(EventId);
+            }
         }
         catch
         {

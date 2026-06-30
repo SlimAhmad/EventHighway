@@ -22,7 +22,9 @@ using EventHighway.Portal.Web.Services.Views.EventListeners;
 using EventHighway.Portal.Web.Services.Views.EventParticipants;
 using EventHighway.Portal.Web.Services.Views.EventParticipantSecrets;
 using EventHighway.Portal.Web.Services.Views.EventArchives;
+using EventHighway.Portal.Web.Services.Views.Events;
 using EventHighway.Portal.Web.Services.Views.HealthDashboards;
+using EventHighway.Portal.Web.Services.Views.ListenerEventArchives;
 using EventHighway.Portal.Web.Services.Views.ListenerEvents;
 using EventHighway.Portal.Web.Services.Views.Replays;
 using EventHighway.Portal.Web.Services.Views.Users;
@@ -110,6 +112,10 @@ namespace EventHighway.Portal.Web.Infrastructure
             services.AddTransient<IEventAddressesViewService, EventAddressesViewService>();
             services.AddTransient<IEventListenersViewService, EventListenersViewService>();
             services.AddTransient<IListenerEventsViewService, ListenerEventsViewService>();
+            services.AddTransient<
+                IListenerEventArchivesViewService,
+                ListenerEventArchivesViewService>();
+            services.AddTransient<IEventsViewService, EventsViewService>();
             services.AddTransient<IEventArchivesViewService, EventArchivesViewService>();
             services.AddTransient<IReplayViewService, ReplayViewService>();
             services.AddTransient<IUsersViewService, UsersViewService>();

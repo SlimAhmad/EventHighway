@@ -6,24 +6,20 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Portal.Web.Models.Views.EventArchives;
+using EventHighway.Portal.Web.Models.Views.Events;
 
-namespace EventHighway.Portal.Web.Services.Views.EventArchives
+namespace EventHighway.Portal.Web.Services.Views.Events
 {
-    public interface IEventArchivesViewService
+    public interface IEventsViewService
     {
-        ValueTask ArchiveProcessedEventsAsync(
+        ValueTask<int> RetrieveArchivableEventCountAsync(
             CancellationToken cancellationToken = default);
 
-        ValueTask PurgeArchivesOlderThanAsync(
-            DateTimeOffset olderThan,
+        ValueTask<List<EventView>> RetrieveAllEventsAsync(
             CancellationToken cancellationToken = default);
 
-        ValueTask<List<EventArchiveView>> RetrieveAllEventArchivesAsync(
-            CancellationToken cancellationToken = default);
-
-        ValueTask<EventArchiveView> RetrieveEventArchiveByIdAsync(
-            Guid eventArchiveId,
+        ValueTask<EventView> RetrieveEventByIdAsync(
+            Guid eventId,
             CancellationToken cancellationToken = default);
     }
 }

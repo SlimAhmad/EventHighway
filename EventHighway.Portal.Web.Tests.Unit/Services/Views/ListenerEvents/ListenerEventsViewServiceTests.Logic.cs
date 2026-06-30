@@ -53,6 +53,48 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.ListenerEvents
         }
 
         [Fact]
+        public async Task ShouldRetrieveListenerEventsByEventIdMostRecentFirstAsync()
+        {
+            // given
+            DateTimeOffset baseDate = GetRandomDateTimeOffset();
+            Guid eventId = Guid.NewGuid();
+
+            ListenerEventV2 oldest = CreateRandomListenerEvent(baseDate.AddDays(-2));
+            oldest.EventId = eventId;
+
+            ListenerEventV2 newest = CreateRandomListenerEvent(baseDate);
+            newest.EventId = eventId;
+
+            ListenerEventV2 otherEvent = CreateRandomListenerEvent(baseDate.AddDays(-1));
+
+            IQueryable<ListenerEventV2> storageListenerEvents =
+                new[] { oldest, otherEvent, newest }.AsQueryable();
+
+            List<ListenerEventView> expectedViews =
+                new[] { newest, oldest }.Select(MapToView).ToList();
+
+            this.eventHighwayBrokerMock.Setup(broker =>
+                broker.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(storageListenerEvents);
+
+            // when
+            List<ListenerEventView> actualViews =
+                await this.listenerEventsViewService.RetrieveListenerEventsByEventIdAsync(
+                    eventId, TestContext.Current.CancellationToken);
+
+            // then
+            actualViews.Should().BeEquivalentTo(
+                expectedViews, options => options.WithStrictOrdering());
+
+            this.eventHighwayBrokerMock.Verify(broker =>
+                broker.RetrieveAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.eventHighwayBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldRetrieveListenerEventByIdAsync()
         {
             // given

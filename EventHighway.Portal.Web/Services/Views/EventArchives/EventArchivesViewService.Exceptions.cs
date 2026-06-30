@@ -5,6 +5,7 @@
 using System;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.ArchivingEvents.V2.Exceptions;
+using EventHighway.Core.Models.Clients.EventArchives.V2.Exceptions;
 using EventHighway.Portal.Web.Models.Views.EventArchives.Exceptions;
 using Xeptions;
 
@@ -13,6 +14,7 @@ namespace EventHighway.Portal.Web.Services.Views.EventArchives
     public partial class EventArchivesViewService
     {
         private delegate ValueTask ReturningNothingFunction();
+        private delegate ValueTask<T> ReturningEventArchivesFunction<T>();
 
         private async ValueTask TryCatch(ReturningNothingFunction returningNothingFunction)
         {
@@ -30,6 +32,35 @@ namespace EventHighway.Portal.Web.Services.Views.EventArchives
                 throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
             }
             catch (ArchivingEventV2ClientServiceException clientServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedServiceException =
+                    new FailedEventArchivesViewServiceException(innerException: exception);
+
+                throw await CreateAndLogServiceExceptionAsync(failedServiceException);
+            }
+        }
+
+        private async ValueTask<T> TryCatch<T>(
+            ReturningEventArchivesFunction<T> returningEventArchivesFunction)
+        {
+            try
+            {
+                return await returningEventArchivesFunction();
+            }
+            catch (EventArchiveV2ClientValidationException clientValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    clientValidationException);
+            }
+            catch (EventArchiveV2ClientDependencyException clientDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(clientDependencyException);
+            }
+            catch (EventArchiveV2ClientServiceException clientServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(clientServiceException);
             }
