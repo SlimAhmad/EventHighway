@@ -130,9 +130,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
                 .OnType<DateTimeOffset?>()
                     .Use(GetRandomDateTimeOffset())
 
-                .OnProperty(eventArchiveV2 => eventArchiveV2.ListenerEventArchiveV2s)
-                    .IgnoreIt()
-
                 .OnProperty(eventArchiveV2 => eventArchiveV2.EventAddressV2)
                     .IgnoreIt()
 
