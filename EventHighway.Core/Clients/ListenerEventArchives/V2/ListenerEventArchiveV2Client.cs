@@ -74,8 +74,46 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
         }
 
         public async ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.listenerEventArchiveV2Service
+                    .RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(cancellationToken);
+            }
+            catch (ListenerEventArchiveV2ValidationException
+                listenerEventArchiveV2ValidationException)
+            {
+                throw CreateListenerEventArchiveV2ClientValidationException(
+                    listenerEventArchiveV2ValidationException.InnerException as Xeption);
+            }
+            catch (ListenerEventArchiveV2DependencyValidationException
+                listenerEventArchiveV2DependencyValidationException)
+            {
+                throw CreateListenerEventArchiveV2ClientValidationException(
+                    listenerEventArchiveV2DependencyValidationException.InnerException as Xeption);
+            }
+            catch (ListenerEventArchiveV2DependencyException
+                listenerEventArchiveV2DependencyException)
+            {
+                throw CreateListenerEventArchiveV2ClientDependencyException(
+                    listenerEventArchiveV2DependencyException.InnerException as Xeption);
+            }
+            catch (ListenerEventArchiveV2ServiceException
+                listenerEventArchiveV2ServiceException)
+            {
+                throw CreateListenerEventArchiveV2ClientDependencyException(
+                    listenerEventArchiveV2ServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw CreateListenerEventArchiveV2ClientServiceException(exception as Xeption);
+            }
+        }
 
         private static ListenerEventArchiveV2ClientValidationException
             CreateListenerEventArchiveV2ClientValidationException(Xeption innerException)
