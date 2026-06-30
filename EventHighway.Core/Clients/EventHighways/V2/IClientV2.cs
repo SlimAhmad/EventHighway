@@ -11,6 +11,7 @@ using EventHighway.Core.Clients.EventParticipantSecrets.V2;
 using EventHighway.Core.Clients.EventParticipants.V2;
 using EventHighway.Core.Clients.Events.V2;
 using EventHighway.Core.Clients.HealthChecks.V2;
+using EventHighway.Core.Clients.ListenerEventArchives.V2;
 using EventHighway.Core.Clients.ListenerEvents.V2;
 using EventHighway.Core.Clients.ReplayingEvents.V2;
 
@@ -38,14 +39,14 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         IArchivingEventV2Client ArchivingEventV2Client { get; }
 
         /// <summary>
-        /// Gets the client for retrieving archived events in V2 API.
-        /// </summary>
-        IEventArchiveV2Client EventArchiveV2Client { get; }
-
-        /// <summary>
         /// Gets the client for managing event addresses in V2 API.
         /// </summary>
         IEventAddressV2Client EventAddressV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for retrieving archived events in V2 API.
+        /// </summary>
+        IEventArchiveV2Client EventArchiveV2Client { get; }
 
         /// <summary>
         /// Gets the client for managing event listeners in V2 API.
@@ -53,9 +54,44 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         IEventListenerV2Client EventListenerV2Client { get; }
 
         /// <summary>
+        /// Gets the client for managing event participant secrets in V2 API.
+        /// </summary>
+        IEventParticipantSecretV2Client EventParticipantSecretV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for managing event participants in V2 API.
+        /// </summary>
+        IEventParticipantV2Client EventParticipantV2Client { get; }
+
+        /// <summary>
         /// Gets the client for managing events in V2 API.
         /// </summary>
         IEventV2Client EventV2Client { get; }
+
+        /// <summary>
+        /// Gets the client for retrieving per-event-address health summaries in V2 API.
+        /// </summary>
+        IHealthAddressClientV2 HealthAddressClientV2 { get; }
+
+        /// <summary>
+        /// Gets the client for retrieving the duplicate-detection summary in V2 API.
+        /// </summary>
+        IHealthDuplicateClientV2 HealthDuplicateClientV2 { get; }
+
+        /// <summary>
+        /// Gets the client for retrieving the loop-detection summary in V2 API.
+        /// </summary>
+        IHealthLoopClientV2 HealthLoopClientV2 { get; }
+
+        /// <summary>
+        /// Gets the client for retrieving the per-participant health summary in V2 API.
+        /// </summary>
+        IHealthParticipantClientV2 HealthParticipantClientV2 { get; }
+
+        /// <summary>
+        /// Gets the client for retrieving the retry-health summary in V2 API.
+        /// </summary>
+        IHealthRetryClientV2 HealthRetryClientV2 { get; }
 
         /// <summary>
         /// Gets the client for performing health checks in V2 API.
@@ -68,29 +104,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         IHealthTrafficClientV2 HealthTrafficClientV2 { get; }
 
         /// <summary>
-        /// Gets the client for retrieving per-event-address health summaries in V2 API.
+        /// Gets the client for retrieving archived listener events in V2 API.
         /// </summary>
-        IHealthAddressClientV2 HealthAddressClientV2 { get; }
-
-        /// <summary>
-        /// Gets the client for retrieving the loop-detection summary in V2 API.
-        /// </summary>
-        IHealthLoopClientV2 HealthLoopClientV2 { get; }
-
-        /// <summary>
-        /// Gets the client for retrieving the duplicate-detection summary in V2 API.
-        /// </summary>
-        IHealthDuplicateClientV2 HealthDuplicateClientV2 { get; }
-
-        /// <summary>
-        /// Gets the client for retrieving the retry-health summary in V2 API.
-        /// </summary>
-        IHealthRetryClientV2 HealthRetryClientV2 { get; }
-
-        /// <summary>
-        /// Gets the client for retrieving the per-participant health summary in V2 API.
-        /// </summary>
-        IHealthParticipantClientV2 HealthParticipantClientV2 { get; }
+        IListenerEventArchiveV2Client ListenerEventArchiveV2Client { get; }
 
         /// <summary>
         /// Gets the client for managing listener events in V2 API.
@@ -101,15 +117,5 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         /// Gets the client for replaying archived events in V2 API.
         /// </summary>
         IReplayingEventV2Client ReplayingEventV2Client { get; }
-
-        /// <summary>
-        /// Gets the client for managing event participants in V2 API.
-        /// </summary>
-        IEventParticipantV2Client EventParticipantV2Client { get; }
-
-        /// <summary>
-        /// Gets the client for managing event participant secrets in V2 API.
-        /// </summary>
-        IEventParticipantSecretV2Client EventParticipantSecretV2Client { get; }
     }
 }
