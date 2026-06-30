@@ -93,6 +93,29 @@ namespace EventHighway.Core.Clients.ListenerEvents.V2
         }
 
         /// <summary>
+        /// Retrieves all listener events asynchronously with their associated event listeners by 
+        /// delegating to the orchestration service and handling any exceptions that occur.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{IQueryable}"/> representing the asynchronous
+        /// operation that returns a queryable collection of all listener events with their
+        /// associated event listeners.</returns>
+        /// <exception cref="ListenerEventV2ClientValidationException">Thrown when validation
+        /// errors occur in the orchestration service.</exception>
+        /// <exception cref="ListenerEventV2ClientDependencyException">Thrown when dependency
+        /// or service errors occur.</exception>
+        /// <exception cref="ListenerEventV2ClientServiceException">Thrown when an unexpected
+        /// error occurs during retrieval.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
+        public async ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
+
+        /// <summary>
         /// Removes a listener event by its identifier asynchronously by delegating to the
         /// orchestration service and handling any exceptions that occur.
         /// </summary>
