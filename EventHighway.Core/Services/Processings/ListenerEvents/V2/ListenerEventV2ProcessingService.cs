@@ -47,6 +47,16 @@ namespace EventHighway.Core.Services.Processings.ListenerEvents.V2
             return await this.listenerEventV2Service.RetrieveAllListenerEventV2sAsync(cancellationToken);
         });
 
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventV2Service
+                .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken);
+        });
+
         public ValueTask<IEnumerable<ListenerEventV2>> BulkRestoreListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default) =>
