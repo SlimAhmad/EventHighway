@@ -63,6 +63,10 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
                 throw CreateListenerEventArchiveV2ClientDependencyException(
                     listenerEventArchiveV2ServiceException.InnerException as Xeption);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception exception)
             {
                 throw CreateListenerEventArchiveV2ClientServiceException(exception as Xeption);
