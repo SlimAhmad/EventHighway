@@ -104,9 +104,15 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 .RetrieveAllEventV2sAsync(cancellationToken);
         });
 
-        public async ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sWithEventAddressV2Async(
+        public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sWithEventAddressV2Async(
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.eventV2OrchestrationService
+                .RetrieveAllEventV2sWithEventAddressV2Async(cancellationToken);
+        });
 
         public ValueTask<EventV2> RetrieveEventV2ByIdAsync(
             Guid eventV2Id,
