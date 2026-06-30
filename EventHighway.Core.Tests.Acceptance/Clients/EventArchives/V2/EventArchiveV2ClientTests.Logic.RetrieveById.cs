@@ -43,6 +43,9 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventArchives.V2
             actualEventArchiveV2.EventAddressId.Should().Be(inputEventAddressV2Id);
 
             await this.clientBroker
+                .PurgeEventArchiveV2sAsync(DateTimeOffset.UtcNow.AddSeconds(1));
+
+            await this.clientBroker
                 .RemoveEventAddressV2ByIdAsync(inputEventAddressV2Id);
         }
     }

@@ -109,6 +109,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
                     .IgnoreIt()
 
                 .OnProperty(eventAddressV2 => eventAddressV2.ListenerEventV2s)
+                    .IgnoreIt()
+
+                .OnProperty(eventAddressV2 => eventAddressV2.EventArchiveV2s)
                     .IgnoreIt();
 
             return filler;
