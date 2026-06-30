@@ -63,7 +63,26 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
             await Task.Delay(TimeSpan.FromSeconds(2));
             await this.clientBroker.FireScheduledPendingEventV2sAsync();
 
-            return await this.clientBroker.RetrieveAllListenerEventV2sAsync();
+            return await RetrieveAllListenerEventV2sUntilAsync(
+                listenerEventV2 => listenerEventV2.EventAddressId == inputEventAddressV2Id);
+        }
+
+        private async ValueTask<IQueryable<ListenerEventV2>>
+            RetrieveAllListenerEventV2sUntilAsync(
+                Func<ListenerEventV2, bool> predicate)
+        {
+            IQueryable<ListenerEventV2> listenerEventV2s =
+                await this.clientBroker.RetrieveAllListenerEventV2sAsync();
+
+            for (int retries = 0; retries < 20 && !listenerEventV2s.Any(predicate); retries++)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(250));
+
+                listenerEventV2s =
+                    await this.clientBroker.RetrieveAllListenerEventV2sAsync();
+            }
+
+            return listenerEventV2s;
         }
 
         private async ValueTask CreateRandomEventListenerV2sAsync(Guid eventAddressV2Id)

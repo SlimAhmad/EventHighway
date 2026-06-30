@@ -73,9 +73,8 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
             }
         }
 
-        public async ValueTask<IQueryable<ListenerEventArchiveV2>>
-            RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(
-                CancellationToken cancellationToken = default)
+        public async ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default)
         {
             try
             {
