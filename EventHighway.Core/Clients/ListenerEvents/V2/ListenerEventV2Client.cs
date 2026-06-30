@@ -111,8 +111,46 @@ namespace EventHighway.Core.Clients.ListenerEvents.V2
         /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
         /// signaled.</exception>
         public async ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await this.eventListenerV2OrchestrationService
+                    .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken);
+            }
+            catch (EventListenerV2OrchestrationValidationException
+                eventListenerV2OrchestrationValidationException)
+            {
+                throw CreateListenerEventV2ClientValidationException(
+                    eventListenerV2OrchestrationValidationException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationDependencyValidationException
+                eventListenerV2OrchestrationDependencyValidationException)
+            {
+                throw CreateListenerEventV2ClientValidationException(
+                    eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationDependencyException
+                eventListenerV2OrchestrationDependencyException)
+            {
+                throw CreateListenerEventV2ClientDependencyException(
+                    eventListenerV2OrchestrationDependencyException.InnerException as Xeption);
+            }
+            catch (EventListenerV2OrchestrationServiceException
+                eventListenerV2OrchestrationServiceException)
+            {
+                throw CreateListenerEventV2ClientDependencyException(
+                    eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw CreateListenerEventV2ClientServiceException(exception as Xeption);
+            }
+        }
 
 
         /// <summary>
