@@ -56,6 +56,12 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
                 throw CreateListenerEventArchiveV2ClientDependencyException(
                     listenerEventArchiveV2DependencyException.InnerException as Xeption);
             }
+            catch (ListenerEventArchiveV2ServiceException
+                listenerEventArchiveV2ServiceException)
+            {
+                throw CreateListenerEventArchiveV2ClientDependencyException(
+                    listenerEventArchiveV2ServiceException.InnerException as Xeption);
+            }
         }
 
         private static ListenerEventArchiveV2ClientValidationException
