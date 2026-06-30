@@ -22,5 +22,19 @@ namespace EventHighway.Portal.Web.Components.CoreUI
 
         [Parameter]
         public RenderFragment? FooterContent { get; set; }
+
+        // Optional Bootstrap modal size (e.g. "lg", "xl"). Empty renders the default width.
+        [Parameter]
+        public string Size { get; set; } = string.Empty;
+
+        // When true, the body scrolls within the modal instead of growing the page.
+        [Parameter]
+        public bool Scrollable { get; set; }
+
+        private string SizeClass =>
+            string.IsNullOrWhiteSpace(Size) ? string.Empty : $"modal-{Size}";
+
+        private string ScrollableClass =>
+            Scrollable ? "modal-dialog-scrollable" : string.Empty;
     }
 }

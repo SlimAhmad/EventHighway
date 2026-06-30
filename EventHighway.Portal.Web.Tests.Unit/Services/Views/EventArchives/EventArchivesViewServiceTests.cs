@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using EventHighway.Portal.Web.Brokers.EventHighways;
 using EventHighway.Portal.Web.Brokers.Loggings;
@@ -45,6 +46,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventArchives
                 Status = EventArchiveStatusV2.Active,
                 RemainingRetryAttempts = 3,
                 EventAddressId = Guid.NewGuid(),
+                EventAddressV2 = new EventAddressV2 { Name = GetRandomString() },
                 ParticipantId = Guid.NewGuid(),
                 ScheduledDate = archivedDate,
                 CreatedDate = archivedDate,
@@ -62,6 +64,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventArchives
                 Status = eventArchive.Status.ToString(),
                 RemainingRetryAttempts = eventArchive.RemainingRetryAttempts,
                 EventAddressId = eventArchive.EventAddressId,
+                EventAddressName = eventArchive.EventAddressV2?.Name ?? string.Empty,
                 ParticipantId = eventArchive.ParticipantId,
                 ScheduledDate = eventArchive.ScheduledDate,
                 CreatedDate = eventArchive.CreatedDate,

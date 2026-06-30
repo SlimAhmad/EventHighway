@@ -48,8 +48,8 @@ namespace EventHighway.Portal.Web.Services.Views.EventArchives
         TryCatch(async () =>
         {
             IQueryable<EventArchiveV2> eventArchives =
-                await this.eventHighwayBroker.RetrieveAllEventArchiveV2sAsync(
-                    cancellationToken);
+                await this.eventHighwayBroker
+                    .RetrieveAllEventArchiveV2sWithEventAddressV2Async(cancellationToken);
 
             return eventArchives
                 .OrderByDescending(eventArchive => eventArchive.ArchivedDate)
@@ -63,8 +63,8 @@ namespace EventHighway.Portal.Web.Services.Views.EventArchives
         TryCatch(async () =>
         {
             IQueryable<EventArchiveV2> eventArchives =
-                await this.eventHighwayBroker.RetrieveAllEventArchiveV2sAsync(
-                    cancellationToken);
+                await this.eventHighwayBroker
+                    .RetrieveAllEventArchiveV2sWithEventAddressV2Async(cancellationToken);
 
             EventArchiveV2 eventArchive = eventArchives
                 .FirstOrDefault(retrievedArchive => retrievedArchive.Id == eventArchiveId);
@@ -82,6 +82,7 @@ namespace EventHighway.Portal.Web.Services.Views.EventArchives
                 Status = eventArchive.Status.ToString(),
                 RemainingRetryAttempts = eventArchive.RemainingRetryAttempts,
                 EventAddressId = eventArchive.EventAddressId,
+                EventAddressName = eventArchive.EventAddressV2?.Name ?? string.Empty,
                 ParticipantId = eventArchive.ParticipantId,
                 ScheduledDate = eventArchive.ScheduledDate,
                 CreatedDate = eventArchive.CreatedDate,

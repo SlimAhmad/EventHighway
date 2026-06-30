@@ -15,6 +15,7 @@ namespace EventHighway.Portal.Web.Models.Views.EventArchives
         public string Status { get; set; } = string.Empty;
         public int RemainingRetryAttempts { get; set; }
         public Guid EventAddressId { get; set; }
+        public string EventAddressName { get; set; } = string.Empty;
         public Guid? ParticipantId { get; set; }
         public DateTimeOffset? ScheduledDate { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
