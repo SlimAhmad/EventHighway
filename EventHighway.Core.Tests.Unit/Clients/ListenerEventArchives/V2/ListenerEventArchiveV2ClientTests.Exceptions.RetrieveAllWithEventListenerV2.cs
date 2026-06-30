@@ -197,5 +197,42 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEventArchives.V2
 
             this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveAllWithEventListenerV2Async()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.listenerEventArchiveV2ServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveAllTask =
+                this.listenerEventArchiveV2Client
+                    .RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(
+                        randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveAllTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+        }
     }
 }
