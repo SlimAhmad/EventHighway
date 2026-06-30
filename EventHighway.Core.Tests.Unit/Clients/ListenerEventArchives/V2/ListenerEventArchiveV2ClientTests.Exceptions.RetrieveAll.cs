@@ -2,6 +2,7 @@
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -182,6 +183,39 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEventArchives.V2
             // then
             actualListenerEventArchiveV2ClientServiceException.Should()
                 .BeEquivalentTo(expectedListenerEventArchiveV2ClientServiceException);
+
+            this.listenerEventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ServiceMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveAllAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var operationCanceledException =
+                new OperationCanceledException();
+
+            this.listenerEventArchiveV2ServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IQueryable<ListenerEventArchiveV2>> retrieveAllListenerEventArchiveV2sTask =
+                this.listenerEventArchiveV2Client.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken);
+
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveAllListenerEventArchiveV2sTask.AsTask);
+
+            // then
+            actualException.Should()
+                .BeEquivalentTo(operationCanceledException);
 
             this.listenerEventArchiveV2ServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventArchiveV2sAsync(It.IsAny<CancellationToken>()),
