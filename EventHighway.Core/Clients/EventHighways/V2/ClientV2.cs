@@ -20,6 +20,7 @@ using EventHighway.Core.Clients.EventParticipantSecrets.V2;
 using EventHighway.Core.Clients.EventParticipants.V2;
 using EventHighway.Core.Clients.Events.V2;
 using EventHighway.Core.Clients.HealthChecks.V2;
+using EventHighway.Core.Clients.ListenerEventArchives.V2;
 using EventHighway.Core.Clients.ListenerEvents.V2;
 using EventHighway.Core.Clients.ReplayingEvents.V2;
 using EventHighway.Core.Services.Coordinations.ArchivingEvents.V2;
@@ -106,14 +107,14 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         public IArchivingEventV2Client ArchivingEventV2Client { get; private set; }
 
         /// <summary>
-        /// Gets the client for retrieving archived events in V2 API.
-        /// </summary>
-        public IEventArchiveV2Client EventArchiveV2Client { get; private set; }
-
-        /// <summary>
         /// Gets the client for managing event addresses in V2 API.
         /// </summary>
         public IEventAddressV2Client EventAddressV2Client { get; private set; }
+
+        /// <summary>
+        /// Gets the client for retrieving archived events in V2 API.
+        /// </summary>
+        public IEventArchiveV2Client EventArchiveV2Client { get; private set; }
 
         /// <summary>
         /// Gets the client for managing event listeners in V2 API.
@@ -121,9 +122,44 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         public IEventListenerV2Client EventListenerV2Client { get; private set; }
 
         /// <summary>
+        /// Gets the client for managing event participant secrets in V2 API.
+        /// </summary>
+        public IEventParticipantSecretV2Client EventParticipantSecretV2Client { get; private set; }
+
+        /// <summary>
+        /// Gets the client for managing event participants in V2 API.
+        /// </summary>
+        public IEventParticipantV2Client EventParticipantV2Client { get; private set; }
+
+        /// <summary>
         /// Gets the client for managing events in V2 API.
         /// </summary>
         public IEventV2Client EventV2Client { get; private set; }
+
+        /// <summary>
+        /// Gets the client for retrieving per-event-address health summaries in V2 API.
+        /// </summary>
+        public IHealthAddressClientV2 HealthAddressClientV2 { get; private set; }
+
+        /// <summary>
+        /// Gets the client for retrieving the duplicate-detection summary in V2 API.
+        /// </summary>
+        public IHealthDuplicateClientV2 HealthDuplicateClientV2 { get; private set; }
+
+        /// <summary>
+        /// Gets the client for retrieving the loop-detection summary in V2 API.
+        /// </summary>
+        public IHealthLoopClientV2 HealthLoopClientV2 { get; private set; }
+
+        /// <summary>
+        /// Gets the client for retrieving the per-participant health summary in V2 API.
+        /// </summary>
+        public IHealthParticipantClientV2 HealthParticipantClientV2 { get; private set; }
+
+        /// <summary>
+        /// Gets the client for retrieving the retry-health summary in V2 API.
+        /// </summary>
+        public IHealthRetryClientV2 HealthRetryClientV2 { get; private set; }
 
         /// <summary>
         /// Gets the client for performing health checks in V2 API.
@@ -136,29 +172,9 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         public IHealthTrafficClientV2 HealthTrafficClientV2 { get; private set; }
 
         /// <summary>
-        /// Gets the client for retrieving per-event-address health summaries in V2 API.
+        /// Gets the client for retrieving archived listener events in V2 API.
         /// </summary>
-        public IHealthAddressClientV2 HealthAddressClientV2 { get; private set; }
-
-        /// <summary>
-        /// Gets the client for retrieving the loop-detection summary in V2 API.
-        /// </summary>
-        public IHealthLoopClientV2 HealthLoopClientV2 { get; private set; }
-
-        /// <summary>
-        /// Gets the client for retrieving the duplicate-detection summary in V2 API.
-        /// </summary>
-        public IHealthDuplicateClientV2 HealthDuplicateClientV2 { get; private set; }
-
-        /// <summary>
-        /// Gets the client for retrieving the retry-health summary in V2 API.
-        /// </summary>
-        public IHealthRetryClientV2 HealthRetryClientV2 { get; private set; }
-
-        /// <summary>
-        /// Gets the client for retrieving the per-participant health summary in V2 API.
-        /// </summary>
-        public IHealthParticipantClientV2 HealthParticipantClientV2 { get; private set; }
+        public IListenerEventArchiveV2Client ListenerEventArchiveV2Client { get; private set; }
 
         /// <summary>
         /// Gets the client for managing listener events in V2 API.
@@ -169,16 +185,6 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         /// Gets the client for replaying archived events in V2 API.
         /// </summary>
         public IReplayingEventV2Client ReplayingEventV2Client { get; private set; }
-
-        /// <summary>
-        /// Gets the client for managing event participants in V2 API.
-        /// </summary>
-        public IEventParticipantV2Client EventParticipantV2Client { get; private set; }
-
-        /// <summary>
-        /// Gets the client for managing event participant secrets in V2 API.
-        /// </summary>
-        public IEventParticipantSecretV2Client EventParticipantSecretV2Client { get; private set; }
 
         private void InitializeClients(IServiceProvider serviceProvider)
         {
@@ -194,17 +200,38 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             this.ArchivingEventV2Client =
                 serviceProvider.GetRequiredService<IArchivingEventV2Client>();
 
-            this.EventArchiveV2Client =
-                serviceProvider.GetRequiredService<IEventArchiveV2Client>();
-
             this.EventAddressV2Client =
                 serviceProvider.GetRequiredService<IEventAddressV2Client>();
+
+            this.EventArchiveV2Client =
+                serviceProvider.GetRequiredService<IEventArchiveV2Client>();
 
             this.EventListenerV2Client =
                 serviceProvider.GetRequiredService<IEventListenerV2Client>();
 
+            this.EventParticipantSecretV2Client =
+                serviceProvider.GetRequiredService<IEventParticipantSecretV2Client>();
+
+            this.EventParticipantV2Client =
+                serviceProvider.GetRequiredService<IEventParticipantV2Client>();
+
             this.EventV2Client =
                 serviceProvider.GetRequiredService<IEventV2Client>();
+
+            this.HealthAddressClientV2 =
+                serviceProvider.GetRequiredService<IHealthAddressClientV2>();
+
+            this.HealthDuplicateClientV2 =
+                serviceProvider.GetRequiredService<IHealthDuplicateClientV2>();
+
+            this.HealthLoopClientV2 =
+                serviceProvider.GetRequiredService<IHealthLoopClientV2>();
+
+            this.HealthParticipantClientV2 =
+                serviceProvider.GetRequiredService<IHealthParticipantClientV2>();
+
+            this.HealthRetryClientV2 =
+                serviceProvider.GetRequiredService<IHealthRetryClientV2>();
 
             this.HealthStatusClientV2 =
                 serviceProvider.GetRequiredService<IHealthStatusClientV2>();
@@ -212,32 +239,14 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             this.HealthTrafficClientV2 =
                 serviceProvider.GetRequiredService<IHealthTrafficClientV2>();
 
-            this.HealthAddressClientV2 =
-                serviceProvider.GetRequiredService<IHealthAddressClientV2>();
-
-            this.HealthLoopClientV2 =
-                serviceProvider.GetRequiredService<IHealthLoopClientV2>();
-
-            this.HealthDuplicateClientV2 =
-                serviceProvider.GetRequiredService<IHealthDuplicateClientV2>();
-
-            this.HealthRetryClientV2 =
-                serviceProvider.GetRequiredService<IHealthRetryClientV2>();
-
-            this.HealthParticipantClientV2 =
-                serviceProvider.GetRequiredService<IHealthParticipantClientV2>();
+            this.ListenerEventArchiveV2Client =
+                serviceProvider.GetRequiredService<IListenerEventArchiveV2Client>();
 
             this.ListenerEventV2Client =
                 serviceProvider.GetRequiredService<IListenerEventV2Client>();
 
             this.ReplayingEventV2Client =
                 serviceProvider.GetRequiredService<IReplayingEventV2Client>();
-
-            this.EventParticipantV2Client =
-                serviceProvider.GetRequiredService<IEventParticipantV2Client>();
-
-            this.EventParticipantSecretV2Client =
-                serviceProvider.GetRequiredService<IEventParticipantSecretV2Client>();
         }
 
         private IServiceProvider ConfigureDependencies()
@@ -372,24 +381,52 @@ namespace EventHighway.Core.Clients.EventHighways.V2
         private static void RegisterClients(IServiceCollection services)
         {
             services.AddTransient<
+                IArchivingEventV2Client,
+                ArchivingEventV2Client>();
+
+            services.AddTransient<
                 IEventAddressV2Client,
                 EventAddressV2Client>();
+
+            services.AddTransient<
+                IEventArchiveV2Client,
+                EventArchiveV2Client>();
 
             services.AddTransient<
                 IEventListenerV2Client,
                 EventListenerV2Client>();
 
             services.AddTransient<
+                IEventParticipantSecretV2Client,
+                EventParticipantSecretV2Client>();
+
+            services.AddTransient<
+                IEventParticipantV2Client,
+                EventParticipantV2Client>();
+
+            services.AddTransient<
                 IEventV2Client,
                 EventV2Client>();
 
             services.AddTransient<
-                IArchivingEventV2Client,
-                ArchivingEventV2Client>();
+                IHealthAddressClientV2,
+                HealthAddressClientV2>();
 
             services.AddTransient<
-                IEventArchiveV2Client,
-                EventArchiveV2Client>();
+                IHealthDuplicateClientV2,
+                HealthDuplicateClientV2>();
+
+            services.AddTransient<
+                IHealthLoopClientV2,
+                HealthLoopClientV2>();
+
+            services.AddTransient<
+                IHealthParticipantClientV2,
+                HealthParticipantClientV2>();
+
+            services.AddTransient<
+                IHealthRetryClientV2,
+                HealthRetryClientV2>();
 
             services.AddTransient<
                 IHealthStatusClientV2,
@@ -400,24 +437,8 @@ namespace EventHighway.Core.Clients.EventHighways.V2
                 HealthTrafficClientV2>();
 
             services.AddTransient<
-                IHealthAddressClientV2,
-                HealthAddressClientV2>();
-
-            services.AddTransient<
-                IHealthLoopClientV2,
-                HealthLoopClientV2>();
-
-            services.AddTransient<
-                IHealthDuplicateClientV2,
-                HealthDuplicateClientV2>();
-
-            services.AddTransient<
-                IHealthRetryClientV2,
-                HealthRetryClientV2>();
-
-            services.AddTransient<
-                IHealthParticipantClientV2,
-                HealthParticipantClientV2>();
+                IListenerEventArchiveV2Client,
+                ListenerEventArchiveV2Client>();
 
             services.AddTransient<
                 IListenerEventV2Client,
@@ -426,14 +447,6 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IReplayingEventV2Client,
                 ReplayingEventV2Client>();
-
-            services.AddTransient<
-                IEventParticipantV2Client,
-                EventParticipantV2Client>();
-
-            services.AddTransient<
-                IEventParticipantSecretV2Client,
-                EventParticipantSecretV2Client>();
         }
     }
 }
