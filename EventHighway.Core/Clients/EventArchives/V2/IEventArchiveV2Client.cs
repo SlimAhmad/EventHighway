@@ -36,6 +36,22 @@ namespace EventHighway.Core.Clients.EventArchives.V2
         ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Retrieves all archived events asynchronously with their associated event address V2.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{IQueryable}"/> representing the asynchronous operation
+        /// that returns all archived events with their associated event address V2.</returns>
+        /// <exception cref="EventArchiveV2ClientValidationException">Thrown when validation errors
+        /// occur.</exception>
+        /// <exception cref="EventArchiveV2ClientDependencyException">Thrown when dependency or
+        /// service errors occur.</exception>
+        /// <exception cref="EventArchiveV2ClientServiceException">Thrown when an unexpected error
+        /// occurs during retrieval.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
         ValueTask<IQueryable<EventV2>> RetrieveAllEventArchiveV2sWithEventAddressV2Async(
             CancellationToken cancellationToken = default);
 

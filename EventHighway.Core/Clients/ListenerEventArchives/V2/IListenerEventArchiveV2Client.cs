@@ -34,5 +34,24 @@ namespace EventHighway.Core.Clients.ListenerEventArchives.V2
         /// signaled.</exception>
         ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retrieves all archived listener events asynchronously with their associated event listener V2.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to allow cancellation of the
+        /// asynchronous operation. The default value is
+        /// <see cref="CancellationToken.None"/>.</param>
+        /// <returns>A <see cref="ValueTask{IQueryable}"/> representing the asynchronous operation
+        /// that returns all archived listener events with their associated event listener V2.</returns>
+        /// <exception cref="ListenerEventArchiveV2ClientValidationException">Thrown when validation
+        /// errors occur.</exception>
+        /// <exception cref="ListenerEventArchiveV2ClientDependencyException">Thrown when dependency
+        /// or service errors occur.</exception>
+        /// <exception cref="ListenerEventArchiveV2ClientServiceException">Thrown when an unexpected
+        /// error occurs during retrieval.</exception>
+        /// <exception cref="OperationCanceledException">Thrown when the cancellation token is
+        /// signaled.</exception>
+        ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default);
     }
 }
