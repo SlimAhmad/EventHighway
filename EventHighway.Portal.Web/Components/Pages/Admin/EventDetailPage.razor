@@ -1,6 +1,8 @@
 @page "/admin/events/{EventId:guid}"
 @attribute [Authorize(Roles = "Administrators")]
 @using System.Collections.Generic
+@using System.Linq
+@using System.Text.Json
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Models.Views.Events
 @using EventHighway.Portal.Web.Models.Views.ListenerEvents
@@ -42,7 +44,19 @@ else if (eventView is not null)
                 <dd class="col-sm-9">@DisplayOrDash(eventView.EventName)</dd>
 
                 <dt class="col-sm-3">Content</dt>
-                <dd class="col-sm-9"><pre class="mb-0 text-wrap">@DisplayOrDash(eventView.Content)</pre></dd>
+                <dd class="col-sm-9">
+                    @if (string.IsNullOrWhiteSpace(eventView.Content))
+                    {
+                        <span>—</span>
+                    }
+                    else
+                    {
+                        <Button Color="outline-primary" CssClass="btn-sm"
+                                OnClick="() => showContent = true">
+                            View Content
+                        </Button>
+                    }
+                </dd>
 
                 <dt class="col-sm-3">Type</dt>
                 <dd class="col-sm-9">@eventView.Type</dd>
@@ -82,14 +96,37 @@ else if (eventView is not null)
             }
             else
             {
-                <DataTable TItem="ListenerEventView" Items="listenerEvents"
+                <DataTable TItem="ListenerEventView" Items="FilteredListenerEvents"
                            Columns="listenerColumns" Searchable="true"
                            RowClass="@(e => e.Status == "Success" ? "table-success"
                                : e.Status == "Error" ? "table-danger"
-                               : null)" />
+                               : null)">
+                    <ExtraFilters>
+                        <select class="form-select w-auto" value="@selectedListenerStatus"
+                                @onchange="e => { selectedListenerStatus = e.Value?.ToString() ?? string.Empty; }">
+                            <option value="">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Success">Success</option>
+                            <option value="Error">Error</option>
+                            <option value="Replay">Replay</option>
+                        </select>
+                    </ExtraFilters>
+                </DataTable>
             }
         </ChildContent>
     </Card>
+
+    <Modal Title="Event Content" Size="xl" Scrollable="true"
+           Visible="showContent" OnClose="() => showContent = false">
+        <ChildContent>
+            <div class="overflow-auto">
+                <pre class="mb-0">@FormattedContent</pre>
+            </div>
+        </ChildContent>
+        <FooterContent>
+            <Button Color="secondary" OnClick="() => showContent = false">Close</Button>
+        </FooterContent>
+    </Modal>
 }
 else
 {
@@ -105,6 +142,41 @@ else
     private EventView? eventView;
     private List<ListenerEventView> listenerEvents = new();
     private List<DataTableColumn<ListenerEventView>> listenerColumns = new();
+    private string selectedListenerStatus = string.Empty;
+    private bool showContent;
+
+    private List<ListenerEventView> FilteredListenerEvents =>
+        string.IsNullOrEmpty(selectedListenerStatus)
+            ? listenerEvents
+            : listenerEvents.Where(e => e.Status == selectedListenerStatus).ToList();
+
+    // Pretty-prints the payload as indented JSON; falls back to the raw string when it
+    // isn't valid JSON so non-JSON content is still viewable.
+    private string FormattedContent
+    {
+        get
+        {
+            string content = eventView?.Content ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                using JsonDocument document = JsonDocument.Parse(content);
+
+                return JsonSerializer.Serialize(
+                    document.RootElement,
+                    new JsonSerializerOptions { WriteIndented = true });
+            }
+            catch (JsonException)
+            {
+                return content;
+            }
+        }
+    }
 
     private string StatusCssClass =>
         eventView?.Status switch
@@ -139,6 +211,10 @@ else
             new DataTableColumn<ListenerEventView>
             {
                 Title = "Listener", Value = e => e.EventListenerId
+            },
+            new DataTableColumn<ListenerEventView>
+            {
+                Title = "Listener Name", Value = e => e.ListenerName ?? "—"
             },
             new DataTableColumn<ListenerEventView>
             {

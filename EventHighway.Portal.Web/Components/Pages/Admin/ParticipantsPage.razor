@@ -71,6 +71,10 @@ else
         {
             new DataTableColumn<EventParticipantView>
             {
+                Title = "Id", Value = participant => participant.Id
+            },
+            new DataTableColumn<EventParticipantView>
+            {
                 Title = "Name", Value = participant => participant.Name
             },
             new DataTableColumn<EventParticipantView>

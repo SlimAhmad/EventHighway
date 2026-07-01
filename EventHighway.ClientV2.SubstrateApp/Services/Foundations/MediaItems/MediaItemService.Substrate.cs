@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using EventHighway.Abstractions.EventHandlers;
+using EventHighway.ClientV2.Seed;
 using EventHighway.ClientV2.SubstrateApp.Models.MediaItems;
 using EventHighway.EventHandlers;
 
@@ -17,7 +18,7 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.MediaItems
         // participant's id or secret — and simply reports each received media item.
         public IEventHandler MediaItemReceivedEventHandler =>
             this.mediaItemReceivedEventHandler ??= new DelegateEventHandler(
-                Guid.NewGuid(),
+                SeedIdentifiers.MediaItemServiceHandler,
                 HandleMediaItemReceivedAsync,
                 name: "MediaItemService");
 

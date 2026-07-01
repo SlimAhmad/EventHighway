@@ -22,6 +22,21 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
                     eventAddressId, eventListenerIds, startDate, endDate, cancellationToken),
                 cancellationToken);
 
+        public ValueTask ReplayEventArchiveV2sAsync(
+            Guid eventV2Id,
+            Guid? eventAddressId,
+            IEnumerable<Guid> eventListenerIds,
+            bool allowReplayOfQuarantinedItem = false,
+            CancellationToken cancellationToken = default) =>
+            this.clientV2Provider.ExecuteAsync(client =>
+                client.ReplayingEventV2Client.ReplayEventArchiveV2sAsync(
+                    eventV2Id,
+                    eventAddressId,
+                    eventListenerIds,
+                    allowReplayOfQuarantinedItem,
+                    cancellationToken),
+                cancellationToken);
+
         public ValueTask ProcessReplayedListenerEventV2sAsync(
             CancellationToken cancellationToken = default) =>
             this.clientV2Provider.ExecuteAsync(client =>

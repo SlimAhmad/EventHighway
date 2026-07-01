@@ -50,7 +50,9 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                 HandlerName = GetRandomString(),
                 HandlerId = Guid.NewGuid(),
                 EventAddressId = eventAddressId,
-                ParticipantId = Guid.NewGuid()
+                ParticipantId = Guid.NewGuid(),
+                PromotedProperties = GetRandomString(),
+                FilterCriteria = GetRandomString()
             }).ToList();
 
         private static List<EventListenerView> MapToViews(IEnumerable<EventListenerV2> listeners) =>
@@ -62,7 +64,9 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                 HandlerName = listener.HandlerName,
                 HandlerId = listener.HandlerId,
                 EventAddressId = listener.EventAddressId,
-                ParticipantId = listener.ParticipantId
+                ParticipantId = listener.ParticipantId,
+                PromotedProperties = listener.PromotedProperties ?? string.Empty,
+                FilterCriteria = listener.FilterCriteria ?? string.Empty
             }).ToList();
     }
 }

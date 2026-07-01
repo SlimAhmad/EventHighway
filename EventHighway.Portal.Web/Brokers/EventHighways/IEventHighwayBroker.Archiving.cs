@@ -21,5 +21,8 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
 
         ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default);
+
+        ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sWithEventAddressV2Async(
+            CancellationToken cancellationToken = default);
     }
 }

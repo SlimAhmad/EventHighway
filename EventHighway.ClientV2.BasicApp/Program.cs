@@ -46,7 +46,7 @@ public partial class Program
         // 2) Create and register the handlers
         // =========================================================
         var bingeBoxHandler = new DelegateEventHandler(
-            Guid.NewGuid(),
+            SeedIdentifiers.BingeBoxHandler,
             (content, cancellationToken) =>
             {
                 MediaItem item = Deserialize(content);
@@ -66,7 +66,7 @@ public partial class Program
             name: "BingeBox");
 
         var joeHandler = new DelegateEventHandler(
-            Guid.NewGuid(),
+            SeedIdentifiers.JoeHandler,
             (content, cancellationToken) =>
             {
                 MediaItem item = Deserialize(content);
@@ -86,7 +86,7 @@ public partial class Program
             name: "Joe");
 
         var annHandler = new DelegateEventHandler(
-            Guid.NewGuid(),
+            SeedIdentifiers.AnnHandler,
             (content, cancellationToken) =>
             {
                 MediaItem item = Deserialize(content);

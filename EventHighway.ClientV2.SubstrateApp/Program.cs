@@ -204,13 +204,10 @@ public partial class Program
         await PrintHealthSummaryAsync();
 
         // =========================================================
-        // 9) Portal demo data — a partner feed whose downstream is
-        //    partially unreliable (one reliable + one failing listener)
+        // 9) Portal demo data on NFlix-NewReleases
         // =========================================================
-        EventAddressV2 partnerFeed = await SetupPartnerFeedAsync();
 
-        // 9a) ARCHIVED demo events (submitted, dispatched, then archived):
-        //     two fully-successful and two partial-success (some success, some failed).
+        // 9a) ARCHIVED demo events (submitted, dispatched, then archived).
         Console.WriteLine("\n── Seeding archived demo events ──");
 
         await SubmitImmediateDemoAsync(
@@ -221,19 +218,10 @@ public partial class Program
             new MediaItem { Id = Guid.NewGuid(), Title = "Oppenheimer", Type = "Movie", Rating = 8.4 },
             newReleases.Id, remainingRetryAttempts: 3);
 
-        await SubmitImmediateDemoAsync(
-            new MediaItem { Id = Guid.NewGuid(), Title = "The Flash", Type = "Movie", Rating = 6.7 },
-            partnerFeed.Id, remainingRetryAttempts: 0);
-
-        await SubmitImmediateDemoAsync(
-            new MediaItem { Id = Guid.NewGuid(), Title = "Madame Web", Type = "Movie", Rating = 4.0 },
-            partnerFeed.Id, remainingRetryAttempts: 0);
-
         // Move the events above into the archive (EventArchiveV2 + ListenerEventArchiveV2).
         await broker.ArchiveEventsAsync();
 
-        // 9b) LIVE demo events — dispatched but left in the live tables (NOT archived):
-        //     two fully-successful and two partial-success that ran out of retries.
+        // 9b) LIVE demo events — dispatched but left in the live tables (NOT archived).
         Console.WriteLine("\n── Seeding live (un-archived) demo events ──");
 
         await SubmitImmediateDemoAsync(
@@ -243,19 +231,6 @@ public partial class Program
         await SubmitImmediateDemoAsync(
             new MediaItem { Id = Guid.NewGuid(), Title = "The Batman", Type = "Movie", Rating = 8.0 },
             newReleases.Id, remainingRetryAttempts: 3);
-
-        await SubmitImmediateDemoAsync(
-            new MediaItem { Id = Guid.NewGuid(), Title = "Morbius", Type = "Movie", Rating = 5.1 },
-            partnerFeed.Id, remainingRetryAttempts: 0);
-
-        await SubmitImmediateDemoAsync(
-            new MediaItem { Id = Guid.NewGuid(), Title = "Cats", Type = "Movie", Rating = 2.8 },
-            partnerFeed.Id, remainingRetryAttempts: 0);
-
-        // A partial event that still has retries left, so it is NOT archivable and stays live.
-        await SubmitImmediateDemoAsync(
-            new MediaItem { Id = Guid.NewGuid(), Title = "Argylle", Type = "Movie", Rating = 5.5 },
-            partnerFeed.Id, remainingRetryAttempts: 2);
 
         Console.WriteLine("\n── Demo data seeded ──");
 
@@ -445,7 +420,7 @@ public partial class Program
             {
                 Id = Guid.NewGuid(),
                 Content = MediaItemSerializer.Serialize(item),
-                EventName = item.Title,
+                EventName = "AddNewRelease",
                 EventAddressId = newReleases.Id,
                 ScheduledDate = now.AddSeconds(1),
                 ParticipantId = participantId,
@@ -474,54 +449,6 @@ public partial class Program
             }
         }
 
-        async Task<EventAddressV2> SetupPartnerFeedAsync()
-        {
-            DateTimeOffset now = DateTimeOffset.UtcNow;
-
-            EventAddressV2 partnerFeedAddress =
-                await broker.RetrieveOrRegisterAddressAsync(
-                    new EventAddressV2
-                    {
-                        Id = SeedIdentifiers.NFlixPartnerFeedAddress,
-                        Name = "NFlix-PartnerFeed",
-                        Description = "Partner feed with a partially unreliable downstream.",
-                        CreatedDate = now,
-                        UpdatedDate = now
-                    });
-
-            // Reliable listener: backed by the always-succeeding BingeBox handler.
-            await broker.RegisterListenerAsync(
-                new EventListenerV2
-                {
-                    Id = SeedIdentifiers.PartnerFeedReliableListener,
-                    Name = "Partner Feed Reliable Listener",
-                    Description = "Receives partner-feed releases and always succeeds.",
-                    HandlerId = handlers.BingeBox.Id,
-                    HandlerName = handlers.BingeBox.Name,
-                    EventAddressId = partnerFeedAddress.Id,
-                    ParticipantId = bingeBox.Id,
-                    CreatedDate = now,
-                    UpdatedDate = now
-                });
-
-            // Failing listener: backed by the always-unavailable FlakyBox handler.
-            await broker.RegisterListenerAsync(
-                new EventListenerV2
-                {
-                    Id = SeedIdentifiers.PartnerFeedFailingListener,
-                    Name = "Partner Feed Failing Listener",
-                    Description = "Receives partner-feed releases but the downstream is unavailable.",
-                    HandlerId = handlers.FlakyBox.Id,
-                    HandlerName = handlers.FlakyBox.Name,
-                    EventAddressId = partnerFeedAddress.Id,
-                    ParticipantId = joe.Id,
-                    CreatedDate = now,
-                    UpdatedDate = now
-                });
-
-            return partnerFeedAddress;
-        }
-
         async Task SubmitImmediateDemoAsync(
             MediaItem item, Guid eventAddressId, int remainingRetryAttempts)
         {
@@ -531,7 +458,7 @@ public partial class Program
             {
                 Id = Guid.NewGuid(),
                 Content = MediaItemSerializer.Serialize(item),
-                EventName = item.Title,
+                EventName = "AddNewRelease",
                 EventAddressId = eventAddressId,
                 ScheduledDate = null,
                 RemainingRetryAttempts = remainingRetryAttempts,

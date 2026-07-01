@@ -44,6 +44,9 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
         ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
             CancellationToken cancellationToken = default);
 
+        ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default);
+
         ValueTask<ListenerEventV2> ModifyListenerEventV2Async(
             ListenerEventV2 listenerEventV2,
             CancellationToken cancellationToken = default);

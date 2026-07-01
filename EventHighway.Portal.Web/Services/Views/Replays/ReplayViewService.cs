@@ -32,9 +32,27 @@ namespace EventHighway.Portal.Web.Services.Views.Replays
         {
             await this.eventHighwayBroker.ReplayEventArchiveV2sAsync(
                 eventAddressId: replayRequest.EventAddressId,
-                eventListenerIds: Array.Empty<Guid>(),
+                eventListenerIds: replayRequest.EventListenerIds ?? new List<Guid>(),
                 startDate: replayRequest.StartDate,
                 endDate: replayRequest.EndDate,
+                cancellationToken: cancellationToken);
+
+            await this.eventHighwayBroker.ProcessReplayedListenerEventV2sAsync(
+                cancellationToken);
+        });
+
+        public ValueTask ReplayListenerEventArchiveAsync(
+            Guid eventV2Id,
+            Guid eventAddressId,
+            Guid eventListenerId,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            await this.eventHighwayBroker.ReplayEventArchiveV2sAsync(
+                eventV2Id: eventV2Id,
+                eventAddressId: eventAddressId,
+                eventListenerIds: new[] { eventListenerId },
+                allowReplayOfQuarantinedItem: true,
                 cancellationToken: cancellationToken);
 
             await this.eventHighwayBroker.ProcessReplayedListenerEventV2sAsync(

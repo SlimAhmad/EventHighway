@@ -64,7 +64,7 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.ExternalMediaI
             {
                 Id = Guid.NewGuid(),
                 Content = content,
-                EventName = "MediaItem Added",
+                EventName = "AddNewRelease",
                 EventAddressId = eventAddress.Id,
                 ParticipantId = externalMediaItem.ParticipantId,
                 ParticipantSecret = externalMediaItem.Secret,

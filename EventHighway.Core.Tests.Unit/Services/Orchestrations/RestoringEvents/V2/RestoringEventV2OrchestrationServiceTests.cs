@@ -180,6 +180,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
                 .OnType<DateTimeOffset?>().Use(GetRandomDateTimeOffset())
+                .OnType<EventParticipantV2>().IgnoreIt()
 
                 .OnProperty(eventArchiveV2 => eventArchiveV2.ListenerEventArchiveV2s)
                     .IgnoreIt()
@@ -212,6 +213,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
                 .OnType<DateTimeOffset?>().Use(GetRandomDateTimeOffset())
+
+                .OnProperty(eventListenerV2 => eventListenerV2.EventAddressV2)
+                    .IgnoreIt()
+
+                .OnProperty(eventListenerV2 => eventListenerV2.ListenerEventV2s)
+                    .IgnoreIt()
 
                 .OnProperty(eventListenerV2 => eventListenerV2.ListenerEventArchiveV2s)
                     .IgnoreIt()

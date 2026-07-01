@@ -1,9 +1,17 @@
 @page "/admin/replay"
 @attribute [Authorize(Roles = "Administrators")]
+@using System.Collections.Generic
+@using System.Linq
 @using EventHighway.Portal.Web.Components.CoreUI
+@using EventHighway.Portal.Web.Models.Views.EventAddresses
+@using EventHighway.Portal.Web.Models.Views.EventListeners
 @using EventHighway.Portal.Web.Models.Views.Replays
+@using EventHighway.Portal.Web.Services.Views.EventAddresses
+@using EventHighway.Portal.Web.Services.Views.EventListeners
 @using EventHighway.Portal.Web.Services.Views.Replays
 @inject IReplayViewService ReplayViewService
+@inject IEventAddressesViewService EventAddressesViewService
+@inject IEventListenersViewService EventListenersViewService
 
 <PageTitle>Replay</PageTitle>
 
@@ -12,8 +20,8 @@
 </div>
 
 <p class="text-body-secondary">
-    Replay archived events back onto the highway. Narrow the scope by event address and/or a date range,
-    then replay. Leave a field blank to leave that dimension unrestricted.
+    Replay archived events back onto the highway. Narrow the scope by event address, specific listeners,
+    and/or a date range, then replay. Leave a dimension unrestricted to include everything.
 </p>
 
 @if (message is not null)
@@ -28,19 +36,78 @@
     <ChildContent>
         <div class="row g-3">
             <div class="col-md-6">
-                <FormText Label="Event Address Id (optional)" @bind-Value="eventAddressId"
-                          Placeholder="00000000-0000-0000-0000-000000000000" />
+                <label class="form-label">Event Address</label>
+                <select class="form-select" value="@selectedAddressId"
+                        @onchange="OnAddressChangedAsync">
+                    <option value="">All</option>
+                    @foreach (EventAddressView address in addresses)
+                    {
+                        <option value="@address.Id">@address.Name</option>
+                    }
+                </select>
             </div>
             <div class="col-md-3">
-                <FormDate Label="From (optional)" @bind-Value="startDate" />
+                <label class="form-label">From (optional)</label>
+                <FormDate @bind-Value="startDate" />
             </div>
             <div class="col-md-3">
-                <FormDate Label="To (optional)" @bind-Value="endDate" />
+                <label class="form-label">To (optional)</label>
+                <FormDate @bind-Value="endDate" />
             </div>
         </div>
-        <Button Color="primary" OnClick="ReplayAsync" Disabled="@isWorking">
-            Replay
-        </Button>
+
+        @if (hasAddressSelected)
+        {
+            <div class="mt-4">
+                <label class="form-label">Event Listeners (optional)</label>
+
+                @if (selectedListenerIds.Any())
+                {
+                    <ul class="list-group mb-3">
+                        @foreach (Guid listenerId in selectedListenerIds)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @ListenerName(listenerId)
+                                <Button Color="danger" CssClass="btn-sm"
+                                        OnClick="@(() => RemoveListener(listenerId))">
+                                    Remove
+                                </Button>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-body-secondary">
+                        No listeners selected — all listeners on this address will be replayed.
+                    </p>
+                }
+
+                @if (availableListenerOptions.Any())
+                {
+                    <div class="d-flex gap-2 align-items-center">
+                        <FormSelect Label="Add Listener"
+                                    Options="availableListenerOptions"
+                                    @bind-Value="selectedListenerToAdd" />
+                        <Button Color="primary" OnClick="AddListener">Add</Button>
+                    </div>
+                }
+                else if (listenersForAddress.Any())
+                {
+                    <p class="text-body-secondary mb-0">All listeners on this address are selected.</p>
+                }
+                else
+                {
+                    <p class="text-body-secondary mb-0">This address has no registered listeners.</p>
+                }
+            </div>
+        }
+
+        <div class="mt-4">
+            <Button Color="primary" OnClick="ReplayAsync" Disabled="@isWorking">
+                Replay
+            </Button>
+        </div>
     </ChildContent>
 </Card>
 
@@ -49,23 +116,95 @@
     private string? message;
     private string alertClass = "alert-info";
 
-    private string? eventAddressId;
+    private List<EventAddressView> addresses = new();
+    private string selectedAddressId = string.Empty;
+
+    private List<EventListenerView> listenersForAddress = new();
+    private List<Guid> selectedListenerIds = new();
+    private string? selectedListenerToAdd = string.Empty;
+
     private DateTimeOffset? startDate;
     private DateTimeOffset? endDate;
+
+    private bool hasAddressSelected => !string.IsNullOrEmpty(selectedAddressId);
+
+    private List<SelectOption> availableListenerOptions =>
+        listenersForAddress
+            .Where(listener => !selectedListenerIds.Contains(listener.Id))
+            .Select(listener => new SelectOption
+            {
+                Text = listener.Name,
+                Value = listener.Id.ToString()
+            })
+            .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            addresses = await EventAddressesViewService.RetrieveAllAddressesAsync();
+        }
+        catch
+        {
+            alertClass = "alert-danger";
+            message = "Unable to load event addresses. Please try again.";
+        }
+    }
+
+    private async Task OnAddressChangedAsync(ChangeEventArgs args)
+    {
+        selectedAddressId = args.Value?.ToString() ?? string.Empty;
+        selectedListenerIds = new();
+        listenersForAddress = new();
+        selectedListenerToAdd = string.Empty;
+
+        if (!hasAddressSelected || !Guid.TryParse(selectedAddressId, out Guid addressId))
+        {
+            return;
+        }
+
+        try
+        {
+            listenersForAddress =
+                await EventListenersViewService.RetrieveListenersByAddressAsync(addressId);
+
+            selectedListenerToAdd = availableListenerOptions.FirstOrDefault()?.Value ?? string.Empty;
+        }
+        catch
+        {
+            alertClass = "alert-danger";
+            message = "Unable to load listeners for this address. Please try again.";
+        }
+    }
+
+    private void AddListener()
+    {
+        if (!Guid.TryParse(selectedListenerToAdd, out Guid listenerId)
+            || selectedListenerIds.Contains(listenerId))
+        {
+            return;
+        }
+
+        selectedListenerIds.Add(listenerId);
+        selectedListenerToAdd = availableListenerOptions.FirstOrDefault()?.Value ?? string.Empty;
+    }
+
+    private void RemoveListener(Guid listenerId)
+    {
+        selectedListenerIds.Remove(listenerId);
+        selectedListenerToAdd = availableListenerOptions.FirstOrDefault()?.Value ?? string.Empty;
+    }
+
+    private string ListenerName(Guid listenerId) =>
+        listenersForAddress.FirstOrDefault(listener => listener.Id == listenerId)?.Name
+            ?? listenerId.ToString();
 
     private async Task ReplayAsync()
     {
         Guid? addressId = null;
 
-        if (!string.IsNullOrWhiteSpace(eventAddressId))
+        if (hasAddressSelected && Guid.TryParse(selectedAddressId, out Guid parsedAddressId))
         {
-            if (!Guid.TryParse(eventAddressId, out Guid parsedAddressId))
-            {
-                alertClass = "alert-danger";
-                message = "Event Address Id must be a valid GUID.";
-                return;
-            }
-
             addressId = parsedAddressId;
         }
 
@@ -77,6 +216,7 @@
             await ReplayViewService.ReplayAsync(new ReplayRequestView
             {
                 EventAddressId = addressId,
+                EventListenerIds = selectedListenerIds.ToList(),
                 StartDate = startDate,
                 EndDate = endDate
             });

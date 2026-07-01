@@ -15,6 +15,7 @@ namespace EventHighway.Portal.Web.Models.Views.ListenerEvents
         public Guid EventId { get; set; }
         public Guid EventAddressId { get; set; }
         public Guid EventListenerId { get; set; }
+        public string? ListenerName { get; set; }
         public Guid? ParticipantId { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
     }

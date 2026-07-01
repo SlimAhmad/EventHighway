@@ -36,5 +36,14 @@ namespace EventHighway.Portal.Web.Brokers.EventHighways
                     .ToList()
                     .AsQueryable(),
                 cancellationToken);
+
+        public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sWithEventAddressV2Async(
+            CancellationToken cancellationToken = default) =>
+            this.clientV2Provider.ExecuteAsync(async client =>
+                (await client.EventArchiveV2Client
+                    .RetrieveAllEventArchiveV2sWithEventAddressV2Async(cancellationToken))
+                    .ToList()
+                    .AsQueryable(),
+                cancellationToken);
     }
 }

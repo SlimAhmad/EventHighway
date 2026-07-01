@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using EventHighway.Abstractions.EventHandlers;
+using EventHighway.ClientV2.Seed;
 using EventHighway.ClientV2.SubstrateApp.Models.MediaItems;
 using EventHighway.EventHandlers;
 using WireMock.Server;
@@ -26,7 +27,7 @@ namespace EventHighway.ClientV2.SubstrateApp.Infrastructure
         public MediaEventHandlers(WireMockServer wireMock)
         {
             this.BingeBox = new DelegateEventHandler(
-                Guid.NewGuid(),
+                SeedIdentifiers.BingeBoxHandler,
                 (content, cancellationToken) =>
                 {
                     MediaItem item = MediaItemSerializer.Deserialize(content);
@@ -48,7 +49,7 @@ namespace EventHighway.ClientV2.SubstrateApp.Infrastructure
             // A downstream that is always unavailable. Used to seed partial-success events:
             // the reliable listener succeeds while this one errors, leaving a mix of statuses.
             this.FlakyBox = new DelegateEventHandler(
-                Guid.NewGuid(),
+                SeedIdentifiers.FlakyBoxHandler,
                 (content, cancellationToken) =>
                 {
                     MediaItem item = MediaItemSerializer.Deserialize(content);
@@ -67,13 +68,14 @@ namespace EventHighway.ClientV2.SubstrateApp.Infrastructure
                 },
                 name: "FlakyBox");
 
-            this.Joe = CreateRestHandler("Joe", wireMock);
-            this.Ann = CreateRestHandler("Ann", wireMock);
+            this.Joe = CreateRestHandler(SeedIdentifiers.JoeHandler, "Joe", wireMock);
+            this.Ann = CreateRestHandler(SeedIdentifiers.AnnHandler, "Ann", wireMock);
         }
 
-        private static DelegateEventHandler CreateRestHandler(string label, WireMockServer wireMock) =>
+        private static DelegateEventHandler CreateRestHandler(
+            Guid handlerId, string label, WireMockServer wireMock) =>
             new DelegateEventHandler(
-                Guid.NewGuid(),
+                handlerId,
                 async (content, cancellationToken) =>
                 {
                     MediaItem item = MediaItemSerializer.Deserialize(content);
