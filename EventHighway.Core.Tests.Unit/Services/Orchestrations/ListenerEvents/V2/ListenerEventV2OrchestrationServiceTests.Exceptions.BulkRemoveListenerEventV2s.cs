@@ -240,5 +240,43 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ListenerEvents.V2
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnBulkRemoveListenerEventV2sAsync()
+        {
+            // given
+            IEnumerable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask bulkRemoveListenerEventV2sTask =
+                this.listenerEventV2OrchestrationService
+                    .BulkRemoveListenerEventV2sAsync(
+                        someListenerEventV2s,
+                        cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    bulkRemoveListenerEventV2sTask.AsTask);
+
+            actualException.Should().NotBeOfType<ListenerEventV2OrchestrationDependencyException>();
+            actualException.Should().NotBeOfType<ListenerEventV2OrchestrationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
