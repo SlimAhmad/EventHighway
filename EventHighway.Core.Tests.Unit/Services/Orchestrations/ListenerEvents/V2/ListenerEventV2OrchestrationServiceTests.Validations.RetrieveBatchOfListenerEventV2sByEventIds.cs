@@ -64,5 +64,54 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ListenerEvents.V2
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowValidationExceptionOnRetrieveBatchOfListenerEventV2sByEventIdsIfTakeIsInvalidAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            IEnumerable<Guid> someEventV2Ids = CreateRandomEventV2Ids();
+            int invalidTake = -1;
+
+            var invalidListenerEventV2OrchestrationException =
+                new InvalidListenerEventV2OrchestrationException(
+                    message: "Listener event is invalid, fix the errors and try again.");
+
+            invalidListenerEventV2OrchestrationException.AddData(
+                key: "take",
+                values: "Value must be greater than or equal to 0");
+
+            var expectedListenerEventV2OrchestrationValidationException =
+                new ListenerEventV2OrchestrationValidationException(
+                    message: "Listener event validation error occurred, fix the errors and try again.",
+                    innerException: invalidListenerEventV2OrchestrationException);
+
+            // when
+            ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchOfListenerEventV2sByEventIdsTask =
+                this.listenerEventV2OrchestrationService
+                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(
+                        someEventV2Ids,
+                        invalidTake,
+                        randomCancellationToken);
+
+            ListenerEventV2OrchestrationValidationException
+                actualListenerEventV2OrchestrationValidationException =
+                    await Assert.ThrowsAsync<ListenerEventV2OrchestrationValidationException>(
+                        retrieveBatchOfListenerEventV2sByEventIdsTask.AsTask);
+
+            // then
+            actualListenerEventV2OrchestrationValidationException.Should()
+                .BeEquivalentTo(expectedListenerEventV2OrchestrationValidationException);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2OrchestrationValidationException))),
+                        Times.Once);
+
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
