@@ -129,5 +129,58 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ListenerEvents.V2
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(DependencyExceptions))]
+        public async Task ShouldThrowDependencyExceptionOnBulkRemoveListenerEventV2sIfDependencyErrorOccursAndLogItAsync(
+            Xeption dependencyException)
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            IEnumerable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
+
+            var expectedListenerEventV2OrchestrationDependencyException =
+                new ListenerEventV2OrchestrationDependencyException(
+                    message: "Listener event dependency error occurred, contact support.",
+                    innerException: dependencyException.InnerException as Xeption);
+
+            this.listenerEventV2ProcessingServiceMock.Setup(service =>
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask bulkRemoveListenerEventV2sTask =
+                this.listenerEventV2OrchestrationService
+                    .BulkRemoveListenerEventV2sAsync(
+                        someListenerEventV2s,
+                        randomCancellationToken);
+
+            ListenerEventV2OrchestrationDependencyException
+                actualListenerEventV2OrchestrationDependencyException =
+                    await Assert.ThrowsAsync<ListenerEventV2OrchestrationDependencyException>(
+                        bulkRemoveListenerEventV2sTask.AsTask);
+
+            // then
+            actualListenerEventV2OrchestrationDependencyException.Should()
+                .BeEquivalentTo(expectedListenerEventV2OrchestrationDependencyException);
+
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
