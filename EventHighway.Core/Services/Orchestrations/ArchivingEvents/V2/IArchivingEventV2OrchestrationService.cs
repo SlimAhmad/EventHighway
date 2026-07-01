@@ -1,13 +1,11 @@
-﻿// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 
 namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 {
@@ -19,16 +17,8 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         ValueTask<IEnumerable<EventV2>> RetrieveBatchOfDeadEventV2sAsync(
             CancellationToken cancellationToken = default);
 
-        ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sAsync(
-            IEnumerable<Guid> eventV2Ids,
-            CancellationToken cancellationToken = default);
-
         ValueTask RemoveEventV2AndListenerEventV2sAsync(
             EventV2 eventV2,
-            CancellationToken cancellationToken = default);
-
-        ValueTask BulkRemoveListenerEventV2sAsync(
-            IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default);
 
         ValueTask BulkRemoveEventV2sAsync(

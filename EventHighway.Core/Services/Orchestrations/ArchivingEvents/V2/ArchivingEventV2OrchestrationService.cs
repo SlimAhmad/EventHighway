@@ -98,36 +98,6 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
                 : deadEventV2s.Take(take).AsEnumerable();
         });
 
-        public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sAsync(
-            IEnumerable<Guid> eventV2Ids,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            BatchConfiguration batchConfiguration =
-                this.configurationBroker.GetBatchConfiguration();
-
-            ValidateOnRetrieveBatchOfListenerEventV2s(eventV2Ids, batchConfiguration);
-
-            int take = batchConfiguration.BatchSizeForBulkProcessing;
-
-            return await this.listenerEventV2ProcessingService
-                .RetrieveBatchOfListenerEventV2sByEventIdsAsync(eventV2Ids, take, cancellationToken);
-        });
-
-        public ValueTask BulkRemoveListenerEventV2sAsync(
-            IEnumerable<ListenerEventV2> listenerEventV2s,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ValidateListenerEventV2sIsNotNull(listenerEventV2s);
-
-            await this.listenerEventV2ProcessingService
-                .BulkRemoveListenerEventV2sAsync(listenerEventV2s, cancellationToken);
-        });
-
         public ValueTask BulkRemoveEventV2sAsync(
             IEnumerable<EventV2> eventV2s,
             CancellationToken cancellationToken = default) =>
