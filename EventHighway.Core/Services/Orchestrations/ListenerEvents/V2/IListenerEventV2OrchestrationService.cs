@@ -16,5 +16,9 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
             IEnumerable<Guid> eventV2Ids,
             int take,
             CancellationToken cancellationToken = default);
+
+        ValueTask BulkRemoveListenerEventV2sAsync(
+            IEnumerable<ListenerEventV2> listenerEventV2s,
+            CancellationToken cancellationToken = default);
     }
 }
