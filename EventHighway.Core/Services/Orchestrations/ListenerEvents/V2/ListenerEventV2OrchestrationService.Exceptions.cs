@@ -98,6 +98,23 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
             {
                 await returningNothingFunction();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException(
+                        "The dependency operation timed out.",
+                        operationCanceledException);
+
+                var timeoutListenerEventV2OrchestrationException =
+                    new TimeoutListenerEventV2OrchestrationException(
+                        message: "Failed listener event orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: operationCanceledException.Data);
+
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutListenerEventV2OrchestrationException);
+            }
             catch (InvalidListenerEventV2OrchestrationException
                 invalidListenerEventV2OrchestrationException)
             {
