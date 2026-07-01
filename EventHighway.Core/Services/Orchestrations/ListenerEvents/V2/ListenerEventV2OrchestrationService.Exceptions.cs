@@ -121,6 +121,18 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
                 throw await CreateAndLogValidationExceptionAsync(
                     invalidListenerEventV2OrchestrationException);
             }
+            catch (ListenerEventV2ProcessingValidationException
+                listenerEventV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2ProcessingValidationException);
+            }
+            catch (ListenerEventV2ProcessingDependencyValidationException
+                listenerEventV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventV2ProcessingDependencyValidationException);
+            }
         }
 
         private async ValueTask<ListenerEventV2OrchestrationValidationException>
