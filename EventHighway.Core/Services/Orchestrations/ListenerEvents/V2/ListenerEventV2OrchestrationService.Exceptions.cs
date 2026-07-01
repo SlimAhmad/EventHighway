@@ -145,6 +145,17 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
                 throw await CreateAndLogDependencyExceptionAsync(
                     listenerEventV2ProcessingServiceException);
             }
+            catch (Exception exception)
+            {
+                var failedListenerEventV2OrchestrationServiceException =
+                    new FailedListenerEventV2OrchestrationServiceException(
+                        message: "Failed listener event orchestration service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(
+                    failedListenerEventV2OrchestrationServiceException);
+            }
         }
 
         private async ValueTask<ListenerEventV2OrchestrationValidationException>
