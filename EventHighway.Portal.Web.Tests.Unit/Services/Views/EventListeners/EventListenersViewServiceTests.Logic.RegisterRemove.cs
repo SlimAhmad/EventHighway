@@ -27,7 +27,10 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                 Description = GetRandomString(),
                 HandlerName = GetRandomString(),
                 HandlerId = Guid.NewGuid(),
-                EventAddressId = addressId
+                EventAddressId = addressId,
+                ParticipantId = Guid.NewGuid(),
+                PromotedProperties = GetRandomString(),
+                FilterCriteria = GetRandomString()
             };
 
             EventListenerV2 returnedListener = new EventListenerV2
@@ -38,6 +41,9 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                 HandlerName = inputView.HandlerName,
                 HandlerId = inputView.HandlerId,
                 EventAddressId = addressId,
+                ParticipantId = inputView.ParticipantId,
+                PromotedProperties = inputView.PromotedProperties,
+                FilterCriteria = inputView.FilterCriteria,
                 CreatedDate = now,
                 UpdatedDate = now
             };
@@ -72,6 +78,9 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                         listener.Name == inputView.Name
                         && listener.HandlerId == inputView.HandlerId
                         && listener.EventAddressId == addressId
+                        && listener.ParticipantId == inputView.ParticipantId
+                        && listener.PromotedProperties == inputView.PromotedProperties
+                        && listener.FilterCriteria == inputView.FilterCriteria
                         && listener.CreatedDate == now
                         && listener.UpdatedDate == now),
                     It.IsAny<CancellationToken>()),
