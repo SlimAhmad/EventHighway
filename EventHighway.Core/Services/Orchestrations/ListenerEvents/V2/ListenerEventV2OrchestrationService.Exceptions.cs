@@ -115,6 +115,10 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
                 throw await CreateAndLogTimeoutDependencyExceptionAsync(
                     timeoutListenerEventV2OrchestrationException);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (InvalidListenerEventV2OrchestrationException
                 invalidListenerEventV2OrchestrationException)
             {

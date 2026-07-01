@@ -43,6 +43,7 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateOnBulkRemoveListenerEventV2s(listenerEventV2s);
 
             await this.listenerEventV2ProcessingService
