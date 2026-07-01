@@ -31,7 +31,7 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
-            ValidateOnRetrieveBatchOfListenerEventV2sByEventIds(eventV2Ids);
+            ValidateOnRetrieveBatchOfListenerEventV2sByEventIds(eventV2Ids, take);
 
             return await this.listenerEventV2ProcessingService
                 .RetrieveBatchOfListenerEventV2sByEventIdsAsync(eventV2Ids, take, cancellationToken);

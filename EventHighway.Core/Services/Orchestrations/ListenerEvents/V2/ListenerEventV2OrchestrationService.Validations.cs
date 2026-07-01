@@ -11,19 +11,29 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
     internal partial class ListenerEventV2OrchestrationService
     {
         private static void ValidateOnRetrieveBatchOfListenerEventV2sByEventIds(
-            IEnumerable<Guid> eventV2Ids)
+            IEnumerable<Guid> eventV2Ids,
+            int take)
         {
             Validate(
                 message: "Listener event is invalid, fix the errors and try again.",
 
                 (Rule: IsNull(eventV2Ids),
-                Parameter: nameof(eventV2Ids)));
+                Parameter: nameof(eventV2Ids)),
+
+                (Rule: IsInvalid(take),
+                Parameter: nameof(take)));
         }
 
         private static dynamic IsNull(IEnumerable<Guid> value) => new
         {
             Condition = value is null,
             Message = "Value is required"
+        };
+
+        private static dynamic IsInvalid(int value) => new
+        {
+            Condition = value < 0,
+            Message = "Value must be greater than or equal to 0"
         };
 
         private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)
