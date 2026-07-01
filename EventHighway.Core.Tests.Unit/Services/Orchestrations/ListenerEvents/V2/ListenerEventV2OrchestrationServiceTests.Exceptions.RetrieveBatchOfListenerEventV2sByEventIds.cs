@@ -256,5 +256,45 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ListenerEvents.V2
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveBatchOfListenerEventV2sByEventIdsAsync()
+        {
+            // given
+            int inputTake = GetRandomNumber();
+            IEnumerable<Guid> someEventV2Ids = CreateRandomEventV2Ids();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<IEnumerable<ListenerEventV2>> retrieveBatchOfListenerEventV2sByEventIdsTask =
+                this.listenerEventV2OrchestrationService
+                    .RetrieveBatchOfListenerEventV2sByEventIdsAsync(
+                        someEventV2Ids,
+                        inputTake,
+                        cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveBatchOfListenerEventV2sByEventIdsTask.AsTask);
+
+            actualException.Should().NotBeOfType<ListenerEventV2OrchestrationDependencyException>();
+            actualException.Should().NotBeOfType<ListenerEventV2OrchestrationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
