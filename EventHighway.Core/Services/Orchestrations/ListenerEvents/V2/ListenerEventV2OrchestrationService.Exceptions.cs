@@ -98,67 +98,11 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
             {
                 await returningNothingFunction();
             }
-            catch (OperationCanceledException operationCanceledException)
-                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
-            {
-                var timeoutException =
-                    new TimeoutException(
-                        "The dependency operation timed out.",
-                        operationCanceledException);
-
-                var timeoutListenerEventV2OrchestrationException =
-                    new TimeoutListenerEventV2OrchestrationException(
-                        message: "Failed listener event orchestration timeout error occurred, contact support.",
-                        innerException: timeoutException,
-                        data: operationCanceledException.Data);
-
-                throw await CreateAndLogTimeoutDependencyExceptionAsync(
-                    timeoutListenerEventV2OrchestrationException);
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
             catch (InvalidListenerEventV2OrchestrationException
                 invalidListenerEventV2OrchestrationException)
             {
                 throw await CreateAndLogValidationExceptionAsync(
                     invalidListenerEventV2OrchestrationException);
-            }
-            catch (ListenerEventV2ProcessingValidationException
-                listenerEventV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    listenerEventV2ProcessingValidationException);
-            }
-            catch (ListenerEventV2ProcessingDependencyValidationException
-                listenerEventV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    listenerEventV2ProcessingDependencyValidationException);
-            }
-            catch (ListenerEventV2ProcessingDependencyException
-                listenerEventV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    listenerEventV2ProcessingDependencyException);
-            }
-            catch (ListenerEventV2ProcessingServiceException
-                listenerEventV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    listenerEventV2ProcessingServiceException);
-            }
-            catch (Exception exception)
-            {
-                var failedListenerEventV2OrchestrationServiceException =
-                    new FailedListenerEventV2OrchestrationServiceException(
-                        message: "Failed listener event orchestration service error occurred, contact support.",
-                        innerException: exception,
-                        data: exception.Data);
-
-                throw await CreateAndLogServiceExceptionAsync(
-                    failedListenerEventV2OrchestrationServiceException);
             }
         }
 

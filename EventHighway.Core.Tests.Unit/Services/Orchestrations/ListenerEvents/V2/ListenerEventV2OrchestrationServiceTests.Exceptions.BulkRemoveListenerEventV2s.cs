@@ -1,0 +1,79 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Models.Services.Orchestrations.ListenerEvents.V2.Exceptions;
+using FluentAssertions;
+using Moq;
+
+namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ListenerEvents.V2
+{
+    public partial class ListenerEventV2OrchestrationServiceTests
+    {
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnBulkRemoveListenerEventV2sIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            IEnumerable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
+
+            var timeoutListenerEventV2OrchestrationException =
+                new TimeoutListenerEventV2OrchestrationException(
+                    message: "Failed listener event orchestration timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: operationCanceledException.Data);
+
+            var expectedListenerEventV2OrchestrationDependencyException =
+                new ListenerEventV2OrchestrationDependencyException(
+                    message: "Listener event dependency error occurred, contact support.",
+                    innerException: timeoutListenerEventV2OrchestrationException);
+
+            this.listenerEventV2ProcessingServiceMock.Setup(service =>
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask bulkRemoveListenerEventV2sTask =
+                this.listenerEventV2OrchestrationService
+                    .BulkRemoveListenerEventV2sAsync(
+                        someListenerEventV2s,
+                        randomCancellationToken);
+
+            ListenerEventV2OrchestrationDependencyException
+                actualListenerEventV2OrchestrationDependencyException =
+                    await Assert.ThrowsAsync<ListenerEventV2OrchestrationDependencyException>(
+                        bulkRemoveListenerEventV2sTask.AsTask);
+
+            // then
+            actualListenerEventV2OrchestrationDependencyException.Should()
+                .BeEquivalentTo(expectedListenerEventV2OrchestrationDependencyException);
+
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+    }
+}
