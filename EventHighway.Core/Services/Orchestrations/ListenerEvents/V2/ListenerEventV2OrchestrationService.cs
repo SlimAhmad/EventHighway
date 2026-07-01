@@ -1,0 +1,38 @@
+// ----------------------------------------------------------------------------------
+// Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
+// ----------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using EventHighway.Core.Brokers.Loggings;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Services.Processings.ListenerEvents.V2;
+
+namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
+{
+    internal partial class ListenerEventV2OrchestrationService : IListenerEventV2OrchestrationService
+    {
+        private readonly IListenerEventV2ProcessingService listenerEventV2ProcessingService;
+        private readonly ILoggingBroker loggingBroker;
+
+        public ListenerEventV2OrchestrationService(
+            IListenerEventV2ProcessingService listenerEventV2ProcessingService,
+            ILoggingBroker loggingBroker)
+        {
+            this.listenerEventV2ProcessingService = listenerEventV2ProcessingService;
+            this.loggingBroker = loggingBroker;
+        }
+
+        public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
+            IEnumerable<Guid> eventV2Ids,
+            int take,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            return await this.listenerEventV2ProcessingService
+                .RetrieveBatchOfListenerEventV2sByEventIdsAsync(eventV2Ids, take, cancellationToken);
+        });
+    }
+}

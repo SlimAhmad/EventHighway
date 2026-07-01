@@ -4,11 +4,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Models.Services.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.ListenerEvents.V2.Exceptions;
 using Xeptions;
@@ -32,21 +31,16 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutArchivingEventV2OrchestrationException =
                     new TimeoutArchivingEventV2OrchestrationException(
                         message: "Failed archiving event orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var archivingEventV2OrchestrationDependencyException =
-                    new ArchivingEventV2OrchestrationDependencyException(
-                        message: "Event dependency error occurred, contact support.",
-                        innerException: timeoutArchivingEventV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(archivingEventV2OrchestrationDependencyException);
-                throw archivingEventV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutArchivingEventV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -303,6 +297,19 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
             await this.loggingBroker.LogErrorAsync(archivingEventV2OrchestrationDependencyValidationException);
 
             return archivingEventV2OrchestrationDependencyValidationException;
+        }
+
+        private async ValueTask<ArchivingEventV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var archivingEventV2OrchestrationDependencyException =
+                new ArchivingEventV2OrchestrationDependencyException(
+                    message: "Event dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(archivingEventV2OrchestrationDependencyException);
+
+            return archivingEventV2OrchestrationDependencyException;
         }
 
         private async ValueTask<ArchivingEventV2OrchestrationDependencyException>

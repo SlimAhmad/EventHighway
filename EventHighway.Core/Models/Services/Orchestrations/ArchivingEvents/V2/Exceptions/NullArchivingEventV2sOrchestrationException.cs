@@ -4,11 +4,11 @@
 
 using Xeptions;
 
-namespace EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions
+namespace EventHighway.Core.Models.Services.Orchestrations.ArchivingEvents.V2.Exceptions
 {
-    public class NullArchivingListenerEventV2sOrchestrationException : Xeption
+    public class NullArchivingEventV2sOrchestrationException : Xeption
     {
-        public NullArchivingListenerEventV2sOrchestrationException(string message)
+        public NullArchivingEventV2sOrchestrationException(string message)
             : base(message)
         { }
     }

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
-using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
+using EventHighway.Core.Models.Services.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using FluentAssertions;
 using Moq;

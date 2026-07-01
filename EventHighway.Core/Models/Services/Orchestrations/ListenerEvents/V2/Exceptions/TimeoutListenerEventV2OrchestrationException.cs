@@ -6,11 +6,14 @@ using System;
 using System.Collections;
 using Xeptions;
 
-namespace EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions
+namespace EventHighway.Core.Models.Services.Orchestrations.ListenerEvents.V2.Exceptions
 {
-    public class TimeoutArchivingEventV2OrchestrationException : Xeption
+    public class TimeoutListenerEventV2OrchestrationException : Xeption
     {
-        public TimeoutArchivingEventV2OrchestrationException(string message, Exception innerException, IDictionary data)
+        public TimeoutListenerEventV2OrchestrationException(
+            string message,
+            Exception innerException,
+            IDictionary data)
             : base(message, innerException, data)
         { }
     }
