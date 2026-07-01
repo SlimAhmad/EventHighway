@@ -82,7 +82,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.EventListeners.V2
                 .OnProperty(eventListenerV2 => eventListenerV2.ListenerEventArchiveV2s)
                     .IgnoreIt()
 
-                .OnProperty(eventListenerV2 => eventListenerV2.Participant)
+                .OnProperty(eventListenerV2 => eventListenerV2.EventParticipantV2)
                     .IgnoreIt();
 
             return filler;

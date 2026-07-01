@@ -21,7 +21,7 @@ namespace EventHighway.Core.Brokers.Storages
 
             model.HasIndex(eventV2 => new
             {
-                eventV2.EventAddressId,
+                eventV2.EventAddressV2Id,
                 eventV2.EventName,
                 eventV2.ContentHash,
                 eventV2.CreatedDate
@@ -29,8 +29,8 @@ namespace EventHighway.Core.Brokers.Storages
             .HasDatabaseName("IX_EventV2s_LoopDetection");
 
             model.HasOne(eventV2 => eventV2.EventAddressV2)
-                .WithMany(eventAddressV2 => eventAddressV2.Events)
-                .HasForeignKey(eventV2 => eventV2.EventAddressId)
+                .WithMany(eventAddressV2 => eventAddressV2.EventV2s)
+                .HasForeignKey(eventV2 => eventV2.EventAddressV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

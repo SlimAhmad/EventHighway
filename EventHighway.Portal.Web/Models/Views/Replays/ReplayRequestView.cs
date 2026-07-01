@@ -9,8 +9,8 @@ namespace EventHighway.Portal.Web.Models.Views.Replays
 {
     public class ReplayRequestView
     {
-        public Guid? EventAddressId { get; set; }
-        public List<Guid> EventListenerIds { get; set; } = new();
+        public Guid? EventAddressV2Id { get; set; }
+        public List<Guid> EventListenerV2Ids { get; set; } = new();
         public DateTimeOffset? StartDate { get; set; }
         public DateTimeOffset? EndDate { get; set; }
     }

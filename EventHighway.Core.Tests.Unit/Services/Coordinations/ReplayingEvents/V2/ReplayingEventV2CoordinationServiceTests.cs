@@ -131,7 +131,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
                 .OnProperty(eventArchiveV2 => eventArchiveV2.EventAddressV2)
                     .IgnoreIt()
 
-                .OnProperty(eventArchiveV2 => eventArchiveV2.Participant)
+                .OnProperty(eventArchiveV2 => eventArchiveV2.EventParticipantV2)
                     .IgnoreIt();
 
             return filler;
@@ -186,9 +186,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
                 .OnType<EventParticipantV2>().IgnoreIt()
-                .OnProperty(lev => lev.Event).IgnoreIt()
-                .OnProperty(lev => lev.EventAddress).IgnoreIt()
-                .OnProperty(lev => lev.EventListener).IgnoreIt();
+                .OnProperty(lev => lev.EventV2).IgnoreIt()
+                .OnProperty(lev => lev.EventAddressV2).IgnoreIt()
+                .OnProperty(lev => lev.EventListenerV2).IgnoreIt();
 
             return filler;
         }

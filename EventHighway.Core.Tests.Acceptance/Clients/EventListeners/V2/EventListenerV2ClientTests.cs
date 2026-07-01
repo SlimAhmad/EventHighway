@@ -65,7 +65,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventListeners.V2
 
             filler.Setup()
                 .OnProperty(eventAddressV2 =>
-                    eventAddressV2.Events).IgnoreIt()
+                    eventAddressV2.EventV2s).IgnoreIt()
 
                 .OnProperty(eventAddressV2 =>
                     eventAddressV2.EventListenerV2s).IgnoreIt()
@@ -89,7 +89,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventListeners.V2
 
             filler.Setup()
                 .OnProperty(eventListenerV2 =>
-                    eventListenerV2.EventAddressId).Use(eventAddressId)
+                    eventListenerV2.EventAddressV2Id).Use(eventAddressId)
 
                 .OnProperty(eventListenerV2 =>
                     eventListenerV2.EventAddressV2).IgnoreIt()
@@ -101,10 +101,10 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventListeners.V2
                     eventListenerV2.ListenerEventArchiveV2s).IgnoreIt()
 
                 .OnProperty(eventListenerV2 =>
-                    eventListenerV2.ParticipantId).IgnoreIt()
+                    eventListenerV2.EventParticipantV2Id).IgnoreIt()
 
                 .OnProperty(eventListenerV2 =>
-                    eventListenerV2.Participant).IgnoreIt()
+                    eventListenerV2.EventParticipantV2).IgnoreIt()
 
                 .OnType<DateTimeOffset>().Use(valueToUse: now);
 

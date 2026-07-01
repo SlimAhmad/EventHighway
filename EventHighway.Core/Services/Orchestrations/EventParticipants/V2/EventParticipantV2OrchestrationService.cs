@@ -41,7 +41,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventParticipants.V2
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (eventV2.ParticipantId is null)
+            if (eventV2.EventParticipantV2Id is null)
             {
                 ValidateParticipantSecretHasParticipantId(eventV2);
 
@@ -50,7 +50,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventParticipants.V2
 
             EventParticipantV2 maybeEventParticipantV2 =
                 await this.eventParticipantV2Service.RetrieveEventParticipantV2ByIdAsync(
-                    eventV2.ParticipantId.Value,
+                    eventV2.EventParticipantV2Id.Value,
                     cancellationToken);
 
             DateTimeOffset now =
@@ -58,7 +58,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventParticipants.V2
 
             ValidateParticipant(maybeEventParticipantV2, now);
 
-            if (string.IsNullOrWhiteSpace(eventV2.ParticipantSecret) is false)
+            if (string.IsNullOrWhiteSpace(eventV2.EventParticipantV2Secret) is false)
             {
                 IQueryable<EventParticipantSecretV2> eventParticipantSecretV2s =
                     await this.eventParticipantSecretV2Service
@@ -66,8 +66,8 @@ namespace EventHighway.Core.Services.Orchestrations.EventParticipants.V2
 
                 EventParticipantSecretV2 maybeEventParticipantSecretV2 =
                     eventParticipantSecretV2s.FirstOrDefault(secret =>
-                        secret.ParticipantId == eventV2.ParticipantId
-                            && secret.Secret == eventV2.ParticipantSecret);
+                        secret.EventParticipantV2Id == eventV2.EventParticipantV2Id
+                            && secret.Secret == eventV2.EventParticipantV2Secret);
 
                 ValidateSecret(maybeEventParticipantSecretV2, now);
             }

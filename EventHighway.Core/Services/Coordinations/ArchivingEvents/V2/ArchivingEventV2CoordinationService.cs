@@ -213,7 +213,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                             !addedListenerEventArchiveIds.Contains(listenerEventV2.Id)))
                     {
                         failedListenerEventV2Ids.Add(unarchivedListenerEventV2.Id);
-                        faultedEventV2Ids.Add(unarchivedListenerEventV2.EventId);
+                        faultedEventV2Ids.Add(unarchivedListenerEventV2.EventV2Id);
                     }
 
                     pendingEventV2Ids =
@@ -283,7 +283,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = eventV2.CreatedDate,
                 ScheduledDate = eventV2.ScheduledDate,
                 RemainingRetryAttempts = eventV2.RemainingRetryAttempts,
-                EventAddressId = eventV2.EventAddressId
+                EventAddressV2Id = eventV2.EventAddressV2Id
             };
         }
 
@@ -299,10 +299,10 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                 ResponseMessage = listenerEventV2.ResponseMessage,
                 CreatedDate = listenerEventV2.CreatedDate,
                 UpdatedDate = listenerEventV2.CreatedDate,
-                EventId = listenerEventV2.EventId,
-                EventAddressId = listenerEventV2.EventAddressId,
-                EventListenerId = listenerEventV2.EventListenerId,
-                EventArchiveV2Id = listenerEventV2.EventId
+                EventV2Id = listenerEventV2.EventV2Id,
+                EventAddressV2Id = listenerEventV2.EventAddressV2Id,
+                EventListenerV2Id = listenerEventV2.EventListenerV2Id,
+                EventArchiveV2Id = listenerEventV2.EventV2Id
             };
         }
     }

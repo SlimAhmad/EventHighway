@@ -68,7 +68,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventAddresses.V2
 
             filler.Setup()
                 .OnProperty(eventAddressV2 =>
-                    eventAddressV2.Events).IgnoreIt()
+                    eventAddressV2.EventV2s).IgnoreIt()
 
                 .OnProperty(eventAddressV2 =>
                     eventAddressV2.EventListenerV2s).IgnoreIt()

@@ -215,8 +215,8 @@
         {
             await ReplayViewService.ReplayAsync(new ReplayRequestView
             {
-                EventAddressId = addressId,
-                EventListenerIds = selectedListenerIds.ToList(),
+                EventAddressV2Id = addressId,
+                EventListenerV2Ids = selectedListenerIds.ToList(),
                 StartDate = startDate,
                 EndDate = endDate
             });

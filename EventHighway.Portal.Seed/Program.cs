@@ -4,8 +4,11 @@
 
 // Sample-data seeder for the EventHighway portal. Tops up the NFlix-NewReleases address with
 // backdated EventV2 + ListenerEventV2 history so the portal lists/filters have several pages of
-// data. Run the ClientV2.SubstrateApp sample first to create the base participant/address/listeners,
-// then run this seeder. The hydration logic lives in DatabaseHydrator so any console app can reuse it.
+// data. Self-sufficient: it creates the NFlix participant, the NFlix-NewReleases address and its
+// listeners when they are missing, so it can run against an empty database on its own. If the
+// ClientV2.SubstrateApp/BasicApp samples have already run, it reconciles to their rows (shared
+// well-known Guids) instead of duplicating them. The hydration logic lives in DatabaseHydrator so
+// any console app can reuse it.
 
 using EventHighway.Portal.Seed;
 

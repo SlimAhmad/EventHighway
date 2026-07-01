@@ -27,8 +27,8 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                 Description = GetRandomString(),
                 HandlerName = GetRandomString(),
                 HandlerId = Guid.NewGuid(),
-                EventAddressId = addressId,
-                ParticipantId = Guid.NewGuid(),
+                EventAddressV2Id = addressId,
+                EventParticipantV2Id = Guid.NewGuid(),
                 PromotedProperties = GetRandomString(),
                 FilterCriteria = GetRandomString()
             };
@@ -40,8 +40,8 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                 Description = inputView.Description,
                 HandlerName = inputView.HandlerName,
                 HandlerId = inputView.HandlerId,
-                EventAddressId = addressId,
-                ParticipantId = inputView.ParticipantId,
+                EventAddressV2Id = addressId,
+                EventParticipantV2Id = inputView.EventParticipantV2Id,
                 PromotedProperties = inputView.PromotedProperties,
                 FilterCriteria = inputView.FilterCriteria,
                 CreatedDate = now,
@@ -77,8 +77,8 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                     It.Is<EventListenerV2>(listener =>
                         listener.Name == inputView.Name
                         && listener.HandlerId == inputView.HandlerId
-                        && listener.EventAddressId == addressId
-                        && listener.ParticipantId == inputView.ParticipantId
+                        && listener.EventAddressV2Id == addressId
+                        && listener.EventParticipantV2Id == inputView.EventParticipantV2Id
                         && listener.PromotedProperties == inputView.PromotedProperties
                         && listener.FilterCriteria == inputView.FilterCriteria
                         && listener.CreatedDate == now

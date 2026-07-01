@@ -63,7 +63,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
                 Description = GetRandomString(),
                 HandlerName = GetRandomString(),
                 HandlerId = Guid.NewGuid(),
-                EventAddressId = addressId
+                EventAddressV2Id = addressId
             }).ToList();
     }
 }

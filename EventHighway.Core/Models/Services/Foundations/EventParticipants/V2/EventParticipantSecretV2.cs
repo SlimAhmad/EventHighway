@@ -51,7 +51,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventParticipants.V2
         /// <summary>
         /// Gets or sets the identifier of the <see cref="EventParticipantV2"/> this secret belongs to.
         /// </summary>
-        public Guid ParticipantId { get; set; }
+        public Guid EventParticipantV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="EventParticipantV2"/> navigation property this secret belongs to.

@@ -54,8 +54,8 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.Events
                 Type = EventTypeV2.Scheduled,
                 Status = EventStatusV2.Active,
                 RemainingRetryAttempts = 3,
-                EventAddressId = Guid.NewGuid(),
-                ParticipantId = Guid.NewGuid(),
+                EventAddressV2Id = Guid.NewGuid(),
+                EventParticipantV2Id = Guid.NewGuid(),
                 ScheduledDate = createdDate,
                 CreatedDate = createdDate,
                 UpdatedDate = createdDate
@@ -70,8 +70,8 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.Events
                 Type = @event.Type.ToString(),
                 Status = @event.Status.ToString(),
                 RemainingRetryAttempts = @event.RemainingRetryAttempts,
-                EventAddressId = @event.EventAddressId,
-                ParticipantId = @event.ParticipantId,
+                EventAddressV2Id = @event.EventAddressV2Id,
+                EventParticipantV2Id = @event.EventParticipantV2Id,
                 ScheduledDate = @event.ScheduledDate,
                 CreatedDate = @event.CreatedDate
             };

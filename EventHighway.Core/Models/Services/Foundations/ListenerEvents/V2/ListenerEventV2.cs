@@ -51,44 +51,44 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2
         public DateTimeOffset UpdatedDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the identifier of the <see cref="EventV2"/> being delivered.
+        /// Gets or sets the identifier of the <see cref="Events.V2.EventV2"/> being delivered.
         /// </summary>
-        public Guid EventId { get; set; }
+        public Guid EventV2Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="EventV2"/> navigation property being delivered to this listener.
+        /// Gets or sets the <see cref="Events.V2.EventV2"/> navigation property being delivered to this listener.
         /// </summary>
-        public EventV2 Event { get; set; }
+        public EventV2 EventV2 { get; set; }
 
         /// <summary>
-        /// Gets or sets the identifier of the <see cref="EventAddressV2"/> where the event was sent.
+        /// Gets or sets the identifier of the <see cref="EventAddresses.V2.EventAddressV2"/> where the event was sent.
         /// </summary>
-        public Guid EventAddressId { get; set; }
+        public Guid EventAddressV2Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="EventAddressV2"/> navigation property representing the delivery endpoint.
+        /// Gets or sets the <see cref="EventAddresses.V2.EventAddressV2"/> navigation property representing the delivery endpoint.
         /// </summary>
-        public EventAddressV2 EventAddress { get; set; }
+        public EventAddressV2 EventAddressV2 { get; set; }
 
         /// <summary>
-        /// Gets or sets the identifier of the <see cref="EventListenerV2"/> receiving the event.
+        /// Gets or sets the identifier of the <see cref="EventListeners.V2.EventListenerV2"/> receiving the event.
         /// </summary>
-        public Guid EventListenerId { get; set; }
+        public Guid EventListenerV2Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="EventListenerV2"/> navigation property that represents the listener.
+        /// Gets or sets the <see cref="EventListeners.V2.EventListenerV2"/> navigation property that represents the listener.
         /// </summary>
-        public EventListenerV2 EventListener { get; set; }
+        public EventListenerV2 EventListenerV2 { get; set; }
 
         /// <summary>
-        /// Gets or sets the identifier of the <see cref="EventParticipantV2"/> associated with this listener event.
+        /// Gets or sets the identifier of the <see cref="EventParticipants.V2.EventParticipantV2"/> associated with this listener event.
         /// A null value indicates no participant is associated with this listener event.
         /// </summary>
-        public Guid? ParticipantId { get; set; }
+        public Guid? EventParticipantV2Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="EventParticipantV2"/> navigation property associated with this listener event.
+        /// Gets or sets the <see cref="EventParticipants.V2.EventParticipantV2"/> navigation property associated with this listener event.
         /// </summary>
-        public EventParticipantV2 Participant { get; set; }
+        public EventParticipantV2 EventParticipantV2 { get; set; }
     }
 }

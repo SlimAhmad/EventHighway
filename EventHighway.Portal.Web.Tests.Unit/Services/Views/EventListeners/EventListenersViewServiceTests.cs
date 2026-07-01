@@ -49,8 +49,8 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                 Description = GetRandomString(),
                 HandlerName = GetRandomString(),
                 HandlerId = Guid.NewGuid(),
-                EventAddressId = eventAddressId,
-                ParticipantId = Guid.NewGuid(),
+                EventAddressV2Id = eventAddressId,
+                EventParticipantV2Id = Guid.NewGuid(),
                 PromotedProperties = GetRandomString(),
                 FilterCriteria = GetRandomString()
             }).ToList();
@@ -63,8 +63,8 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventListeners
                 Description = listener.Description,
                 HandlerName = listener.HandlerName,
                 HandlerId = listener.HandlerId,
-                EventAddressId = listener.EventAddressId,
-                ParticipantId = listener.ParticipantId,
+                EventAddressV2Id = listener.EventAddressV2Id,
+                EventParticipantV2Id = listener.EventParticipantV2Id,
                 PromotedProperties = listener.PromotedProperties ?? string.Empty,
                 FilterCriteria = listener.FilterCriteria ?? string.Empty
             }).ToList();

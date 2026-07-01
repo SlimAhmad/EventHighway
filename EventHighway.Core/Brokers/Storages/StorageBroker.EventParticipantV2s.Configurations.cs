@@ -16,28 +16,28 @@ namespace EventHighway.Core.Brokers.Storages
             model.HasKey(eventParticipantV2 => eventParticipantV2.Id);
 
             model.HasMany(eventParticipantV2 => eventParticipantV2.EventV2s)
-                .WithOne(eventV2 => eventV2.Participant)
-                .HasForeignKey(eventV2 => eventV2.ParticipantId)
+                .WithOne(eventV2 => eventV2.EventParticipantV2)
+                .HasForeignKey(eventV2 => eventV2.EventParticipantV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
             model.HasMany(eventParticipantV2 => eventParticipantV2.EventArchiveV2s)
-                .WithOne(eventArchiveV2 => eventArchiveV2.Participant)
-                .HasForeignKey(eventArchiveV2 => eventArchiveV2.ParticipantId)
+                .WithOne(eventArchiveV2 => eventArchiveV2.EventParticipantV2)
+                .HasForeignKey(eventArchiveV2 => eventArchiveV2.EventParticipantV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
             model.HasMany(eventParticipantV2 => eventParticipantV2.EventListenerV2s)
-                .WithOne(eventListenerV2 => eventListenerV2.Participant)
-                .HasForeignKey(eventListenerV2 => eventListenerV2.ParticipantId)
+                .WithOne(eventListenerV2 => eventListenerV2.EventParticipantV2)
+                .HasForeignKey(eventListenerV2 => eventListenerV2.EventParticipantV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
             model.HasMany(eventParticipantV2 => eventParticipantV2.ListenerEventV2s)
-                .WithOne(listenerEventV2 => listenerEventV2.Participant)
-                .HasForeignKey(listenerEventV2 => listenerEventV2.ParticipantId)
+                .WithOne(listenerEventV2 => listenerEventV2.EventParticipantV2)
+                .HasForeignKey(listenerEventV2 => listenerEventV2.EventParticipantV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
             model.HasMany(eventParticipantV2 => eventParticipantV2.ListenerEventArchiveV2s)
-                .WithOne(listenerEventArchiveV2 => listenerEventArchiveV2.Participant)
-                .HasForeignKey(listenerEventArchiveV2 => listenerEventArchiveV2.ParticipantId)
+                .WithOne(listenerEventArchiveV2 => listenerEventArchiveV2.EventParticipantV2)
+                .HasForeignKey(listenerEventArchiveV2 => listenerEventArchiveV2.EventParticipantV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

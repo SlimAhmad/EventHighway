@@ -56,17 +56,17 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2
         /// <summary>
         /// Gets or sets the identifier of the event associated with this archived listener event.
         /// </summary>
-        public Guid EventId { get; set; }
+        public Guid EventV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the event address where the archived event was sent.
         /// </summary>
-        public Guid EventAddressId { get; set; }
+        public Guid EventAddressV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the event listener that received the archived event.
         /// </summary>
-        public Guid EventListenerId { get; set; }
+        public Guid EventListenerV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="EventListenerV2"/> navigation property associated with this listener event archive.
@@ -79,14 +79,14 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2
         public Guid EventArchiveV2Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the identifier of the <see cref="EventParticipantV2"/> associated with this listener event archive.
+        /// Gets or sets the identifier of the <see cref="EventParticipants.V2.EventParticipantV2"/> associated with this listener event archive.
         /// A null value indicates no participant is associated with this listener event archive.
         /// </summary>
-        public Guid? ParticipantId { get; set; }
+        public Guid? EventParticipantV2Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="EventParticipantV2"/> navigation property associated with this listener event archive.
+        /// Gets or sets the <see cref="EventParticipants.V2.EventParticipantV2"/> navigation property associated with this listener event archive.
         /// </summary>
-        public EventParticipantV2 Participant { get; set; }
+        public EventParticipantV2 EventParticipantV2 { get; set; }
     }
 }

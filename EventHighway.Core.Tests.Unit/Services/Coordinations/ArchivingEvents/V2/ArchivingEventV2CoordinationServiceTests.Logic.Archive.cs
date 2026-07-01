@@ -43,7 +43,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         UpdatedDate = item.UpdatedDate,
                         ScheduledDate = item.ScheduledDate,
                         RemainingRetryAttempts = item.RemainingRetryAttempts,
-                        EventAddressId = item.EventAddressId
+                        EventAddressV2Id = item.EventAddressId
                     }).ToList();
 
             List<dynamic> randomListenerEventV2sProperties = CreateRandomListenerEventV2sProperties();
@@ -59,9 +59,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         ResponseMessage = item.ResponseMessage,
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.UpdatedDate,
-                        EventId = item.EventId,
-                        EventAddressId = item.EventAddressId,
-                        EventListenerId = item.EventListenerId
+                        EventV2Id = item.EventId,
+                        EventAddressV2Id = item.EventAddressId,
+                        EventListenerV2Id = item.EventListenerId
                     }).ToList();
 
             IEnumerable<Guid> inputEventV2Ids =
@@ -79,7 +79,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         UpdatedDate = item.CreatedDate,
                         ScheduledDate = item.ScheduledDate,
                         RemainingRetryAttempts = item.RemainingRetryAttempts,
-                        EventAddressId = item.EventAddressId
+                        EventAddressV2Id = item.EventAddressId
                     }).ToList();
 
             List<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
@@ -93,9 +93,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         ResponseMessage = item.ResponseMessage,
                         CreatedDate = item.CreatedDate,
                         UpdatedDate = item.CreatedDate,
-                        EventId = item.EventId,
-                        EventAddressId = item.EventAddressId,
-                        EventListenerId = item.EventListenerId,
+                        EventV2Id = item.EventId,
+                        EventAddressV2Id = item.EventAddressId,
+                        EventListenerV2Id = item.EventListenerId,
                         EventArchiveV2Id = item.EventId
                     }).ToList();
 
@@ -245,7 +245,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = randomDateTimeOffset,
                 ScheduledDate = randomDateTimeOffset,
                 RemainingRetryAttempts = GetRandomNumber(),
-                EventAddressId = GetRandomId()
+                EventAddressV2Id = GetRandomId()
             };
 
             var faultedEventV2 = new EventV2
@@ -258,7 +258,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = randomDateTimeOffset,
                 ScheduledDate = randomDateTimeOffset,
                 RemainingRetryAttempts = GetRandomNumber(),
-                EventAddressId = GetRandomId()
+                EventAddressV2Id = GetRandomId()
             };
 
             List<EventV2> retrievedEventV2s =
@@ -273,9 +273,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 ResponseMessage = GetRandomString(),
                 CreatedDate = randomDateTimeOffset,
                 UpdatedDate = randomDateTimeOffset,
-                EventId = cleanEventV2Id,
-                EventAddressId = GetRandomId(),
-                EventListenerId = GetRandomId()
+                EventV2Id = cleanEventV2Id,
+                EventAddressV2Id = GetRandomId(),
+                EventListenerV2Id = GetRandomId()
             };
 
             var faultedListenerEventV2 = new ListenerEventV2
@@ -287,9 +287,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 ResponseMessage = GetRandomString(),
                 CreatedDate = randomDateTimeOffset,
                 UpdatedDate = randomDateTimeOffset,
-                EventId = faultedEventV2Id,
-                EventAddressId = GetRandomId(),
-                EventListenerId = GetRandomId()
+                EventV2Id = faultedEventV2Id,
+                EventAddressV2Id = GetRandomId(),
+                EventListenerV2Id = GetRandomId()
             };
 
             List<ListenerEventV2> retrievedListenerEventV2s =
@@ -322,7 +322,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         UpdatedDate = eventV2.UpdatedDate,
                         ScheduledDate = eventV2.ScheduledDate,
                         RemainingRetryAttempts = eventV2.RemainingRetryAttempts,
-                        EventAddressId = eventV2.EventAddressId
+                        EventAddressV2Id = eventV2.EventAddressV2Id
                     }).ToList();
 
             List<ListenerEventArchiveV2> expectedListenerEventArchiveV2s =
@@ -336,10 +336,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         ResponseMessage = listenerEventV2.ResponseMessage,
                         CreatedDate = listenerEventV2.CreatedDate,
                         UpdatedDate = listenerEventV2.UpdatedDate,
-                        EventId = listenerEventV2.EventId,
-                        EventAddressId = listenerEventV2.EventAddressId,
-                        EventListenerId = listenerEventV2.EventListenerId,
-                        EventArchiveV2Id = listenerEventV2.EventId
+                        EventV2Id = listenerEventV2.EventV2Id,
+                        EventAddressV2Id = listenerEventV2.EventAddressV2Id,
+                        EventListenerV2Id = listenerEventV2.EventListenerV2Id,
+                        EventArchiveV2Id = listenerEventV2.EventV2Id
                     }).ToList();
 
             IEnumerable<EventArchiveV2> addedEventArchiveV2s =
@@ -509,7 +509,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = randomDateTimeOffset,
                 ScheduledDate = randomDateTimeOffset,
                 RemainingRetryAttempts = GetRandomNumber(),
-                EventAddressId = GetRandomId()
+                EventAddressV2Id = GetRandomId()
             };
 
             var faultedEventV2 = new EventV2
@@ -522,7 +522,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = randomDateTimeOffset,
                 ScheduledDate = randomDateTimeOffset,
                 RemainingRetryAttempts = GetRandomNumber(),
-                EventAddressId = GetRandomId()
+                EventAddressV2Id = GetRandomId()
             };
 
             List<EventV2> retrievedEventV2s =
@@ -537,9 +537,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 ResponseMessage = GetRandomString(),
                 CreatedDate = randomDateTimeOffset,
                 UpdatedDate = randomDateTimeOffset,
-                EventId = cleanEventV2Id,
-                EventAddressId = GetRandomId(),
-                EventListenerId = GetRandomId()
+                EventV2Id = cleanEventV2Id,
+                EventAddressV2Id = GetRandomId(),
+                EventListenerV2Id = GetRandomId()
             };
 
             List<ListenerEventV2> retrievedListenerEventV2s =
@@ -566,7 +566,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         UpdatedDate = eventV2.UpdatedDate,
                         ScheduledDate = eventV2.ScheduledDate,
                         RemainingRetryAttempts = eventV2.RemainingRetryAttempts,
-                        EventAddressId = eventV2.EventAddressId
+                        EventAddressV2Id = eventV2.EventAddressV2Id
                     }).ToList();
 
             IEnumerable<EventArchiveV2> addedEventArchiveV2s =
@@ -584,10 +584,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         ResponseMessage = listenerEventV2.ResponseMessage,
                         CreatedDate = listenerEventV2.CreatedDate,
                         UpdatedDate = listenerEventV2.UpdatedDate,
-                        EventId = listenerEventV2.EventId,
-                        EventAddressId = listenerEventV2.EventAddressId,
-                        EventListenerId = listenerEventV2.EventListenerId,
-                        EventArchiveV2Id = listenerEventV2.EventId
+                        EventV2Id = listenerEventV2.EventV2Id,
+                        EventAddressV2Id = listenerEventV2.EventAddressV2Id,
+                        EventListenerV2Id = listenerEventV2.EventListenerV2Id,
+                        EventArchiveV2Id = listenerEventV2.EventV2Id
                     }).ToList();
 
             IEnumerable<ListenerEventArchiveV2> addedListenerEventArchiveV2s =
@@ -745,7 +745,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = randomDateTimeOffset,
                 ScheduledDate = randomDateTimeOffset,
                 RemainingRetryAttempts = GetRandomNumber(),
-                EventAddressId = GetRandomId()
+                EventAddressV2Id = GetRandomId()
             };
 
             List<EventV2> retrievedEventV2s =
@@ -760,9 +760,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 ResponseMessage = GetRandomString(),
                 CreatedDate = randomDateTimeOffset,
                 UpdatedDate = randomDateTimeOffset,
-                EventId = eventV2Id,
-                EventAddressId = GetRandomId(),
-                EventListenerId = GetRandomId()
+                EventV2Id = eventV2Id,
+                EventAddressV2Id = GetRandomId(),
+                EventListenerV2Id = GetRandomId()
             };
 
             List<ListenerEventV2> retrievedListenerEventV2s =
@@ -784,7 +784,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         UpdatedDate = deadEventV2.UpdatedDate,
                         ScheduledDate = deadEventV2.ScheduledDate,
                         RemainingRetryAttempts = deadEventV2.RemainingRetryAttempts,
-                        EventAddressId = deadEventV2.EventAddressId
+                        EventAddressV2Id = deadEventV2.EventAddressV2Id
                     }
                 };
 
@@ -800,10 +800,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         ResponseMessage = listenerEventV2.ResponseMessage,
                         CreatedDate = listenerEventV2.CreatedDate,
                         UpdatedDate = listenerEventV2.UpdatedDate,
-                        EventId = listenerEventV2.EventId,
-                        EventAddressId = listenerEventV2.EventAddressId,
-                        EventListenerId = listenerEventV2.EventListenerId,
-                        EventArchiveV2Id = listenerEventV2.EventId
+                        EventV2Id = listenerEventV2.EventV2Id,
+                        EventAddressV2Id = listenerEventV2.EventAddressV2Id,
+                        EventListenerV2Id = listenerEventV2.EventListenerV2Id,
+                        EventArchiveV2Id = listenerEventV2.EventV2Id
                     }
                 };
 

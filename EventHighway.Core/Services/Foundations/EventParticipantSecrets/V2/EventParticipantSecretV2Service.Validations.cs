@@ -40,8 +40,8 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
                 (Rule: await IsNotRecentAsync(eventParticipantSecretV2.CreatedDate),
                 Parameter: nameof(EventParticipantSecretV2.CreatedDate)),
 
-                (Rule: IsInvalid(eventParticipantSecretV2.ParticipantId),
-                Parameter: nameof(EventParticipantSecretV2.ParticipantId)),
+                (Rule: IsInvalid(eventParticipantSecretV2.EventParticipantV2Id),
+                Parameter: nameof(EventParticipantSecretV2.EventParticipantV2Id)),
 
                 (Rule: IsInvalidIfSet(eventParticipantSecretV2.ActiveFrom),
                 Parameter: nameof(EventParticipantSecretV2.ActiveFrom)),
@@ -84,8 +84,8 @@ namespace EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2
                 (Rule: await IsNotRecentAsync(eventParticipantSecretV2.UpdatedDate),
                 Parameter: nameof(EventParticipantSecretV2.UpdatedDate)),
 
-                (Rule: IsInvalid(eventParticipantSecretV2.ParticipantId),
-                Parameter: nameof(EventParticipantSecretV2.ParticipantId)),
+                (Rule: IsInvalid(eventParticipantSecretV2.EventParticipantV2Id),
+                Parameter: nameof(EventParticipantSecretV2.EventParticipantV2Id)),
 
                 (Rule: IsInvalidIfSet(eventParticipantSecretV2.ActiveFrom),
                 Parameter: nameof(EventParticipantSecretV2.ActiveFrom)),

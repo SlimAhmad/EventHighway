@@ -23,7 +23,7 @@ namespace EventHighway.Core.Brokers.Storages
 
             model.HasOne(eventListenerV2 => eventListenerV2.EventAddressV2)
                 .WithMany(eventAddressV2 => eventAddressV2.EventListenerV2s)
-                .HasForeignKey(eventListenerV2 => eventListenerV2.EventAddressId)
+                .HasForeignKey(eventListenerV2 => eventListenerV2.EventAddressV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

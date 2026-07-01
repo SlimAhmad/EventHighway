@@ -72,7 +72,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
         /// Gets or sets the unique identifier of the event address associated with this
         /// listener.
         /// </summary>
-        public Guid EventAddressId { get; set; }
+        public Guid EventAddressV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the event address object that this listener is associated with.
@@ -94,11 +94,11 @@ namespace EventHighway.Core.Models.Services.Foundations.EventListeners.V2
         /// Gets or sets the unique identifier of the participant that owns this listener.
         /// Nullable: a listener need not be associated with a participant.
         /// </summary>
-        public Guid? ParticipantId { get; set; }
+        public Guid? EventParticipantV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the participant that owns this listener.
         /// </summary>
-        public EventParticipantV2 Participant { get; set; }
+        public EventParticipantV2 EventParticipantV2 { get; set; }
     }
 }

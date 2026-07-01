@@ -27,7 +27,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                 CreateRandomEventV2(dates: GetRandomDateTimeOffset());
 
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.EventAddressId = System.Guid.Empty;
+            inputEventV2.EventAddressV2Id = System.Guid.Empty;
 
             var loopDetectionConfiguration = new LoopDetection
             {
@@ -39,7 +39,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     message: "Event is invalid, fix the errors and try again.");
 
             invalidEventV2Exception.UpsertDataList(
-                key: nameof(EventV2.EventAddressId),
+                key: nameof(EventV2.EventAddressV2Id),
                 value: "Required");
 
             var expectedEventV2ValidationException =

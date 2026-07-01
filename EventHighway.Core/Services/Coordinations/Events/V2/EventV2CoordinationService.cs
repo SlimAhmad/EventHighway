@@ -167,7 +167,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             IQueryable<EventListenerV2> eventListenerV2s =
                 await this.eventListenerV2OrchestrationService
                     .RetrieveEventListenerV2sByEventAddressIdAsync(
-                        eventV2.EventAddressId, cancellationToken);
+                        eventV2.EventAddressV2Id, cancellationToken);
 
             foreach (EventListenerV2 eventListenerV2 in eventListenerV2s)
             {
@@ -261,9 +261,9 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             return new ListenerEventV2
             {
                 Id = Guid.NewGuid(),
-                EventId = eventV2.Id,
-                EventListenerId = eventListenerV2.Id,
-                EventAddressId = eventV2.EventAddressId,
+                EventV2Id = eventV2.Id,
+                EventListenerV2Id = eventListenerV2.Id,
+                EventAddressV2Id = eventV2.EventAddressV2Id,
                 Status = ListenerEventStatusV2.Pending,
                 CreatedDate = now,
                 UpdatedDate = now,

@@ -142,7 +142,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             EventV2 invalidEventV2 = new EventV2
             {
-                EventAddressId = Guid.Empty,
+                EventAddressV2Id = Guid.Empty,
                 EventName = string.Empty,
                 ContentHash = string.Empty
             };
@@ -157,7 +157,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                     message: "Arguments are invalid, fix the errors and try again.");
 
             invalidEventV2Exception.UpsertDataList(
-                key: nameof(EventV2.EventAddressId),
+                key: nameof(EventV2.EventAddressV2Id),
                 value: "Required");
 
             invalidEventV2Exception.UpsertDataList(

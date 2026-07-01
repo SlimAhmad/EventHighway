@@ -117,7 +117,7 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
                 return;
 
             if (eventAddressId.HasValue
-                && eventArchiveV2.EventAddressId != eventAddressId.Value)
+                && eventArchiveV2.EventAddressV2Id != eventAddressId.Value)
             {
                 return;
             }

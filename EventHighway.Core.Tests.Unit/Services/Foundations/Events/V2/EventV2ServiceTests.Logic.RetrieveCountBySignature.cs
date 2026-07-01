@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
 
             EventV2 matchingEventV2 = new EventV2
             {
-                EventAddressId = inputEventV2.EventAddressId,
+                EventAddressV2Id = inputEventV2.EventAddressV2Id,
                 EventName = inputEventV2.EventName,
                 ContentHash = inputEventV2.ContentHash,
                 CreatedDate = createdAfter.AddSeconds(1)

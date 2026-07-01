@@ -73,7 +73,7 @@ namespace EventHighway.Core.Models.Services.Foundations.Events.V2
         /// Gets or sets the unique identifier of the event address associated with this
         /// event.
         /// </summary>
-        public Guid EventAddressId { get; set; }
+        public Guid EventAddressV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the event address object that this event is associated with.
@@ -86,9 +86,9 @@ namespace EventHighway.Core.Models.Services.Foundations.Events.V2
         /// </summary>
         public IEnumerable<ListenerEventV2> ListenerEventV2s { get; set; }
 
-        public string ParticipantSecret { get; set; }
-        public Guid? ParticipantId { get; set; }
-        public EventParticipantV2 Participant { get; set; }
+        public string EventParticipantV2Secret { get; set; }
+        public Guid? EventParticipantV2Id { get; set; }
+        public EventParticipantV2 EventParticipantV2 { get; set; }
 
     }
 }

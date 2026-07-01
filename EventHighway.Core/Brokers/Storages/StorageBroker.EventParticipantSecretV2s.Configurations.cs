@@ -28,7 +28,7 @@ namespace EventHighway.Core.Brokers.Storages
 
             model.HasOne(eventParticipantSecretV2 => eventParticipantSecretV2.EventParticipantV2)
                 .WithMany(eventParticipantV2 => eventParticipantV2.EventParticipantSecretV2s)
-                .HasForeignKey(eventParticipantSecretV2 => eventParticipantSecretV2.ParticipantId)
+                .HasForeignKey(eventParticipantSecretV2 => eventParticipantSecretV2.EventParticipantV2Id)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

@@ -51,7 +51,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
             {
                 Id = Guid.NewGuid(),
                 Name = GetRandomString(),
-                EventAddressId = addressId
+                EventAddressV2Id = addressId
             }).ToList();
     }
 }

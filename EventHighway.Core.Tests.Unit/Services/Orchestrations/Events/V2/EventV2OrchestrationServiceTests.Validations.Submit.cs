@@ -78,7 +78,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
                 TestContext.Current.CancellationToken;
 
             EventV2 someEventV2 = CreateRandomEventV2();
-            Guid nonExistingEventAddressV2Id = someEventV2.EventAddressId;
+            Guid nonExistingEventAddressV2Id = someEventV2.EventAddressV2Id;
             EventAddressV2 nullEventAddressV2 = null;
 
             var notFoundEventAddressV2OrchestrationException =

@@ -47,7 +47,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
                 Content = GetRandomString(),
                 Type = "Immediate",
                 Status = "Active",
-                EventAddressId = Guid.NewGuid(),
+                EventAddressV2Id = Guid.NewGuid(),
                 EventAddressName = GetRandomString()
             };
 
@@ -59,9 +59,9 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
                 Status = status,
                 ResponseCode = status == "Success" ? "200" : "503",
                 ResponseMessage = status,
-                EventId = Guid.NewGuid(),
-                EventAddressId = Guid.NewGuid(),
-                EventListenerId = Guid.NewGuid(),
+                EventV2Id = Guid.NewGuid(),
+                EventAddressV2Id = Guid.NewGuid(),
+                EventListenerV2Id = Guid.NewGuid(),
                 EventArchiveV2Id = eventArchiveId,
                 ListenerName = GetRandomString()
             };

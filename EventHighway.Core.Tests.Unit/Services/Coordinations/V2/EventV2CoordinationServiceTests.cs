@@ -306,7 +306,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     eventListenerV2.ListenerEventArchiveV2s).IgnoreIt()
 
                 .OnProperty(eventListenerV2 =>
-                    eventListenerV2.Participant).IgnoreIt()
+                    eventListenerV2.EventParticipantV2).IgnoreIt()
 
                 .OnType<EventAddressV2>().IgnoreIt()
                 .OnType<EventV2>().IgnoreIt();

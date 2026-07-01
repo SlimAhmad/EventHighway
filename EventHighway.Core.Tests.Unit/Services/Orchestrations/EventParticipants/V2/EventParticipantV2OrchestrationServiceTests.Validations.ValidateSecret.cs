@@ -30,15 +30,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             activeEventParticipantV2.ActiveFrom = null;
             activeEventParticipantV2.ActiveTo = null;
 
-            storedSecret.ParticipantId = activeEventParticipantV2.Id;
+            storedSecret.EventParticipantV2Id = activeEventParticipantV2.Id;
 
             IQueryable<EventParticipantSecretV2> eventParticipantSecretV2s =
                 new List<EventParticipantSecretV2> { storedSecret }.AsQueryable();
 
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = activeEventParticipantV2.Id;
-            inputEventV2.ParticipantSecret = inputSecret;
+            inputEventV2.EventParticipantV2Id = activeEventParticipantV2.Id;
+            inputEventV2.EventParticipantV2Secret = inputSecret;
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
@@ -51,7 +51,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Setup(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()))
                         .ReturnsAsync(activeEventParticipantV2);
 
@@ -82,7 +82,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Verify(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -111,7 +111,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
         {
             // given
             EventParticipantSecretV2 nonMatchingSecret = CreateRandomEventParticipantSecretV2();
-            nonMatchingSecret.ParticipantId = GetRandomId();
+            nonMatchingSecret.EventParticipantV2Id = GetRandomId();
             nonMatchingSecret.Secret = GetRandomString();
             string inputSecret = GetRandomString();
 

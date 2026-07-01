@@ -110,17 +110,17 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 await this.listenerEventV2ProcessingService
                     .RetrieveAllListenerEventV2sAsync(cancellationToken);
 
-            HashSet<(System.Guid EventId, System.Guid EventListenerId)> existingPairs =
+            HashSet<(System.Guid EventV2Id, System.Guid EventListenerV2Id)> existingPairs =
                 existingListenerEventV2s
-                    .Where(listenerEventV2 => incomingEventIds.Contains(listenerEventV2.EventId))
+                    .Where(listenerEventV2 => incomingEventIds.Contains(listenerEventV2.EventV2Id))
                     .Select(listenerEventV2 => new
                     {
-                        listenerEventV2.EventId,
-                        listenerEventV2.EventListenerId
+                        listenerEventV2.EventV2Id,
+                        listenerEventV2.EventListenerV2Id
                     })
                     .AsEnumerable()
                     .Select(listenerEventV2 =>
-                        (listenerEventV2.EventId, listenerEventV2.EventListenerId))
+                        (listenerEventV2.EventV2Id, listenerEventV2.EventListenerV2Id))
                     .ToHashSet();
 
             List<ListenerEventV2> generatedListenerEventV2s = new List<ListenerEventV2>();
@@ -130,7 +130,7 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 IQueryable<EventListenerV2> eventListenerV2s =
                     await this.eventListenerV2ProcessingService
                         .RetrieveEventListenerV2sByEventAddressIdAsync(
-                            eventArchiveV2.EventAddressId, cancellationToken);
+                            eventArchiveV2.EventAddressV2Id, cancellationToken);
 
                 foreach (EventListenerV2 eventListenerV2 in eventListenerV2s)
                 {
@@ -167,17 +167,17 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 await this.listenerEventV2ProcessingService
                     .RetrieveAllListenerEventV2sAsync(cancellationToken);
 
-            HashSet<(System.Guid EventId, System.Guid EventListenerId)> existingPairs =
+            HashSet<(System.Guid EventV2Id, System.Guid EventListenerV2Id)> existingPairs =
                 existingListenerEventV2s
-                    .Where(listenerEventV2 => incomingEventIds.Contains(listenerEventV2.EventId))
+                    .Where(listenerEventV2 => incomingEventIds.Contains(listenerEventV2.EventV2Id))
                     .Select(listenerEventV2 => new
                     {
-                        listenerEventV2.EventId,
-                        listenerEventV2.EventListenerId
+                        listenerEventV2.EventV2Id,
+                        listenerEventV2.EventListenerV2Id
                     })
                     .AsEnumerable()
                     .Select(listenerEventV2 =>
-                        (listenerEventV2.EventId, listenerEventV2.EventListenerId))
+                        (listenerEventV2.EventV2Id, listenerEventV2.EventListenerV2Id))
                     .ToHashSet();
 
             List<ListenerEventV2> generatedListenerEventV2s = new List<ListenerEventV2>();
@@ -187,7 +187,7 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 IQueryable<EventListenerV2> eventListenerV2s =
                     await this.eventListenerV2ProcessingService
                         .RetrieveEventListenerV2sByEventAddressIdAsync(
-                            eventArchiveV2.EventAddressId, cancellationToken);
+                            eventArchiveV2.EventAddressV2Id, cancellationToken);
 
                 foreach (EventListenerV2 eventListenerV2 in eventListenerV2s)
                 {
@@ -221,9 +221,9 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 ResponseMessage = null,
                 CreatedDate = eventArchiveV2.CreatedDate,
                 UpdatedDate = eventArchiveV2.CreatedDate,
-                EventId = eventArchiveV2.Id,
-                EventAddressId = eventArchiveV2.EventAddressId,
-                EventListenerId = eventListenerV2.Id
+                EventV2Id = eventArchiveV2.Id,
+                EventAddressV2Id = eventArchiveV2.EventAddressV2Id,
+                EventListenerV2Id = eventListenerV2.Id
             };
 
         private static EventV2 MapToEventV2(EventArchiveV2 eventArchiveV2) =>
@@ -239,7 +239,7 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 ScheduledDate = null,
                 ContentHash = null,
                 RemainingRetryAttempts = 0,
-                EventAddressId = eventArchiveV2.EventAddressId
+                EventAddressV2Id = eventArchiveV2.EventAddressV2Id
             };
 
         private static ListenerEventV2 MapToListenerEventV2(
@@ -253,9 +253,9 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 ResponseMessage = null,
                 CreatedDate = listenerEventArchiveV2.CreatedDate,
                 UpdatedDate = listenerEventArchiveV2.UpdatedDate,
-                EventId = listenerEventArchiveV2.EventId,
-                EventAddressId = listenerEventArchiveV2.EventAddressId,
-                EventListenerId = listenerEventArchiveV2.EventListenerId
+                EventV2Id = listenerEventArchiveV2.EventV2Id,
+                EventAddressV2Id = listenerEventArchiveV2.EventAddressV2Id,
+                EventListenerV2Id = listenerEventArchiveV2.EventListenerV2Id
             };
     }
 }

@@ -60,10 +60,10 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.ListenerEvents
             Guid eventId = Guid.NewGuid();
 
             ListenerEventV2 oldest = CreateRandomListenerEvent(baseDate.AddDays(-2));
-            oldest.EventId = eventId;
+            oldest.EventV2Id = eventId;
 
             ListenerEventV2 newest = CreateRandomListenerEvent(baseDate);
-            newest.EventId = eventId;
+            newest.EventV2Id = eventId;
 
             ListenerEventV2 otherEvent = CreateRandomListenerEvent(baseDate.AddDays(-1));
 

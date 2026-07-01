@@ -97,8 +97,8 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
             this.replayViewServiceMock.Verify(service =>
                 service.ReplayListenerEventArchiveAsync(
                     row.EventArchiveV2Id,
-                    row.EventAddressId,
-                    row.EventListenerId,
+                    row.EventAddressV2Id,
+                    row.EventListenerV2Id,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
         }

@@ -40,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                 {
                     new VolatilePaths
                     {
-                        EventAddressId = inputEventV2.EventAddressId,
+                        EventAddressId = inputEventV2.EventAddressV2Id,
                         VolatileContentPaths = someVolatileContentPaths
                     }
                 }

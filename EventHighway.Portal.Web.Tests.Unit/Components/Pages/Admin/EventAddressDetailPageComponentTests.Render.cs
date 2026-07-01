@@ -140,10 +140,10 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
 
             captured.Should().NotBeNull();
             captured!.HandlerId.Should().Be(handlerId);
-            captured.ParticipantId.Should().Be(chosenParticipant.Id);
+            captured.EventParticipantV2Id.Should().Be(chosenParticipant.Id);
             captured.PromotedProperties.Should().Be(promotedProperties);
             captured.FilterCriteria.Should().Be(filterCriteria);
-            captured.EventAddressId.Should().Be(address.Id);
+            captured.EventAddressV2Id.Should().Be(address.Id);
         }
     }
 }

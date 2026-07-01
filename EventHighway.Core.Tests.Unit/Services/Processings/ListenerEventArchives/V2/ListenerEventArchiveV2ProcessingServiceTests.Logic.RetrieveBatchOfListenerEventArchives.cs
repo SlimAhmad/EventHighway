@@ -79,7 +79,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 CreateRandomListenerEventArchiveV2s().ToList();
 
             matchingListenerEventArchiveV2s.ForEach(listenerEventArchiveV2 =>
-                listenerEventArchiveV2.EventAddressId = eventAddressId);
+                listenerEventArchiveV2.EventAddressV2Id = eventAddressId);
 
             List<ListenerEventArchiveV2> otherListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();
@@ -147,13 +147,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEventArchive
                 CreateRandomListenerEventArchiveV2s().ToList();
 
             firstMatchingListenerEventArchiveV2s.ForEach(listenerEventArchiveV2 =>
-                listenerEventArchiveV2.EventListenerId = firstEventListenerId);
+                listenerEventArchiveV2.EventListenerV2Id = firstEventListenerId);
 
             List<ListenerEventArchiveV2> secondMatchingListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();
 
             secondMatchingListenerEventArchiveV2s.ForEach(listenerEventArchiveV2 =>
-                listenerEventArchiveV2.EventListenerId = secondEventListenerId);
+                listenerEventArchiveV2.EventListenerV2Id = secondEventListenerId);
 
             List<ListenerEventArchiveV2> otherListenerEventArchiveV2s =
                 CreateRandomListenerEventArchiveV2s().ToList();

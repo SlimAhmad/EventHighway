@@ -161,10 +161,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 retrievedEventListenerV2s.Select(eventListenerV2 =>
                     new ListenerEventV2
                     {
-                        EventListenerId = eventListenerV2.Id,
-                        EventId = inputImmediateEventV2.Id,
+                        EventListenerV2Id = eventListenerV2.Id,
+                        EventV2Id = inputImmediateEventV2.Id,
                         Status = ListenerEventStatusV2.Pending,
-                        EventAddressId = inputImmediateEventV2.EventAddressId,
+                        EventAddressV2Id = inputImmediateEventV2.EventAddressV2Id,
                         CreatedDate = randomDateTimeOffset,
                         UpdatedDate = randomDateTimeOffset
                     }).ToList();
@@ -225,7 +225,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                        inputImmediateEventV2.EventAddressId,
+                        inputImmediateEventV2.EventAddressV2Id,
                         randomCancellationToken))
                             .ReturnsAsync(retrievedEventListenerV2s);
 
@@ -313,7 +313,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                    inputImmediateEventV2.EventAddressId,
+                    inputImmediateEventV2.EventAddressV2Id,
                     randomCancellationToken),
                         Times.Once);
 
@@ -397,10 +397,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             ListenerEventV2 inputListenerEventV2 =
                 new ListenerEventV2
                 {
-                    EventListenerId = retrievedEventListenerV2.Id,
-                    EventId = inputImmediateEventV2.Id,
+                    EventListenerV2Id = retrievedEventListenerV2.Id,
+                    EventV2Id = inputImmediateEventV2.Id,
                     Status = ListenerEventStatusV2.Pending,
-                    EventAddressId = inputImmediateEventV2.EventAddressId,
+                    EventAddressV2Id = inputImmediateEventV2.EventAddressV2Id,
                     CreatedDate = randomDateTimeOffset,
                     UpdatedDate = randomDateTimeOffset
                 };
@@ -457,7 +457,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                        inputImmediateEventV2.EventAddressId,
+                        inputImmediateEventV2.EventAddressV2Id,
                         randomCancellationToken))
                             .ReturnsAsync(retrievedEventListenerV2s);
 
@@ -545,7 +545,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                    inputImmediateEventV2.EventAddressId,
+                    inputImmediateEventV2.EventAddressV2Id,
                     randomCancellationToken),
                         Times.Once);
 
@@ -637,10 +637,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             ListenerEventV2 inputListenerEventV2 =
                 new ListenerEventV2
                 {
-                    EventListenerId = retrievedEventListenerV2.Id,
-                    EventId = inputImmediateEventV2.Id,
+                    EventListenerV2Id = retrievedEventListenerV2.Id,
+                    EventV2Id = inputImmediateEventV2.Id,
                     Status = ListenerEventStatusV2.Pending,
-                    EventAddressId = inputImmediateEventV2.EventAddressId,
+                    EventAddressV2Id = inputImmediateEventV2.EventAddressV2Id,
                     CreatedDate = randomDateTimeOffset,
                     UpdatedDate = randomDateTimeOffset
                 };
@@ -697,7 +697,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                        inputImmediateEventV2.EventAddressId,
+                        inputImmediateEventV2.EventAddressV2Id,
                         randomCancellationToken))
                             .ReturnsAsync(retrievedEventListenerV2s);
 
@@ -785,7 +785,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                    inputImmediateEventV2.EventAddressId,
+                    inputImmediateEventV2.EventAddressV2Id,
                     randomCancellationToken),
                         Times.Once);
 
@@ -881,10 +881,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             ListenerEventV2 inputListenerEventV2 =
                 new ListenerEventV2
                 {
-                    EventListenerId = retrievedEventListenerV2.Id,
-                    EventId = inputImmediateEventV2.Id,
+                    EventListenerV2Id = retrievedEventListenerV2.Id,
+                    EventV2Id = inputImmediateEventV2.Id,
                     Status = ListenerEventStatusV2.Pending,
-                    EventAddressId = inputImmediateEventV2.EventAddressId,
+                    EventAddressV2Id = inputImmediateEventV2.EventAddressV2Id,
                     CreatedDate = randomDateTimeOffset,
                     UpdatedDate = randomDateTimeOffset,
                 };
@@ -930,7 +930,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventListenerV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
                     service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                        inputImmediateEventV2.EventAddressId,
+                        inputImmediateEventV2.EventAddressV2Id,
                         randomCancellationToken))
                             .ReturnsAsync(retrievedEventListenerV2s);
 
@@ -1021,7 +1021,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.eventListenerV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                    inputImmediateEventV2.EventAddressId,
+                    inputImmediateEventV2.EventAddressV2Id,
                     randomCancellationToken),
                         Times.Once);
 

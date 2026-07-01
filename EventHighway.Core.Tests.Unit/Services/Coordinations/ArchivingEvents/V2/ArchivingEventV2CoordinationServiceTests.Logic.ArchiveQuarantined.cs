@@ -37,7 +37,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = GetRandomDateTimeOffset(),
                 ScheduledDate = GetRandomDateTimeOffset(),
                 RemainingRetryAttempts = GetRandomNumber(),
-                EventAddressId = GetRandomId()
+                EventAddressV2Id = GetRandomId()
             };
 
             List<EventV2> retrievedQuarantinedEventV2s =
@@ -54,7 +54,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = quarantinedEventV2.CreatedDate,
                 ScheduledDate = quarantinedEventV2.ScheduledDate,
                 RemainingRetryAttempts = quarantinedEventV2.RemainingRetryAttempts,
-                EventAddressId = quarantinedEventV2.EventAddressId
+                EventAddressV2Id = quarantinedEventV2.EventAddressV2Id
             };
 
             List<EventArchiveV2> expectedEventArchiveV2s =

@@ -24,7 +24,7 @@ namespace EventHighway.Core.Brokers.Storages
 
             model.HasOne<EventAddressV2>(eventArchiveV2 => eventArchiveV2.EventAddressV2)
                 .WithMany(eventAddressV2 => eventAddressV2.EventArchiveV2s)
-                .HasForeignKey(eventArchiveV2 => eventArchiveV2.EventAddressId)
+                .HasForeignKey(eventArchiveV2 => eventArchiveV2.EventAddressV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

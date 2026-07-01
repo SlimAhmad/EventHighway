@@ -176,7 +176,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
 
             string[] volatilePaths =
                 config?.VolatilePaths
-                    ?.FirstOrDefault(vp => vp.EventAddressId == eventV2.EventAddressId)
+                    ?.FirstOrDefault(vp => vp.EventAddressId == eventV2.EventAddressV2Id)
                     ?.VolatileContentPaths;
 
             ValidateOnRemoveVolatilePathsWithConfig(eventV2);
@@ -214,7 +214,7 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             DateTimeOffset createdAfter = now - config.Window;
 
             return eventV2s.Count(ev =>
-                ev.EventAddressId == eventV2.EventAddressId
+                ev.EventAddressV2Id == eventV2.EventAddressV2Id
                     && ev.EventName == eventV2.EventName
                     && ev.ContentHash == eventV2.ContentHash
                     && ev.CreatedDate > createdAfter);

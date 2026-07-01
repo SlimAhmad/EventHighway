@@ -93,12 +93,12 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             EventAddressV2 maybeEventAddressV2 =
                 await this.eventAddressV2ProcessingService
                     .RetrieveEventAddressV2ByIdAsync(
-                        eventV2.EventAddressId,
+                        eventV2.EventAddressV2Id,
                         cancellationToken);
 
             ValidateEventAddressV2Exists(
                 maybeEventAddressV2,
-                eventV2.EventAddressId);
+                eventV2.EventAddressV2Id);
 
             return await this.eventV2ProcessingService
                 .AddEventV2Async(eventV2, cancellationToken);

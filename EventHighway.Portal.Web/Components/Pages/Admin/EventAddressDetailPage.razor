@@ -204,7 +204,7 @@ else
 
     private void OpenRegisterListenerModal()
     {
-        newListener = new EventListenerView { EventAddressId = AddressId };
+        newListener = new EventListenerView { EventAddressV2Id = AddressId };
         newListenerHandlerId = null;
         newListenerParticipantId = string.Empty;
         registerListenerError = null;
@@ -224,7 +224,7 @@ else
 
         newListener.HandlerId = handlerId;
 
-        newListener.ParticipantId =
+        newListener.EventParticipantV2Id =
             Guid.TryParse(newListenerParticipantId, out Guid participantId)
                 ? participantId
                 : null;

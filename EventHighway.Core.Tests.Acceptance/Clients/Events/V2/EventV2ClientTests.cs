@@ -140,7 +140,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
                 Description = GetRandomString(),
                 HandlerId = this.delegateEventHandler.Id,
                 HandlerName = this.delegateEventHandler.Name,
-                EventAddressId = eventAddressId,
+                EventAddressV2Id = eventAddressId,
                 CreatedDate = now,
                 UpdatedDate = now,
             };
@@ -157,12 +157,12 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
             filler.Setup()
                 .OnProperty(eventV2 => eventV2.EventAddressV2).IgnoreIt()
                 .OnProperty(eventV2 => eventV2.ListenerEventV2s).IgnoreIt()
-                .OnProperty(eventV2 => eventV2.EventAddressId).Use(eventAddressV2Id)
+                .OnProperty(eventV2 => eventV2.EventAddressV2Id).Use(eventAddressV2Id)
                 .OnProperty(eventV2 => eventV2.ScheduledDate).Use(scheduledDate)
                 .OnProperty(eventV2 => eventV2.Status).Use(EventStatusV2.Active)
                 .OnType<DateTimeOffset>().Use(now)
-                .OnProperty(eventV2 => eventV2.ParticipantId).IgnoreIt()
-                .OnProperty(eventV2 => eventV2.ParticipantSecret).IgnoreIt()
+                .OnProperty(eventV2 => eventV2.EventParticipantV2Id).IgnoreIt()
+                .OnProperty(eventV2 => eventV2.EventParticipantV2Secret).IgnoreIt()
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             if (content is not null)
@@ -178,7 +178,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(now)
-                .OnProperty(eventAddressV2 => eventAddressV2.Events).IgnoreIt()
+                .OnProperty(eventAddressV2 => eventAddressV2.EventV2s).IgnoreIt()
                 .OnProperty(eventAddressV2 => eventAddressV2.EventListenerV2s).IgnoreIt()
                 .OnProperty(eventAddressV2 => eventAddressV2.ListenerEventV2s).IgnoreIt()
                 .OnProperty(eventAddressV2 => eventAddressV2.EventArchiveV2s).IgnoreIt();
@@ -234,7 +234,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
 
             filler.Setup()
                 .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.Id).Use(() => Guid.NewGuid())
-                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.ParticipantId).Use(participantId)
+                .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.EventParticipantV2Id).Use(participantId)
                 .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.IsActive).Use(true)
                 .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.ActiveFrom).IgnoreIt()
                 .OnProperty(eventParticipantSecretV2 => eventParticipantSecretV2.ActiveTo).IgnoreIt()

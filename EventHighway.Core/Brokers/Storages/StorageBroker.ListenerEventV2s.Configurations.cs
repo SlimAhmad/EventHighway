@@ -19,19 +19,19 @@ namespace EventHighway.Core.Brokers.Storages
                 .Property(listenerEventV2 => listenerEventV2.Id)
                 .IsRequired();
 
-            model.HasOne(listenerEventV2 => listenerEventV2.Event)
+            model.HasOne(listenerEventV2 => listenerEventV2.EventV2)
                 .WithMany(eventV2 => eventV2.ListenerEventV2s)
-                .HasForeignKey(listenerEventV2 => listenerEventV2.EventId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(listenerEventV2 => listenerEventV2.EventV2Id)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            model.HasOne(listenerEventV2 => listenerEventV2.EventAddress)
+            model.HasOne(listenerEventV2 => listenerEventV2.EventAddressV2)
                 .WithMany(eventAddressV2 => eventAddressV2.ListenerEventV2s)
-                .HasForeignKey(listenerEventV2 => listenerEventV2.EventAddressId)
+                .HasForeignKey(listenerEventV2 => listenerEventV2.EventAddressV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            model.HasOne(listenerEventV2 => listenerEventV2.EventListener)
+            model.HasOne(listenerEventV2 => listenerEventV2.EventListenerV2)
                 .WithMany(eventListenerV2 => eventListenerV2.ListenerEventV2s)
-                .HasForeignKey(listenerEventV2 => listenerEventV2.EventListenerId)
+                .HasForeignKey(listenerEventV2 => listenerEventV2.EventListenerV2Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

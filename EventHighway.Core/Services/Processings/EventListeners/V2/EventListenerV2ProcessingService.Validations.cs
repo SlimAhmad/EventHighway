@@ -27,7 +27,7 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
                 message: "Event listener is invalid, fix the errors and try again.",
 
                 (Rule: IsInvalid(eventAddressId),
-                Parameter: nameof(EventListenerV2.EventAddressId)));
+                Parameter: nameof(EventListenerV2.EventAddressV2Id)));
         }
 
         private static void ValidateEventListenerV2Id(Guid eventListenerV2Id)

@@ -76,9 +76,9 @@ namespace EventHighway.Portal.Web.Services.Views.Events
                 Type = @event.Type.ToString(),
                 Status = @event.Status.ToString(),
                 RemainingRetryAttempts = @event.RemainingRetryAttempts,
-                EventAddressId = @event.EventAddressId,
+                EventAddressV2Id = @event.EventAddressV2Id,
                 EventAddressName = @event.EventAddressV2?.Name ?? string.Empty,
-                ParticipantId = @event.ParticipantId,
+                EventParticipantV2Id = @event.EventParticipantV2Id,
                 ScheduledDate = @event.ScheduledDate,
                 CreatedDate = @event.CreatedDate
             };

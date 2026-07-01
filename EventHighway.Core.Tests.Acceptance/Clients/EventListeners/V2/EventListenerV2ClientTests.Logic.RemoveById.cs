@@ -40,7 +40,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventListeners.V2
 
             await this.clientBroker
                 .RemoveEventAddressV2ByIdAsync(
-                    inputEventListenerV2.EventAddressId);
+                    inputEventListenerV2.EventAddressV2Id);
         }
     }
 }

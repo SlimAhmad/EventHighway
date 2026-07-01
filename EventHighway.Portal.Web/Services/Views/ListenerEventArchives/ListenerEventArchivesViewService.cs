@@ -83,11 +83,11 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEventArchives
                 Response = listenerEventArchive.Response,
                 ResponseCode = listenerEventArchive.ResponseCode,
                 ResponseMessage = listenerEventArchive.ResponseMessage,
-                EventId = listenerEventArchive.EventId,
-                EventAddressId = listenerEventArchive.EventAddressId,
-                EventListenerId = listenerEventArchive.EventListenerId,
+                EventV2Id = listenerEventArchive.EventV2Id,
+                EventAddressV2Id = listenerEventArchive.EventAddressV2Id,
+                EventListenerV2Id = listenerEventArchive.EventListenerV2Id,
                 EventArchiveV2Id = listenerEventArchive.EventArchiveV2Id,
-                ParticipantId = listenerEventArchive.ParticipantId,
+                EventParticipantV2Id = listenerEventArchive.EventParticipantV2Id,
                 CreatedDate = listenerEventArchive.CreatedDate,
                 ArchivedDate = listenerEventArchive.ArchivedDate
             };
@@ -101,12 +101,12 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEventArchives
                 Response = listenerEventArchive.Response,
                 ResponseCode = listenerEventArchive.ResponseCode,
                 ResponseMessage = listenerEventArchive.ResponseMessage,
-                EventId = listenerEventArchive.EventId,
-                EventAddressId = listenerEventArchive.EventAddressId,
-                EventListenerId = listenerEventArchive.EventListenerId,
+                EventV2Id = listenerEventArchive.EventV2Id,
+                EventAddressV2Id = listenerEventArchive.EventAddressV2Id,
+                EventListenerV2Id = listenerEventArchive.EventListenerV2Id,
                 ListenerName = listenerEventArchive.EventListenerV2?.Name,
                 EventArchiveV2Id = listenerEventArchive.EventArchiveV2Id,
-                ParticipantId = listenerEventArchive.ParticipantId,
+                EventParticipantV2Id = listenerEventArchive.EventParticipantV2Id,
                 CreatedDate = listenerEventArchive.CreatedDate,
                 ArchivedDate = listenerEventArchive.ArchivedDate
             };

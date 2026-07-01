@@ -34,7 +34,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
                 Type = "Immediate",
                 Status = status,
                 RemainingRetryAttempts = remainingRetryAttempts,
-                EventAddressId = Guid.NewGuid(),
+                EventAddressV2Id = Guid.NewGuid(),
                 EventAddressName = GetRandomString(),
                 ArchivedDate = DateTimeOffset.UtcNow
             };

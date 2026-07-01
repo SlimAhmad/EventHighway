@@ -24,7 +24,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // given
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = GetRandomId();
+            inputEventV2.EventParticipantV2Id = GetRandomId();
 
             var expectedEventParticipantV2OrchestrationDependencyValidationException =
                 new EventParticipantV2OrchestrationDependencyValidationException(
@@ -78,7 +78,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // given
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = GetRandomId();
+            inputEventV2.EventParticipantV2Id = GetRandomId();
 
             var expectedEventParticipantV2OrchestrationDependencyException =
                 new EventParticipantV2OrchestrationDependencyException(
@@ -130,7 +130,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // given
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = GetRandomId();
+            inputEventV2.EventParticipantV2Id = GetRandomId();
 
             var serviceException = new Exception();
             serviceException.Data.Add("ErrorCode", new List<string> { "ServiceError" });
@@ -191,7 +191,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // given
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = GetRandomId();
+            inputEventV2.EventParticipantV2Id = GetRandomId();
 
             var operationCanceledException = new OperationCanceledException();
 
@@ -254,7 +254,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // given
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = GetRandomId();
+            inputEventV2.EventParticipantV2Id = GetRandomId();
 
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();

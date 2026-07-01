@@ -156,7 +156,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 await this.storageBroker.SelectAllListenerEventV2sAsync(cancellationToken);
 
             return listenerEventV2s.Where(
-                listenerEvent => eventIds.Contains(listenerEvent.EventId));
+                listenerEvent => eventIds.Contains(listenerEvent.EventV2Id));
         });
 
         public ValueTask<IEnumerable<ListenerEventV2>>

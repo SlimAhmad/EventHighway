@@ -44,10 +44,10 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.ListenerEvents
                 Status = ListenerEventStatusV2.Success,
                 ResponseCode = GetRandomString(),
                 ResponseMessage = GetRandomString(),
-                EventId = Guid.NewGuid(),
-                EventAddressId = Guid.NewGuid(),
-                EventListenerId = Guid.NewGuid(),
-                ParticipantId = Guid.NewGuid(),
+                EventV2Id = Guid.NewGuid(),
+                EventAddressV2Id = Guid.NewGuid(),
+                EventListenerV2Id = Guid.NewGuid(),
+                EventParticipantV2Id = Guid.NewGuid(),
                 CreatedDate = createdDate,
                 UpdatedDate = createdDate
             };
@@ -59,10 +59,10 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.ListenerEvents
                 Status = listenerEvent.Status.ToString(),
                 ResponseCode = listenerEvent.ResponseCode,
                 ResponseMessage = listenerEvent.ResponseMessage,
-                EventId = listenerEvent.EventId,
-                EventAddressId = listenerEvent.EventAddressId,
-                EventListenerId = listenerEvent.EventListenerId,
-                ParticipantId = listenerEvent.ParticipantId,
+                EventV2Id = listenerEvent.EventV2Id,
+                EventAddressV2Id = listenerEvent.EventAddressV2Id,
+                EventListenerV2Id = listenerEvent.EventListenerV2Id,
+                EventParticipantV2Id = listenerEvent.EventParticipantV2Id,
                 CreatedDate = listenerEvent.CreatedDate
             };
     }

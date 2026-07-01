@@ -82,7 +82,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                 EventName = null,
                 Type = GetInvalidEnum<EventTypeV2>(),
                 Status = GetInvalidEnum<EventStatusV2>(),
-                EventAddressId = Guid.Empty
+                EventAddressV2Id = Guid.Empty
             };
 
             List<EventV2> inputEventV2s =
@@ -108,7 +108,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                 values: "Required");
 
             invalidEventV2Exception.AddData(
-                key: nameof(EventV2.EventAddressId),
+                key: nameof(EventV2.EventAddressV2Id),
                 values: "Required");
 
             invalidEventV2Exception.AddData(

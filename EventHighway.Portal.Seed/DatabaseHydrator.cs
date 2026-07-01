@@ -6,8 +6,10 @@
 // ListenerEventV2 rows directly through the internal StorageBroker, bypassing foundation
 // validation (which forbids a backdated CreatedDate). Any console app that references this
 // project can call DatabaseHydrator.HydrateNewReleasesAsync(connectionString) to top up the
-// database. Run the ClientV2.SubstrateApp sample first so the NFlix participant, the
-// NFlix-NewReleases address and its listeners exist.
+// database. Self-sufficient: the Ensure* helpers create the NFlix participant, the
+// NFlix-NewReleases address and its listeners when missing, so it runs against an empty database
+// on its own; when the ClientV2.SubstrateApp/BasicApp samples have already run it reconciles to
+// their rows via the shared well-known Guids instead of duplicating them.
 
 using EventHighway.Core.Brokers.Storages;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
@@ -295,8 +297,8 @@ namespace EventHighway.Portal.Seed
                             Description = spec.ListenerDescription,
                             HandlerId = spec.HandlerId,
                             HandlerName = spec.HandlerName,
-                            EventAddressId = eventAddressId,
-                            ParticipantId = spec.ParticipantId,
+                            EventAddressV2Id = eventAddressId,
+                            EventParticipantV2Id = spec.ParticipantId,
                             PromotedProperties = spec.PromotedProperties,
                             FilterCriteria = spec.FilterCriteria,
                             CreatedDate = now,
@@ -306,7 +308,7 @@ namespace EventHighway.Portal.Seed
             }
 
             return (await broker.SelectAllEventListenerV2sAsync())
-                .Where(listener => listener.EventAddressId == eventAddressId)
+                .Where(listener => listener.EventAddressV2Id == eventAddressId)
                 .ToList();
         }
 
@@ -330,9 +332,9 @@ namespace EventHighway.Portal.Seed
                 Status = status,
                 RemainingRetryAttempts = remainingRetryAttempts,
                 ScheduledDate = scheduledDate,
-                EventAddressId = eventAddressId,
-                ParticipantId = participantId,
-                ParticipantSecret = "NFlix",
+                EventAddressV2Id = eventAddressId,
+                EventParticipantV2Id = participantId,
+                EventParticipantV2Secret = "NFlix",
                 CreatedDate = created,
                 UpdatedDate = created
             };
@@ -348,10 +350,10 @@ namespace EventHighway.Portal.Seed
                 Response = isError ? "Handler failed" : "Event received",
                 ResponseCode = isError ? "503" : "200",
                 ResponseMessage = isError ? "Service Unavailable" : "OK",
-                EventId = eventV2.Id,
-                EventAddressId = eventV2.EventAddressId,
-                EventListenerId = listener.Id,
-                ParticipantId = listener.ParticipantId,
+                EventV2Id = eventV2.Id,
+                EventAddressV2Id = eventV2.EventAddressV2Id,
+                EventListenerV2Id = listener.Id,
+                EventParticipantV2Id = listener.EventParticipantV2Id,
                 CreatedDate = eventV2.CreatedDate.AddSeconds(3),
                 UpdatedDate = eventV2.CreatedDate.AddSeconds(3)
             };

@@ -117,8 +117,8 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
                         Times.Once);
 
             captured.Should().NotBeNull();
-            captured!.EventAddressId.Should().Be(chosen.Id);
-            captured.EventListenerIds.Should().Contain(listeners[0].Id);
+            captured!.EventAddressV2Id.Should().Be(chosen.Id);
+            captured.EventListenerV2Ids.Should().Contain(listeners[0].Id);
         }
     }
 }
