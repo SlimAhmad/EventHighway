@@ -4,10 +4,13 @@
 @using EventHighway.Portal.Web.Components.CoreUI
 @using EventHighway.Portal.Web.Models.Views.EventAddresses
 @using EventHighway.Portal.Web.Models.Views.EventListeners
+@using EventHighway.Portal.Web.Models.Views.EventParticipants
 @using EventHighway.Portal.Web.Services.Views.EventAddresses
 @using EventHighway.Portal.Web.Services.Views.EventListeners
+@using EventHighway.Portal.Web.Services.Views.EventParticipants
 @inject IEventAddressesViewService AddressesViewService
 @inject IEventListenersViewService ListenersViewService
+@inject IEventParticipantsViewService ParticipantsViewService
 @inject NavigationManager Navigation
 
 <PageTitle>Event Address</PageTitle>
@@ -97,9 +100,24 @@ else
         }
         <FormText Label="Name" @bind-Value="newListener.Name" />
         <FormText Label="Description" @bind-Value="newListener.Description" />
-        <FormText Label="Handler Name" @bind-Value="newListener.HandlerName" />
         <FormText Label="Handler Id" @bind-Value="newListenerHandlerId"
                   Placeholder="00000000-0000-0000-0000-000000000000" />
+        <FormText Label="Handler Name" @bind-Value="newListener.HandlerName" />
+
+        <div class="mb-3">
+            <label class="form-label">Participant</label>
+            <select class="form-select" value="@newListenerParticipantId"
+                    @onchange="e => { newListenerParticipantId = e.Value?.ToString() ?? string.Empty; }">
+                <option value="">(none)</option>
+                @foreach (EventParticipantView participant in participants)
+                {
+                    <option value="@participant.Id">@participant.Name</option>
+                }
+            </select>
+        </div>
+
+        <FormText Label="Promoted Properties" @bind-Value="newListener.PromotedProperties" />
+        <FormText Label="Filter Criteria" @bind-Value="newListener.FilterCriteria" />
     </ChildContent>
     <FooterContent>
         <Button Color="secondary" OnClick="CloseRegisterListenerModal">Cancel</Button>
@@ -131,6 +149,8 @@ else
     private string? registerListenerError;
     private EventListenerView newListener = new();
     private string? newListenerHandlerId;
+    private string newListenerParticipantId = string.Empty;
+    private List<EventParticipantView> participants = new();
 
     private string? deleteError;
 
@@ -155,6 +175,7 @@ else
 
             if (address is not null)
             {
+                participants = await ParticipantsViewService.RetrieveAllParticipantsAsync();
                 await LoadListenersAsync();
             }
         }
@@ -185,6 +206,7 @@ else
     {
         newListener = new EventListenerView { EventAddressId = AddressId };
         newListenerHandlerId = null;
+        newListenerParticipantId = string.Empty;
         registerListenerError = null;
         showRegisterListenerModal = true;
     }
@@ -201,6 +223,11 @@ else
         }
 
         newListener.HandlerId = handlerId;
+
+        newListener.ParticipantId =
+            Guid.TryParse(newListenerParticipantId, out Guid participantId)
+                ? participantId
+                : null;
 
         try
         {

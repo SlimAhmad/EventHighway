@@ -59,9 +59,10 @@ namespace EventHighway.Portal.Web.Services.Views.EventListeners
                 Description = listener.Description,
                 HandlerId = listener.HandlerId,
                 HandlerName = listener.HandlerName,
-                PromotedProperties = string.Empty,
-                FilterCriteria = string.Empty,
+                PromotedProperties = listener.PromotedProperties ?? string.Empty,
+                FilterCriteria = listener.FilterCriteria ?? string.Empty,
                 EventAddressId = listener.EventAddressId,
+                ParticipantId = listener.ParticipantId,
                 CreatedDate = now,
                 UpdatedDate = now
             };
@@ -94,7 +95,9 @@ namespace EventHighway.Portal.Web.Services.Views.EventListeners
                 HandlerName = listener.HandlerName,
                 HandlerId = listener.HandlerId,
                 EventAddressId = listener.EventAddressId,
-                ParticipantId = listener.ParticipantId
+                ParticipantId = listener.ParticipantId,
+                PromotedProperties = listener.PromotedProperties ?? string.Empty,
+                FilterCriteria = listener.FilterCriteria ?? string.Empty
             };
     }
 }

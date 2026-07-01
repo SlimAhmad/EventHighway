@@ -45,5 +45,23 @@ namespace EventHighway.ClientV2.Seed
 
         public static readonly Guid MediaItemServiceInternalListener =
             new Guid("5b1f7ee4-d421-4e2a-a534-c41cb1627bd1");
+
+        // Event handlers. Stable Ids (shared by both console apps and the Portal.Seed hydrator) so a
+        // listener registered by one app references a handler the other app also registers under the
+        // same Id — dispatch then works regardless of which app created the listener or the run order.
+        public static readonly Guid BingeBoxHandler =
+            new Guid("6326cae3-04ff-411f-93fb-e606859390f6");
+
+        public static readonly Guid JoeHandler =
+            new Guid("9846c9e3-2843-4a2e-a586-4321c3a5f1a9");
+
+        public static readonly Guid AnnHandler =
+            new Guid("a9079276-fbbe-4176-9744-9fee3354f3e7");
+
+        public static readonly Guid FlakyBoxHandler =
+            new Guid("9cc4ac0e-6ef2-4c99-a0cd-831867fff9df");
+
+        public static readonly Guid MediaItemServiceHandler =
+            new Guid("6743a4f1-07c4-4def-9d1f-e0ca926c6b90");
     }
 }
