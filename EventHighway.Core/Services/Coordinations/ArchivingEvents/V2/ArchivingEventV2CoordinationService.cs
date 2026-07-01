@@ -18,6 +18,7 @@ using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Services.Orchestrations.ListenerEvents.V2;
 
 namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 {
@@ -25,6 +26,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
     {
         private readonly IArchivingEventV2OrchestrationService archivingEventV2OrchestrationService;
         private readonly IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService;
+        private readonly IListenerEventV2OrchestrationService listenerEventV2OrchestrationService;
         private readonly IConfigurationBroker configurationBroker;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
@@ -32,12 +34,14 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         public ArchivingEventV2CoordinationService(
             IArchivingEventV2OrchestrationService archivingEventV2OrchestrationService,
             IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService,
+            IListenerEventV2OrchestrationService listenerEventV2OrchestrationService,
             IConfigurationBroker configurationBroker,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.archivingEventV2OrchestrationService = archivingEventV2OrchestrationService;
             this.eventArchiveV2OrchestrationService = eventArchiveV2OrchestrationService;
+            this.listenerEventV2OrchestrationService = listenerEventV2OrchestrationService;
             this.configurationBroker = configurationBroker;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
@@ -139,6 +143,9 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 
         private async ValueTask ArchiveDeadEventsV2sAsync(CancellationToken cancellationToken)
         {
+            BatchConfiguration batchConfiguration = this.configurationBroker.GetBatchConfiguration();
+            int take = batchConfiguration.BatchSizeForBulkProcessing;
+
             var faultedEventV2Ids = new HashSet<Guid>();
             var failedEventV2Ids = new List<Guid>();
             var failedListenerEventV2Ids = new List<Guid>();
@@ -180,8 +187,9 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 
                 do
                 {
-                    listenerEventV2s = await this.archivingEventV2OrchestrationService
-                        .RetrieveBatchOfListenerEventV2sAsync(pendingEventV2Ids, cancellationToken);
+                    listenerEventV2s = await this.listenerEventV2OrchestrationService
+                        .RetrieveBatchOfListenerEventV2sByEventIdsAsync(
+                            pendingEventV2Ids, take, cancellationToken);
 
                     if (!listenerEventV2s.Any())
                         break;
@@ -204,7 +212,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 
                     if (addedListenerEventV2s.Any())
                     {
-                        await this.archivingEventV2OrchestrationService
+                        await this.listenerEventV2OrchestrationService
                             .BulkRemoveListenerEventV2sAsync(addedListenerEventV2s, cancellationToken);
                     }
 

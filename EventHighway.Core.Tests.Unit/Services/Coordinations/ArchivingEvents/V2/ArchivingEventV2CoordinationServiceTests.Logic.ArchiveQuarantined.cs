@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using Moq;
@@ -23,6 +24,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 TestContext.Current.CancellationToken;
 
             var mockSequence = new MockSequence();
+
+            BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
 
             Guid quarantinedEventV2Id = GetRandomId();
 
@@ -88,6 +91,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken))
                         .ReturnsAsync(Enumerable.Empty<EventV2>());
 
+            this.configurationBrokerMock
+                .InSequence(mockSequence).Setup(broker =>
+                    broker.GetBatchConfiguration())
+                        .Returns(randomBatchConfiguration);
+
             // Step 5
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
@@ -119,8 +127,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 service.RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken),
                     Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
             this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

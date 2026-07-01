@@ -91,6 +91,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ReturnsAsync(Enumerable.Empty<EventV2>());
 
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(CreateRandomBatchConfiguration());
+
             // when
             ValueTask archiveEventV2sTask =
                 this.archivingEventV2CoordinationService
