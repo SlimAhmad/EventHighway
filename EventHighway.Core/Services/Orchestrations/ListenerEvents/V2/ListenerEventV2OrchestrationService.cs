@@ -41,6 +41,10 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
         public ValueTask BulkRemoveListenerEventV2sAsync(
             IEnumerable<ListenerEventV2> listenerEventV2s,
             CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            await this.listenerEventV2ProcessingService
+                .BulkRemoveListenerEventV2sAsync(listenerEventV2s, cancellationToken);
+        });
     }
 }
