@@ -182,5 +182,63 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ListenerEvents.V2
             this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnBulkRemoveListenerEventV2sIfExceptionOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            IEnumerable<ListenerEventV2> someListenerEventV2s = CreateRandomListenerEventV2s();
+            var serviceException = new Exception();
+
+            var failedListenerEventV2OrchestrationServiceException =
+                new FailedListenerEventV2OrchestrationServiceException(
+                    message: "Failed listener event orchestration service error occurred, contact support.",
+                    innerException: serviceException,
+                    data: serviceException.Data);
+
+            var expectedListenerEventV2OrchestrationServiceException =
+                new ListenerEventV2OrchestrationServiceException(
+                    message: "Listener event service error occurred, contact support.",
+                    innerException: failedListenerEventV2OrchestrationServiceException);
+
+            this.listenerEventV2ProcessingServiceMock.Setup(service =>
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask bulkRemoveListenerEventV2sTask =
+                this.listenerEventV2OrchestrationService
+                    .BulkRemoveListenerEventV2sAsync(
+                        someListenerEventV2s,
+                        randomCancellationToken);
+
+            ListenerEventV2OrchestrationServiceException
+                actualListenerEventV2OrchestrationServiceException =
+                    await Assert.ThrowsAsync<ListenerEventV2OrchestrationServiceException>(
+                        bulkRemoveListenerEventV2sTask.AsTask);
+
+            // then
+            actualListenerEventV2OrchestrationServiceException.Should()
+                .BeEquivalentTo(expectedListenerEventV2OrchestrationServiceException);
+
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
+                service.BulkRemoveListenerEventV2sAsync(
+                    It.IsAny<IEnumerable<ListenerEventV2>>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2OrchestrationServiceException))),
+                        Times.Once);
+
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
