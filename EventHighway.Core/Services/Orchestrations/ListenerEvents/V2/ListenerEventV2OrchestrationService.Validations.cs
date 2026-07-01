@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Orchestrations.ListenerEvents.V2.Exceptions;
 
 namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
@@ -24,7 +25,23 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
                 Parameter: nameof(take)));
         }
 
+        private static void ValidateOnBulkRemoveListenerEventV2s(
+            IEnumerable<ListenerEventV2> listenerEventV2s)
+        {
+            Validate(
+                message: "Listener event is invalid, fix the errors and try again.",
+
+                (Rule: IsNull(listenerEventV2s),
+                Parameter: nameof(listenerEventV2s)));
+        }
+
         private static dynamic IsNull(IEnumerable<Guid> value) => new
+        {
+            Condition = value is null,
+            Message = "Value is required"
+        };
+
+        private static dynamic IsNull(IEnumerable<ListenerEventV2> value) => new
         {
             Condition = value is null,
             Message = "Value is required"
