@@ -15,7 +15,7 @@ namespace EventHighway.Core.Tests.Acceptance.Brokers
         public ClientBroker()
         {
             string connectionString = String.Concat(
-                "Server=(localdb)\\MSSQLLocalDB;Database=EventHighwayDb;",
+                "Server=(localdb)\\MSSQLLocalDB;Database=EventHighwayDb.Acceptance;",
                 "Trusted_Connection=True;MultipleActiveResultSets=true");
 
             this.eventHighwayClient = new EventHighwayClient(connectionString);
