@@ -90,6 +90,82 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
 
         [Fact]
         public async Task
+            ShouldRetrieveEventArchiveV2WithListenerEventArchiveV2sByIdFilteredByStartDateAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid inputEventArchiveId = GetRandomId();
+
+            DateTimeOffset inputStartDate = GetRandomDateTimeOffset();
+            DateTimeOffset onOrAfterStartDate = inputStartDate.AddDays(1);
+            DateTimeOffset beforeStartDate = inputStartDate.AddDays(-1);
+
+            var matchingListenerEventArchiveV2 = new ListenerEventArchiveV2
+            {
+                Id = GetRandomId(),
+                EventArchiveV2Id = inputEventArchiveId,
+                EventAddressV2Id = GetRandomId(),
+                EventListenerV2Id = GetRandomId(),
+                CreatedDate = onOrAfterStartDate
+            };
+
+            var otherListenerEventArchiveV2 = new ListenerEventArchiveV2
+            {
+                Id = GetRandomId(),
+                EventArchiveV2Id = inputEventArchiveId,
+                EventAddressV2Id = GetRandomId(),
+                EventListenerV2Id = GetRandomId(),
+                CreatedDate = beforeStartDate
+            };
+
+            IQueryable<ListenerEventArchiveV2> storedListenerEventArchiveV2s =
+                new List<ListenerEventArchiveV2>
+                {
+                    matchingListenerEventArchiveV2,
+                    otherListenerEventArchiveV2
+                }
+                    .AsQueryable();
+
+            var expectedEventArchiveV2 = new EventArchiveV2
+            {
+                Id = inputEventArchiveId,
+                ListenerEventArchiveV2s =
+                    new List<ListenerEventArchiveV2> { matchingListenerEventArchiveV2 }
+            };
+
+            this.listenerEventArchiveV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(storedListenerEventArchiveV2s);
+
+            // when
+            EventArchiveV2 actualEventArchiveV2 =
+                await this.eventArchiveV2OrchestrationService
+                    .RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                        eventArchiveId: inputEventArchiveId,
+                        eventListenerIds: null,
+                        startDate: inputStartDate,
+                        endDate: null,
+                        skip: 0,
+                        take: 10,
+                        randomCancellationToken);
+
+            // then
+            actualEventArchiveV2.Should()
+                .BeEquivalentTo(expectedEventArchiveV2);
+
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task
             ShouldRetrieveEventArchiveV2WithListenerEventArchiveV2sByIdFilteredByEventListenerIdsAsync()
         {
             // given
