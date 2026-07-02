@@ -21,6 +21,14 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2
         public Guid Id { get; set; }
 
         /// <summary>
+        /// Gets or sets the identifier of the originating listener event this record was replayed from.
+        /// When a listener event is restored from an archive during replay it receives a new <see cref="Id"/>,
+        /// and this correlation identifier is set to the archived listener event's identifier to preserve history.
+        /// A null value indicates the listener event was not produced by a replay.
+        /// </summary>
+        public Guid? CorrelationId { get; set; }
+
+        /// <summary>
         /// Gets or sets the <see cref="ListenerEventStatusV2"/> indicating the current state of the listener event delivery.
         /// </summary>
         public ListenerEventStatusV2 Status { get; set; }
