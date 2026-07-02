@@ -119,6 +119,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         private static IQueryable<ListenerEventArchiveV2> CreateRandomListenerEventArchiveV2s() =>
             CreateListenerEventArchiveV2Filler().Create(count: GetRandomNumber()).AsQueryable();
 
+        private static ListenerEventArchiveV2 CreateRandomListenerEventArchiveV2() =>
+            CreateListenerEventArchiveV2Filler().Create();
+
         private static Filler<EventArchiveV2> CreateEventArchiveV2Filler()
         {
             var filler = new Filler<EventArchiveV2>();
