@@ -69,5 +69,14 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             int skip,
             int take,
             CancellationToken cancellationToken = default);
+
+        ValueTask<EventArchiveV2> RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+            Guid eventArchiveId,
+            IEnumerable<Guid> eventListenerIds,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int skip,
+            int take,
+            CancellationToken cancellationToken = default);
     }
 }

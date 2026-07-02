@@ -144,6 +144,16 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 : eventArchiveV2s.Take(take).ToList();
         });
 
+        public ValueTask<EventArchiveV2> RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+            Guid eventArchiveId,
+            IEnumerable<Guid> eventListenerIds,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int skip,
+            int take,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         public ValueTask BulkRemoveEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default) =>
