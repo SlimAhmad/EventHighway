@@ -106,6 +106,13 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                         listenerEventArchiveV2.EventAddressV2Id == eventAddressId.Value);
             }
 
+            if (eventListenerIds is not null && eventListenerIds.Any())
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        eventListenerIds.Contains(listenerEventArchiveV2.EventListenerV2Id));
+            }
+
             IQueryable<EventArchiveV2> eventArchiveV2s =
                 await this.eventArchiveV2ProcessingService
                     .RetrieveAllEventArchiveV2sAsync(cancellationToken);
