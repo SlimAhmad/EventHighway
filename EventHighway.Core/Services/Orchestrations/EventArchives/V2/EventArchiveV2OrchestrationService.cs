@@ -152,7 +152,27 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             int skip,
             int take,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2s =
+                await this.listenerEventArchiveV2ProcessingService
+                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+
+            listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                listenerEventArchiveV2 =>
+                    listenerEventArchiveV2.EventArchiveV2Id == eventArchiveId);
+
+            List<ListenerEventArchiveV2> listenerEventArchiveV2Page =
+                listenerEventArchiveV2s.ToList();
+
+            return new EventArchiveV2
+            {
+                Id = eventArchiveId,
+                ListenerEventArchiveV2s = listenerEventArchiveV2Page
+            };
+        });
 
         public ValueTask BulkRemoveEventArchiveV2sAsync(
             IEnumerable<EventArchiveV2> eventArchiveV2s,

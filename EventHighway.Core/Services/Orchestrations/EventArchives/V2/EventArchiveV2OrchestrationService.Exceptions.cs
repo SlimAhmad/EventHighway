@@ -19,6 +19,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
     internal partial class EventArchiveV2OrchestrationService
     {
         private delegate ValueTask<IQueryable<EventArchiveV2>> ReturningEventArchiveV2sFunction();
+        private delegate ValueTask<EventArchiveV2> ReturningEventArchiveV2Function();
         private delegate ValueTask<IEnumerable<EventArchiveV2>> ReturningEventArchiveV2EnumerableFunction();
         private delegate ValueTask<IQueryable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2sFunction();
         private delegate ValueTask<IEnumerable<ListenerEventArchiveV2>> ReturningListenerEventArchiveV2EnumerableFunction();
@@ -146,6 +147,93 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             catch (NullEventArchiveV2sOrchestrationException nullEventArchiveV2sOrchestrationException)
             {
                 throw await CreateAndLogValidationExceptionAsync(nullEventArchiveV2sOrchestrationException);
+            }
+            catch (EventArchiveV2ProcessingValidationException eventArchiveV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2ProcessingValidationException);
+            }
+            catch (EventArchiveV2ProcessingDependencyValidationException
+                eventArchiveV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    eventArchiveV2ProcessingDependencyValidationException);
+            }
+            catch (ListenerEventArchiveV2ProcessingValidationException
+                listenerEventArchiveV2ProcessingValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingValidationException);
+            }
+            catch (ListenerEventArchiveV2ProcessingDependencyValidationException
+                listenerEventArchiveV2ProcessingDependencyValidationException)
+            {
+                throw await CreateAndLogDependencyValidationExceptionAsync(
+                    listenerEventArchiveV2ProcessingDependencyValidationException);
+            }
+            catch (EventArchiveV2ProcessingDependencyException eventArchiveV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingDependencyException);
+            }
+            catch (EventArchiveV2ProcessingServiceException eventArchiveV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(eventArchiveV2ProcessingServiceException);
+            }
+            catch (ListenerEventArchiveV2ProcessingDependencyException
+                listenerEventArchiveV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2ProcessingDependencyException);
+            }
+            catch (ListenerEventArchiveV2ProcessingServiceException
+                listenerEventArchiveV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventArchiveV2ProcessingServiceException);
+            }
+            catch (Exception exception)
+            {
+                var failedEventArchiveV2OrchestrationServiceException =
+                    new FailedEventArchiveV2OrchestrationServiceException(
+                        message: "Failed event archive service error occurred, contact support.",
+                        innerException: exception,
+                        data: exception.Data);
+
+                throw await CreateAndLogServiceExceptionAsync(failedEventArchiveV2OrchestrationServiceException);
+            }
+        }
+
+        private async ValueTask<EventArchiveV2> TryCatch(
+            ReturningEventArchiveV2Function returningEventArchiveV2Function)
+        {
+            try
+            {
+                return await returningEventArchiveV2Function();
+            }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventArchiveV2OrchestrationException =
+                    new TimeoutEventArchiveV2OrchestrationException(
+                        message: "Failed event archive orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventArchiveV2OrchestrationDependencyException =
+                    new EventArchiveV2OrchestrationDependencyException(
+                        message: "Event archive dependency error occurred, contact support.",
+                        innerException: timeoutEventArchiveV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventArchiveV2OrchestrationDependencyException);
+
+                throw eventArchiveV2OrchestrationDependencyException;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (EventArchiveV2ProcessingValidationException eventArchiveV2ProcessingValidationException)
             {
