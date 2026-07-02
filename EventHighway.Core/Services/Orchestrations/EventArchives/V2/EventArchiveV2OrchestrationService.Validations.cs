@@ -53,15 +53,5 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                     message: "Event archive ids are null.");
             }
         }
-
-        private static void ValidateListenerEventArchiveV2sIsNotNull(
-            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s)
-        {
-            if (listenerEventArchiveV2s is null)
-            {
-                throw new NullListenerEventArchiveV2sOrchestrationException(
-                    message: "Listener event archives are null.");
-            }
-        }
     }
 }

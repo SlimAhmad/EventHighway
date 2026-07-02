@@ -43,29 +43,6 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 .RetrieveBatchOfEventArchiveV2sOlderThanAsync(olderThan, take, cancellationToken);
         });
 
-        public ValueTask<IEnumerable<ListenerEventArchiveV2>> RetrieveBatchOfListenerEventArchiveV2sAsync(
-            Guid? eventAddressId,
-            IEnumerable<Guid> eventListenerIds,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
-            int skip,
-            int take,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await this.listenerEventArchiveV2ProcessingService
-                .RetrieveBatchOfListenerEventArchiveV2sAsync(
-                    eventAddressId,
-                    eventListenerIds,
-                    startDate,
-                    endDate,
-                    skip,
-                    take,
-                    cancellationToken);
-        });
-
         public ValueTask<IEnumerable<EventArchiveV2>> RetrieveEventArchiveV2sByIdsAsync(
             IEnumerable<Guid> eventArchiveIds,
             CancellationToken cancellationToken = default) =>
@@ -234,16 +211,6 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 .RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken);
         });
 
-        public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await this.listenerEventArchiveV2ProcessingService
-                .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
-        });
-
         public ValueTask AddEventArchiveV2WithListenerEventArchiveV2sAsync(
             EventArchiveV2 eventArchiveV2,
             CancellationToken cancellationToken = default) =>
@@ -303,18 +270,6 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             }
 
             return eventArchiveV2s;
-        });
-
-        public ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
-            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ValidateListenerEventArchiveV2sIsNotNull(listenerEventArchiveV2s);
-
-            return await this.listenerEventArchiveV2ProcessingService
-                .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
         });
     }
 }
