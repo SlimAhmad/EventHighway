@@ -164,6 +164,13 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 listenerEventArchiveV2 =>
                     listenerEventArchiveV2.EventArchiveV2Id == eventArchiveId);
 
+            if (eventListenerIds is not null && eventListenerIds.Any())
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        eventListenerIds.Contains(listenerEventArchiveV2.EventListenerV2Id));
+            }
+
             List<ListenerEventArchiveV2> listenerEventArchiveV2Page =
                 listenerEventArchiveV2s.ToList();
 
