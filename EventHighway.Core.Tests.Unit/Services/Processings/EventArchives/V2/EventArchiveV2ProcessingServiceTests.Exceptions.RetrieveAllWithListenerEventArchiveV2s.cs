@@ -115,5 +115,39 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventArchives.V2
             this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnRetrieveAllWithListenerEventArchiveV2sAsync()
+        {
+            // given
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<IQueryable<EventArchiveV2>> retrieveAllEventArchiveV2sTask =
+                this.eventArchiveV2ProcessingService
+                    .RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    retrieveAllEventArchiveV2sTask.AsTask);
+
+            actualException.Should().NotBeOfType<EventArchiveV2ProcessingDependencyException>();
+            actualException.Should().NotBeOfType<EventArchiveV2ProcessingServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
