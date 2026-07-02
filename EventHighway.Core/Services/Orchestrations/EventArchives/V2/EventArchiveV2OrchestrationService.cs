@@ -120,6 +120,13 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                         listenerEventArchiveV2.CreatedDate >= startDate.Value);
             }
 
+            if (endDate is not null)
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        listenerEventArchiveV2.CreatedDate <= endDate.Value);
+            }
+
             IQueryable<EventArchiveV2> eventArchiveV2s =
                 await this.eventArchiveV2ProcessingService
                     .RetrieveAllEventArchiveV2sAsync(cancellationToken);
