@@ -141,6 +141,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
             new ListenerEventV2
             {
                 Id = listenerEventArchiveV2.Id,
+                CorrelationId = listenerEventArchiveV2.Id,
                 Status = ListenerEventStatusV2.Replay,
                 Response = null,
                 ResponseCode = null,

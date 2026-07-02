@@ -81,7 +81,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
                 service.BulkRestoreListenerEventV2sAsync(
                     It.Is<List<ListenerEventV2>>(actual =>
-                        SameListenerEventV2sAs(expectedListenerEventV2sToRestore, actual)),
+                        SameGeneratedListenerEventV2sAs(expectedListenerEventV2sToRestore, actual)),
                     randomCancellationToken),
                         Times.Once);
 
@@ -114,7 +114,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
                     .AsQueryable();
 
             IQueryable<ListenerEventV2> existingListenerEventV2s =
-                new List<ListenerEventV2> { new ListenerEventV2 { Id = mappedListenerEventV2s.First().Id } }
+                new List<ListenerEventV2>
+                {
+                    new ListenerEventV2
+                    {
+                        Id = GetRandomId(),
+                        CorrelationId = mappedListenerEventV2s.First().CorrelationId
+                    }
+                }
                     .AsQueryable();
 
             List<EventV2> expectedEventV2sToRestore =
@@ -160,7 +167,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
             this.listenerEventV2ProcessingServiceMock.Verify(service =>
                 service.BulkRestoreListenerEventV2sAsync(
                     It.Is<List<ListenerEventV2>>(actual =>
-                        SameListenerEventV2sAs(expectedListenerEventV2sToRestore, actual)),
+                        SameGeneratedListenerEventV2sAs(expectedListenerEventV2sToRestore, actual)),
                     randomCancellationToken),
                         Times.Once);
 
