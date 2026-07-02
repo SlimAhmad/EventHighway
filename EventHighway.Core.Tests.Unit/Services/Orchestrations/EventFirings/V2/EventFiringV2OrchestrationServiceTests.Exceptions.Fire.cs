@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
@@ -118,6 +119,69 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventFirings.V2
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogErrorAsync(It.Is(SameExceptionAs(
                     expectedEventFiringV2OrchestrationDependencyException))),
+                        Times.Once);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldThrowServiceExceptionOnFireIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            EventV2 someEventV2 = CreateRandomEventV2();
+
+            var exception = new Exception();
+            exception.Data.Add("ErrorCode", new List<string> { "ServiceError" });
+
+            var failedEventFiringV2OrchestrationServiceException =
+                new FailedEventFiringV2OrchestrationServiceException(
+                    message: "Failed event firing service error occurred, contact support.",
+                    innerException: exception,
+                    data: exception.Data);
+
+            var expectedEventFiringV2OrchestrationServiceException =
+                new EventFiringV2OrchestrationServiceException(
+                    message: "Event firing service error occurred, contact support.",
+                    innerException: failedEventFiringV2OrchestrationServiceException);
+
+            this.eventListenerV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()))
+                        .ThrowsAsync(exception);
+
+            // when
+            ValueTask<EventV2> fireEventV2Task =
+                this.eventFiringV2OrchestrationService
+                    .FireEventV2Async(
+                        someEventV2,
+                        randomCancellationToken);
+
+            EventFiringV2OrchestrationServiceException
+                actualEventFiringV2OrchestrationServiceException =
+                    await Assert.ThrowsAsync<EventFiringV2OrchestrationServiceException>(
+                        fireEventV2Task.AsTask);
+
+            // then
+            actualEventFiringV2OrchestrationServiceException.Should()
+                .BeEquivalentTo(expectedEventFiringV2OrchestrationServiceException);
+
+            this.eventListenerV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveEventListenerV2sByEventAddressIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()),
+                        Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedEventFiringV2OrchestrationServiceException))),
                         Times.Once);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
