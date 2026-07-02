@@ -66,6 +66,42 @@ namespace EventHighway.Core.Services.Orchestrations.EventFirings.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventCallV2ProcessingDependencyValidationException);
             }
+            catch (EventListenerV2ProcessingDependencyException
+                eventListenerV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventListenerV2ProcessingDependencyException);
+            }
+            catch (EventListenerV2ProcessingServiceException
+                eventListenerV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventListenerV2ProcessingServiceException);
+            }
+            catch (ListenerEventV2ProcessingDependencyException
+                listenerEventV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventV2ProcessingDependencyException);
+            }
+            catch (ListenerEventV2ProcessingServiceException
+                listenerEventV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    listenerEventV2ProcessingServiceException);
+            }
+            catch (EventCallV2ProcessingDependencyException
+                eventCallV2ProcessingDependencyException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventCallV2ProcessingDependencyException);
+            }
+            catch (EventCallV2ProcessingServiceException
+                eventCallV2ProcessingServiceException)
+            {
+                throw await CreateAndLogDependencyExceptionAsync(
+                    eventCallV2ProcessingServiceException);
+            }
             catch (Exception exception)
             {
                 var failedEventFiringV2OrchestrationServiceException =
@@ -104,6 +140,19 @@ namespace EventHighway.Core.Services.Orchestrations.EventFirings.V2
                 eventFiringV2OrchestrationDependencyValidationException);
 
             return eventFiringV2OrchestrationDependencyValidationException;
+        }
+
+        private async ValueTask<EventFiringV2OrchestrationDependencyException>
+            CreateAndLogDependencyExceptionAsync(Xeption exception)
+        {
+            var eventFiringV2OrchestrationDependencyException =
+                new EventFiringV2OrchestrationDependencyException(
+                    message: "Event firing dependency error occurred, contact support.",
+                    innerException: exception.InnerException as Xeption);
+
+            await this.loggingBroker.LogErrorAsync(eventFiringV2OrchestrationDependencyException);
+
+            return eventFiringV2OrchestrationDependencyException;
         }
 
         private async ValueTask<EventFiringV2OrchestrationServiceException>
