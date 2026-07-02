@@ -45,6 +45,10 @@ namespace EventHighway.Core.Services.Orchestrations.EventFirings.V2
 
                 throw eventFiringV2OrchestrationDependencyException;
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (NullEventFiringV2OrchestrationException
                 nullEventFiringV2OrchestrationException)
             {

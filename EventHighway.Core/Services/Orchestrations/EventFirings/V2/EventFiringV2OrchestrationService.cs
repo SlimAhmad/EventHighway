@@ -47,6 +47,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventFirings.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventV2IsNotNull(eventV2);
 
             IQueryable<EventListenerV2> eventListenerV2s =

@@ -17,6 +17,47 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventFirings.V2
     public partial class EventFiringV2OrchestrationServiceTests
     {
         [Fact]
+        public async Task ShouldThrowOperationCanceledExceptionRawWhenCancellationIsRequestedOnFireAsync()
+        {
+            // given
+            EventV2 someEventV2 = CreateRandomEventV2();
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+            CancellationToken cancelledToken = cancellationTokenSource.Token;
+
+            // when
+            ValueTask<EventV2> fireEventV2Task =
+                this.eventFiringV2OrchestrationService
+                    .FireEventV2Async(
+                        someEventV2,
+                        cancelledToken);
+
+            // then
+            OperationCanceledException actualException =
+                await Assert.ThrowsAsync<OperationCanceledException>(
+                    fireEventV2Task.AsTask);
+
+            actualException.Should().NotBeOfType<EventFiringV2OrchestrationDependencyException>();
+            actualException.Should().NotBeOfType<EventFiringV2OrchestrationServiceException>();
+            actualException.CancellationToken.IsCancellationRequested.Should().BeTrue();
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCriticalAsync(It.IsAny<Xeption>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.eventListenerV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldThrowDependencyExceptionOnFireIfTimeoutOccursAndLogItAsync()
         {
             // given
