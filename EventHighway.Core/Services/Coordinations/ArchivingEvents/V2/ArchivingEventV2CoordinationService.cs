@@ -197,13 +197,25 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                     IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s =
                         listenerEventV2s.Select(MapToListenerEventArchiveV2).ToList();
 
-                    IEnumerable<ListenerEventArchiveV2> addedListenerEventArchiveV2s =
+                    IEnumerable<EventArchiveV2> eventArchiveV2sWithListenerEventArchiveV2s =
+                        listenerEventArchiveV2s
+                            .GroupBy(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
+                            .Select(listenerEventArchiveV2Group => new EventArchiveV2
+                            {
+                                Id = listenerEventArchiveV2Group.Key,
+                                ListenerEventArchiveV2s = listenerEventArchiveV2Group.ToList()
+                            }).ToList();
+
+                    IEnumerable<EventArchiveV2> archivedEventArchiveV2s =
                         await this.eventArchiveV2OrchestrationService
-                            .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
+                            .BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                                eventArchiveV2sWithListenerEventArchiveV2s, cancellationToken);
 
                     var addedListenerEventArchiveIds =
-                        addedListenerEventArchiveV2s.Select(listenerEventArchiveV2 =>
-                            listenerEventArchiveV2.Id).ToHashSet();
+                        archivedEventArchiveV2s
+                            .SelectMany(eventArchiveV2 => eventArchiveV2.ListenerEventArchiveV2s)
+                            .Select(listenerEventArchiveV2 => listenerEventArchiveV2.Id)
+                            .ToHashSet();
 
                     IEnumerable<ListenerEventV2> addedListenerEventV2s =
                         listenerEventV2s

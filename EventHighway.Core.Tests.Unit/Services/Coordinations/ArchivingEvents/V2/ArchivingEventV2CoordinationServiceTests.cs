@@ -306,6 +306,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         .AreEqual;
         }
 
+        private static IEnumerable<EventArchiveV2> MapToEventArchiveV2sWithListenerEventArchiveV2s(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s)
+        {
+            return listenerEventArchiveV2s
+                .GroupBy(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
+                .Select(listenerEventArchiveV2Group => new EventArchiveV2
+                {
+                    Id = listenerEventArchiveV2Group.Key,
+                    ListenerEventArchiveV2s = listenerEventArchiveV2Group.ToList()
+                }).ToList();
+        }
+
         private static List<dynamic> CreateRandomEventV2sProperties()
         {
             int randomCount = GetRandomNumber();

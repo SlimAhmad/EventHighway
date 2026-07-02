@@ -143,10 +143,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 5
             this.eventArchiveV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.BulkAddListenerEventArchiveV2sAsync(
-                        It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                    service.BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                        It.Is(SameEventArchiveV2sAs(
+                            MapToEventArchiveV2sWithListenerEventArchiveV2s(expectedListenerEventArchiveV2s))),
                         randomCancellationToken))
-                            .ReturnsAsync(expectedListenerEventArchiveV2s);
+                            .ReturnsAsync(
+                                MapToEventArchiveV2sWithListenerEventArchiveV2s(expectedListenerEventArchiveV2s));
 
             // Step 6
             this.listenerEventV2OrchestrationServiceMock
@@ -214,8 +216,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         Times.Exactly(2));
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.BulkAddListenerEventArchiveV2sAsync(
-                    It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                service.BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                    It.Is(SameEventArchiveV2sAs(
+                        MapToEventArchiveV2sWithListenerEventArchiveV2s(expectedListenerEventArchiveV2s))),
                     randomCancellationToken),
                         Times.Once);
 
@@ -417,10 +420,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 5 (one listener archive fails -> only clean one added)
             this.eventArchiveV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.BulkAddListenerEventArchiveV2sAsync(
-                        It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                    service.BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                        It.Is(SameEventArchiveV2sAs(
+                            MapToEventArchiveV2sWithListenerEventArchiveV2s(expectedListenerEventArchiveV2s))),
                         randomCancellationToken))
-                            .ReturnsAsync(addedListenerEventArchiveV2s);
+                            .ReturnsAsync(
+                                MapToEventArchiveV2sWithListenerEventArchiveV2s(addedListenerEventArchiveV2s));
 
             // Step 6 (only the clean listener is removed)
             this.listenerEventV2OrchestrationServiceMock
@@ -484,8 +489,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.BulkAddListenerEventArchiveV2sAsync(
-                    It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                service.BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                    It.Is(SameEventArchiveV2sAs(
+                        MapToEventArchiveV2sWithListenerEventArchiveV2s(expectedListenerEventArchiveV2s))),
                     randomCancellationToken),
                         Times.Once);
 
@@ -678,10 +684,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 5
             this.eventArchiveV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.BulkAddListenerEventArchiveV2sAsync(
-                        It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                    service.BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                        It.Is(SameEventArchiveV2sAs(
+                            MapToEventArchiveV2sWithListenerEventArchiveV2s(expectedListenerEventArchiveV2s))),
                         randomCancellationToken))
-                            .ReturnsAsync(addedListenerEventArchiveV2s);
+                            .ReturnsAsync(
+                                MapToEventArchiveV2sWithListenerEventArchiveV2s(addedListenerEventArchiveV2s));
 
             // Step 6
             this.listenerEventV2OrchestrationServiceMock
@@ -745,8 +753,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         Times.Exactly(2));
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.BulkAddListenerEventArchiveV2sAsync(
-                    It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                service.BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                    It.Is(SameEventArchiveV2sAs(
+                        MapToEventArchiveV2sWithListenerEventArchiveV2s(expectedListenerEventArchiveV2s))),
                     randomCancellationToken),
                         Times.Once);
 
@@ -915,10 +924,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             // Step 5 (listener archive fails -> none added)
             this.eventArchiveV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
-                    service.BulkAddListenerEventArchiveV2sAsync(
-                        It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                    service.BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                        It.Is(SameEventArchiveV2sAs(
+                            MapToEventArchiveV2sWithListenerEventArchiveV2s(expectedListenerEventArchiveV2s))),
                         randomCancellationToken))
-                            .ReturnsAsync(addedListenerEventArchiveV2s);
+                            .ReturnsAsync(
+                                MapToEventArchiveV2sWithListenerEventArchiveV2s(addedListenerEventArchiveV2s));
 
             // Step 6 (event still dead -> returned again, now faulted -> outer breaks)
             this.archivingEventV2OrchestrationServiceMock
@@ -957,8 +968,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.BulkAddListenerEventArchiveV2sAsync(
-                    It.Is(SameListenerEventArchiveV2sAs(expectedListenerEventArchiveV2s)),
+                service.BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                    It.Is(SameEventArchiveV2sAs(
+                        MapToEventArchiveV2sWithListenerEventArchiveV2s(expectedListenerEventArchiveV2s))),
                     randomCancellationToken),
                         Times.Once);
 
