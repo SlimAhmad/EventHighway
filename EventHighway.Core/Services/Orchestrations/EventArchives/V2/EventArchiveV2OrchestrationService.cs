@@ -107,7 +107,13 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
 
         public ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.eventArchiveV2ProcessingService
+                .RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken);
+        });
 
         public ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default) =>
