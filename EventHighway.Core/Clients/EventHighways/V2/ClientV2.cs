@@ -39,6 +39,7 @@ using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Services.Orchestrations.EventFirings.V2;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
 using EventHighway.Core.Services.Orchestrations.EventParticipants.V2;
 using EventHighway.Core.Services.Orchestrations.Events.V2;
@@ -338,6 +339,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IEventListenerV2OrchestrationService,
                 EventListenerV2OrchestrationService>();
+
+            services.AddTransient<
+                IEventFiringV2OrchestrationService,
+                EventFiringV2OrchestrationService>();
 
             services.AddTransient<
                 IListenerEventV2OrchestrationService,
