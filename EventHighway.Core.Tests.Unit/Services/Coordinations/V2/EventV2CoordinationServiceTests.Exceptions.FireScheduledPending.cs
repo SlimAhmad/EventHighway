@@ -6,8 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
-using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
-using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using FluentAssertions;
 using Moq;
 using Xeptions;
@@ -59,38 +58,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     expectedEventV2CoordinationDependencyValidationException))),
                         Times.Once);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                    It.IsAny<Guid>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
                     Times.Never);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.AddListenerEventV2Async(
-                    It.IsAny<ListenerEventV2>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
-            this.eventV2OrchestrationServiceMock.Verify(service =>
-                service.RunEventCallV2Async(
-                    It.IsAny<EventCallV2>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.ModifyListenerEventV2Async(
-                    It.IsAny<ListenerEventV2>(),
+            this.eventFiringV2OrchestrationServiceMock.Verify(service =>
+                service.FireEventV2Async(
+                    It.IsAny<EventV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventFiringV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
@@ -137,38 +118,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     expectedEventV2CoordinationDependencyException))),
                         Times.Once);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                    It.IsAny<Guid>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
                     Times.Never);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.AddListenerEventV2Async(
-                    It.IsAny<ListenerEventV2>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
-            this.eventV2OrchestrationServiceMock.Verify(service =>
-                service.RunEventCallV2Async(
-                    It.IsAny<EventCallV2>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.ModifyListenerEventV2Async(
-                    It.IsAny<ListenerEventV2>(),
+            this.eventFiringV2OrchestrationServiceMock.Verify(service =>
+                service.FireEventV2Async(
+                    It.IsAny<EventV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventFiringV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
@@ -205,7 +168,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventFiringV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
@@ -258,38 +221,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     expectedEventV2CoordinationDependencyException))),
                         Times.Once);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                    It.IsAny<Guid>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
                     Times.Never);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.AddListenerEventV2Async(
-                    It.IsAny<ListenerEventV2>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
-            this.eventV2OrchestrationServiceMock.Verify(service =>
-                service.RunEventCallV2Async(
-                    It.IsAny<EventCallV2>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.ModifyListenerEventV2Async(
-                    It.IsAny<ListenerEventV2>(),
+            this.eventFiringV2OrchestrationServiceMock.Verify(service =>
+                service.FireEventV2Async(
+                    It.IsAny<EventV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventFiringV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
 
@@ -340,38 +285,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     expectedEventV2CoordinationServiceException))),
                         Times.Once);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                    It.IsAny<Guid>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetDateTimeOffsetAsync(),
                     Times.Never);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.AddListenerEventV2Async(
-                    It.IsAny<ListenerEventV2>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
-            this.eventV2OrchestrationServiceMock.Verify(service =>
-                service.RunEventCallV2Async(
-                    It.IsAny<EventCallV2>(),
-                    It.IsAny<CancellationToken>()),
-                        Times.Never);
-
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.ModifyListenerEventV2Async(
-                    It.IsAny<ListenerEventV2>(),
+            this.eventFiringV2OrchestrationServiceMock.Verify(service =>
+                service.FireEventV2Async(
+                    It.IsAny<EventV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventFiringV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
     }

@@ -3,19 +3,14 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Coordinations.Events.V2.Exceptions;
-using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
-using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
-using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
-using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
+using EventHighway.Core.Services.Orchestrations.EventFirings.V2;
 using EventHighway.Core.Services.Orchestrations.EventParticipants.V2;
 using EventHighway.Core.Services.Orchestrations.Events.V2;
 
@@ -24,20 +19,20 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
     internal partial class EventV2CoordinationService : IEventV2CoordinationService
     {
         private readonly IEventV2OrchestrationService eventV2OrchestrationService;
-        private readonly IEventListenerV2OrchestrationService eventListenerV2OrchestrationService;
+        private readonly IEventFiringV2OrchestrationService eventFiringV2OrchestrationService;
         private readonly IEventParticipantV2OrchestrationService eventParticipantV2OrchestrationService;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventV2CoordinationService(
             IEventV2OrchestrationService eventV2OrchestrationService,
-            IEventListenerV2OrchestrationService eventListenerV2OrchestrationService,
+            IEventFiringV2OrchestrationService eventFiringV2OrchestrationService,
             IEventParticipantV2OrchestrationService eventParticipantV2OrchestrationService,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2OrchestrationService = eventV2OrchestrationService;
-            this.eventListenerV2OrchestrationService = eventListenerV2OrchestrationService;
+            this.eventFiringV2OrchestrationService = eventFiringV2OrchestrationService;
             this.eventParticipantV2OrchestrationService = eventParticipantV2OrchestrationService;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
@@ -89,7 +84,10 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             }
 
             if (submittedEventV2.Type is EventTypeV2.Immediate)
-                await ProcessEventListenerV2sAsync(submittedEventV2, cancellationToken);
+            {
+                submittedEventV2 = await this.eventFiringV2OrchestrationService
+                    .FireEventV2Async(submittedEventV2, cancellationToken);
+            }
 
             return submittedEventV2;
         });
@@ -141,7 +139,8 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
                 if (eventV2.Status == EventStatusV2.Quarantined)
                     continue;
 
-                await ProcessEventListenerV2sAsync(eventV2, cancellationToken);
+                await this.eventFiringV2OrchestrationService
+                    .FireEventV2Async(eventV2, cancellationToken);
 
                 await this.eventV2OrchestrationService
                     .MarkEventV2AsImmediateAsync(eventV2, cancellationToken);
@@ -159,115 +158,5 @@ namespace EventHighway.Core.Services.Coordinations.Events.V2
             return await this.eventV2OrchestrationService
                 .RemoveEventV2ByIdAsync(eventV2Id, cancellationToken);
         });
-
-        private async ValueTask ProcessEventListenerV2sAsync(
-            EventV2 eventV2,
-            CancellationToken cancellationToken)
-        {
-            IQueryable<EventListenerV2> eventListenerV2s =
-                await this.eventListenerV2OrchestrationService
-                    .RetrieveEventListenerV2sByEventAddressIdAsync(
-                        eventV2.EventAddressV2Id, cancellationToken);
-
-            foreach (EventListenerV2 eventListenerV2 in eventListenerV2s)
-            {
-                DateTimeOffset now =
-                    await this.dateTimeBroker.GetDateTimeOffsetAsync();
-
-                ListenerEventV2 listenerEventV2 =
-                    CreateListenerEventV2(
-                        eventV2,
-                        eventListenerV2,
-                        now);
-
-                ListenerEventV2 addedListenerEventV2 =
-                    await this.eventListenerV2OrchestrationService
-                        .AddListenerEventV2Async(listenerEventV2, cancellationToken);
-
-                await RunEventCallV2Async(
-                    eventV2,
-                    eventListenerV2,
-                    addedListenerEventV2,
-                    cancellationToken);
-            }
-        }
-
-        private async Task RunEventCallV2Async(
-            EventV2 eventV2,
-            EventListenerV2 eventListenerV2,
-            ListenerEventV2 listenerEventV2,
-            CancellationToken cancellationToken)
-        {
-            IEnumerable<string> requiredKeys =
-                string.IsNullOrWhiteSpace(eventListenerV2.PromotedProperties)
-                    ? Array.Empty<string>()
-                    : await this.eventV2OrchestrationService
-                        .SplitPromotedPropertyKeysAsync(
-                            eventListenerV2.PromotedProperties,
-                            cancellationToken);
-
-            var eventCallV2 = new EventCallV2
-            {
-                Content = eventV2.Content,
-                HandlerId = eventListenerV2.HandlerId,
-                HandlerName = eventListenerV2.HandlerName,
-                FilterCriteria = eventListenerV2.FilterCriteria,
-                RequiredPromotedProperties = requiredKeys,
-                Response = null
-            };
-
-            try
-            {
-                eventCallV2.PromotedProperties =
-                    string.IsNullOrWhiteSpace(eventV2.Content)
-                        || string.IsNullOrWhiteSpace(eventListenerV2.PromotedProperties)
-                        ? new List<PromotedProperty>()
-                        : await this.eventV2OrchestrationService
-                            .PromotePropertiesAsync(
-                                eventV2.Content,
-                                eventListenerV2.PromotedProperties,
-                                cancellationToken);
-
-                EventCallV2 ranEventCallV2 =
-                    await this.eventV2OrchestrationService
-                        .RunEventCallV2Async(eventCallV2, cancellationToken);
-
-                listenerEventV2.Response = ranEventCallV2.Response;
-                listenerEventV2.ResponseCode = ranEventCallV2.ResponseCode;
-                listenerEventV2.ResponseMessage = ranEventCallV2.ResponseMessage;
-
-                listenerEventV2.Status = ranEventCallV2.IsSuccess
-                    ? ListenerEventStatusV2.Success
-                    : ListenerEventStatusV2.Error;
-            }
-            catch (Exception exception)
-            {
-                listenerEventV2.Response = exception.Message;
-                listenerEventV2.Status = ListenerEventStatusV2.Error;
-            }
-
-            listenerEventV2.UpdatedDate =
-                await this.dateTimeBroker.GetDateTimeOffsetAsync();
-
-            await this.eventListenerV2OrchestrationService
-                .ModifyListenerEventV2Async(listenerEventV2, cancellationToken);
-        }
-
-        private static ListenerEventV2 CreateListenerEventV2(
-            EventV2 eventV2,
-            EventListenerV2 eventListenerV2,
-            DateTimeOffset now)
-        {
-            return new ListenerEventV2
-            {
-                Id = Guid.NewGuid(),
-                EventV2Id = eventV2.Id,
-                EventListenerV2Id = eventListenerV2.Id,
-                EventAddressV2Id = eventV2.EventAddressV2Id,
-                Status = ListenerEventStatusV2.Pending,
-                CreatedDate = now,
-                UpdatedDate = now,
-            };
-        }
     }
 }

@@ -111,9 +111,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     expectedEventV2CoordinationValidationException))),
                         Times.Once);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveEventListenerV2sByEventAddressIdAsync(
-                    It.IsAny<Guid>(),
+            this.eventFiringV2OrchestrationServiceMock.Verify(service =>
+                service.FireEventV2Async(
+                    It.IsAny<EventV2>(),
                     It.IsAny<CancellationToken>()),
                         Times.Never);
 
@@ -121,7 +121,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.eventV2OrchestrationServiceMock.VerifyNoOtherCalls();
-            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.eventFiringV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventParticipantV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
