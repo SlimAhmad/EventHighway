@@ -60,5 +60,14 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         ValueTask<IEnumerable<EventArchiveV2>> RetrieveEventArchiveV2sByIdsAsync(
             IEnumerable<Guid> eventArchiveIds,
             CancellationToken cancellationToken = default);
+
+        ValueTask<IEnumerable<EventArchiveV2>> RetrieveBatchOfEventArchiveV2sMatchingAsync(
+            Guid? eventAddressId,
+            IEnumerable<Guid> eventListenerIds,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int skip,
+            int take,
+            CancellationToken cancellationToken = default);
     }
 }

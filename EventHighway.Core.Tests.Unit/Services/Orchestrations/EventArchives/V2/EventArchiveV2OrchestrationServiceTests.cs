@@ -107,6 +107,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 9).GetValue();
 
+        private static Guid GetRandomId() =>
+            Guid.NewGuid();
+
         private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: DateTime.UnixEpoch).GetValue();
 
