@@ -34,35 +34,57 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             int take = GetRandomNumber();
             BatchConfiguration batchConfiguration = CreateBatchConfiguration(take);
 
-            List<ListenerEventArchiveV2> listenerArchiveBatch =
-                CreateRandomListenerEventArchiveV2s();
+            Guid eventArchiveId = GetRandomId();
+            var eventArchiveV2 = new EventArchiveV2 { Id = eventArchiveId };
 
-            List<EventArchiveV2> eventArchives = CreateRandomEventArchiveV2s();
+            List<EventArchiveV2> eventArchiveV2Batch =
+                new List<EventArchiveV2> { eventArchiveV2 };
 
-            IEnumerable<Guid> expectedEventArchiveIds =
-                listenerArchiveBatch
-                    .Select(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
-                    .Distinct()
-                    .ToList();
+            List<ListenerEventArchiveV2> listenerArchivePage =
+                new List<ListenerEventArchiveV2>
+                {
+                    new ListenerEventArchiveV2
+                    {
+                        Id = GetRandomId(),
+                        EventArchiveV2Id = eventArchiveId
+                    }
+                };
+
+            var eventArchiveV2WithListenerArchivePage = new EventArchiveV2
+            {
+                Id = eventArchiveId,
+                ListenerEventArchiveV2s = listenerArchivePage
+            };
+
+            var eventArchiveV2WithEmptyListenerArchivePage = new EventArchiveV2
+            {
+                Id = eventArchiveId,
+                ListenerEventArchiveV2s = new List<ListenerEventArchiveV2>()
+            };
 
             this.configurationBrokerMock.Setup(broker =>
                 broker.GetBatchConfiguration())
                     .Returns(batchConfiguration);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken))
-                        .ReturnsAsync(listenerArchiveBatch);
+                        .ReturnsAsync(eventArchiveV2Batch);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, eventListenerIds, startDate, endDate, take, take, randomCancellationToken))
-                        .ReturnsAsync(new List<ListenerEventArchiveV2>());
+                        .ReturnsAsync(new List<EventArchiveV2>());
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveEventArchiveV2sByIdsAsync(
-                    It.IsAny<IEnumerable<Guid>>(), randomCancellationToken))
-                        .ReturnsAsync(eventArchives);
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    eventArchiveId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken))
+                        .ReturnsAsync(eventArchiveV2WithListenerArchivePage);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    eventArchiveId, eventListenerIds, startDate, endDate, take, take, randomCancellationToken))
+                        .ReturnsAsync(eventArchiveV2WithEmptyListenerArchivePage);
 
             this.restoringEventV2OrchestrationServiceMock.Setup(service =>
                 service.RestoreAsync(
@@ -80,24 +102,33 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
                 broker.GetBatchConfiguration(), Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken),
                         Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, eventListenerIds, startDate, endDate, take, take, randomCancellationToken),
                         Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveEventArchiveV2sByIdsAsync(
-                    It.Is<IEnumerable<Guid>>(ids => SameGuidSetAs(expectedEventArchiveIds, ids)),
-                    randomCancellationToken),
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    eventArchiveId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken),
+                        Times.Once);
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    eventArchiveId, eventListenerIds, startDate, endDate, take, take, randomCancellationToken),
                         Times.Once);
 
             this.restoringEventV2OrchestrationServiceMock.Verify(service =>
-                service.RestoreAsync(eventArchives, listenerArchiveBatch, randomCancellationToken),
-                    Times.Once);
+                service.RestoreAsync(
+                    It.Is<IEnumerable<EventArchiveV2>>(actualEventArchiveV2s =>
+                        actualEventArchiveV2s.SequenceEqual(new List<EventArchiveV2> { eventArchiveV2 })),
+                    It.Is<IEnumerable<ListenerEventArchiveV2>>(actualListenerArchivePage =>
+                        actualListenerArchivePage.SequenceEqual(listenerArchivePage)),
+                    randomCancellationToken),
+                        Times.Once);
 
             this.restoringEventV2OrchestrationServiceMock.Verify(service =>
                 service.GenerateReplayForNewListenersAsync(
@@ -125,29 +156,57 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             int take = GetRandomNumber();
             BatchConfiguration batchConfiguration = CreateBatchConfiguration(take);
 
-            List<ListenerEventArchiveV2> listenerArchiveBatch =
-                CreateRandomListenerEventArchiveV2s();
+            Guid eventArchiveId = GetRandomId();
+            var eventArchiveV2 = new EventArchiveV2 { Id = eventArchiveId };
 
-            List<EventArchiveV2> eventArchives = CreateRandomEventArchiveV2s();
+            List<EventArchiveV2> eventArchiveV2Batch =
+                new List<EventArchiveV2> { eventArchiveV2 };
+
+            List<ListenerEventArchiveV2> listenerArchivePage =
+                new List<ListenerEventArchiveV2>
+                {
+                    new ListenerEventArchiveV2
+                    {
+                        Id = GetRandomId(),
+                        EventArchiveV2Id = eventArchiveId
+                    }
+                };
+
+            var eventArchiveV2WithListenerArchivePage = new EventArchiveV2
+            {
+                Id = eventArchiveId,
+                ListenerEventArchiveV2s = listenerArchivePage
+            };
+
+            var eventArchiveV2WithEmptyListenerArchivePage = new EventArchiveV2
+            {
+                Id = eventArchiveId,
+                ListenerEventArchiveV2s = new List<ListenerEventArchiveV2>()
+            };
 
             this.configurationBrokerMock.Setup(broker =>
                 broker.GetBatchConfiguration())
                     .Returns(batchConfiguration);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, nullEventListenerIds, startDate, endDate, 0, take, randomCancellationToken))
-                        .ReturnsAsync(listenerArchiveBatch);
+                        .ReturnsAsync(eventArchiveV2Batch);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, nullEventListenerIds, startDate, endDate, take, take, randomCancellationToken))
-                        .ReturnsAsync(new List<ListenerEventArchiveV2>());
+                        .ReturnsAsync(new List<EventArchiveV2>());
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveEventArchiveV2sByIdsAsync(
-                    It.IsAny<IEnumerable<Guid>>(), randomCancellationToken))
-                        .ReturnsAsync(eventArchives);
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    eventArchiveId, nullEventListenerIds, startDate, endDate, 0, take, randomCancellationToken))
+                        .ReturnsAsync(eventArchiveV2WithListenerArchivePage);
+
+            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    eventArchiveId, nullEventListenerIds, startDate, endDate, take, take, randomCancellationToken))
+                        .ReturnsAsync(eventArchiveV2WithEmptyListenerArchivePage);
 
             this.restoringEventV2OrchestrationServiceMock.Setup(service =>
                 service.RestoreAsync(
@@ -167,21 +226,30 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
 
             // then
             this.restoringEventV2OrchestrationServiceMock.Verify(service =>
-                service.RestoreAsync(eventArchives, listenerArchiveBatch, randomCancellationToken),
-                    Times.Once);
+                service.RestoreAsync(
+                    It.Is<IEnumerable<EventArchiveV2>>(actualEventArchiveV2s =>
+                        actualEventArchiveV2s.SequenceEqual(new List<EventArchiveV2> { eventArchiveV2 })),
+                    It.Is<IEnumerable<ListenerEventArchiveV2>>(actualListenerArchivePage =>
+                        actualListenerArchivePage.SequenceEqual(listenerArchivePage)),
+                    randomCancellationToken),
+                        Times.Once);
 
             this.restoringEventV2OrchestrationServiceMock.Verify(service =>
-                service.GenerateReplayForNewListenersAsync(eventArchives, randomCancellationToken),
-                    Times.Once);
-
-            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveEventArchiveV2sByIdsAsync(
-                    It.IsAny<IEnumerable<Guid>>(), randomCancellationToken),
+                service.GenerateReplayForNewListenersAsync(
+                    It.Is<IEnumerable<EventArchiveV2>>(actualEventArchiveV2s =>
+                        actualEventArchiveV2s.SequenceEqual(eventArchiveV2Batch)),
+                    randomCancellationToken),
                         Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, nullEventListenerIds, startDate, endDate,
+                    It.IsAny<int>(), take, randomCancellationToken),
+                        Times.Exactly(2));
+
+            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    eventArchiveId, nullEventListenerIds, startDate, endDate,
                     It.IsAny<int>(), take, randomCancellationToken),
                         Times.Exactly(2));
 
@@ -209,24 +277,41 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             int take = 0;
             BatchConfiguration batchConfiguration = CreateBatchConfiguration(take);
 
-            List<ListenerEventArchiveV2> listenerArchiveBatch =
-                CreateRandomListenerEventArchiveV2s();
+            Guid eventArchiveId = GetRandomId();
+            var eventArchiveV2 = new EventArchiveV2 { Id = eventArchiveId };
 
-            List<EventArchiveV2> eventArchives = CreateRandomEventArchiveV2s();
+            List<EventArchiveV2> eventArchiveV2Batch =
+                new List<EventArchiveV2> { eventArchiveV2 };
+
+            List<ListenerEventArchiveV2> listenerArchivePage =
+                new List<ListenerEventArchiveV2>
+                {
+                    new ListenerEventArchiveV2
+                    {
+                        Id = GetRandomId(),
+                        EventArchiveV2Id = eventArchiveId
+                    }
+                };
+
+            var eventArchiveV2WithListenerArchivePage = new EventArchiveV2
+            {
+                Id = eventArchiveId,
+                ListenerEventArchiveV2s = listenerArchivePage
+            };
 
             this.configurationBrokerMock.Setup(broker =>
                 broker.GetBatchConfiguration())
                     .Returns(batchConfiguration);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken))
-                        .ReturnsAsync(listenerArchiveBatch);
+                        .ReturnsAsync(eventArchiveV2Batch);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveEventArchiveV2sByIdsAsync(
-                    It.IsAny<IEnumerable<Guid>>(), randomCancellationToken))
-                        .ReturnsAsync(eventArchives);
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    eventArchiveId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken))
+                        .ReturnsAsync(eventArchiveV2WithListenerArchivePage);
 
             this.restoringEventV2OrchestrationServiceMock.Setup(service =>
                 service.RestoreAsync(
@@ -241,17 +326,22 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
 
             // then
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken),
                         Times.Once);
 
-            this.restoringEventV2OrchestrationServiceMock.Verify(service =>
-                service.RestoreAsync(eventArchives, listenerArchiveBatch, randomCancellationToken),
-                    Times.Once);
-
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveEventArchiveV2sByIdsAsync(
-                    It.IsAny<IEnumerable<Guid>>(), randomCancellationToken),
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    eventArchiveId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken),
+                        Times.Once);
+
+            this.restoringEventV2OrchestrationServiceMock.Verify(service =>
+                service.RestoreAsync(
+                    It.Is<IEnumerable<EventArchiveV2>>(actualEventArchiveV2s =>
+                        actualEventArchiveV2s.SequenceEqual(new List<EventArchiveV2> { eventArchiveV2 })),
+                    It.Is<IEnumerable<ListenerEventArchiveV2>>(actualListenerArchivePage =>
+                        actualListenerArchivePage.SequenceEqual(listenerArchivePage)),
+                    randomCancellationToken),
                         Times.Once);
 
             this.configurationBrokerMock.Verify(broker =>
@@ -283,9 +373,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
                     .Returns(batchConfiguration);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken))
-                        .ReturnsAsync(new List<ListenerEventArchiveV2>());
+                        .ReturnsAsync(new List<EventArchiveV2>());
 
             // when
             await this.replayingEventV2CoordinationService.ReplayEventArchiveV2sAsync(
@@ -293,13 +383,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
 
             // then
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     eventAddressId, eventListenerIds, startDate, endDate, 0, take, randomCancellationToken),
                         Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveEventArchiveV2sByIdsAsync(
-                    It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()),
+                service.RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<IEnumerable<Guid>>(),
+                    It.IsAny<DateTimeOffset?>(),
+                    It.IsAny<DateTimeOffset?>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()),
                         Times.Never);
 
             this.restoringEventV2OrchestrationServiceMock.Verify(service =>
