@@ -131,11 +131,17 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 await this.eventArchiveV2ProcessingService
                     .RetrieveAllEventArchiveV2sAsync(cancellationToken);
 
-            return eventArchiveV2s
+            eventArchiveV2s = eventArchiveV2s
                 .Where(eventArchiveV2 =>
                     listenerEventArchiveV2s.Any(listenerEventArchiveV2 =>
                         listenerEventArchiveV2.EventArchiveV2Id == eventArchiveV2.Id))
-                .ToList();
+                .OrderBy(eventArchiveV2 => eventArchiveV2.CreatedDate)
+                .ThenBy(eventArchiveV2 => eventArchiveV2.Id)
+                .Skip(skip);
+
+            return take == 0
+                ? eventArchiveV2s.ToList()
+                : eventArchiveV2s.Take(take).ToList();
         });
 
         public ValueTask BulkRemoveEventArchiveV2sAsync(
