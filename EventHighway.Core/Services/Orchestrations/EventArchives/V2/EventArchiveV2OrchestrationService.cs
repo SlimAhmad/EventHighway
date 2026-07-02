@@ -185,8 +185,15 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                         listenerEventArchiveV2.CreatedDate <= endDate.Value);
             }
 
+            listenerEventArchiveV2s = listenerEventArchiveV2s
+                .OrderBy(listenerEventArchiveV2 => listenerEventArchiveV2.CreatedDate)
+                .ThenBy(listenerEventArchiveV2 => listenerEventArchiveV2.Id)
+                .Skip(skip);
+
             List<ListenerEventArchiveV2> listenerEventArchiveV2Page =
-                listenerEventArchiveV2s.ToList();
+                take == 0
+                    ? listenerEventArchiveV2s.ToList()
+                    : listenerEventArchiveV2s.Take(take).ToList();
 
             return new EventArchiveV2
             {
