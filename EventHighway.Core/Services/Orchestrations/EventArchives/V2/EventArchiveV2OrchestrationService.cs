@@ -160,6 +160,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         TryCatch(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventArchiveV2sIsNotNull(eventArchiveV2s);
 
             IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s =
                 eventArchiveV2s.SelectMany(eventArchiveV2 =>
