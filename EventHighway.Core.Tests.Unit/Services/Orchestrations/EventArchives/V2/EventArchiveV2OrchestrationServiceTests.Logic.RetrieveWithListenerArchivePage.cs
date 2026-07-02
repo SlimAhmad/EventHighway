@@ -87,5 +87,81 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
             this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task
+            ShouldRetrieveEventArchiveV2WithListenerEventArchiveV2sByIdFilteredByEventListenerIdsAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid inputEventArchiveId = GetRandomId();
+            Guid inputEventListenerId = GetRandomId();
+
+            var matchingListenerEventArchiveV2 = new ListenerEventArchiveV2
+            {
+                Id = GetRandomId(),
+                EventArchiveV2Id = inputEventArchiveId,
+                EventAddressV2Id = GetRandomId(),
+                EventListenerV2Id = inputEventListenerId,
+                CreatedDate = GetRandomDateTimeOffset()
+            };
+
+            var otherListenerEventArchiveV2 = new ListenerEventArchiveV2
+            {
+                Id = GetRandomId(),
+                EventArchiveV2Id = inputEventArchiveId,
+                EventAddressV2Id = GetRandomId(),
+                EventListenerV2Id = GetRandomId(),
+                CreatedDate = GetRandomDateTimeOffset()
+            };
+
+            IQueryable<ListenerEventArchiveV2> storedListenerEventArchiveV2s =
+                new List<ListenerEventArchiveV2>
+                {
+                    matchingListenerEventArchiveV2,
+                    otherListenerEventArchiveV2
+                }
+                    .AsQueryable();
+
+            List<Guid> inputEventListenerIds =
+                new List<Guid> { inputEventListenerId };
+
+            var expectedEventArchiveV2 = new EventArchiveV2
+            {
+                Id = inputEventArchiveId,
+                ListenerEventArchiveV2s =
+                    new List<ListenerEventArchiveV2> { matchingListenerEventArchiveV2 }
+            };
+
+            this.listenerEventArchiveV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(storedListenerEventArchiveV2s);
+
+            // when
+            EventArchiveV2 actualEventArchiveV2 =
+                await this.eventArchiveV2OrchestrationService
+                    .RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                        eventArchiveId: inputEventArchiveId,
+                        eventListenerIds: inputEventListenerIds,
+                        startDate: null,
+                        endDate: null,
+                        skip: 0,
+                        take: 10,
+                        randomCancellationToken);
+
+            // then
+            actualEventArchiveV2.Should()
+                .BeEquivalentTo(expectedEventArchiveV2);
+
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
