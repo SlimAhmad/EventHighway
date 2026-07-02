@@ -72,23 +72,26 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             List<ListenerEventV2> mappedListenerEventV2s =
                 listenerEventArchiveV2s.Select(MapToListenerEventV2).ToList();
 
-            HashSet<System.Guid> incomingListenerEventV2Ids =
-                mappedListenerEventV2s.Select(listenerEventV2 => listenerEventV2.Id).ToHashSet();
+            HashSet<System.Guid?> incomingCorrelationIds =
+                mappedListenerEventV2s
+                    .Select(listenerEventV2 => listenerEventV2.CorrelationId)
+                    .ToHashSet();
 
             IQueryable<ListenerEventV2> existingListenerEventV2s =
                 await this.listenerEventV2ProcessingService
                     .RetrieveAllListenerEventV2sAsync(cancellationToken);
 
-            HashSet<System.Guid> existingListenerEventV2Ids =
+            HashSet<System.Guid?> existingCorrelationIds =
                 existingListenerEventV2s
-                    .Where(listenerEventV2 => incomingListenerEventV2Ids.Contains(listenerEventV2.Id))
-                    .Select(listenerEventV2 => listenerEventV2.Id)
+                    .Where(listenerEventV2 =>
+                        incomingCorrelationIds.Contains(listenerEventV2.CorrelationId))
+                    .Select(listenerEventV2 => listenerEventV2.CorrelationId)
                     .ToHashSet();
 
             List<ListenerEventV2> listenerEventV2sToRestore =
                 mappedListenerEventV2s
                     .Where(listenerEventV2 =>
-                        existingListenerEventV2Ids.Contains(listenerEventV2.Id) is false)
+                        existingCorrelationIds.Contains(listenerEventV2.CorrelationId) is false)
                             .ToList();
 
             await this.listenerEventV2ProcessingService.BulkRestoreListenerEventV2sAsync(
@@ -246,7 +249,8 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
             ListenerEventArchiveV2 listenerEventArchiveV2) =>
             new ListenerEventV2
             {
-                Id = listenerEventArchiveV2.Id,
+                Id = System.Guid.NewGuid(),
+                CorrelationId = listenerEventArchiveV2.Id,
                 Status = ListenerEventStatusV2.Replay,
                 Response = null,
                 ResponseCode = null,
