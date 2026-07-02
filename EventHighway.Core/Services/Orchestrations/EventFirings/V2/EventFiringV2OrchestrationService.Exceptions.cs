@@ -24,6 +24,27 @@ namespace EventHighway.Core.Services.Orchestrations.EventFirings.V2
             {
                 return await returningEventV2Function();
             }
+            catch (OperationCanceledException operationCanceledException)
+                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
+            {
+                var timeoutException =
+                    new TimeoutException("The dependency operation timed out.");
+
+                var timeoutEventFiringV2OrchestrationException =
+                    new TimeoutEventFiringV2OrchestrationException(
+                        message: "Failed event firing orchestration timeout error occurred, contact support.",
+                        innerException: timeoutException,
+                        data: timeoutException.Data);
+
+                var eventFiringV2OrchestrationDependencyException =
+                    new EventFiringV2OrchestrationDependencyException(
+                        message: "Event firing dependency error occurred, contact support.",
+                        innerException: timeoutEventFiringV2OrchestrationException);
+
+                await this.loggingBroker.LogErrorAsync(eventFiringV2OrchestrationDependencyException);
+
+                throw eventFiringV2OrchestrationDependencyException;
+            }
             catch (NullEventFiringV2OrchestrationException
                 nullEventFiringV2OrchestrationException)
             {
