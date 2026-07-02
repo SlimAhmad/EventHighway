@@ -207,6 +207,105 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventArchives.V2
         }
 
         [Fact]
+        public async Task ShouldRetrieveBatchOfEventArchiveV2sMatchingWithPagingAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            DateTimeOffset baseCreatedDate = GetRandomDateTimeOffset();
+
+            Guid firstEventArchiveId = GetRandomId();
+            Guid secondEventArchiveId = GetRandomId();
+            Guid thirdEventArchiveId = GetRandomId();
+
+            var firstEventArchiveV2 = new EventArchiveV2
+            {
+                Id = firstEventArchiveId,
+                CreatedDate = baseCreatedDate
+            };
+
+            var secondEventArchiveV2 = new EventArchiveV2
+            {
+                Id = secondEventArchiveId,
+                CreatedDate = baseCreatedDate.AddDays(1)
+            };
+
+            var thirdEventArchiveV2 = new EventArchiveV2
+            {
+                Id = thirdEventArchiveId,
+                CreatedDate = baseCreatedDate.AddDays(2)
+            };
+
+            ListenerEventArchiveV2 CreateChildFor(Guid eventArchiveId) =>
+                new ListenerEventArchiveV2
+                {
+                    Id = GetRandomId(),
+                    EventArchiveV2Id = eventArchiveId,
+                    EventAddressV2Id = GetRandomId(),
+                    EventListenerV2Id = GetRandomId(),
+                    CreatedDate = GetRandomDateTimeOffset()
+                };
+
+            IQueryable<EventArchiveV2> storedEventArchiveV2s =
+                new List<EventArchiveV2>
+                {
+                    thirdEventArchiveV2,
+                    firstEventArchiveV2,
+                    secondEventArchiveV2
+                }
+                    .AsQueryable();
+
+            IQueryable<ListenerEventArchiveV2> storedListenerEventArchiveV2s =
+                new List<ListenerEventArchiveV2>
+                {
+                    CreateChildFor(firstEventArchiveId),
+                    CreateChildFor(secondEventArchiveId),
+                    CreateChildFor(thirdEventArchiveId)
+                }
+                    .AsQueryable();
+
+            List<EventArchiveV2> expectedEventArchiveV2s =
+                new List<EventArchiveV2> { secondEventArchiveV2 };
+
+            this.listenerEventArchiveV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(storedListenerEventArchiveV2s);
+
+            this.eventArchiveV2ProcessingServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(storedEventArchiveV2s);
+
+            // when
+            IEnumerable<EventArchiveV2> actualEventArchiveV2s =
+                await this.eventArchiveV2OrchestrationService
+                    .RetrieveBatchOfEventArchiveV2sMatchingAsync(
+                        eventAddressId: null,
+                        eventListenerIds: null,
+                        startDate: null,
+                        endDate: null,
+                        skip: 1,
+                        take: 1,
+                        randomCancellationToken);
+
+            // then
+            actualEventArchiveV2s.Should()
+                .BeEquivalentTo(expectedEventArchiveV2s);
+
+            this.listenerEventArchiveV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.eventArchiveV2ProcessingServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.listenerEventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public async Task ShouldRetrieveBatchOfEventArchiveV2sMatchingByEndDateAsync()
         {
             // given
