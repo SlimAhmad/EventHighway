@@ -171,6 +171,13 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                         eventListenerIds.Contains(listenerEventArchiveV2.EventListenerV2Id));
             }
 
+            if (startDate is not null)
+            {
+                listenerEventArchiveV2s = listenerEventArchiveV2s.Where(
+                    listenerEventArchiveV2 =>
+                        listenerEventArchiveV2.CreatedDate >= startDate.Value);
+            }
+
             List<ListenerEventArchiveV2> listenerEventArchiveV2Page =
                 listenerEventArchiveV2s.ToList();
 
