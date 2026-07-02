@@ -165,8 +165,22 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                 eventArchiveV2s.SelectMany(eventArchiveV2 =>
                     eventArchiveV2.ListenerEventArchiveV2s).ToList();
 
-            await this.listenerEventArchiveV2ProcessingService
-                .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
+            IEnumerable<ListenerEventArchiveV2> archivedListenerEventArchiveV2s =
+                await this.listenerEventArchiveV2ProcessingService
+                    .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
+
+            var archivedListenerEventArchiveV2Ids =
+                archivedListenerEventArchiveV2s.Select(listenerEventArchiveV2 =>
+                    listenerEventArchiveV2.Id).ToHashSet();
+
+            foreach (EventArchiveV2 eventArchiveV2 in eventArchiveV2s)
+            {
+                eventArchiveV2.ListenerEventArchiveV2s =
+                    eventArchiveV2.ListenerEventArchiveV2s
+                        .Where(listenerEventArchiveV2 =>
+                            archivedListenerEventArchiveV2Ids.Contains(listenerEventArchiveV2.Id))
+                        .ToList();
+            }
 
             return eventArchiveV2s;
         });
