@@ -675,6 +675,24 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             return archives.AsQueryable();
         }
 
+        private static IQueryable<EventArchiveV2> AttachListenerEventArchiveV2s(
+            IQueryable<EventArchiveV2> eventArchiveV2s,
+            IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2s)
+        {
+            List<EventArchiveV2> eventArchives = eventArchiveV2s.ToList();
+            List<ListenerEventArchiveV2> listenerArchives = listenerEventArchiveV2s.ToList();
+
+            for (int i = 0; i < eventArchives.Count; i++)
+            {
+                eventArchives[i].ListenerEventArchiveV2s =
+                    i == 0
+                        ? listenerArchives
+                        : new List<ListenerEventArchiveV2>();
+            }
+
+            return eventArchives.AsQueryable();
+        }
+
         private void SetupHealthOrchestrationMocks(
             CancellationToken cancellationToken,
             IQueryable<EventV2> events,
@@ -706,12 +724,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .ReturnsAsync(handlers);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllEventArchiveV2sAsync(cancellationToken))
-                    .ReturnsAsync(archives);
-
-            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(cancellationToken))
-                    .ReturnsAsync(listenerArchives);
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken))
+                    .ReturnsAsync(AttachListenerEventArchiveV2s(archives, listenerArchives));
         }
 
         private void VerifyHealthOrchestrationMocksOnce(CancellationToken cancellationToken)
@@ -732,10 +746,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 service.RetrieveAllEventHandlerV2sAsync(cancellationToken), Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllEventArchiveV2sAsync(cancellationToken), Times.Once);
-
-            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(cancellationToken), Times.Once);
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken), Times.Once);
 
             this.configurationBrokerMock.Verify(broker =>
                 broker.GetHealthConfiguration(), Times.Once);

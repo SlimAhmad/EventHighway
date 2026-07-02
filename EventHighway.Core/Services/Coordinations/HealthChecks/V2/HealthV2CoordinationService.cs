@@ -72,11 +72,10 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
             var allArchivedEvents =
                 await this.eventArchiveV2OrchestrationService
-                    .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+                    .RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken);
 
             var allArchivedListenerEvents =
-                await this.eventArchiveV2OrchestrationService
-                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+                allArchivedEvents.SelectMany(archive => archive.ListenerEventArchiveV2s);
 
             int totalAddresses = allAddresses.Count();
             int totalListeners = allListeners.Count();
