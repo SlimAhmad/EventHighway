@@ -7,8 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.HealthChecks.V2.Exceptions;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
-using EventHighway.Core.Models.Coordinations.HealthChecks.V2.Exceptions;
-using EventHighway.Core.Services.Coordinations.HealthChecks.V2;
+using EventHighway.Core.Models.Services.Orchestrations.RetrySummaries.V2.Exceptions;
+using EventHighway.Core.Services.Orchestrations.RetrySummaries.V2;
 using Xeptions;
 
 namespace EventHighway.Core.Clients.HealthChecks.V2
@@ -19,16 +19,16 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
     /// </summary>
     internal class HealthRetryClientV2 : IHealthRetryClientV2
     {
-        private readonly IHealthV2CoordinationService healthV2CoordinationService;
+        private readonly IRetrySummaryV2OrchestrationService retrySummaryV2OrchestrationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HealthRetryClientV2"/> class with the
-        /// specified health check coordination service.
+        /// specified retry summary orchestration service.
         /// </summary>
-        /// <param name="healthV2CoordinationService">The coordination service for health
-        /// checks.</param>
-        public HealthRetryClientV2(IHealthV2CoordinationService healthV2CoordinationService) =>
-            this.healthV2CoordinationService = healthV2CoordinationService;
+        /// <param name="retrySummaryV2OrchestrationService">The orchestration service for
+        /// retry-health summaries.</param>
+        public HealthRetryClientV2(IRetrySummaryV2OrchestrationService retrySummaryV2OrchestrationService) =>
+            this.retrySummaryV2OrchestrationService = retrySummaryV2OrchestrationService;
 
         /// <summary>
         /// Retrieves the current retry-health summary asynchronously by delegating to the
@@ -43,32 +43,20 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
         {
             try
             {
-                return await this.healthV2CoordinationService
+                return await this.retrySummaryV2OrchestrationService
                     .RetrieveRetryHealthV2Async(cancellationToken);
             }
-            catch (HealthV2CoordinationValidationException
-                healthV2CoordinationValidationException)
-            {
-                throw CreateHealthRetryClientV2ValidationException(
-                    healthV2CoordinationValidationException.InnerException as Xeption);
-            }
-            catch (HealthV2CoordinationDependencyValidationException
-                healthV2CoordinationDependencyValidationException)
-            {
-                throw CreateHealthRetryClientV2ValidationException(
-                    healthV2CoordinationDependencyValidationException.InnerException as Xeption);
-            }
-            catch (HealthV2CoordinationDependencyException
-                healthV2CoordinationDependencyException)
+            catch (RetrySummaryV2OrchestrationDependencyException
+                retrySummaryV2OrchestrationDependencyException)
             {
                 throw CreateHealthRetryClientV2DependencyException(
-                    healthV2CoordinationDependencyException.InnerException as Xeption);
+                    retrySummaryV2OrchestrationDependencyException.InnerException as Xeption);
             }
-            catch (HealthV2CoordinationServiceException
-                healthV2CoordinationServiceException)
+            catch (RetrySummaryV2OrchestrationServiceException
+                retrySummaryV2OrchestrationServiceException)
             {
                 throw CreateHealthRetryClientV2DependencyException(
-                    healthV2CoordinationServiceException.InnerException as Xeption);
+                    retrySummaryV2OrchestrationServiceException.InnerException as Xeption);
             }
             catch (OperationCanceledException)
             {
@@ -78,15 +66,6 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
             {
                 throw CreateHealthRetryClientV2ServiceException(exception as Xeption);
             }
-        }
-
-        private static HealthRetryClientV2ValidationException
-            CreateHealthRetryClientV2ValidationException(Xeption innerException)
-        {
-            return new HealthRetryClientV2ValidationException(
-                message: "Health client validation error occurred, fix the errors and try again.",
-                innerException: innerException,
-                data: innerException?.Data);
         }
 
         private static HealthRetryClientV2DependencyException
