@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -138,6 +140,36 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ParticipantSummar
             summaryUnknown.TotalEventsSubmitted.Should().Be(1);
             summaryUnknown.OwnedListeners.Should().Be(1);
             summaryUnknown.TotalListenerEvents.Should().Be(0);
+
+            VerifyParticipantFoundationMocksOnce(randomCancellationToken);
+        }
+
+        [Fact]
+        public async Task ShouldReturnEmptyParticipantSummaryV2WhenNoEventsOrListenersExistAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var windowStart = new DateTimeOffset(2026, 6, 24, 0, 0, 0, TimeSpan.Zero);
+            var emptyAddresses = Array.Empty<EventAddressV2>().AsQueryable();
+            var emptyEvents = Array.Empty<EventV2>().AsQueryable();
+            var emptyListeners = Array.Empty<EventListenerV2>().AsQueryable();
+            var emptyListenerEvents = Array.Empty<ListenerEventV2>().AsQueryable();
+
+            SetupParticipantFoundationMocks(
+                randomCancellationToken,
+                AttachEventListenerV2s(emptyAddresses, emptyListeners),
+                AttachListenerEventV2s(emptyEvents, emptyListenerEvents));
+
+            // when
+            var actualSummaries =
+                await this.participantSummaryV2OrchestrationService
+                    .RetrieveParticipantSummaryV2Async(
+                        TrafficPeriodV2.Day, windowStart, randomCancellationToken);
+
+            // then
+            actualSummaries.Should().BeEmpty();
 
             VerifyParticipantFoundationMocksOnce(randomCancellationToken);
         }
