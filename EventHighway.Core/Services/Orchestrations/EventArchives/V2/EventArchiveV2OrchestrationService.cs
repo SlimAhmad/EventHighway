@@ -104,14 +104,19 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
                         listenerEventArchiveV2.CreatedDate <= endDate.Value);
             }
 
+            List<Guid> matchingEventArchiveV2Ids =
+                listenerEventArchiveV2s
+                    .Select(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
+                    .Distinct()
+                    .ToList();
+
             IQueryable<EventArchiveV2> eventArchiveV2s =
                 await this.eventArchiveV2ProcessingService
                     .RetrieveAllEventArchiveV2sAsync(cancellationToken);
 
             eventArchiveV2s = eventArchiveV2s
                 .Where(eventArchiveV2 =>
-                    listenerEventArchiveV2s.Any(listenerEventArchiveV2 =>
-                        listenerEventArchiveV2.EventArchiveV2Id == eventArchiveV2.Id))
+                    matchingEventArchiveV2Ids.Contains(eventArchiveV2.Id))
                 .OrderBy(eventArchiveV2 => eventArchiveV2.CreatedDate)
                 .ThenBy(eventArchiveV2 => eventArchiveV2.Id)
                 .Skip(skip);
