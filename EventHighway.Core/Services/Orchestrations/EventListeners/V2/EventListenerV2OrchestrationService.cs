@@ -3,57 +3,27 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Abstractions.EventHandlers;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
-using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
-using EventHighway.Core.Services.Foundations.EventHandlers.V2;
 using EventHighway.Core.Services.Processings.EventListeners.V2;
-using EventHighway.Core.Services.Processings.ListenerEvents.V2;
 
 namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
 {
     internal partial class EventListenerV2OrchestrationService : IEventListenerV2OrchestrationService
     {
         private readonly IEventListenerV2ProcessingService eventListenerV2ProcessingService;
-        private readonly IListenerEventV2ProcessingService listenerEventV2ProcessingService;
-        private readonly IEventHandlerV2Service eventHandlerV2Service;
         private readonly ILoggingBroker loggingBroker;
 
         public EventListenerV2OrchestrationService(
             IEventListenerV2ProcessingService eventListenerV2ProcessingService,
-            IListenerEventV2ProcessingService listenerEventV2ProcessingService,
-            IEventHandlerV2Service eventHandlerV2Service,
             ILoggingBroker loggingBroker)
         {
             this.eventListenerV2ProcessingService = eventListenerV2ProcessingService;
-            this.listenerEventV2ProcessingService = listenerEventV2ProcessingService;
-            this.eventHandlerV2Service = eventHandlerV2Service;
             this.loggingBroker = loggingBroker;
         }
-
-        public ValueTask<IQueryable<EventListenerV2>> RetrieveAllEventListenerV2sAsync(
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await this.eventListenerV2ProcessingService
-                .RetrieveAllEventListenerV2sAsync(cancellationToken);
-        });
-
-        public ValueTask<IEnumerable<IEventHandler>> RetrieveAllEventHandlerV2sAsync(
-            CancellationToken cancellationToken = default) =>
-        TryCatch(() =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return ValueTask.FromResult(this.eventHandlerV2Service.RetrieveAllEventHandlerV2s());
-        });
 
         public ValueTask<EventListenerV2> AddEventListenerV2Async(
             EventListenerV2 eventListenerV2,
@@ -82,16 +52,6 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
                     cancellationToken);
         });
 
-        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await this.listenerEventV2ProcessingService
-                .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken);
-        });
-
         public ValueTask<EventListenerV2> RemoveEventListenerV2ByIdAsync(
             Guid eventListenerV2Id,
             CancellationToken cancellationToken = default) =>
@@ -116,56 +76,6 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
             return await this.eventListenerV2ProcessingService.RetrieveOrRegisterEventListenerV2Async(
                 eventListenerV2,
                 cancellationToken);
-        });
-
-        public ValueTask<ListenerEventV2> AddListenerEventV2Async(
-            ListenerEventV2 listenerEventV2,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ValidateListenerEventV2IsNotNull(listenerEventV2);
-
-            return await this.listenerEventV2ProcessingService.AddListenerEventV2Async(
-                listenerEventV2,
-                cancellationToken);
-        });
-
-        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await this.listenerEventV2ProcessingService
-                .RetrieveAllListenerEventV2sAsync(cancellationToken);
-        });
-
-        public ValueTask<ListenerEventV2> ModifyListenerEventV2Async(
-            ListenerEventV2 listenerEventV2,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ValidateListenerEventV2IsNotNull(listenerEventV2);
-
-            return await this.listenerEventV2ProcessingService.ModifyListenerEventV2Async(
-                listenerEventV2,
-                cancellationToken);
-        });
-
-        public ValueTask<ListenerEventV2> RemoveListenerEventV2ByIdAsync(
-            Guid listenerEventV2Id,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ValidateListenerEventV2Id(listenerEventV2Id);
-
-            return await this.listenerEventV2ProcessingService
-                .RemoveListenerEventV2ByIdAsync(
-                    listenerEventV2Id,
-                    cancellationToken);
         });
     }
 }
