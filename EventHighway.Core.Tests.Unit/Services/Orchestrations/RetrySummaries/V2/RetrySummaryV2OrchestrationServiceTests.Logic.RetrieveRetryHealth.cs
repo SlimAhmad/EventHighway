@@ -82,5 +82,43 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RetrySummaries.V2
 
             VerifyRetryFoundationMocksOnce(randomCancellationToken);
         }
+
+        [Fact]
+        public async Task ShouldReturnEmptyRetryHealthV2WhenNoActiveEventsExistAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            Guid addressAId = Guid.NewGuid();
+            DateTimeOffset anyDate = GetRandomDateTimeOffset();
+
+            var addresses = new[]
+            {
+                CreateEventAddressV2(addressAId, GetRandomString(), GetRandomString())
+            }.AsQueryable();
+
+            var events = new[]
+            {
+                CreateEventV2ForAddress(addressAId, anyDate, "h1", 1, EventStatusV2.Quarantined)
+            }.AsQueryable();
+
+            SetupRetryFoundationMocks(randomCancellationToken, addresses, events);
+
+            // when
+            RetryHealthSummaryV2 actualSummary =
+                await this.retrySummaryV2OrchestrationService
+                    .RetrieveRetryHealthV2Async(randomCancellationToken);
+
+            // then
+            actualSummary.TotalActiveEvents.Should().Be(0);
+            actualSummary.DeadEvents.Should().Be(0);
+            actualSummary.CriticalEvents.Should().Be(0);
+            actualSummary.HealthyEvents.Should().Be(0);
+            actualSummary.Distribution.Should().BeEmpty();
+            actualSummary.ByAddress.Should().BeEmpty();
+
+            VerifyRetryFoundationMocksOnce(randomCancellationToken);
+        }
     }
 }
