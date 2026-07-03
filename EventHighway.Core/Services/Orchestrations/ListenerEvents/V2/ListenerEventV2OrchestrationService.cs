@@ -74,6 +74,12 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
         public ValueTask<ListenerEventV2> RemoveListenerEventV2ByIdAsync(
             Guid listenerEventV2Id,
             CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventV2ProcessingService
+                .RemoveListenerEventV2ByIdAsync(listenerEventV2Id, cancellationToken);
+        });
     }
 }
