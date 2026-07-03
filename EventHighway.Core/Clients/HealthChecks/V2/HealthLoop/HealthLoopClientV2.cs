@@ -7,8 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.HealthChecks.V2.Exceptions;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
-using EventHighway.Core.Models.Coordinations.HealthChecks.V2.Exceptions;
-using EventHighway.Core.Services.Coordinations.HealthChecks.V2;
+using EventHighway.Core.Models.Services.Orchestrations.LoopDetections.V2.Exceptions;
+using EventHighway.Core.Services.Orchestrations.LoopDetections.V2;
 using Xeptions;
 
 namespace EventHighway.Core.Clients.HealthChecks.V2
@@ -19,16 +19,16 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
     /// </summary>
     internal class HealthLoopClientV2 : IHealthLoopClientV2
     {
-        private readonly IHealthV2CoordinationService healthV2CoordinationService;
+        private readonly ILoopDetectionV2OrchestrationService loopDetectionV2OrchestrationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HealthLoopClientV2"/> class with the
-        /// specified health check coordination service.
+        /// specified loop detection orchestration service.
         /// </summary>
-        /// <param name="healthV2CoordinationService">The coordination service for health
-        /// checks.</param>
-        public HealthLoopClientV2(IHealthV2CoordinationService healthV2CoordinationService) =>
-            this.healthV2CoordinationService = healthV2CoordinationService;
+        /// <param name="loopDetectionV2OrchestrationService">The orchestration service for
+        /// loop-detection summaries.</param>
+        public HealthLoopClientV2(ILoopDetectionV2OrchestrationService loopDetectionV2OrchestrationService) =>
+            this.loopDetectionV2OrchestrationService = loopDetectionV2OrchestrationService;
 
         /// <summary>
         /// Retrieves the loop-detection summary asynchronously by delegating to the
@@ -48,32 +48,20 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
         {
             try
             {
-                return await this.healthV2CoordinationService
+                return await this.loopDetectionV2OrchestrationService
                     .RetrieveLoopDetectionSummaryV2Async(period, windowStart, cancellationToken);
             }
-            catch (HealthV2CoordinationValidationException
-                healthV2CoordinationValidationException)
-            {
-                throw CreateHealthLoopClientV2ValidationException(
-                    healthV2CoordinationValidationException.InnerException as Xeption);
-            }
-            catch (HealthV2CoordinationDependencyValidationException
-                healthV2CoordinationDependencyValidationException)
-            {
-                throw CreateHealthLoopClientV2ValidationException(
-                    healthV2CoordinationDependencyValidationException.InnerException as Xeption);
-            }
-            catch (HealthV2CoordinationDependencyException
-                healthV2CoordinationDependencyException)
+            catch (LoopDetectionV2OrchestrationDependencyException
+                loopDetectionV2OrchestrationDependencyException)
             {
                 throw CreateHealthLoopClientV2DependencyException(
-                    healthV2CoordinationDependencyException.InnerException as Xeption);
+                    loopDetectionV2OrchestrationDependencyException.InnerException as Xeption);
             }
-            catch (HealthV2CoordinationServiceException
-                healthV2CoordinationServiceException)
+            catch (LoopDetectionV2OrchestrationServiceException
+                loopDetectionV2OrchestrationServiceException)
             {
                 throw CreateHealthLoopClientV2DependencyException(
-                    healthV2CoordinationServiceException.InnerException as Xeption);
+                    loopDetectionV2OrchestrationServiceException.InnerException as Xeption);
             }
             catch (OperationCanceledException)
             {
@@ -83,15 +71,6 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
             {
                 throw CreateHealthLoopClientV2ServiceException(exception as Xeption);
             }
-        }
-
-        private static HealthLoopClientV2ValidationException
-            CreateHealthLoopClientV2ValidationException(Xeption innerException)
-        {
-            return new HealthLoopClientV2ValidationException(
-                message: "Health client validation error occurred, fix the errors and try again.",
-                innerException: innerException,
-                data: innerException?.Data);
         }
 
         private static HealthLoopClientV2DependencyException
