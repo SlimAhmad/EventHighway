@@ -10,9 +10,9 @@ using FluentAssertions;
 using Force.DeepCloner;
 using Moq;
 
-namespace EventHighway.Core.Tests.Unit.Clients.ListenerEvents.V2
+namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ListenerEvents.V2
 {
-    public partial class ListenerEventV2ClientTests
+    public partial class ListenerEventV2OrchestrationServiceTests
     {
         [Fact]
         public async Task ShouldRemoveListenerEventV2ByIdAsync()
@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEvents.V2
             ListenerEventV2 expectedListenerEventV2 =
                 removedListenerEventV2.DeepClone();
 
-            this.listenerEventV2OrchestrationServiceMock.Setup(service =>
+            this.listenerEventV2ProcessingServiceMock.Setup(service =>
                 service.RemoveListenerEventV2ByIdAsync(
                     inputListenerEventV2Id,
                     randomCancellationToken))
@@ -41,22 +41,22 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEvents.V2
 
             // when
             ListenerEventV2 actualListenerEventV2 =
-                await this.listenerEventV2Client
+                await this.listenerEventV2OrchestrationService
                     .RemoveListenerEventV2ByIdAsync(
                         inputListenerEventV2Id,
                         randomCancellationToken);
 
             // then
-            actualListenerEventV2.Should()
-                .BeEquivalentTo(expectedListenerEventV2);
+            actualListenerEventV2.Should().BeEquivalentTo(expectedListenerEventV2);
 
-            this.listenerEventV2OrchestrationServiceMock.Verify(service =>
+            this.listenerEventV2ProcessingServiceMock.Verify(service =>
                 service.RemoveListenerEventV2ByIdAsync(
                     inputListenerEventV2Id,
                     randomCancellationToken),
                         Times.Once);
 
-            this.listenerEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

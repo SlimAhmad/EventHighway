@@ -35,6 +35,15 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
                 Parameter: nameof(listenerEventV2s)));
         }
 
+        private static void ValidateListenerEventV2Id(Guid listenerEventV2Id)
+        {
+            Validate(
+                message: "Listener event is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(listenerEventV2Id),
+                Parameter: nameof(ListenerEventV2.Id)));
+        }
+
         private static dynamic IsNull(IEnumerable<Guid> value) => new
         {
             Condition = value is null,
@@ -51,6 +60,12 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
         {
             Condition = value < 0,
             Message = "Value must be greater than or equal to 0"
+        };
+
+        private static dynamic IsInvalid(Guid id) => new
+        {
+            Condition = id == Guid.Empty,
+            Message = "Required"
         };
 
         private static void Validate(string message, params (dynamic Rule, string Parameter)[] validations)

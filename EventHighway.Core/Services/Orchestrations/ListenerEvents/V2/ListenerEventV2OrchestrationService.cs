@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
@@ -24,6 +25,26 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
             this.listenerEventV2ProcessingService = listenerEventV2ProcessingService;
             this.loggingBroker = loggingBroker;
         }
+
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventV2ProcessingService
+                .RetrieveAllListenerEventV2sAsync(cancellationToken);
+        });
+
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.listenerEventV2ProcessingService
+                .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken);
+        });
 
         public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
             IEnumerable<Guid> eventV2Ids,
@@ -48,6 +69,18 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
 
             await this.listenerEventV2ProcessingService
                 .BulkRemoveListenerEventV2sAsync(listenerEventV2s, cancellationToken);
+        });
+
+        public ValueTask<ListenerEventV2> RemoveListenerEventV2ByIdAsync(
+            Guid listenerEventV2Id,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateListenerEventV2Id(listenerEventV2Id);
+
+            return await this.listenerEventV2ProcessingService
+                .RemoveListenerEventV2ByIdAsync(listenerEventV2Id, cancellationToken);
         });
     }
 }

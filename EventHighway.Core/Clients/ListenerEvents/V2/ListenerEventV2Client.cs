@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.ListenerEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
-using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
-using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Orchestrations.ListenerEvents.V2.Exceptions;
+using EventHighway.Core.Services.Orchestrations.ListenerEvents.V2;
 using Xeptions;
 
 namespace EventHighway.Core.Clients.ListenerEvents.V2
@@ -20,18 +20,18 @@ namespace EventHighway.Core.Clients.ListenerEvents.V2
     /// </summary>
     internal class ListenerEventV2Client : IListenerEventV2Client
     {
-        private readonly IEventListenerV2OrchestrationService eventListenerV2OrchestrationService;
+        private readonly IListenerEventV2OrchestrationService listenerEventV2OrchestrationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListenerEventV2Client"/> class with
         /// the specified orchestration service.
         /// </summary>
-        /// <param name="eventListenerV2OrchestrationService">The orchestration service for
+        /// <param name="listenerEventV2OrchestrationService">The orchestration service for
         /// managing listener events.</param>
         /// <exception cref="ArgumentNullException">Thrown when
-        /// eventListenerV2OrchestrationService is null.</exception>
-        public ListenerEventV2Client(IEventListenerV2OrchestrationService eventListenerV2OrchestrationService) =>
-            this.eventListenerV2OrchestrationService = eventListenerV2OrchestrationService;
+        /// listenerEventV2OrchestrationService is null.</exception>
+        public ListenerEventV2Client(IListenerEventV2OrchestrationService listenerEventV2OrchestrationService) =>
+            this.listenerEventV2OrchestrationService = listenerEventV2OrchestrationService;
 
         /// <summary>
         /// Retrieves all listener events asynchronously by delegating to the orchestration
@@ -55,32 +55,32 @@ namespace EventHighway.Core.Clients.ListenerEvents.V2
         {
             try
             {
-                return await this.eventListenerV2OrchestrationService
+                return await this.listenerEventV2OrchestrationService
                     .RetrieveAllListenerEventV2sAsync(cancellationToken);
             }
-            catch (EventListenerV2OrchestrationValidationException
-                eventListenerV2OrchestrationValidationException)
+            catch (ListenerEventV2OrchestrationValidationException
+                listenerEventV2OrchestrationValidationException)
             {
                 throw CreateListenerEventV2ClientValidationException(
-                    eventListenerV2OrchestrationValidationException.InnerException as Xeption);
+                    listenerEventV2OrchestrationValidationException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationDependencyValidationException
-                eventListenerV2OrchestrationDependencyValidationException)
+            catch (ListenerEventV2OrchestrationDependencyValidationException
+                listenerEventV2OrchestrationDependencyValidationException)
             {
                 throw CreateListenerEventV2ClientValidationException(
-                    eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
+                    listenerEventV2OrchestrationDependencyValidationException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationDependencyException
-                eventListenerV2OrchestrationDependencyException)
+            catch (ListenerEventV2OrchestrationDependencyException
+                listenerEventV2OrchestrationDependencyException)
             {
                 throw CreateListenerEventV2ClientDependencyException(
-                    eventListenerV2OrchestrationDependencyException.InnerException as Xeption);
+                    listenerEventV2OrchestrationDependencyException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationServiceException
-                eventListenerV2OrchestrationServiceException)
+            catch (ListenerEventV2OrchestrationServiceException
+                listenerEventV2OrchestrationServiceException)
             {
                 throw CreateListenerEventV2ClientDependencyException(
-                    eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+                    listenerEventV2OrchestrationServiceException.InnerException as Xeption);
             }
             catch (OperationCanceledException)
             {
@@ -115,32 +115,32 @@ namespace EventHighway.Core.Clients.ListenerEvents.V2
         {
             try
             {
-                return await this.eventListenerV2OrchestrationService
+                return await this.listenerEventV2OrchestrationService
                     .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken);
             }
-            catch (EventListenerV2OrchestrationValidationException
-                eventListenerV2OrchestrationValidationException)
+            catch (ListenerEventV2OrchestrationValidationException
+                listenerEventV2OrchestrationValidationException)
             {
                 throw CreateListenerEventV2ClientValidationException(
-                    eventListenerV2OrchestrationValidationException.InnerException as Xeption);
+                    listenerEventV2OrchestrationValidationException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationDependencyValidationException
-                eventListenerV2OrchestrationDependencyValidationException)
+            catch (ListenerEventV2OrchestrationDependencyValidationException
+                listenerEventV2OrchestrationDependencyValidationException)
             {
                 throw CreateListenerEventV2ClientValidationException(
-                    eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
+                    listenerEventV2OrchestrationDependencyValidationException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationDependencyException
-                eventListenerV2OrchestrationDependencyException)
+            catch (ListenerEventV2OrchestrationDependencyException
+                listenerEventV2OrchestrationDependencyException)
             {
                 throw CreateListenerEventV2ClientDependencyException(
-                    eventListenerV2OrchestrationDependencyException.InnerException as Xeption);
+                    listenerEventV2OrchestrationDependencyException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationServiceException
-                eventListenerV2OrchestrationServiceException)
+            catch (ListenerEventV2OrchestrationServiceException
+                listenerEventV2OrchestrationServiceException)
             {
                 throw CreateListenerEventV2ClientDependencyException(
-                    eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+                    listenerEventV2OrchestrationServiceException.InnerException as Xeption);
             }
             catch (OperationCanceledException)
             {
@@ -178,32 +178,32 @@ namespace EventHighway.Core.Clients.ListenerEvents.V2
         {
             try
             {
-                return await this.eventListenerV2OrchestrationService
+                return await this.listenerEventV2OrchestrationService
                     .RemoveListenerEventV2ByIdAsync(listenerEventV2Id, cancellationToken);
             }
-            catch (EventListenerV2OrchestrationValidationException
-                eventListenerV2OrchestrationValidationException)
+            catch (ListenerEventV2OrchestrationValidationException
+                listenerEventV2OrchestrationValidationException)
             {
                 throw CreateListenerEventV2ClientValidationException(
-                    eventListenerV2OrchestrationValidationException.InnerException as Xeption);
+                    listenerEventV2OrchestrationValidationException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationDependencyValidationException
-                eventListenerV2OrchestrationDependencyValidationException)
+            catch (ListenerEventV2OrchestrationDependencyValidationException
+                listenerEventV2OrchestrationDependencyValidationException)
             {
                 throw CreateListenerEventV2ClientValidationException(
-                    eventListenerV2OrchestrationDependencyValidationException.InnerException as Xeption);
+                    listenerEventV2OrchestrationDependencyValidationException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationDependencyException
-                eventListenerV2OrchestrationDependencyException)
+            catch (ListenerEventV2OrchestrationDependencyException
+                listenerEventV2OrchestrationDependencyException)
             {
                 throw CreateListenerEventV2ClientDependencyException(
-                    eventListenerV2OrchestrationDependencyException.InnerException as Xeption);
+                    listenerEventV2OrchestrationDependencyException.InnerException as Xeption);
             }
-            catch (EventListenerV2OrchestrationServiceException
-                eventListenerV2OrchestrationServiceException)
+            catch (ListenerEventV2OrchestrationServiceException
+                listenerEventV2OrchestrationServiceException)
             {
                 throw CreateListenerEventV2ClientDependencyException(
-                    eventListenerV2OrchestrationServiceException.InnerException as Xeption);
+                    listenerEventV2OrchestrationServiceException.InnerException as Xeption);
             }
             catch (OperationCanceledException)
             {
