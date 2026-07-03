@@ -71,13 +71,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Traffics.V2
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutTrafficV2ProcessingException =
                 new TimeoutTrafficV2ProcessingException(
                     message: "Failed traffic processing timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedTrafficV2ProcessingDependencyException =
                 new TrafficV2ProcessingDependencyException(

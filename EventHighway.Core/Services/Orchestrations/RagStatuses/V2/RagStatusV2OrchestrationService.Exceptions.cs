@@ -29,21 +29,16 @@ namespace EventHighway.Core.Services.Orchestrations.RagStatuses.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutRagStatusV2OrchestrationException =
                     new TimeoutRagStatusV2OrchestrationException(
                         message: "Failed rag status orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var ragStatusV2OrchestrationDependencyException =
-                    new RagStatusV2OrchestrationDependencyException(
-                        message: "Rag status dependency error occurred, contact support.",
-                        innerException: timeoutRagStatusV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(ragStatusV2OrchestrationDependencyException);
-                throw ragStatusV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutRagStatusV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -84,6 +79,20 @@ namespace EventHighway.Core.Services.Orchestrations.RagStatuses.V2
                 throw await CreateAndLogServiceExceptionAsync(
                     failedRagStatusV2OrchestrationServiceException);
             }
+        }
+
+        private async ValueTask<RagStatusV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var ragStatusV2OrchestrationDependencyException =
+                new RagStatusV2OrchestrationDependencyException(
+                    message: "Rag status dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                ragStatusV2OrchestrationDependencyException);
+
+            return ragStatusV2OrchestrationDependencyException;
         }
 
         private async ValueTask<RagStatusV2OrchestrationDependencyException> CreateAndLogDependencyExceptionAsync(

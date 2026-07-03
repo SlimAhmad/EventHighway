@@ -27,21 +27,16 @@ namespace EventHighway.Core.Services.Orchestrations.RetrySummaries.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutRetrySummaryV2OrchestrationException =
                     new TimeoutRetrySummaryV2OrchestrationException(
                         message: "Failed retry summary orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var retrySummaryV2OrchestrationDependencyException =
-                    new RetrySummaryV2OrchestrationDependencyException(
-                        message: "Retry summary dependency error occurred, contact support.",
-                        innerException: timeoutRetrySummaryV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(retrySummaryV2OrchestrationDependencyException);
-                throw retrySummaryV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutRetrySummaryV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -74,6 +69,20 @@ namespace EventHighway.Core.Services.Orchestrations.RetrySummaries.V2
                 throw await CreateAndLogServiceExceptionAsync(
                     failedRetrySummaryV2OrchestrationServiceException);
             }
+        }
+
+        private async ValueTask<RetrySummaryV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var retrySummaryV2OrchestrationDependencyException =
+                new RetrySummaryV2OrchestrationDependencyException(
+                    message: "Retry summary dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                retrySummaryV2OrchestrationDependencyException);
+
+            return retrySummaryV2OrchestrationDependencyException;
         }
 
         private async ValueTask<RetrySummaryV2OrchestrationDependencyException> CreateAndLogDependencyExceptionAsync(

@@ -61,13 +61,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RetrySummaries.V2
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutRetrySummaryV2OrchestrationException =
                 new TimeoutRetrySummaryV2OrchestrationException(
                     message: "Failed retry summary orchestration timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedRetrySummaryV2OrchestrationDependencyException =
                 new RetrySummaryV2OrchestrationDependencyException(

@@ -86,21 +86,16 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutArchivingEventV2OrchestrationException =
                     new TimeoutArchivingEventV2OrchestrationException(
                         message: "Failed archiving event orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var archivingEventV2OrchestrationDependencyException =
-                    new ArchivingEventV2OrchestrationDependencyException(
-                        message: "Event dependency error occurred, contact support.",
-                        innerException: timeoutArchivingEventV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(archivingEventV2OrchestrationDependencyException);
-                throw archivingEventV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutArchivingEventV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {

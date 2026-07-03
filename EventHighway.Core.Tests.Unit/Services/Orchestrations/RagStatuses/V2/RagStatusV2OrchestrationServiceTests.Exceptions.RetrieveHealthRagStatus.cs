@@ -63,13 +63,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RagStatuses.V2
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutRagStatusV2OrchestrationException =
                 new TimeoutRagStatusV2OrchestrationException(
                     message: "Failed rag status orchestration timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedRagStatusV2OrchestrationDependencyException =
                 new RagStatusV2OrchestrationDependencyException(

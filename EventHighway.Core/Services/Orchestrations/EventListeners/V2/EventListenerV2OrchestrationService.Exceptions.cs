@@ -29,22 +29,16 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutEventListenerV2OrchestrationException =
                     new TimeoutEventListenerV2OrchestrationException(
                         message: "Failed event listener orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var eventListenerV2OrchestrationDependencyException =
-                    new EventListenerV2OrchestrationDependencyException(
-                        message: "Event listener dependency error occurred, contact support.",
-                        innerException: timeoutEventListenerV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(eventListenerV2OrchestrationDependencyException);
-
-                throw eventListenerV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutEventListenerV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -110,22 +104,16 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutEventListenerV2OrchestrationException =
                     new TimeoutEventListenerV2OrchestrationException(
                         message: "Failed event listener orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var eventListenerV2OrchestrationDependencyException =
-                    new EventListenerV2OrchestrationDependencyException(
-                        message: "Event listener dependency error occurred, contact support.",
-                        innerException: timeoutEventListenerV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(eventListenerV2OrchestrationDependencyException);
-
-                throw eventListenerV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutEventListenerV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -199,6 +187,20 @@ namespace EventHighway.Core.Services.Orchestrations.EventListeners.V2
             await this.loggingBroker.LogErrorAsync(eventListenerV2OrchestrationDependencyValidationException);
 
             return eventListenerV2OrchestrationDependencyValidationException;
+        }
+
+        private async ValueTask<EventListenerV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var eventListenerV2OrchestrationDependencyException =
+                new EventListenerV2OrchestrationDependencyException(
+                    message: "Event listener dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                eventListenerV2OrchestrationDependencyException);
+
+            return eventListenerV2OrchestrationDependencyException;
         }
 
         private async ValueTask<EventListenerV2OrchestrationDependencyException> CreateAndLogDependencyExceptionAsync(

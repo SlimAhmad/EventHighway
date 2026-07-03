@@ -25,21 +25,16 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutArchivingEventV2CoordinationException =
                     new TimeoutArchivingEventV2CoordinationException(
                         message: "Failed archiving event coordination timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var archivingEventV2CoordinationDependencyException =
-                    new ArchivingEventV2CoordinationDependencyException(
-                        message: "Archiving event dependency error occurred, contact support.",
-                        innerException: timeoutArchivingEventV2CoordinationException);
-
-                await this.loggingBroker.LogErrorAsync(archivingEventV2CoordinationDependencyException);
-                throw archivingEventV2CoordinationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutArchivingEventV2CoordinationException);
             }
             catch (OperationCanceledException)
             {
@@ -147,6 +142,19 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
             await this.loggingBroker.LogErrorAsync(archivingEventV2CoordinationDependencyValidationException);
 
             return archivingEventV2CoordinationDependencyValidationException;
+        }
+
+        private async ValueTask<ArchivingEventV2CoordinationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var archivingEventV2CoordinationDependencyException =
+                new ArchivingEventV2CoordinationDependencyException(
+                    message: "Archiving event dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(archivingEventV2CoordinationDependencyException);
+
+            return archivingEventV2CoordinationDependencyException;
         }
 
         private async ValueTask<ArchivingEventV2CoordinationDependencyException>

@@ -132,13 +132,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutEventV2OrchestrationException =
                 new TimeoutEventV2OrchestrationException(
                     message: "Failed event orchestration timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedEventV2OrchestrationDependencyException =
                 new EventV2OrchestrationDependencyException(

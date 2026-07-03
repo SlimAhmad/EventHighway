@@ -68,13 +68,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventFirings.V2
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutEventFiringV2OrchestrationException =
                 new TimeoutEventFiringV2OrchestrationException(
                     message: "Failed event firing orchestration timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedEventFiringV2OrchestrationDependencyException =
                 new EventFiringV2OrchestrationDependencyException(

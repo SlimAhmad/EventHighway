@@ -29,21 +29,16 @@ namespace EventHighway.Core.Services.Orchestrations.AddressSummaries.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutAddressSummaryV2OrchestrationException =
                     new TimeoutAddressSummaryV2OrchestrationException(
                         message: "Failed address summary orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var addressSummaryV2OrchestrationDependencyException =
-                    new AddressSummaryV2OrchestrationDependencyException(
-                        message: "Address summary dependency error occurred, contact support.",
-                        innerException: timeoutAddressSummaryV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(addressSummaryV2OrchestrationDependencyException);
-                throw addressSummaryV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutAddressSummaryV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -84,6 +79,20 @@ namespace EventHighway.Core.Services.Orchestrations.AddressSummaries.V2
                 throw await CreateAndLogServiceExceptionAsync(
                     failedAddressSummaryV2OrchestrationServiceException);
             }
+        }
+
+        private async ValueTask<AddressSummaryV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var addressSummaryV2OrchestrationDependencyException =
+                new AddressSummaryV2OrchestrationDependencyException(
+                    message: "Address summary dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                addressSummaryV2OrchestrationDependencyException);
+
+            return addressSummaryV2OrchestrationDependencyException;
         }
 
         private async ValueTask<AddressSummaryV2OrchestrationDependencyException> CreateAndLogDependencyExceptionAsync(
