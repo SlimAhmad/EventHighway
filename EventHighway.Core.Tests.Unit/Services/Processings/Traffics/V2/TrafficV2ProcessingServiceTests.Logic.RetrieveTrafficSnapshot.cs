@@ -90,5 +90,175 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Traffics.V2
             this.eventV2ServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldRetrieveTrafficSnapshotV2ForWeekWindowAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var windowStart = new DateTimeOffset(2026, 6, 15, 0, 0, 0, TimeSpan.Zero);
+            var expectedWindowEnd = new DateTimeOffset(2026, 6, 22, 0, 0, 0, TimeSpan.Zero);
+
+            EventV2 carrierEvent =
+                CreateEventV2WithDate(windowStart.AddDays(-40), EventTypeV2.Immediate);
+
+            carrierEvent.ListenerEventV2s = new[]
+            {
+                CreateListenerEventV2WithDate(windowStart.AddDays(2), ListenerEventStatusV2.Success)
+            };
+
+            IQueryable<EventV2> retrievedEvents = new[] { carrierEvent }.AsQueryable();
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(retrievedEvents);
+
+            // when
+            TrafficSnapshotV2 actualSnapshot =
+                await this.trafficV2ProcessingService
+                    .RetrieveTrafficSnapshotV2Async(
+                        TrafficPeriodV2.Week, windowStart, randomCancellationToken);
+
+            // then
+            actualSnapshot.WindowEnd.Should().Be(expectedWindowEnd);
+            actualSnapshot.WindowLabel.Should().Be("15 Jun – 21 Jun 2026");
+            actualSnapshot.TotalListenerEvents.Should().Be(1);
+            actualSnapshot.Buckets.Should().HaveCount(7);
+            actualSnapshot.Buckets.ElementAt(2).ListenerEvents.Should().Be(1);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldRetrieveTrafficSnapshotV2ForMonthWindowAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var windowStart = new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero);
+            var expectedWindowEnd = new DateTimeOffset(2026, 7, 1, 0, 0, 0, TimeSpan.Zero);
+
+            EventV2 carrierEvent =
+                CreateEventV2WithDate(windowStart.AddDays(-40), EventTypeV2.Immediate);
+
+            carrierEvent.ListenerEventV2s = new[]
+            {
+                CreateListenerEventV2WithDate(windowStart.AddDays(4), ListenerEventStatusV2.Success)
+            };
+
+            IQueryable<EventV2> retrievedEvents = new[] { carrierEvent }.AsQueryable();
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(retrievedEvents);
+
+            // when
+            TrafficSnapshotV2 actualSnapshot =
+                await this.trafficV2ProcessingService
+                    .RetrieveTrafficSnapshotV2Async(
+                        TrafficPeriodV2.Month, windowStart, randomCancellationToken);
+
+            // then
+            actualSnapshot.WindowEnd.Should().Be(expectedWindowEnd);
+            actualSnapshot.WindowLabel.Should().Be("Jun 2026");
+            actualSnapshot.Buckets.Should().HaveCount(30);
+            actualSnapshot.Buckets.ElementAt(0).Label.Should().Be("01");
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldRetrieveTrafficSnapshotV2ForYearWindowAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var windowStart = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            var expectedWindowEnd = new DateTimeOffset(2027, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+            EventV2 carrierEvent =
+                CreateEventV2WithDate(windowStart.AddDays(-40), EventTypeV2.Immediate);
+
+            carrierEvent.ListenerEventV2s = new[]
+            {
+                CreateListenerEventV2WithDate(
+                    new DateTimeOffset(2026, 3, 10, 0, 0, 0, TimeSpan.Zero),
+                    ListenerEventStatusV2.Success)
+            };
+
+            IQueryable<EventV2> retrievedEvents = new[] { carrierEvent }.AsQueryable();
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(retrievedEvents);
+
+            // when
+            TrafficSnapshotV2 actualSnapshot =
+                await this.trafficV2ProcessingService
+                    .RetrieveTrafficSnapshotV2Async(
+                        TrafficPeriodV2.Year, windowStart, randomCancellationToken);
+
+            // then
+            actualSnapshot.WindowEnd.Should().Be(expectedWindowEnd);
+            actualSnapshot.WindowLabel.Should().Be("2026");
+            actualSnapshot.Buckets.Should().HaveCount(12);
+            actualSnapshot.Buckets.ElementAt(2).Label.Should().Be("Mar");
+            actualSnapshot.Buckets.ElementAt(2).ListenerEvents.Should().Be(1);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ShouldSubstituteUtcNowWhenWindowStartIsMinValueOnRetrieveTrafficSnapshotAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            DateTimeOffset beforeCall = DateTimeOffset.UtcNow;
+            IQueryable<EventV2> emptyEvents = Array.Empty<EventV2>().AsQueryable();
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(emptyEvents);
+
+            // when
+            TrafficSnapshotV2 actualSnapshot =
+                await this.trafficV2ProcessingService
+                    .RetrieveTrafficSnapshotV2Async(
+                        TrafficPeriodV2.Day, DateTimeOffset.MinValue, randomCancellationToken);
+
+            // then
+            actualSnapshot.WindowStart.Should().BeOnOrAfter(beforeCall);
+            actualSnapshot.WindowStart.Should().NotBe(DateTimeOffset.MinValue);
+            actualSnapshot.WindowEnd.Should().Be(actualSnapshot.WindowStart.AddHours(24));
+            actualSnapshot.Buckets.Should().HaveCount(24);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(randomCancellationToken),
+                    Times.Once);
+
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
