@@ -328,5 +328,102 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RagStatuses.V2
 
             VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
         }
+
+        [Fact]
+        public async Task ShouldReturnAmberForArchiveErrorRateWhenBetweenGreenAndRedAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var events = AttachListenerEventV2s(
+                CreateRandomEventV2s(immediateCount: 2, scheduledCount: 1, deadCount: 0),
+                CreateRandomListenerEventV2s(successCount: 9, pendingCount: 0, errorCount: 0));
+
+            var archives = AttachListenerEventArchiveV2s(
+                CreateRandomEventArchiveV2s(),
+                CreateRandomListenerEventArchiveV2s(successCount: 8, errorCount: 2));
+
+            SetupRagStatusFoundationMocks(
+                randomCancellationToken, CreateAddressesWithListeners(5, 1), events, archives);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.ragStatusV2OrchestrationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Archive Error Rate %")
+                .StatusCode.Should().Be((int)HealthStatusV2.Amber);
+
+            VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
+        }
+
+        [Fact]
+        public async Task ShouldReturnRedForArchiveErrorRateWhenAtOrAboveRedAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var events = AttachListenerEventV2s(
+                CreateRandomEventV2s(immediateCount: 2, scheduledCount: 1, deadCount: 0),
+                CreateRandomListenerEventV2s(successCount: 9, pendingCount: 0, errorCount: 0));
+
+            var archives = AttachListenerEventArchiveV2s(
+                CreateRandomEventArchiveV2s(),
+                CreateRandomListenerEventArchiveV2s(successCount: 7, errorCount: 3));
+
+            SetupRagStatusFoundationMocks(
+                randomCancellationToken, CreateAddressesWithListeners(5, 1), events, archives);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.ragStatusV2OrchestrationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Archive Error Rate %")
+                .StatusCode.Should().Be((int)HealthStatusV2.Red);
+
+            VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
+        }
+
+        [Fact]
+        public async Task ShouldReturnNAForArchiveErrorRateWhenNoThresholdIsConfiguredAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var configWithoutArchiveErrorRate = new HealthConfiguration();
+            configWithoutArchiveErrorRate.Thresholds.RemoveAll(t => t.Metric == HealthMetric.ArchiveErrorRate);
+
+            this.configurationBrokerMock
+                .Setup(broker => broker.GetHealthConfiguration())
+                .Returns(configWithoutArchiveErrorRate);
+
+            var events = AttachListenerEventV2s(
+                CreateRandomEventV2s(immediateCount: 2, scheduledCount: 1, deadCount: 0),
+                CreateRandomListenerEventV2s(successCount: 9, pendingCount: 0, errorCount: 0));
+
+            var archives = AttachListenerEventArchiveV2s(
+                CreateRandomEventArchiveV2s(),
+                CreateRandomListenerEventArchiveV2s(successCount: 7, errorCount: 3));
+
+            SetupRagStatusFoundationMocks(
+                randomCancellationToken, CreateAddressesWithListeners(5, 1), events, archives);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.ragStatusV2OrchestrationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Event Archives" && i.Item == "Archive Error Rate %")
+                .StatusCode.Should().Be((int)HealthStatusV2.NA);
+
+            VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
+        }
     }
 }
