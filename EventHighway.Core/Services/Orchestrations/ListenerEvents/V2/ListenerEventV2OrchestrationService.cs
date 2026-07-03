@@ -36,6 +36,10 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
                 .RetrieveAllListenerEventV2sAsync(cancellationToken);
         });
 
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sWithEventListenerV2Async(
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
             IEnumerable<Guid> eventV2Ids,
             int take,
