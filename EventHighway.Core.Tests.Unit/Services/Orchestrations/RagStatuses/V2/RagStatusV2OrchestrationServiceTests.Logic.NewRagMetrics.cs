@@ -134,5 +134,102 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RagStatuses.V2
 
             VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
         }
+
+        [Fact]
+        public async Task ShouldReturnAmberForPendingBacklogWhenBetweenGreenAndRedAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var events = AttachListenerEventV2s(
+                CreateRandomEventV2s(immediateCount: 2, scheduledCount: 1, deadCount: 0),
+                CreateRandomListenerEventV2s(successCount: 9, pendingCount: 100, errorCount: 0));
+
+            var archives = AttachListenerEventArchiveV2s(
+                CreateRandomEventArchiveV2s(),
+                CreateRandomListenerEventArchiveV2s(successCount: 9, errorCount: 0));
+
+            SetupRagStatusFoundationMocks(
+                randomCancellationToken, CreateAddressesWithListeners(5, 1), events, archives);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.ragStatusV2OrchestrationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Pending Listener Events")
+                .StatusCode.Should().Be((int)HealthStatusV2.Amber);
+
+            VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
+        }
+
+        [Fact]
+        public async Task ShouldReturnRedForPendingBacklogWhenAtOrAboveRedAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var events = AttachListenerEventV2s(
+                CreateRandomEventV2s(immediateCount: 2, scheduledCount: 1, deadCount: 0),
+                CreateRandomListenerEventV2s(successCount: 9, pendingCount: 500, errorCount: 0));
+
+            var archives = AttachListenerEventArchiveV2s(
+                CreateRandomEventArchiveV2s(),
+                CreateRandomListenerEventArchiveV2s(successCount: 9, errorCount: 0));
+
+            SetupRagStatusFoundationMocks(
+                randomCancellationToken, CreateAddressesWithListeners(5, 1), events, archives);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.ragStatusV2OrchestrationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Pending Listener Events")
+                .StatusCode.Should().Be((int)HealthStatusV2.Red);
+
+            VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
+        }
+
+        [Fact]
+        public async Task ShouldReturnNAForPendingBacklogWhenNoThresholdIsConfiguredAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var configWithoutPendingBacklog = new HealthConfiguration();
+            configWithoutPendingBacklog.Thresholds.RemoveAll(t => t.Metric == HealthMetric.PendingBacklog);
+
+            this.configurationBrokerMock
+                .Setup(broker => broker.GetHealthConfiguration())
+                .Returns(configWithoutPendingBacklog);
+
+            var events = AttachListenerEventV2s(
+                CreateRandomEventV2s(immediateCount: 2, scheduledCount: 1, deadCount: 0),
+                CreateRandomListenerEventV2s(successCount: 9, pendingCount: 100, errorCount: 0));
+
+            var archives = AttachListenerEventArchiveV2s(
+                CreateRandomEventArchiveV2s(),
+                CreateRandomListenerEventArchiveV2s(successCount: 9, errorCount: 0));
+
+            SetupRagStatusFoundationMocks(
+                randomCancellationToken, CreateAddressesWithListeners(5, 1), events, archives);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.ragStatusV2OrchestrationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Pending Listener Events")
+                .StatusCode.Should().Be((int)HealthStatusV2.NA);
+
+            VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
+        }
     }
 }
