@@ -30,7 +30,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             IEnumerable<HealthCheckItemV2> expectedHealthCheckItemV2s =
                 returnedHealthCheckItemV2s.DeepClone();
 
-            this.healthV2CoordinationServiceMock.Setup(service =>
+            this.ragStatusV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveHealthRagStatusV2Async(randomCancellationToken))
                     .ReturnsAsync(returnedHealthCheckItemV2s);
 
@@ -43,11 +43,11 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             actualHealthCheckItemV2s.Should()
                 .BeEquivalentTo(expectedHealthCheckItemV2s);
 
-            this.healthV2CoordinationServiceMock.Verify(service =>
+            this.ragStatusV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveHealthRagStatusV2Async(randomCancellationToken),
                     Times.Once);
 
-            this.healthV2CoordinationServiceMock
+            this.ragStatusV2OrchestrationServiceMock
                 .VerifyNoOtherCalls();
         }
     }
