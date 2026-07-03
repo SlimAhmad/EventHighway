@@ -27,21 +27,16 @@ namespace EventHighway.Core.Services.Orchestrations.DuplicateSummaries.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutDuplicateSummaryV2OrchestrationException =
                     new TimeoutDuplicateSummaryV2OrchestrationException(
                         message: "Failed duplicate summary orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var duplicateSummaryV2OrchestrationDependencyException =
-                    new DuplicateSummaryV2OrchestrationDependencyException(
-                        message: "Duplicate summary dependency error occurred, contact support.",
-                        innerException: timeoutDuplicateSummaryV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(duplicateSummaryV2OrchestrationDependencyException);
-                throw duplicateSummaryV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutDuplicateSummaryV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -74,6 +69,20 @@ namespace EventHighway.Core.Services.Orchestrations.DuplicateSummaries.V2
                 throw await CreateAndLogServiceExceptionAsync(
                     failedDuplicateSummaryV2OrchestrationServiceException);
             }
+        }
+
+        private async ValueTask<DuplicateSummaryV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var duplicateSummaryV2OrchestrationDependencyException =
+                new DuplicateSummaryV2OrchestrationDependencyException(
+                    message: "Duplicate summary dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                duplicateSummaryV2OrchestrationDependencyException);
+
+            return duplicateSummaryV2OrchestrationDependencyException;
         }
 
         private async ValueTask<DuplicateSummaryV2OrchestrationDependencyException> CreateAndLogDependencyExceptionAsync(

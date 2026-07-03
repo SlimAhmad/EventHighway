@@ -28,21 +28,16 @@ namespace EventHighway.Core.Services.Orchestrations.LoopDetections.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutLoopDetectionV2OrchestrationException =
                     new TimeoutLoopDetectionV2OrchestrationException(
                         message: "Failed loop detection orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var loopDetectionV2OrchestrationDependencyException =
-                    new LoopDetectionV2OrchestrationDependencyException(
-                        message: "Loop detection dependency error occurred, contact support.",
-                        innerException: timeoutLoopDetectionV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(loopDetectionV2OrchestrationDependencyException);
-                throw loopDetectionV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutLoopDetectionV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -83,6 +78,20 @@ namespace EventHighway.Core.Services.Orchestrations.LoopDetections.V2
                 throw await CreateAndLogServiceExceptionAsync(
                     failedLoopDetectionV2OrchestrationServiceException);
             }
+        }
+
+        private async ValueTask<LoopDetectionV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var loopDetectionV2OrchestrationDependencyException =
+                new LoopDetectionV2OrchestrationDependencyException(
+                    message: "Loop detection dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                loopDetectionV2OrchestrationDependencyException);
+
+            return loopDetectionV2OrchestrationDependencyException;
         }
 
         private async ValueTask<LoopDetectionV2OrchestrationDependencyException> CreateAndLogDependencyExceptionAsync(

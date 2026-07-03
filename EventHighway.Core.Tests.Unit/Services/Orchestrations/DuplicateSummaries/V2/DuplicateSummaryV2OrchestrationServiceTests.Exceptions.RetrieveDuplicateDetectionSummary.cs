@@ -62,13 +62,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.DuplicateSummarie
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutDuplicateSummaryV2OrchestrationException =
                 new TimeoutDuplicateSummaryV2OrchestrationException(
                     message: "Failed duplicate summary orchestration timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedDuplicateSummaryV2OrchestrationDependencyException =
                 new DuplicateSummaryV2OrchestrationDependencyException(

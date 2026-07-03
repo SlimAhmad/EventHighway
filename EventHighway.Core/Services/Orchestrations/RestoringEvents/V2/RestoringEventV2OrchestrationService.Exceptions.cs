@@ -26,23 +26,16 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutRestoringEventV2OrchestrationException =
                     new TimeoutRestoringEventV2OrchestrationException(
                         message: "Failed restoring event orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var restoringEventV2OrchestrationDependencyException =
-                    new RestoringEventV2OrchestrationDependencyException(
-                        message: "Restoring event dependency error occurred, contact support.",
-                        innerException: timeoutRestoringEventV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(
-                    restoringEventV2OrchestrationDependencyException);
-
-                throw restoringEventV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutRestoringEventV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -138,6 +131,20 @@ namespace EventHighway.Core.Services.Orchestrations.RestoringEvents.V2
                 restoringEventV2OrchestrationServiceException);
 
             return restoringEventV2OrchestrationServiceException;
+        }
+
+        private async ValueTask<RestoringEventV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var restoringEventV2OrchestrationDependencyException =
+                new RestoringEventV2OrchestrationDependencyException(
+                    message: "Restoring event dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                restoringEventV2OrchestrationDependencyException);
+
+            return restoringEventV2OrchestrationDependencyException;
         }
 
         private async ValueTask<RestoringEventV2OrchestrationDependencyException>

@@ -24,13 +24,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutArchivingEventV2OrchestrationException =
                 new TimeoutArchivingEventV2OrchestrationException(
                     message: "Failed archiving event orchestration timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedArchivingEventV2OrchestrationDependencyException =
                 new ArchivingEventV2OrchestrationDependencyException(
@@ -71,7 +71,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.configurationBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -126,7 +125,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.configurationBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -181,7 +179,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.configurationBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -241,7 +238,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.configurationBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -281,7 +277,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.configurationBrokerMock.VerifyNoOtherCalls();
         }
     }

@@ -169,13 +169,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutEventV2CoordinationException =
                 new TimeoutEventV2CoordinationException(
                     message: "Failed event coordination timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedEventV2CoordinationDependencyException =
                 new EventV2CoordinationDependencyException(

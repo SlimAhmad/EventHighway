@@ -13,6 +13,7 @@ using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Models.Services.Orchestrations.EventFirings.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.EventParticipants.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
 using EventHighway.Core.Services.Coordinations.Events.V2;
@@ -76,6 +77,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     someMessage,
                     someInnerException),
 
+                new EventFiringV2OrchestrationValidationException(
+                    someMessage,
+                    someInnerException),
+
+                new EventFiringV2OrchestrationDependencyValidationException(
+                    someMessage,
+                    someInnerException),
+
                 new EventParticipantV2OrchestrationValidationException(
                     someMessage,
                     someInnerException),
@@ -98,6 +107,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     someInnerException),
 
                 new EventV2OrchestrationServiceException(
+                    someMessage,
+                    someInnerException),
+
+                new EventFiringV2OrchestrationDependencyException(
+                    someMessage,
+                    someInnerException),
+
+                new EventFiringV2OrchestrationServiceException(
                     someMessage,
                     someInnerException),
 

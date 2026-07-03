@@ -26,23 +26,16 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutReplayingEventV2CoordinationException =
                     new TimeoutReplayingEventV2CoordinationException(
                         message: "Failed replaying event coordination timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var replayingEventV2CoordinationDependencyException =
-                    new ReplayingEventV2CoordinationDependencyException(
-                        message: "Replaying event dependency error occurred, contact support.",
-                        innerException: timeoutReplayingEventV2CoordinationException);
-
-                await this.loggingBroker.LogErrorAsync(
-                    replayingEventV2CoordinationDependencyException);
-
-                throw replayingEventV2CoordinationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutReplayingEventV2CoordinationException);
             }
             catch (OperationCanceledException)
             {
@@ -138,6 +131,20 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
                 replayingEventV2CoordinationServiceException);
 
             return replayingEventV2CoordinationServiceException;
+        }
+
+        private async ValueTask<ReplayingEventV2CoordinationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var replayingEventV2CoordinationDependencyException =
+                new ReplayingEventV2CoordinationDependencyException(
+                    message: "Replaying event dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                replayingEventV2CoordinationDependencyException);
+
+            return replayingEventV2CoordinationDependencyException;
         }
 
         private async ValueTask<ReplayingEventV2CoordinationDependencyException>

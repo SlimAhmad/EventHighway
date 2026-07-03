@@ -28,21 +28,16 @@ namespace EventHighway.Core.Services.Orchestrations.ParticipantSummaries.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutParticipantSummaryV2OrchestrationException =
                     new TimeoutParticipantSummaryV2OrchestrationException(
                         message: "Failed participant summary orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var participantSummaryV2OrchestrationDependencyException =
-                    new ParticipantSummaryV2OrchestrationDependencyException(
-                        message: "Participant summary dependency error occurred, contact support.",
-                        innerException: timeoutParticipantSummaryV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(participantSummaryV2OrchestrationDependencyException);
-                throw participantSummaryV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutParticipantSummaryV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -75,6 +70,20 @@ namespace EventHighway.Core.Services.Orchestrations.ParticipantSummaries.V2
                 throw await CreateAndLogServiceExceptionAsync(
                     failedParticipantSummaryV2OrchestrationServiceException);
             }
+        }
+
+        private async ValueTask<ParticipantSummaryV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var participantSummaryV2OrchestrationDependencyException =
+                new ParticipantSummaryV2OrchestrationDependencyException(
+                    message: "Participant summary dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(
+                participantSummaryV2OrchestrationDependencyException);
+
+            return participantSummaryV2OrchestrationDependencyException;
         }
 
         private async ValueTask<ParticipantSummaryV2OrchestrationDependencyException> CreateAndLogDependencyExceptionAsync(

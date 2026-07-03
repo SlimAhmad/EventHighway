@@ -28,22 +28,16 @@ namespace EventHighway.Core.Services.Orchestrations.EventFirings.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutEventFiringV2OrchestrationException =
                     new TimeoutEventFiringV2OrchestrationException(
                         message: "Failed event firing orchestration timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var eventFiringV2OrchestrationDependencyException =
-                    new EventFiringV2OrchestrationDependencyException(
-                        message: "Event firing dependency error occurred, contact support.",
-                        innerException: timeoutEventFiringV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(eventFiringV2OrchestrationDependencyException);
-
-                throw eventFiringV2OrchestrationDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutEventFiringV2OrchestrationException);
             }
             catch (OperationCanceledException)
             {
@@ -165,6 +159,19 @@ namespace EventHighway.Core.Services.Orchestrations.EventFirings.V2
                 eventFiringV2OrchestrationDependencyValidationException);
 
             return eventFiringV2OrchestrationDependencyValidationException;
+        }
+
+        private async ValueTask<EventFiringV2OrchestrationDependencyException>
+            CreateAndLogTimeoutDependencyExceptionAsync(Xeption exception)
+        {
+            var eventFiringV2OrchestrationDependencyException =
+                new EventFiringV2OrchestrationDependencyException(
+                    message: "Event firing dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(eventFiringV2OrchestrationDependencyException);
+
+            return eventFiringV2OrchestrationDependencyException;
         }
 
         private async ValueTask<EventFiringV2OrchestrationDependencyException>

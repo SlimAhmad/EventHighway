@@ -124,13 +124,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutReplayingEventV2CoordinationException =
                 new TimeoutReplayingEventV2CoordinationException(
                     message: "Failed replaying event coordination timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedException =
                 new ReplayingEventV2CoordinationDependencyException(

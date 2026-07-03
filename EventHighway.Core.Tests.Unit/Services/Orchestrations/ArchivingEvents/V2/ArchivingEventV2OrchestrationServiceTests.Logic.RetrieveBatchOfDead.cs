@@ -60,7 +60,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             this.configurationBrokerMock.VerifyNoOtherCalls();
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
-            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
 
@@ -110,7 +109,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ArchivingEvents.V
 
             this.configurationBrokerMock.VerifyNoOtherCalls();
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
-            this.listenerEventV2ProcessingServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

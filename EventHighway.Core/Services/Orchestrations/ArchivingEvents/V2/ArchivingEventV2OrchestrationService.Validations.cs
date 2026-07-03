@@ -74,14 +74,5 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
                     message: "Events are null.");
             }
         }
-
-        private static void ValidateEventV2IsNotNull(EventV2 eventV2)
-        {
-            if (eventV2 is null)
-            {
-                throw new NullArchivingEventV2OrchestrationException(
-                    message: "Event is null.");
-            }
-        }
     }
 }

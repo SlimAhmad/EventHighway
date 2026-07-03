@@ -68,13 +68,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutArchivingEventV2CoordinationException =
                 new TimeoutArchivingEventV2CoordinationException(
                     message: "Failed archiving event coordination timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedArchivingEventV2CoordinationDependencyException =
                 new ArchivingEventV2CoordinationDependencyException(

@@ -26,21 +26,16 @@ namespace EventHighway.Core.Services.Processings.Traffics.V2
                 when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
             {
                 var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
+                    new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
                 var timeoutTrafficV2ProcessingException =
                     new TimeoutTrafficV2ProcessingException(
                         message: "Failed traffic processing timeout error occurred, contact support.",
                         innerException: timeoutException,
-                        data: timeoutException.Data);
+                        data: operationCanceledException.Data);
 
-                var trafficV2ProcessingDependencyException =
-                    new TrafficV2ProcessingDependencyException(
-                        message: "Traffic dependency error occurred, contact support.",
-                        innerException: timeoutTrafficV2ProcessingException);
-
-                await this.loggingBroker.LogErrorAsync(trafficV2ProcessingDependencyException);
-                throw trafficV2ProcessingDependencyException;
+                throw await CreateAndLogTimeoutDependencyExceptionAsync(
+                    timeoutTrafficV2ProcessingException);
             }
             catch (OperationCanceledException)
             {
@@ -65,6 +60,19 @@ namespace EventHighway.Core.Services.Processings.Traffics.V2
                 throw await CreateAndLogServiceExceptionAsync(
                     failedTrafficV2ProcessingServiceException);
             }
+        }
+
+        private async ValueTask<TrafficV2ProcessingDependencyException> CreateAndLogTimeoutDependencyExceptionAsync(
+            Xeption exception)
+        {
+            var trafficV2ProcessingDependencyException =
+                new TrafficV2ProcessingDependencyException(
+                    message: "Traffic dependency error occurred, contact support.",
+                    innerException: exception);
+
+            await this.loggingBroker.LogErrorAsync(trafficV2ProcessingDependencyException);
+
+            return trafficV2ProcessingDependencyException;
         }
 
         private async ValueTask<TrafficV2ProcessingDependencyException> CreateAndLogDependencyExceptionAsync(

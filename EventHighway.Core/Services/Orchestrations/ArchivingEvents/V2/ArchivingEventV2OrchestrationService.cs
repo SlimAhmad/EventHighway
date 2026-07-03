@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Copyright (c) The Standard Organization: A coalition of the Good-Hearted Engineers
 // ----------------------------------------------------------------------------------
 
@@ -13,29 +13,24 @@ using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Configurations.LoopDetections;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Processings.Events.V2;
-using EventHighway.Core.Services.Processings.ListenerEvents.V2;
 
 namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 {
     internal partial class ArchivingEventV2OrchestrationService : IArchivingEventV2OrchestrationService
     {
         private readonly IEventV2ProcessingService eventV2ProcessingService;
-        private readonly IListenerEventV2ProcessingService listenerEventV2ProcessingService;
         private readonly IConfigurationBroker configurationBroker;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public ArchivingEventV2OrchestrationService(
             IEventV2ProcessingService eventV2ProcessingService,
-            IListenerEventV2ProcessingService listenerEventV2ProcessingService,
             IConfigurationBroker configurationBroker,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2ProcessingService = eventV2ProcessingService;
-            this.listenerEventV2ProcessingService = listenerEventV2ProcessingService;
             this.configurationBroker = configurationBroker;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
@@ -108,26 +103,6 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
 
             await this.eventV2ProcessingService
                 .BulkRemoveEventV2sAsync(eventV2s, cancellationToken);
-        });
-
-        public ValueTask RemoveEventV2AndListenerEventV2sAsync(
-            EventV2 eventV2,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ValidateEventV2IsNotNull(eventV2);
-
-            IEnumerable<ListenerEventV2> listenerEventV2s =
-                eventV2.ListenerEventV2s ?? Enumerable.Empty<ListenerEventV2>();
-
-            foreach (ListenerEventV2 listenerEventV2 in listenerEventV2s)
-            {
-                await this.listenerEventV2ProcessingService
-                    .RemoveListenerEventV2ByIdAsync(listenerEventV2.Id, cancellationToken);
-            }
-
-            await this.eventV2ProcessingService.RemoveEventV2ByIdAsync(eventV2.Id, cancellationToken);
         });
     }
 }

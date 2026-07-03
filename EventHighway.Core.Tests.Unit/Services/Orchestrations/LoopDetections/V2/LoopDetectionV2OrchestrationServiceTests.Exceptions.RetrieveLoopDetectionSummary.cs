@@ -64,13 +64,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.LoopDetections.V2
             var operationCanceledException = new OperationCanceledException();
 
             var timeoutException =
-                new TimeoutException("The dependency operation timed out.");
+                new TimeoutException("The dependency operation timed out.", operationCanceledException);
 
             var timeoutLoopDetectionV2OrchestrationException =
                 new TimeoutLoopDetectionV2OrchestrationException(
                     message: "Failed loop detection orchestration timeout error occurred, contact support.",
                     innerException: timeoutException,
-                    data: timeoutException.Data);
+                    data: operationCanceledException.Data);
 
             var expectedLoopDetectionV2OrchestrationDependencyException =
                 new LoopDetectionV2OrchestrationDependencyException(
