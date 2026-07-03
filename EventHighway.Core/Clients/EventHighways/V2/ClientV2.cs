@@ -53,6 +53,7 @@ using EventHighway.Core.Services.Processings.EventListeners.V2;
 using EventHighway.Core.Services.Processings.Events.V2;
 using EventHighway.Core.Services.Processings.ListenerEventArchives.V2;
 using EventHighway.Core.Services.Processings.ListenerEvents.V2;
+using EventHighway.Core.Services.Processings.Traffics.V2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -328,6 +329,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IListenerEventArchiveV2ProcessingService,
                 ListenerEventArchiveV2ProcessingService>();
+
+            services.AddTransient<
+                ITrafficV2ProcessingService,
+                TrafficV2ProcessingService>();
         }
 
         private static void RegisterOrchestrationServices(IServiceCollection services)
