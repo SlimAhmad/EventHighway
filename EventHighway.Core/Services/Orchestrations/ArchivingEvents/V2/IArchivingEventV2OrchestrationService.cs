@@ -17,10 +17,6 @@ namespace EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2
         ValueTask<IEnumerable<EventV2>> RetrieveBatchOfDeadEventV2sAsync(
             CancellationToken cancellationToken = default);
 
-        ValueTask RemoveEventV2AndListenerEventV2sAsync(
-            EventV2 eventV2,
-            CancellationToken cancellationToken = default);
-
         ValueTask BulkRemoveEventV2sAsync(
             IEnumerable<EventV2> eventV2s,
             CancellationToken cancellationToken = default);
