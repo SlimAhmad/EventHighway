@@ -4,7 +4,6 @@
 
 using System;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
-using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
 
@@ -12,15 +11,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
 {
     internal partial class EventV2OrchestrationService
     {
-        private static void ValidateEventCallV2IsNotNull(EventCallV2 eventCallV2)
-        {
-            if (eventCallV2 is null)
-            {
-                throw new NullEventCallV2OrchestrationException(
-                    message: "Event call is null.");
-            }
-        }
-
         private static void ValidateEventV2IsNotNull(EventV2 eventV2)
         {
             if (eventV2 is null)

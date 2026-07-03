@@ -3,17 +3,13 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
-using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.EventAddresses.V2.Exceptions;
-using EventHighway.Core.Models.Services.Processings.EventCalls.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.Events.V2.Exceptions;
 using Xeptions;
 
@@ -24,10 +20,7 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
         private delegate ValueTask<EventV2> ReturningEventV2Function();
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
         private delegate ValueTask<IQueryable<EventAddressV2>> ReturningEventAddressV2sFunction();
-        private delegate ValueTask<EventCallV2> ReturningEventCallV2Function();
         private delegate ValueTask<bool> ReturningBoolFunction();
-        private delegate ValueTask<IEnumerable<string>> ReturningPromotedPropertyKeysFunction();
-        private delegate ValueTask<List<PromotedProperty>> ReturningPromotedPropertiesListFunction();
 
         private async ValueTask<EventV2> TryCatch(ReturningEventV2Function returningEventV2Function)
         {
@@ -101,18 +94,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventAddressV2ProcessingDependencyValidationException);
             }
-            catch (EventCallV2ProcessingValidationException
-                eventCallV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingValidationException);
-            }
-            catch (EventCallV2ProcessingDependencyValidationException
-                eventCallV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingDependencyValidationException);
-            }
             catch (EventV2ProcessingDependencyException
                 eventV2ProcessingDependencyException)
             {
@@ -136,18 +117,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             {
                 throw await CreateAndLogDependencyExceptionAsync(
                     eventAddressV2ProcessingServiceException);
-            }
-            catch (EventCallV2ProcessingDependencyException
-                eventCallV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingDependencyException);
-            }
-            catch (EventCallV2ProcessingServiceException
-                eventCallV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingServiceException);
             }
             catch (Exception exception)
             {
@@ -217,18 +186,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventAddressV2ProcessingDependencyValidationException);
             }
-            catch (EventCallV2ProcessingValidationException
-                eventCallV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingValidationException);
-            }
-            catch (EventCallV2ProcessingDependencyValidationException
-                eventCallV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingDependencyValidationException);
-            }
             catch (EventV2ProcessingDependencyException eventV2ProcessingDependencyException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventV2ProcessingDependencyException);
@@ -246,16 +203,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 eventAddressV2ProcessingServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventAddressV2ProcessingServiceException);
-            }
-            catch (EventCallV2ProcessingDependencyException
-                eventCallV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventCallV2ProcessingDependencyException);
-            }
-            catch (EventCallV2ProcessingServiceException
-                eventCallV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventCallV2ProcessingServiceException);
             }
             catch (Exception exception)
             {
@@ -324,18 +271,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventAddressV2ProcessingDependencyValidationException);
             }
-            catch (EventCallV2ProcessingValidationException
-                eventCallV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingValidationException);
-            }
-            catch (EventCallV2ProcessingDependencyValidationException
-                eventCallV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingDependencyValidationException);
-            }
             catch (EventV2ProcessingDependencyException
                 eventV2ProcessingDependencyException)
             {
@@ -354,16 +289,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventAddressV2ProcessingServiceException);
             }
-            catch (EventCallV2ProcessingDependencyException
-                eventCallV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventCallV2ProcessingDependencyException);
-            }
-            catch (EventCallV2ProcessingServiceException
-                eventCallV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventCallV2ProcessingServiceException);
-            }
             catch (Exception exception)
             {
                 var failedEventV2OrchestrationServiceException =
@@ -373,128 +298,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                         data: exception.Data);
 
                 throw await CreateAndLogServiceExceptionAsync(failedEventV2OrchestrationServiceException);
-            }
-        }
-
-        private async ValueTask<EventCallV2> TryCatch(
-            ReturningEventCallV2Function returningEventCallV2Function)
-        {
-            try
-            {
-                return await returningEventCallV2Function();
-            }
-            catch (OperationCanceledException operationCanceledException)
-                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
-            {
-                var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
-
-                var timeoutEventV2OrchestrationException =
-                    new TimeoutEventV2OrchestrationException(
-                        message: "Failed event orchestration timeout error occurred, contact support.",
-                        innerException: timeoutException,
-                        data: timeoutException.Data);
-
-                var eventV2OrchestrationDependencyException =
-                    new EventV2OrchestrationDependencyException(
-                        message: "Event dependency error occurred, contact support.",
-                        innerException: timeoutEventV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
-                throw eventV2OrchestrationDependencyException;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (NullEventCallV2OrchestrationException
-                nullEventCallV2OrchestrationException)
-            {
-                throw await CreateAndLogValidationExceptionAsync(
-                    nullEventCallV2OrchestrationException);
-            }
-            catch (EventV2ProcessingValidationException
-                eventV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventV2ProcessingValidationException);
-            }
-            catch (EventV2ProcessingDependencyValidationException
-                eventV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventV2ProcessingDependencyValidationException);
-            }
-            catch (EventAddressV2ProcessingValidationException
-                eventAddressV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventAddressV2ProcessingValidationException);
-            }
-            catch (EventAddressV2ProcessingDependencyValidationException
-                eventAddressV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventAddressV2ProcessingDependencyValidationException);
-            }
-            catch (EventCallV2ProcessingValidationException
-                eventCallV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingValidationException);
-            }
-            catch (EventCallV2ProcessingDependencyValidationException
-                eventCallV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingDependencyValidationException);
-            }
-            catch (EventV2ProcessingDependencyException
-                eventV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventV2ProcessingDependencyException);
-            }
-            catch (EventV2ProcessingServiceException
-                eventV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventV2ProcessingServiceException);
-            }
-            catch (EventAddressV2ProcessingDependencyException
-                eventAddressV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventAddressV2ProcessingDependencyException);
-            }
-            catch (EventAddressV2ProcessingServiceException
-                eventAddressV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventAddressV2ProcessingServiceException);
-            }
-            catch (EventCallV2ProcessingDependencyException
-                eventCallV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingDependencyException);
-            }
-            catch (EventCallV2ProcessingServiceException
-                eventCallV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingServiceException);
-            }
-            catch (Exception exception)
-            {
-                var failedEventV2OrchestrationServiceException =
-                    new FailedEventV2OrchestrationServiceException(
-                        message: "Failed event service error occurred, contact support.",
-                        innerException: exception,
-                        data: exception.Data);
-
-                throw await CreateAndLogServiceExceptionAsync(
-                    failedEventV2OrchestrationServiceException);
             }
         }
 
@@ -558,18 +361,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 throw await CreateAndLogDependencyValidationExceptionAsync(
                     eventAddressV2ProcessingDependencyValidationException);
             }
-            catch (EventCallV2ProcessingValidationException
-                eventCallV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingValidationException);
-            }
-            catch (EventCallV2ProcessingDependencyValidationException
-                eventCallV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingDependencyValidationException);
-            }
             catch (EventV2ProcessingDependencyException
                 eventV2ProcessingDependencyException)
             {
@@ -593,154 +384,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             {
                 throw await CreateAndLogDependencyExceptionAsync(
                     eventAddressV2ProcessingServiceException);
-            }
-            catch (EventCallV2ProcessingDependencyException
-                eventCallV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingDependencyException);
-            }
-            catch (EventCallV2ProcessingServiceException
-                eventCallV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingServiceException);
-            }
-            catch (Exception exception)
-            {
-                var failedEventV2OrchestrationServiceException =
-                    new FailedEventV2OrchestrationServiceException(
-                        message: "Failed event service error occurred, contact support.",
-                        innerException: exception,
-                        data: exception.Data);
-
-                throw await CreateAndLogServiceExceptionAsync(
-                    failedEventV2OrchestrationServiceException);
-            }
-        }
-
-        private async ValueTask<IEnumerable<string>> TryCatch(
-            ReturningPromotedPropertyKeysFunction returningPromotedPropertyKeysFunction)
-        {
-            try
-            {
-                return await returningPromotedPropertyKeysFunction();
-            }
-            catch (OperationCanceledException operationCanceledException)
-                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
-            {
-                var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
-
-                var timeoutEventV2OrchestrationException =
-                    new TimeoutEventV2OrchestrationException(
-                        message: "Failed event orchestration timeout error occurred, contact support.",
-                        innerException: timeoutException,
-                        data: timeoutException.Data);
-
-                var eventV2OrchestrationDependencyException =
-                    new EventV2OrchestrationDependencyException(
-                        message: "Event dependency error occurred, contact support.",
-                        innerException: timeoutEventV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
-                throw eventV2OrchestrationDependencyException;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (EventCallV2ProcessingValidationException
-                eventCallV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingValidationException);
-            }
-            catch (EventCallV2ProcessingDependencyValidationException
-                eventCallV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingDependencyValidationException);
-            }
-            catch (EventCallV2ProcessingDependencyException
-                eventCallV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingDependencyException);
-            }
-            catch (EventCallV2ProcessingServiceException
-                eventCallV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingServiceException);
-            }
-            catch (Exception exception)
-            {
-                var failedEventV2OrchestrationServiceException =
-                    new FailedEventV2OrchestrationServiceException(
-                        message: "Failed event service error occurred, contact support.",
-                        innerException: exception,
-                        data: exception.Data);
-
-                throw await CreateAndLogServiceExceptionAsync(
-                    failedEventV2OrchestrationServiceException);
-            }
-        }
-
-        private async ValueTask<List<PromotedProperty>> TryCatch(
-            ReturningPromotedPropertiesListFunction returningPromotedPropertiesListFunction)
-        {
-            try
-            {
-                return await returningPromotedPropertiesListFunction();
-            }
-            catch (OperationCanceledException operationCanceledException)
-                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
-            {
-                var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
-
-                var timeoutEventV2OrchestrationException =
-                    new TimeoutEventV2OrchestrationException(
-                        message: "Failed event orchestration timeout error occurred, contact support.",
-                        innerException: timeoutException,
-                        data: timeoutException.Data);
-
-                var eventV2OrchestrationDependencyException =
-                    new EventV2OrchestrationDependencyException(
-                        message: "Event dependency error occurred, contact support.",
-                        innerException: timeoutEventV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
-                throw eventV2OrchestrationDependencyException;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (EventCallV2ProcessingValidationException
-                eventCallV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingValidationException);
-            }
-            catch (EventCallV2ProcessingDependencyValidationException
-                eventCallV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventCallV2ProcessingDependencyValidationException);
-            }
-            catch (EventCallV2ProcessingDependencyException
-                eventCallV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingDependencyException);
-            }
-            catch (EventCallV2ProcessingServiceException
-                eventCallV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(
-                    eventCallV2ProcessingServiceException);
             }
             catch (Exception exception)
             {

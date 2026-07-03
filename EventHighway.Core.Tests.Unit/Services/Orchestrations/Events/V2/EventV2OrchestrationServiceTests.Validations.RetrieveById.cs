@@ -65,7 +65,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.Events.V2
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.eventV2ProcessingServiceMock.VerifyNoOtherCalls();
-            this.eventCallV2ProcessingServiceMock.VerifyNoOtherCalls();
         }
     }
 }
