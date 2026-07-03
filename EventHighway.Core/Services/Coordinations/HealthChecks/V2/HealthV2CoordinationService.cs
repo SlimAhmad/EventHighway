@@ -306,7 +306,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
                 summaries.Add(new EventAddressSummaryV2
                 {
-                    Id = address.Id,
+                    EventAddressV2Id = address.Id,
                     Name = address.Name,
                     Description = address.Description,
                     Period = period,
@@ -422,10 +422,10 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
                     byAddress.Add(new LoopDetailV2
                     {
-                        EventAddressId = addressId,
-                        AddressName = addressName,
-                        ParticipantId = isKnownParticipant ? participantKey : (Guid?)null,
-                        ParticipantName = isKnownParticipant ? participant.Name : "Unknown",
+                        EventAddressV2Id = addressId,
+                        EventAddressV2Name = addressName,
+                        EventParticipantV2Id = isKnownParticipant ? participantKey : (Guid?)null,
+                        EventParticipantV2Name = isKnownParticipant ? participant.Name : "Unknown",
                         ActiveQuarantined = participantActive.Count,
                         ArchivedQuarantined = participantArchived.Count,
                         InWindow = participantActive.Count + participantArchived.Count,
@@ -524,10 +524,10 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
                     byAddress.Add(new DuplicateDetailV2
                     {
-                        EventAddressId = address.Id,
-                        AddressName = address.Name,
-                        ParticipantId = isKnownParticipant ? participantGroup.Key : (Guid?)null,
-                        ParticipantName = isKnownParticipant ? participant.Name : "Unknown",
+                        EventAddressV2Id = address.Id,
+                        EventAddressV2Name = address.Name,
+                        EventParticipantV2Id = isKnownParticipant ? participantGroup.Key : (Guid?)null,
+                        EventParticipantV2Name = isKnownParticipant ? participant.Name : "Unknown",
                         TotalEvents = totalEvents,
                         Duplicates = duplicates,
                         DuplicateRate = duplicateRate,
@@ -594,8 +594,8 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 .GroupBy(e => e.EventAddressV2Id)
                 .Select(group => new RetryAddressDetailV2
                 {
-                    EventAddressId = group.Key,
-                    AddressName = addressNames.TryGetValue(group.Key, out string name) ? name : null,
+                    EventAddressV2Id = group.Key,
+                    EventAddressV2Name = addressNames.TryGetValue(group.Key, out string name) ? name : null,
                     DeadEvents = group.Count(e => e.RemainingRetryAttempts == 0),
                     CriticalEvents = group.Count(e =>
                         e.RemainingRetryAttempts >= 1 && e.RemainingRetryAttempts <= 2),
@@ -730,7 +730,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
                 summaries.Add(new ParticipantSummaryV2
                 {
-                    ParticipantId = participantKey,
+                    EventParticipantV2Id = participantKey,
                     Name = isKnownParticipant ? participant.Name : "Unknown",
                     ContactEmail = isKnownParticipant ? participant.ContactEmail : null,
                     ContactPhone = isKnownParticipant ? participant.ContactPhone : null,

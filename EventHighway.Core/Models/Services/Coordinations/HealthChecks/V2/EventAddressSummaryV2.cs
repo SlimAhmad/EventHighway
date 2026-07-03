@@ -15,7 +15,7 @@ namespace EventHighway.Core.Models.Coordinations.HealthChecks.V2
         /// <summary>
         /// Gets or sets the identifier of the event address.
         /// </summary>
-        public Guid Id { get; set; }
+        public Guid EventAddressV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the event address.

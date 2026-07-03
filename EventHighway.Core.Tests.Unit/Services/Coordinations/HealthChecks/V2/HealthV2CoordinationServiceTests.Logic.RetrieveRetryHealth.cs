@@ -71,18 +71,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             actualSummary.Distribution.Single(b => b.RemainingRetries == 5).Count.Should().Be(1);
 
             actualSummary.ByAddress.Should().HaveCount(2);
-            actualSummary.ByAddress.First().EventAddressId.Should().Be(addressAId);
+            actualSummary.ByAddress.First().EventAddressV2Id.Should().Be(addressAId);
 
             RetryAddressDetailV2 detailA =
-                actualSummary.ByAddress.Single(d => d.EventAddressId == addressAId);
+                actualSummary.ByAddress.Single(d => d.EventAddressV2Id == addressAId);
 
-            detailA.AddressName.Should().Be(addressAName);
+            detailA.EventAddressV2Name.Should().Be(addressAName);
             detailA.DeadEvents.Should().Be(2);
             detailA.CriticalEvents.Should().Be(1);
             detailA.TotalEvents.Should().Be(4);
 
             RetryAddressDetailV2 detailB =
-                actualSummary.ByAddress.Single(d => d.EventAddressId == addressBId);
+                actualSummary.ByAddress.Single(d => d.EventAddressV2Id == addressBId);
 
             detailB.DeadEvents.Should().Be(0);
             detailB.CriticalEvents.Should().Be(1);

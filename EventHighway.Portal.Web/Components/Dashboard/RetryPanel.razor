@@ -48,7 +48,7 @@
     {
         columns = new List<DataTableColumn<RetryAddressDetailV2>>
         {
-            new DataTableColumn<RetryAddressDetailV2> { Title = "Address", Value = d => d.AddressName },
+            new DataTableColumn<RetryAddressDetailV2> { Title = "Address", Value = d => d.EventAddressV2Name },
             new DataTableColumn<RetryAddressDetailV2> { Title = "Dead", Value = d => d.DeadEvents },
             new DataTableColumn<RetryAddressDetailV2> { Title = "Critical", Value = d => d.CriticalEvents },
             new DataTableColumn<RetryAddressDetailV2> { Title = "Total", Value = d => d.TotalEvents },

@@ -50,7 +50,7 @@
 
     private readonly List<DataTableColumn<LoopDetailV2>> columns = new()
     {
-        new DataTableColumn<LoopDetailV2> { Title = "Address", Value = d => d.AddressName },
+        new DataTableColumn<LoopDetailV2> { Title = "Address", Value = d => d.EventAddressV2Name },
         new DataTableColumn<LoopDetailV2> { Title = "Active", Value = d => d.ActiveQuarantined },
         new DataTableColumn<LoopDetailV2> { Title = "Archived", Value = d => d.ArchivedQuarantined },
         new DataTableColumn<LoopDetailV2> { Title = "In Window", Value = d => d.InWindow },
@@ -64,7 +64,7 @@
             summary = await HealthViewService.RetrieveLoopSummaryAsync(period, windowStart);
 
             details = (summary.ByAddress ?? Enumerable.Empty<LoopDetailV2>()).ToList();
-            labels = details.Select(d => d.AddressName).ToList();
+            labels = details.Select(d => d.EventAddressV2Name).ToList();
             datasets = new List<ChartDataset>
             {
                 new ChartDataset

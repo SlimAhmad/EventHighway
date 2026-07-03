@@ -53,8 +53,8 @@
 
     private readonly List<DataTableColumn<DuplicateDetailV2>> columns = new()
     {
-        new DataTableColumn<DuplicateDetailV2> { Title = "Address", Value = d => d.AddressName },
-        new DataTableColumn<DuplicateDetailV2> { Title = "Participant", Value = d => d.ParticipantName ?? "Unknown" },
+        new DataTableColumn<DuplicateDetailV2> { Title = "Address", Value = d => d.EventAddressV2Name },
+        new DataTableColumn<DuplicateDetailV2> { Title = "Participant", Value = d => d.EventParticipantV2Name ?? "Unknown" },
         new DataTableColumn<DuplicateDetailV2> { Title = "Total", Value = d => d.TotalEvents },
         new DataTableColumn<DuplicateDetailV2> { Title = "Duplicates", Value = d => d.Duplicates },
         new DataTableColumn<DuplicateDetailV2> { Title = "Rate %", Value = d => d.DuplicateRate.ToString("0.00") },

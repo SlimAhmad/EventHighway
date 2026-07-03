@@ -66,7 +66,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
         private static ParticipantSummaryV2 CreateRandomParticipantSummaryV2() =>
             new ParticipantSummaryV2
             {
-                ParticipantId = Guid.NewGuid(),
+                EventParticipantV2Id = Guid.NewGuid(),
                 Name = GetRandomString(),
                 ContactEmail = GetRandomString(),
                 ContactPhone = GetRandomString(),

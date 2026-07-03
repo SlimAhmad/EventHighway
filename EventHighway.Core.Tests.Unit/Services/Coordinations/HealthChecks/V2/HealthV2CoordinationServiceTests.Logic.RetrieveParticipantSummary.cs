@@ -111,10 +111,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
 
             // then
             actualSummaries.Should().HaveCount(3);
-            actualSummaries.First().ParticipantId.Should().Be(p1Id);
+            actualSummaries.First().EventParticipantV2Id.Should().Be(p1Id);
 
             ParticipantSummaryV2 summaryP1 =
-                actualSummaries.Single(s => s.ParticipantId == p1Id);
+                actualSummaries.Single(s => s.EventParticipantV2Id == p1Id);
 
             summaryP1.Name.Should().Be(p1Name);
             summaryP1.ContactEmail.Should().Be(p1Email);
@@ -136,14 +136,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             summaryP1.LastActivity.Should().Be(windowStart.AddHours(3));
 
             ParticipantSummaryV2 summaryP2 =
-                actualSummaries.Single(s => s.ParticipantId == p2Id);
+                actualSummaries.Single(s => s.EventParticipantV2Id == p2Id);
 
             summaryP2.IsActive.Should().BeFalse();
             summaryP2.TotalEventsSubmitted.Should().Be(1);
             summaryP2.OwnedListeners.Should().Be(1);
 
             ParticipantSummaryV2 summaryUnknown =
-                actualSummaries.Single(s => s.ParticipantId == Guid.Empty);
+                actualSummaries.Single(s => s.EventParticipantV2Id == Guid.Empty);
 
             summaryUnknown.Name.Should().Be("Unknown");
             summaryUnknown.ContactEmail.Should().BeNull();

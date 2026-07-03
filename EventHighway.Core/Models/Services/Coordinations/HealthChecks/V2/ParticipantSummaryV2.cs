@@ -16,7 +16,7 @@ namespace EventHighway.Core.Models.Coordinations.HealthChecks.V2
         /// <summary>
         /// Gets or sets the identifier of the participant.
         /// </summary>
-        public Guid ParticipantId { get; set; }
+        public Guid EventParticipantV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the participant.

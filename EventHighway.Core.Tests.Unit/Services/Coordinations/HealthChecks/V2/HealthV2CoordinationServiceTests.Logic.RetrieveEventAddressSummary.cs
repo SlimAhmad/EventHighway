@@ -110,7 +110,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             actualSummaries.Should().HaveCount(2);
 
             EventAddressSummaryV2 summaryA =
-                actualSummaries.Single(s => s.Id == addressAId);
+                actualSummaries.Single(s => s.EventAddressV2Id == addressAId);
 
             summaryA.Name.Should().Be(addressAName);
             summaryA.Description.Should().Be(addressADescription);
@@ -131,7 +131,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             summaryA.LastActivity.Should().Be(windowStart.AddHours(5));
 
             EventAddressSummaryV2 summaryB =
-                actualSummaries.Single(s => s.Id == addressBId);
+                actualSummaries.Single(s => s.EventAddressV2Id == addressBId);
 
             summaryB.TotalActiveEvents.Should().Be(1);
             summaryB.ActiveListeners.Should().Be(1);

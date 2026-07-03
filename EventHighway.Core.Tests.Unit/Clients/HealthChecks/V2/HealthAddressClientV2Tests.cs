@@ -62,7 +62,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             Enumerable.Range(0, new IntRange(min: 2, max: 9).GetValue())
                 .Select(_ => new EventAddressSummaryV2
                 {
-                    Id = Guid.NewGuid(),
+                    EventAddressV2Id = Guid.NewGuid(),
                     Name = GetRandomString(),
                     WindowLabel = GetRandomString()
                 })

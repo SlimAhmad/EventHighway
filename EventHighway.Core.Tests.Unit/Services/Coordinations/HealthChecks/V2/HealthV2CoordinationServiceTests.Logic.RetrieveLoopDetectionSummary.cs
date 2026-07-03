@@ -82,12 +82,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             actualSummary.TotalInWindow.Should().Be(4);
             actualSummary.ByAddress.Should().HaveCount(2);
 
-            actualSummary.ByAddress.First().EventAddressId.Should().Be(addressAId);
+            actualSummary.ByAddress.First().EventAddressV2Id.Should().Be(addressAId);
 
             LoopDetailV2 detailA =
-                actualSummary.ByAddress.Single(d => d.EventAddressId == addressAId);
+                actualSummary.ByAddress.Single(d => d.EventAddressV2Id == addressAId);
 
-            detailA.AddressName.Should().Be(addressAName);
+            detailA.EventAddressV2Name.Should().Be(addressAName);
             detailA.ActiveQuarantined.Should().Be(2);
             detailA.ArchivedQuarantined.Should().Be(1);
             detailA.InWindow.Should().Be(3);
@@ -95,9 +95,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             detailA.Status.Should().Be(HealthStatusV2.Amber);
 
             LoopDetailV2 detailB =
-                actualSummary.ByAddress.Single(d => d.EventAddressId == addressBId);
+                actualSummary.ByAddress.Single(d => d.EventAddressV2Id == addressBId);
 
-            detailB.AddressName.Should().Be(addressBName);
+            detailB.EventAddressV2Name.Should().Be(addressBName);
             detailB.ActiveQuarantined.Should().Be(1);
             detailB.ArchivedQuarantined.Should().Be(0);
             detailB.InWindow.Should().Be(1);
@@ -183,20 +183,20 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
             actualSummary.ByAddress.Should().HaveCount(2);
 
             LoopDetailV2 detailA =
-                actualSummary.ByAddress.Single(d => d.ParticipantId == participantAId);
+                actualSummary.ByAddress.Single(d => d.EventParticipantV2Id == participantAId);
 
-            detailA.EventAddressId.Should().Be(addressId);
-            detailA.AddressName.Should().Be(addressName);
-            detailA.ParticipantName.Should().Be(participantAName);
+            detailA.EventAddressV2Id.Should().Be(addressId);
+            detailA.EventAddressV2Name.Should().Be(addressName);
+            detailA.EventParticipantV2Name.Should().Be(participantAName);
             detailA.ActiveQuarantined.Should().Be(2);
             detailA.ArchivedQuarantined.Should().Be(0);
             detailA.InWindow.Should().Be(2);
             detailA.MostRecentDetection.Should().Be(windowStart.AddHours(2));
 
             LoopDetailV2 detailB =
-                actualSummary.ByAddress.Single(d => d.ParticipantId == participantBId);
+                actualSummary.ByAddress.Single(d => d.EventParticipantV2Id == participantBId);
 
-            detailB.ParticipantName.Should().Be(participantBName);
+            detailB.EventParticipantV2Name.Should().Be(participantBName);
             detailB.ActiveQuarantined.Should().Be(1);
             detailB.InWindow.Should().Be(1);
             detailB.MostRecentDetection.Should().Be(windowStart.AddHours(3));
