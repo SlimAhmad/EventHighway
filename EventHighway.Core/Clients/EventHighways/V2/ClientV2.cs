@@ -37,6 +37,7 @@ using EventHighway.Core.Services.Foundations.EventParticipantSecrets.V2;
 using EventHighway.Core.Services.Foundations.Events.V2;
 using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Services.Foundations.ListenerEvents.V2;
+using EventHighway.Core.Services.Orchestrations.AddressSummaries.V2;
 using EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
 using EventHighway.Core.Services.Orchestrations.EventFirings.V2;
@@ -377,6 +378,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 IRagStatusV2OrchestrationService,
                 RagStatusV2OrchestrationService>();
+
+            services.AddTransient<
+                IAddressSummaryV2OrchestrationService,
+                AddressSummaryV2OrchestrationService>();
         }
 
         private static void RegisterCoordinationServices(IServiceCollection services)

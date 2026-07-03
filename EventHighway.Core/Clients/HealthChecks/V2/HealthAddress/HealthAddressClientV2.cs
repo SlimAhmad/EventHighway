@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.HealthChecks.V2.Exceptions;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
-using EventHighway.Core.Models.Coordinations.HealthChecks.V2.Exceptions;
-using EventHighway.Core.Services.Coordinations.HealthChecks.V2;
+using EventHighway.Core.Models.Services.Orchestrations.AddressSummaries.V2.Exceptions;
+using EventHighway.Core.Services.Orchestrations.AddressSummaries.V2;
 using Xeptions;
 
 namespace EventHighway.Core.Clients.HealthChecks.V2
@@ -20,16 +20,16 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
     /// </summary>
     internal class HealthAddressClientV2 : IHealthAddressClientV2
     {
-        private readonly IHealthV2CoordinationService healthV2CoordinationService;
+        private readonly IAddressSummaryV2OrchestrationService addressSummaryV2OrchestrationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HealthAddressClientV2"/> class with the
-        /// specified health check coordination service.
+        /// specified address summary orchestration service.
         /// </summary>
-        /// <param name="healthV2CoordinationService">The coordination service for health
-        /// checks.</param>
-        public HealthAddressClientV2(IHealthV2CoordinationService healthV2CoordinationService) =>
-            this.healthV2CoordinationService = healthV2CoordinationService;
+        /// <param name="addressSummaryV2OrchestrationService">The orchestration service for
+        /// per-event-address summaries.</param>
+        public HealthAddressClientV2(IAddressSummaryV2OrchestrationService addressSummaryV2OrchestrationService) =>
+            this.addressSummaryV2OrchestrationService = addressSummaryV2OrchestrationService;
 
         /// <summary>
         /// Retrieves a per-event-address health summary asynchronously by delegating to the
@@ -49,32 +49,20 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
         {
             try
             {
-                return await this.healthV2CoordinationService
+                return await this.addressSummaryV2OrchestrationService
                     .RetrieveEventAddressSummaryV2Async(period, windowStart, cancellationToken);
             }
-            catch (HealthV2CoordinationValidationException
-                healthV2CoordinationValidationException)
-            {
-                throw CreateHealthAddressClientV2ValidationException(
-                    healthV2CoordinationValidationException.InnerException as Xeption);
-            }
-            catch (HealthV2CoordinationDependencyValidationException
-                healthV2CoordinationDependencyValidationException)
-            {
-                throw CreateHealthAddressClientV2ValidationException(
-                    healthV2CoordinationDependencyValidationException.InnerException as Xeption);
-            }
-            catch (HealthV2CoordinationDependencyException
-                healthV2CoordinationDependencyException)
+            catch (AddressSummaryV2OrchestrationDependencyException
+                addressSummaryV2OrchestrationDependencyException)
             {
                 throw CreateHealthAddressClientV2DependencyException(
-                    healthV2CoordinationDependencyException.InnerException as Xeption);
+                    addressSummaryV2OrchestrationDependencyException.InnerException as Xeption);
             }
-            catch (HealthV2CoordinationServiceException
-                healthV2CoordinationServiceException)
+            catch (AddressSummaryV2OrchestrationServiceException
+                addressSummaryV2OrchestrationServiceException)
             {
                 throw CreateHealthAddressClientV2DependencyException(
-                    healthV2CoordinationServiceException.InnerException as Xeption);
+                    addressSummaryV2OrchestrationServiceException.InnerException as Xeption);
             }
             catch (OperationCanceledException)
             {
@@ -84,15 +72,6 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
             {
                 throw CreateHealthAddressClientV2ServiceException(exception as Xeption);
             }
-        }
-
-        private static HealthAddressClientV2ValidationException
-            CreateHealthAddressClientV2ValidationException(Xeption innerException)
-        {
-            return new HealthAddressClientV2ValidationException(
-                message: "Health client validation error occurred, fix the errors and try again.",
-                innerException: innerException,
-                data: innerException?.Data);
         }
 
         private static HealthAddressClientV2DependencyException
