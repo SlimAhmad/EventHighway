@@ -7,8 +7,8 @@ using System.Linq;
 using EventHighway.Core.Clients.ListenerEvents.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
-using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
-using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Orchestrations.ListenerEvents.V2.Exceptions;
+using EventHighway.Core.Services.Orchestrations.ListenerEvents.V2;
 using Moq;
 using Tynamix.ObjectFiller;
 using Xeptions;
@@ -17,18 +17,18 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEvents.V2
 {
     public partial class ListenerEventV2ClientTests
     {
-        private readonly Mock<IEventListenerV2OrchestrationService> eventListenerV2OrchestrationServiceMock;
+        private readonly Mock<IListenerEventV2OrchestrationService> listenerEventV2OrchestrationServiceMock;
         private readonly IListenerEventV2Client listenerEventV2Client;
 
         public ListenerEventV2ClientTests()
         {
-            this.eventListenerV2OrchestrationServiceMock =
-                new Mock<IEventListenerV2OrchestrationService>();
+            this.listenerEventV2OrchestrationServiceMock =
+                new Mock<IListenerEventV2OrchestrationService>();
 
             this.listenerEventV2Client =
                 new ListenerEventV2Client(
-                    eventListenerV2OrchestrationService:
-                        this.eventListenerV2OrchestrationServiceMock.Object);
+                    listenerEventV2OrchestrationService:
+                        this.listenerEventV2OrchestrationServiceMock.Object);
         }
 
         public static TheoryData<Xeption> ValidationExceptions()
@@ -39,11 +39,11 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEvents.V2
 
             return new TheoryData<Xeption>
             {
-                new EventListenerV2OrchestrationValidationException(
+                new ListenerEventV2OrchestrationValidationException(
                     someMessage,
                     someInnerException),
 
-                new EventListenerV2OrchestrationDependencyValidationException(
+                new ListenerEventV2OrchestrationDependencyValidationException(
                     someMessage,
                     someInnerException),
             };

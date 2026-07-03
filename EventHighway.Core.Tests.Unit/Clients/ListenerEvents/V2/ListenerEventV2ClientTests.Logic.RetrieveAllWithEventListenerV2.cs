@@ -30,7 +30,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEvents.V2
             IQueryable<ListenerEventV2> expectedListenerEventV2s =
                 retrievedListenerEventV2s.DeepClone();
 
-            this.eventListenerV2OrchestrationServiceMock.Setup(service =>
+            this.listenerEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveAllListenerEventV2sWithEventListenerV2Async(
                     randomCancellationToken))
                         .ReturnsAsync(retrievedListenerEventV2s);
@@ -44,12 +44,12 @@ namespace EventHighway.Core.Tests.Unit.Clients.ListenerEvents.V2
             // then
             actualListenerEventV2s.Should().BeEquivalentTo(expectedListenerEventV2s);
 
-            this.eventListenerV2OrchestrationServiceMock.Verify(service =>
+            this.listenerEventV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveAllListenerEventV2sWithEventListenerV2Async(
                     randomCancellationToken),
                         Times.Once);
 
-            this.eventListenerV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
         }
     }
 }
