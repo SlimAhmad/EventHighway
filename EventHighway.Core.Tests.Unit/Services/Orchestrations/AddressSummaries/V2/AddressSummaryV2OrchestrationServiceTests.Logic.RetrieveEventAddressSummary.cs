@@ -7,7 +7,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
+using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
+using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
+using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
+using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using FluentAssertions;
 
@@ -120,6 +124,39 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.AddressSummaries.
 
             summaryB.TotalActiveEvents.Should().Be(1);
             summaryB.ActiveListeners.Should().Be(1);
+
+            VerifyAddressSummaryFoundationMocksOnce(randomCancellationToken);
+        }
+
+        [Fact]
+        public async Task ShouldReturnEmptyEventAddressSummaryV2WhenNoAddressesExistAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var windowStart = new DateTimeOffset(2026, 6, 24, 0, 0, 0, TimeSpan.Zero);
+            var emptyAddresses = Array.Empty<EventAddressV2>().AsQueryable();
+            var emptyEvents = Array.Empty<EventV2>().AsQueryable();
+            var emptyListeners = Array.Empty<EventListenerV2>().AsQueryable();
+            var emptyListenerEvents = Array.Empty<ListenerEventV2>().AsQueryable();
+            var emptyArchivedEvents = Array.Empty<EventArchiveV2>().AsQueryable();
+            var emptyArchivedListenerEvents = Array.Empty<ListenerEventArchiveV2>().AsQueryable();
+
+            SetupAddressSummaryFoundationMocks(
+                randomCancellationToken,
+                AttachEventListenerV2s(emptyAddresses, emptyListeners),
+                AttachListenerEventV2s(emptyEvents, emptyListenerEvents),
+                AttachListenerEventArchiveV2s(emptyArchivedEvents, emptyArchivedListenerEvents));
+
+            // when
+            var actualSummaries =
+                await this.addressSummaryV2OrchestrationService
+                    .RetrieveEventAddressSummaryV2Async(
+                        TrafficPeriodV2.Day, windowStart, randomCancellationToken);
+
+            // then
+            actualSummaries.Should().BeEmpty();
 
             VerifyAddressSummaryFoundationMocksOnce(randomCancellationToken);
         }
