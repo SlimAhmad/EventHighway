@@ -15,24 +15,24 @@ namespace EventHighway.Core.Models.Coordinations.HealthChecks.V2
         /// <summary>
         /// Gets or sets the identifier of the event address.
         /// </summary>
-        public Guid EventAddressId { get; set; }
+        public Guid EventAddressV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the event address.
         /// </summary>
-        public string AddressName { get; set; }
+        public string EventAddressV2Name { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the publishing participant, or <c>null</c> when no
         /// participant is registered for the quarantined events.
         /// </summary>
-        public Guid? ParticipantId { get; set; }
+        public Guid? EventParticipantV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the publishing participant, or "Unknown" when
-        /// <see cref="ParticipantId"/> is <c>null</c>.
+        /// <see cref="EventParticipantV2Id"/> is <c>null</c>.
         /// </summary>
-        public string ParticipantName { get; set; }
+        public string EventParticipantV2Name { get; set; }
 
         /// <summary>
         /// Gets or sets the number of quarantined active events for this address.

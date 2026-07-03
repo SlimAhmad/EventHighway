@@ -7,32 +7,32 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Clients.HealthChecks.V2.Exceptions;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
-using EventHighway.Core.Models.Coordinations.HealthChecks.V2.Exceptions;
-using EventHighway.Core.Services.Coordinations.HealthChecks.V2;
+using EventHighway.Core.Models.Services.Processings.Traffics.V2.Exceptions;
+using EventHighway.Core.Services.Processings.Traffics.V2;
 using Xeptions;
 
 namespace EventHighway.Core.Clients.HealthChecks.V2
 {
     /// <summary>
     /// Represents the V2 health traffic client implementation, handling traffic snapshot
-    /// retrieval while managing coordination service exceptions.
+    /// retrieval while managing traffic processing service exceptions.
     /// </summary>
     internal class HealthTrafficClientV2 : IHealthTrafficClientV2
     {
-        private readonly IHealthV2CoordinationService healthV2CoordinationService;
+        private readonly ITrafficV2ProcessingService trafficV2ProcessingService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HealthTrafficClientV2"/> class with the
-        /// specified health check coordination service.
+        /// specified traffic processing service.
         /// </summary>
-        /// <param name="healthV2CoordinationService">The coordination service for health
-        /// checks.</param>
-        public HealthTrafficClientV2(IHealthV2CoordinationService healthV2CoordinationService) =>
-            this.healthV2CoordinationService = healthV2CoordinationService;
+        /// <param name="trafficV2ProcessingService">The processing service for traffic
+        /// snapshots.</param>
+        public HealthTrafficClientV2(ITrafficV2ProcessingService trafficV2ProcessingService) =>
+            this.trafficV2ProcessingService = trafficV2ProcessingService;
 
         /// <summary>
         /// Retrieves a time-bucketed traffic snapshot asynchronously by delegating to the
-        /// coordination service and handling any exceptions that occur.
+        /// processing service and handling any exceptions that occur.
         /// </summary>
         /// <param name="period">The period granularity to aggregate over.</param>
         /// <param name="windowStart">The inclusive UTC start of the window, or
@@ -48,32 +48,20 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
         {
             try
             {
-                return await this.healthV2CoordinationService
+                return await this.trafficV2ProcessingService
                     .RetrieveTrafficSnapshotV2Async(period, windowStart, cancellationToken);
             }
-            catch (HealthV2CoordinationValidationException
-                healthV2CoordinationValidationException)
-            {
-                throw CreateHealthTrafficClientV2ValidationException(
-                    healthV2CoordinationValidationException.InnerException as Xeption);
-            }
-            catch (HealthV2CoordinationDependencyValidationException
-                healthV2CoordinationDependencyValidationException)
-            {
-                throw CreateHealthTrafficClientV2ValidationException(
-                    healthV2CoordinationDependencyValidationException.InnerException as Xeption);
-            }
-            catch (HealthV2CoordinationDependencyException
-                healthV2CoordinationDependencyException)
+            catch (TrafficV2ProcessingDependencyException
+                trafficV2ProcessingDependencyException)
             {
                 throw CreateHealthTrafficClientV2DependencyException(
-                    healthV2CoordinationDependencyException.InnerException as Xeption);
+                    trafficV2ProcessingDependencyException.InnerException as Xeption);
             }
-            catch (HealthV2CoordinationServiceException
-                healthV2CoordinationServiceException)
+            catch (TrafficV2ProcessingServiceException
+                trafficV2ProcessingServiceException)
             {
                 throw CreateHealthTrafficClientV2DependencyException(
-                    healthV2CoordinationServiceException.InnerException as Xeption);
+                    trafficV2ProcessingServiceException.InnerException as Xeption);
             }
             catch (OperationCanceledException)
             {
@@ -83,15 +71,6 @@ namespace EventHighway.Core.Clients.HealthChecks.V2
             {
                 throw CreateHealthTrafficClientV2ServiceException(exception as Xeption);
             }
-        }
-
-        private static HealthTrafficClientV2ValidationException
-            CreateHealthTrafficClientV2ValidationException(Xeption innerException)
-        {
-            return new HealthTrafficClientV2ValidationException(
-                message: "Health client validation error occurred, fix the errors and try again.",
-                innerException: innerException,
-                data: innerException?.Data);
         }
 
         private static HealthTrafficClientV2DependencyException

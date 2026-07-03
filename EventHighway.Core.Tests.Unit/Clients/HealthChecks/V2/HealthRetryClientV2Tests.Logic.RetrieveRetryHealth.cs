@@ -29,7 +29,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             RetryHealthSummaryV2 expectedSummary =
                 returnedSummary.DeepClone();
 
-            this.healthV2CoordinationServiceMock.Setup(service =>
+            this.retrySummaryV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveRetryHealthV2Async(randomCancellationToken))
                     .ReturnsAsync(returnedSummary);
 
@@ -42,11 +42,11 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             actualSummary.Should()
                 .BeEquivalentTo(expectedSummary);
 
-            this.healthV2CoordinationServiceMock.Verify(service =>
+            this.retrySummaryV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveRetryHealthV2Async(randomCancellationToken),
                     Times.Once);
 
-            this.healthV2CoordinationServiceMock
+            this.retrySummaryV2OrchestrationServiceMock
                 .VerifyNoOtherCalls();
         }
     }

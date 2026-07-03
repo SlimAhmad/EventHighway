@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             TrafficSnapshotV2 expectedTrafficSnapshotV2 =
                 returnedTrafficSnapshotV2.DeepClone();
 
-            this.healthV2CoordinationServiceMock.Setup(service =>
+            this.trafficV2ProcessingServiceMock.Setup(service =>
                 service.RetrieveTrafficSnapshotV2Async(
                     randomPeriod, randomWindowStart, randomCancellationToken))
                         .ReturnsAsync(returnedTrafficSnapshotV2);
@@ -48,12 +48,12 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             actualTrafficSnapshotV2.Should()
                 .BeEquivalentTo(expectedTrafficSnapshotV2);
 
-            this.healthV2CoordinationServiceMock.Verify(service =>
+            this.trafficV2ProcessingServiceMock.Verify(service =>
                 service.RetrieveTrafficSnapshotV2Async(
                     randomPeriod, randomWindowStart, randomCancellationToken),
                         Times.Once);
 
-            this.healthV2CoordinationServiceMock
+            this.trafficV2ProcessingServiceMock
                 .VerifyNoOtherCalls();
         }
     }

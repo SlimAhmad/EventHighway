@@ -69,6 +69,16 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 .SelectAllEventV2sWithEventAddressV2Async(cancellationToken);
         });
 
+        public ValueTask<IQueryable<EventV2>> RetrieveAllEventV2sWithListenerEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await this.storageBroker
+                .SelectAllEventV2sWithListenerEventV2sAsync(cancellationToken);
+        });
+
         public ValueTask<EventV2> RetrieveEventV2ByIdAsync(
             Guid eventV2Id,
             CancellationToken cancellationToken = default) =>

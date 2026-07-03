@@ -33,7 +33,7 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             LoopDetectionSummaryV2 expectedSummary =
                 returnedSummary.DeepClone();
 
-            this.healthV2CoordinationServiceMock.Setup(service =>
+            this.loopDetectionV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveLoopDetectionSummaryV2Async(
                     randomPeriod, randomWindowStart, randomCancellationToken))
                         .ReturnsAsync(returnedSummary);
@@ -48,12 +48,12 @@ namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
             actualSummary.Should()
                 .BeEquivalentTo(expectedSummary);
 
-            this.healthV2CoordinationServiceMock.Verify(service =>
+            this.loopDetectionV2OrchestrationServiceMock.Verify(service =>
                 service.RetrieveLoopDetectionSummaryV2Async(
                     randomPeriod, randomWindowStart, randomCancellationToken),
                         Times.Once);
 
-            this.healthV2CoordinationServiceMock
+            this.loopDetectionV2OrchestrationServiceMock
                 .VerifyNoOtherCalls();
         }
     }

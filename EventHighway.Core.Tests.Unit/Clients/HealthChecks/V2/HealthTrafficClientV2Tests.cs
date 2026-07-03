@@ -6,46 +6,26 @@ using System;
 using System.Collections.Generic;
 using EventHighway.Core.Clients.HealthChecks.V2;
 using EventHighway.Core.Models.Coordinations.HealthChecks.V2;
-using EventHighway.Core.Models.Coordinations.HealthChecks.V2.Exceptions;
-using EventHighway.Core.Services.Coordinations.HealthChecks.V2;
+using EventHighway.Core.Services.Processings.Traffics.V2;
 using Moq;
 using Tynamix.ObjectFiller;
-using Xeptions;
 
 namespace EventHighway.Core.Tests.Unit.Clients.HealthChecks.V2
 {
     public partial class HealthTrafficClientV2Tests
     {
-        private readonly Mock<IHealthV2CoordinationService> healthV2CoordinationServiceMock;
+        private readonly Mock<ITrafficV2ProcessingService> trafficV2ProcessingServiceMock;
         private readonly IHealthTrafficClientV2 healthTrafficClientV2;
 
         public HealthTrafficClientV2Tests()
         {
-            this.healthV2CoordinationServiceMock =
-                new Mock<IHealthV2CoordinationService>();
+            this.trafficV2ProcessingServiceMock =
+                new Mock<ITrafficV2ProcessingService>();
 
             this.healthTrafficClientV2 =
                 new HealthTrafficClientV2(
-                    healthV2CoordinationService:
-                        this.healthV2CoordinationServiceMock.Object);
-        }
-
-        public static TheoryData<Xeption> ValidationExceptions()
-        {
-            string someMessage = GetRandomString();
-            var someInnerException = new Xeption(someMessage);
-            someInnerException.Data.Add("ErrorCode", new List<string> { "ValidationError" });
-
-            return new TheoryData<Xeption>
-            {
-                new HealthV2CoordinationValidationException(
-                    someMessage,
-                    someInnerException),
-
-                new HealthV2CoordinationDependencyValidationException(
-                    someMessage,
-                    someInnerException),
-            };
+                    trafficV2ProcessingService:
+                        this.trafficV2ProcessingServiceMock.Object);
         }
 
         private static string GetRandomString() =>
