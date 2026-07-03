@@ -72,11 +72,10 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
             var allArchivedEvents =
                 await this.eventArchiveV2OrchestrationService
-                    .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+                    .RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken);
 
             var allArchivedListenerEvents =
-                await this.eventArchiveV2OrchestrationService
-                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+                allArchivedEvents.SelectMany(archive => archive.ListenerEventArchiveV2s);
 
             int totalAddresses = allAddresses.Count();
             int totalListeners = allListeners.Count();
@@ -250,11 +249,10 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
 
             var allArchivedEvents =
                 await this.eventArchiveV2OrchestrationService
-                    .RetrieveAllEventArchiveV2sAsync(cancellationToken);
+                    .RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken);
 
             var allArchivedListenerEvents =
-                await this.eventArchiveV2OrchestrationService
-                    .RetrieveAllListenerEventArchiveV2sAsync(cancellationToken);
+                allArchivedEvents.SelectMany(archive => archive.ListenerEventArchiveV2s);
 
             HealthConfiguration healthConfig =
                 this.configurationBroker.GetHealthConfiguration();
@@ -264,24 +262,24 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             foreach (var address in allAddresses)
             {
                 var addressEvents = allEvents
-                    .Where(e => e.EventAddressId == address.Id
+                    .Where(e => e.EventAddressV2Id == address.Id
                         && e.CreatedDate >= effectiveWindowStart && e.CreatedDate < windowEnd)
                     .ToList();
 
                 var addressListenerEvents = allListenerEvents
-                    .Where(le => le.EventAddressId == address.Id
+                    .Where(le => le.EventAddressV2Id == address.Id
                         && le.CreatedDate >= effectiveWindowStart && le.CreatedDate < windowEnd)
                     .ToList();
 
                 int totalArchivedEvents = allArchivedEvents.Count(a =>
-                    a.EventAddressId == address.Id
+                    a.EventAddressV2Id == address.Id
                     && a.ArchivedDate >= effectiveWindowStart && a.ArchivedDate < windowEnd);
 
                 int totalArchivedListenerEvents = allArchivedListenerEvents.Count(la =>
-                    la.EventAddressId == address.Id
+                    la.EventAddressV2Id == address.Id
                     && la.ArchivedDate >= effectiveWindowStart && la.ArchivedDate < windowEnd);
 
-                int activeListeners = allListeners.Count(l => l.EventAddressId == address.Id);
+                int activeListeners = allListeners.Count(l => l.EventAddressV2Id == address.Id);
 
                 int totalListenerEvents = addressListenerEvents.Count;
                 int errorListenerEvents = addressListenerEvents.Count(le => le.Status == ListenerEventStatusV2.Error);
@@ -372,8 +370,8 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             var addressNames = allAddresses
                 .ToDictionary(address => address.Id, address => address.Name);
 
-            var addressIds = quarantinedEvents.Select(e => e.EventAddressId)
-                .Concat(quarantinedArchives.Select(a => a.EventAddressId))
+            var addressIds = quarantinedEvents.Select(e => e.EventAddressV2Id)
+                .Concat(quarantinedArchives.Select(a => a.EventAddressV2Id))
                 .Distinct()
                 .ToList();
 
@@ -382,29 +380,29 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             foreach (var addressId in addressIds)
             {
                 var addressActive = quarantinedEvents
-                    .Where(e => e.EventAddressId == addressId)
+                    .Where(e => e.EventAddressV2Id == addressId)
                     .ToList();
 
                 var addressArchived = quarantinedArchives
-                    .Where(a => a.EventAddressId == addressId)
+                    .Where(a => a.EventAddressV2Id == addressId)
                     .ToList();
 
                 string addressName =
                     addressNames.TryGetValue(addressId, out string name) ? name : null;
 
-                var participantKeys = addressActive.Select(e => e.ParticipantId ?? Guid.Empty)
-                    .Concat(addressArchived.Select(a => a.ParticipantId ?? Guid.Empty))
+                var participantKeys = addressActive.Select(e => e.EventParticipantV2Id ?? Guid.Empty)
+                    .Concat(addressArchived.Select(a => a.EventParticipantV2Id ?? Guid.Empty))
                     .Distinct()
                     .ToList();
 
                 foreach (var participantKey in participantKeys)
                 {
                     var participantActive = addressActive
-                        .Where(e => (e.ParticipantId ?? Guid.Empty) == participantKey)
+                        .Where(e => (e.EventParticipantV2Id ?? Guid.Empty) == participantKey)
                         .ToList();
 
                     var participantArchived = addressArchived
-                        .Where(a => (a.ParticipantId ?? Guid.Empty) == participantKey)
+                        .Where(a => (a.EventParticipantV2Id ?? Guid.Empty) == participantKey)
                         .ToList();
 
                     var detectionDates = participantActive.Select(e => e.CreatedDate)
@@ -415,8 +413,8 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                         ? detectionDates.Max()
                         : (DateTimeOffset?)null;
 
-                    var participant = participantActive.Select(e => e.Participant)
-                        .Concat(participantArchived.Select(a => a.Participant))
+                    var participant = participantActive.Select(e => e.EventParticipantV2)
+                        .Concat(participantArchived.Select(a => a.EventParticipantV2))
                         .FirstOrDefault(p => p != null);
 
                     bool isKnownParticipant =
@@ -482,7 +480,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             foreach (var address in allAddresses)
             {
                 var addressEvents = windowEvents
-                    .Where(e => e.EventAddressId == address.Id)
+                    .Where(e => e.EventAddressV2Id == address.Id)
                     .ToList();
 
                 if (addressEvents.Count == 0)
@@ -491,7 +489,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 }
 
                 var participantGroups = addressEvents
-                    .GroupBy(e => e.ParticipantId ?? Guid.Empty)
+                    .GroupBy(e => e.EventParticipantV2Id ?? Guid.Empty)
                     .ToList();
 
                 foreach (var participantGroup in participantGroups)
@@ -519,7 +517,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                         ? (decimal)duplicates / totalEvents * 100
                         : 0;
 
-                    var participant = participantEvents[0].Participant;
+                    var participant = participantEvents[0].EventParticipantV2;
 
                     bool isKnownParticipant =
                         participantGroup.Key != Guid.Empty && participant != null;
@@ -593,7 +591,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 .ToList();
 
             var byAddress = activeEvents
-                .GroupBy(e => e.EventAddressId)
+                .GroupBy(e => e.EventAddressV2Id)
                 .Select(group => new RetryAddressDetailV2
                 {
                     EventAddressId = group.Key,
@@ -662,13 +660,13 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                 .ToDictionary(address => address.Id, address => address.Name);
 
             var participantsById = windowEvents
-                .Where(e => e.Participant != null).Select(e => e.Participant)
-                .Concat(allListeners.Where(l => l.Participant != null).Select(l => l.Participant))
+                .Where(e => e.EventParticipantV2 != null).Select(e => e.EventParticipantV2)
+                .Concat(allListeners.Where(l => l.EventParticipantV2 != null).Select(l => l.EventParticipantV2))
                 .GroupBy(participant => participant.Id)
                 .ToDictionary(group => group.Key, group => group.First());
 
-            var participantKeys = windowEvents.Select(e => e.ParticipantId ?? Guid.Empty)
-                .Concat(allListeners.Select(l => l.ParticipantId ?? Guid.Empty))
+            var participantKeys = windowEvents.Select(e => e.EventParticipantV2Id ?? Guid.Empty)
+                .Concat(allListeners.Select(l => l.EventParticipantV2Id ?? Guid.Empty))
                 .Distinct()
                 .ToList();
 
@@ -677,22 +675,22 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
             foreach (var participantKey in participantKeys)
             {
                 var participantEvents = windowEvents
-                    .Where(e => (e.ParticipantId ?? Guid.Empty) == participantKey)
+                    .Where(e => (e.EventParticipantV2Id ?? Guid.Empty) == participantKey)
                     .ToList();
 
                 var ownedListenerIds = allListeners
-                    .Where(l => (l.ParticipantId ?? Guid.Empty) == participantKey)
+                    .Where(l => (l.EventParticipantV2Id ?? Guid.Empty) == participantKey)
                     .Select(l => l.Id)
                     .ToHashSet();
 
                 var participantEventIds = participantEvents.Select(e => e.Id).ToHashSet();
 
                 var ownedListenerEvents = windowListenerEvents
-                    .Where(le => ownedListenerIds.Contains(le.EventListenerId))
+                    .Where(le => ownedListenerIds.Contains(le.EventListenerV2Id))
                     .ToList();
 
                 var publisherListenerEvents = windowListenerEvents
-                    .Where(le => participantEventIds.Contains(le.EventId))
+                    .Where(le => participantEventIds.Contains(le.EventV2Id))
                     .ToList();
 
                 decimal publisherErrorRate = publisherListenerEvents.Count > 0
@@ -706,7 +704,7 @@ namespace EventHighway.Core.Services.Coordinations.HealthChecks.V2
                     : 0;
 
                 var addressIds = participantEvents
-                    .Select(e => e.EventAddressId)
+                    .Select(e => e.EventAddressV2Id)
                     .Distinct()
                     .ToList();
 

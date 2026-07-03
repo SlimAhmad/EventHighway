@@ -26,7 +26,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
             Guid eventAddressId = GetRandomId();
 
             EventArchiveV2 inputEventArchiveV2 = CreateRandomEventArchiveV2s().First();
-            inputEventArchiveV2.EventAddressId = eventAddressId;
+            inputEventArchiveV2.EventAddressV2Id = eventAddressId;
 
             List<EventArchiveV2> inputEventArchiveV2s =
                 new List<EventArchiveV2> { inputEventArchiveV2 };
@@ -43,8 +43,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
                 {
                     new ListenerEventV2
                     {
-                        EventId = inputEventArchiveV2.Id,
-                        EventListenerId = existingEventListenerV2.Id
+                        EventV2Id = inputEventArchiveV2.Id,
+                        EventListenerV2Id = existingEventListenerV2.Id
                     }
                 }.AsQueryable();
 
@@ -54,9 +54,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
                     new ListenerEventV2
                     {
                         Status = ListenerEventStatusV2.Replay,
-                        EventId = inputEventArchiveV2.Id,
-                        EventAddressId = eventAddressId,
-                        EventListenerId = newEventListenerV2.Id,
+                        EventV2Id = inputEventArchiveV2.Id,
+                        EventAddressV2Id = eventAddressId,
+                        EventListenerV2Id = newEventListenerV2.Id,
                         CreatedDate = inputEventArchiveV2.CreatedDate,
                         UpdatedDate = inputEventArchiveV2.CreatedDate
                     }

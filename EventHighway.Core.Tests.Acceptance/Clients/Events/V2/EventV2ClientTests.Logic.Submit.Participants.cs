@@ -28,8 +28,8 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
             EventV2 inputEventV2 =
                 CreateRandomEventV2(inputEventAddressV2Id, scheduledDate);
 
-            inputEventV2.ParticipantId = null;
-            inputEventV2.ParticipantSecret = null;
+            inputEventV2.EventParticipantV2Id = null;
+            inputEventV2.EventParticipantV2Secret = null;
             EventV2 expectedEventV2 = inputEventV2;
 
             // when
@@ -63,8 +63,8 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
             EventV2 inputEventV2 =
                 CreateRandomEventV2(inputEventAddressV2Id, scheduledDate);
 
-            inputEventV2.ParticipantId = addedEventParticipantV2.Id;
-            inputEventV2.ParticipantSecret = null;
+            inputEventV2.EventParticipantV2Id = addedEventParticipantV2.Id;
+            inputEventV2.EventParticipantV2Secret = null;
             EventV2 expectedEventV2 = inputEventV2;
 
             // when
@@ -105,8 +105,8 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V2
             EventV2 inputEventV2 =
                 CreateRandomEventV2(inputEventAddressV2Id, scheduledDate);
 
-            inputEventV2.ParticipantId = addedEventParticipantV2.Id;
-            inputEventV2.ParticipantSecret = addedEventParticipantSecretV2.Secret;
+            inputEventV2.EventParticipantV2Id = addedEventParticipantV2.Id;
+            inputEventV2.EventParticipantV2Secret = addedEventParticipantSecretV2.Secret;
             EventV2 expectedEventV2 = inputEventV2;
 
             // when

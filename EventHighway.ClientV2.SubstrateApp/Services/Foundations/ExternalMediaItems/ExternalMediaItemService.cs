@@ -65,9 +65,9 @@ namespace EventHighway.ClientV2.SubstrateApp.Services.Foundations.ExternalMediaI
                 Id = Guid.NewGuid(),
                 Content = content,
                 EventName = "AddNewRelease",
-                EventAddressId = eventAddress.Id,
-                ParticipantId = externalMediaItem.ParticipantId,
-                ParticipantSecret = externalMediaItem.Secret,
+                EventAddressV2Id = eventAddress.Id,
+                EventParticipantV2Id = externalMediaItem.ParticipantId,
+                EventParticipantV2Secret = externalMediaItem.Secret,
                 CreatedDate = now,
                 UpdatedDate = now
             };

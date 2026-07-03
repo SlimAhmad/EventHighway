@@ -42,7 +42,7 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
                     cancellationToken);
 
             return secrets
-                .Where(secret => secret.ParticipantId == participantId)
+                .Where(secret => secret.EventParticipantV2Id == participantId)
                 .Select(AsView)
                 .ToList();
         });
@@ -61,7 +61,7 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
                 IsActive = secret.IsActive,
                 ActiveFrom = secret.ActiveFrom,
                 ActiveTo = secret.ActiveTo,
-                ParticipantId = secret.ParticipantId,
+                EventParticipantV2Id = secret.EventParticipantV2Id,
                 CreatedDate = now,
                 UpdatedDate = now
             };
@@ -119,7 +119,7 @@ namespace EventHighway.Portal.Web.Services.Views.EventParticipantSecrets
                 IsActive = secret.IsActive,
                 ActiveFrom = secret.ActiveFrom,
                 ActiveTo = secret.ActiveTo,
-                ParticipantId = secret.ParticipantId
+                EventParticipantV2Id = secret.EventParticipantV2Id
             };
     }
 }

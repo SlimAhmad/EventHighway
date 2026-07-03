@@ -95,12 +95,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .ReturnsAsync(listenerEvents);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
-                    .ReturnsAsync(archivedEvents);
-
-            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
-                    .ReturnsAsync(archivedListenerEvents);
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(AttachListenerEventArchiveV2s(
+                        archivedEvents, archivedListenerEvents));
 
             // when
             var actualSummaries =
@@ -152,10 +149,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 service.RetrieveAllListenerEventV2sAsync(randomCancellationToken), Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken), Times.Once);
-
-            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
             this.configurationBrokerMock.Verify(broker =>
                 broker.GetHealthConfiguration(), Times.Once);
@@ -199,12 +193,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .ReturnsAsync(emptyListenerEvents);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken))
-                    .ReturnsAsync(emptyArchivedEvents);
-
-            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken))
-                    .ReturnsAsync(emptyArchivedListenerEvents);
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(randomCancellationToken))
+                    .ReturnsAsync(AttachListenerEventArchiveV2s(
+                        emptyArchivedEvents, emptyArchivedListenerEvents));
 
             // when
             var actualSummaries =
@@ -228,10 +219,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 service.RetrieveAllListenerEventV2sAsync(randomCancellationToken), Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllEventArchiveV2sAsync(randomCancellationToken), Times.Once);
-
-            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(randomCancellationToken), Times.Once);
 
             this.configurationBrokerMock.Verify(broker =>
                 broker.GetHealthConfiguration(), Times.Once);

@@ -84,7 +84,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                 Content = invalidText,
                 EventName = invalidText,
                 Type = invalidEventV2Type,
-                EventAddressId = Guid.Empty
+                EventAddressV2Id = Guid.Empty
             };
 
             var invalidEventV2Exception =
@@ -104,7 +104,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.Events.V2
                 values: "Required");
 
             invalidEventV2Exception.AddData(
-                key: nameof(EventV2.EventAddressId),
+                key: nameof(EventV2.EventAddressV2Id),
                 values: "Required");
 
             invalidEventV2Exception.AddData(

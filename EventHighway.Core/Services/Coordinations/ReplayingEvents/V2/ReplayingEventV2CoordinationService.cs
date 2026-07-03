@@ -57,34 +57,59 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
 
             int take = batchConfiguration.BatchSizeForBulkProcessing;
             int skip = 0;
-            IEnumerable<ListenerEventArchiveV2> listenerArchiveBatch;
+            IEnumerable<EventArchiveV2> eventArchiveV2Batch;
 
             do
             {
-                listenerArchiveBatch = await this.eventArchiveV2OrchestrationService
-                    .RetrieveBatchOfListenerEventArchiveV2sAsync(
+                eventArchiveV2Batch = await this.eventArchiveV2OrchestrationService
+                    .RetrieveBatchOfEventArchiveV2sMatchingAsync(
                         eventAddressId, eventListenerIds, startDate, endDate, skip, take, cancellationToken);
 
-                if (!listenerArchiveBatch.Any())
+                if (!eventArchiveV2Batch.Any())
                     break;
 
-                IEnumerable<Guid> eventArchiveIds =
-                    listenerArchiveBatch
-                        .Select(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
-                        .Distinct()
-                        .ToList();
+                foreach (EventArchiveV2 eventArchiveV2 in eventArchiveV2Batch)
+                {
+                    int listenerArchiveSkip = 0;
+                    IEnumerable<ListenerEventArchiveV2> listenerArchivePage;
 
-                IEnumerable<EventArchiveV2> eventArchiveV2s =
-                    await this.eventArchiveV2OrchestrationService
-                        .RetrieveEventArchiveV2sByIdsAsync(eventArchiveIds, cancellationToken);
+                    do
+                    {
+                        EventArchiveV2 eventArchiveV2WithListenerArchivePage =
+                            await this.eventArchiveV2OrchestrationService
+                                .RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+                                    eventArchiveV2.Id,
+                                    eventListenerIds,
+                                    startDate,
+                                    endDate,
+                                    listenerArchiveSkip,
+                                    take,
+                                    cancellationToken);
 
-                await this.restoringEventV2OrchestrationService
-                    .RestoreAsync(eventArchiveV2s, listenerArchiveBatch, cancellationToken);
+                        listenerArchivePage =
+                            eventArchiveV2WithListenerArchivePage.ListenerEventArchiveV2s;
+
+                        if (listenerArchivePage is null || !listenerArchivePage.Any())
+                            break;
+
+                        await this.restoringEventV2OrchestrationService
+                            .RestoreAsync(
+                                new[] { eventArchiveV2 },
+                                listenerArchivePage,
+                                cancellationToken);
+
+                        if (take == 0)
+                            break;
+
+                        listenerArchiveSkip += take;
+                    }
+                    while (true);
+                }
 
                 if (eventListenerIds is null || !eventListenerIds.Any())
                 {
                     await this.restoringEventV2OrchestrationService
-                        .GenerateReplayForNewListenersAsync(eventArchiveV2s, cancellationToken);
+                        .GenerateReplayForNewListenersAsync(eventArchiveV2Batch, cancellationToken);
                 }
 
                 if (take == 0)
@@ -117,7 +142,7 @@ namespace EventHighway.Core.Services.Coordinations.ReplayingEvents.V2
                 return;
 
             if (eventAddressId.HasValue
-                && eventArchiveV2.EventAddressId != eventAddressId.Value)
+                && eventArchiveV2.EventAddressV2Id != eventAddressId.Value)
             {
                 return;
             }

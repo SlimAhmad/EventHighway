@@ -102,8 +102,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
         private static ListenerEventV2 CreateRandomListenerEventV2WithNavProps()
         {
             ListenerEventV2 listenerEventV2 = CreateListenerEventV2Filler().Create();
-            listenerEventV2.Event = CreateEventV2Filler().Create();
-            listenerEventV2.EventListener = CreateEventListenerV2Filler().Create();
+            listenerEventV2.EventV2 = CreateEventV2Filler().Create();
+            listenerEventV2.EventListenerV2 = CreateEventListenerV2Filler().Create();
 
             return listenerEventV2;
         }
@@ -124,9 +124,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
                 .OnType<EventParticipantV2>().IgnoreIt()
-                .OnProperty(lev => lev.Event).IgnoreIt()
-                .OnProperty(lev => lev.EventAddress).IgnoreIt()
-                .OnProperty(lev => lev.EventListener).IgnoreIt();
+                .OnProperty(lev => lev.EventV2).IgnoreIt()
+                .OnProperty(lev => lev.EventAddressV2).IgnoreIt()
+                .OnProperty(lev => lev.EventListenerV2).IgnoreIt();
 
             return filler;
         }
@@ -162,7 +162,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
                 .OnProperty(eventListenerV2 => eventListenerV2.ListenerEventArchiveV2s)
                     .IgnoreIt()
 
-                .OnProperty(eventListenerV2 => eventListenerV2.Participant)
+                .OnProperty(eventListenerV2 => eventListenerV2.EventParticipantV2)
                     .IgnoreIt();
 
             return filler;

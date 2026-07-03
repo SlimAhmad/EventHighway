@@ -25,7 +25,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             ListenerEventV2 inputListenerEventV2 =
                 CreateRandomListenerEventV2WithNavProps();
 
-            inputListenerEventV2.EventListener.PromotedProperties = null;
+            inputListenerEventV2.EventListenerV2.PromotedProperties = null;
 
             DateTimeOffset randomNow = GetRandomDateTimeOffset();
 
@@ -52,10 +52,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
                 .InSequence(mockSequence)
                 .Setup(service => service.RunEventCallV2Async(
                     It.Is<EventCallV2>(call =>
-                        call.Content == inputListenerEventV2.Event.Content
-                        && call.HandlerId == inputListenerEventV2.EventListener.HandlerId
-                        && call.HandlerName == inputListenerEventV2.EventListener.HandlerName
-                        && call.FilterCriteria == inputListenerEventV2.EventListener.FilterCriteria),
+                        call.Content == inputListenerEventV2.EventV2.Content
+                        && call.HandlerId == inputListenerEventV2.EventListenerV2.HandlerId
+                        && call.HandlerName == inputListenerEventV2.EventListenerV2.HandlerName
+                        && call.FilterCriteria == inputListenerEventV2.EventListenerV2.FilterCriteria),
                     randomCancellationToken))
                 .ReturnsAsync(ranEventCallV2);
 
@@ -118,7 +118,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             ListenerEventV2 inputListenerEventV2 =
                 CreateRandomListenerEventV2WithNavProps();
 
-            inputListenerEventV2.EventListener.PromotedProperties = null;
+            inputListenerEventV2.EventListenerV2.PromotedProperties = null;
 
             DateTimeOffset randomNow = GetRandomDateTimeOffset();
 
@@ -207,7 +207,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             ListenerEventV2 inputListenerEventV2 =
                 CreateRandomListenerEventV2WithNavProps();
 
-            inputListenerEventV2.EventListener.PromotedProperties = null;
+            inputListenerEventV2.EventListenerV2.PromotedProperties = null;
 
             DateTimeOffset randomNow = GetRandomDateTimeOffset();
             var deliveryException = new Exception();

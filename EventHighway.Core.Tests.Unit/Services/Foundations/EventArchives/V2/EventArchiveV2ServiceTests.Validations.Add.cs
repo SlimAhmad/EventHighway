@@ -119,7 +119,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventArchives.V2
                 values: "Required");
 
             invalidEventArchiveV2Exception.AddData(
-                key: nameof(EventArchiveV2.EventAddressId),
+                key: nameof(EventArchiveV2.EventAddressV2Id),
                 values: "Required");
 
             var expectedEventArchiveV2ValidationException =

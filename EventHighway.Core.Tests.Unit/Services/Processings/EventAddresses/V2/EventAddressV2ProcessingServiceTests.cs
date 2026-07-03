@@ -102,7 +102,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventAddresses.V2
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
 
-                .OnProperty(eventAddressV2 => eventAddressV2.Events)
+                .OnProperty(eventAddressV2 => eventAddressV2.EventV2s)
                     .IgnoreIt()
 
                 .OnProperty(eventAddressV2 => eventAddressV2.EventListenerV2s)

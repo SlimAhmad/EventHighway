@@ -81,9 +81,9 @@ namespace EventHighway.Portal.Web.Services.Views.EventArchives
                 Type = eventArchive.Type.ToString(),
                 Status = eventArchive.Status.ToString(),
                 RemainingRetryAttempts = eventArchive.RemainingRetryAttempts,
-                EventAddressId = eventArchive.EventAddressId,
+                EventAddressV2Id = eventArchive.EventAddressV2Id,
                 EventAddressName = eventArchive.EventAddressV2?.Name ?? string.Empty,
-                ParticipantId = eventArchive.ParticipantId,
+                EventParticipantV2Id = eventArchive.EventParticipantV2Id,
                 ScheduledDate = eventArchive.ScheduledDate,
                 CreatedDate = eventArchive.CreatedDate,
                 ArchivedDate = eventArchive.ArchivedDate

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
 using Moq;
@@ -24,6 +25,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             var mockSequence = new MockSequence();
 
+            BatchConfiguration randomBatchConfiguration = CreateRandomBatchConfiguration();
+
             Guid quarantinedEventV2Id = GetRandomId();
 
             var quarantinedEventV2 = new EventV2
@@ -37,7 +40,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = GetRandomDateTimeOffset(),
                 ScheduledDate = GetRandomDateTimeOffset(),
                 RemainingRetryAttempts = GetRandomNumber(),
-                EventAddressId = GetRandomId()
+                EventAddressV2Id = GetRandomId()
             };
 
             List<EventV2> retrievedQuarantinedEventV2s =
@@ -54,7 +57,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = quarantinedEventV2.CreatedDate,
                 ScheduledDate = quarantinedEventV2.ScheduledDate,
                 RemainingRetryAttempts = quarantinedEventV2.RemainingRetryAttempts,
-                EventAddressId = quarantinedEventV2.EventAddressId
+                EventAddressV2Id = quarantinedEventV2.EventAddressV2Id
             };
 
             List<EventArchiveV2> expectedEventArchiveV2s =
@@ -88,6 +91,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     service.RetrieveBatchOfQuarantinedEventV2sAsync(randomCancellationToken))
                         .ReturnsAsync(Enumerable.Empty<EventV2>());
 
+            this.configurationBrokerMock
+                .InSequence(mockSequence).Setup(broker =>
+                    broker.GetBatchConfiguration())
+                        .Returns(randomBatchConfiguration);
+
             // Step 5
             this.archivingEventV2OrchestrationServiceMock
                 .InSequence(mockSequence).Setup(service =>
@@ -119,8 +127,14 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                 service.RetrieveBatchOfDeadEventV2sAsync(randomCancellationToken),
                     Times.Once);
 
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetBatchConfiguration(),
+                    Times.Once);
+
             this.archivingEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
             this.eventArchiveV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.listenerEventV2OrchestrationServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

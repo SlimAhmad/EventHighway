@@ -29,7 +29,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
                     message: "Event listener is invalid, fix the errors and try again.");
 
             invalidEventListenerV2ProcessingException.AddData(
-                key: nameof(EventListenerV2.EventAddressId),
+                key: nameof(EventListenerV2.EventAddressV2Id),
                 values: "Required");
 
             var expectedEventListenerV2ProcessingValidationException =

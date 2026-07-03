@@ -8,5 +8,6 @@ namespace EventHighway.Core.Models.Services.Foundations.EventsArchives.V2
     {
         Active = 0,
         Quarantined = 1,
+        Dispatched = 2
     }
 }

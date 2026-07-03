@@ -22,8 +22,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // given
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = null;
-            inputEventV2.ParticipantSecret = null;
+            inputEventV2.EventParticipantV2Id = null;
+            inputEventV2.EventParticipantV2Secret = null;
 
             // when
             await this.eventParticipantV2OrchestrationService
@@ -51,12 +51,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = activeEventParticipantV2.Id;
-            inputEventV2.ParticipantSecret = null;
+            inputEventV2.EventParticipantV2Id = activeEventParticipantV2.Id;
+            inputEventV2.EventParticipantV2Secret = null;
 
             this.eventParticipantV2ServiceMock.Setup(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()))
                         .ReturnsAsync(activeEventParticipantV2);
 
@@ -73,7 +73,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // then
             this.eventParticipantV2ServiceMock.Verify(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -103,19 +103,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             activeEventParticipantSecretV2.IsActive = true;
             activeEventParticipantSecretV2.ActiveFrom = null;
             activeEventParticipantSecretV2.ActiveTo = null;
-            activeEventParticipantSecretV2.ParticipantId = activeEventParticipantV2.Id;
+            activeEventParticipantSecretV2.EventParticipantV2Id = activeEventParticipantV2.Id;
 
             IQueryable<EventParticipantSecretV2> eventParticipantSecretV2s =
                 new List<EventParticipantSecretV2> { activeEventParticipantSecretV2 }.AsQueryable();
 
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = activeEventParticipantV2.Id;
-            inputEventV2.ParticipantSecret = activeEventParticipantSecretV2.Secret;
+            inputEventV2.EventParticipantV2Id = activeEventParticipantV2.Id;
+            inputEventV2.EventParticipantV2Secret = activeEventParticipantSecretV2.Secret;
 
             this.eventParticipantV2ServiceMock.Setup(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()))
                         .ReturnsAsync(activeEventParticipantV2);
 
@@ -137,7 +137,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // then
             this.eventParticipantV2ServiceMock.Verify(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -173,19 +173,19 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             activeEventParticipantSecretV2.IsActive = true;
             activeEventParticipantSecretV2.ActiveFrom = randomDateTimeOffset.AddMinutes(-1);
             activeEventParticipantSecretV2.ActiveTo = randomDateTimeOffset.AddMinutes(1);
-            activeEventParticipantSecretV2.ParticipantId = activeEventParticipantV2.Id;
+            activeEventParticipantSecretV2.EventParticipantV2Id = activeEventParticipantV2.Id;
 
             IQueryable<EventParticipantSecretV2> eventParticipantSecretV2s =
                 new List<EventParticipantSecretV2> { activeEventParticipantSecretV2 }.AsQueryable();
 
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = activeEventParticipantV2.Id;
-            inputEventV2.ParticipantSecret = activeEventParticipantSecretV2.Secret;
+            inputEventV2.EventParticipantV2Id = activeEventParticipantV2.Id;
+            inputEventV2.EventParticipantV2Secret = activeEventParticipantSecretV2.Secret;
 
             this.eventParticipantV2ServiceMock.Setup(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()))
                         .ReturnsAsync(activeEventParticipantV2);
 
@@ -207,7 +207,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // then
             this.eventParticipantV2ServiceMock.Verify(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 

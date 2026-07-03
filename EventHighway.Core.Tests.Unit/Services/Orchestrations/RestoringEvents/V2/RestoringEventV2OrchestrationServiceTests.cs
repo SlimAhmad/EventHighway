@@ -134,22 +134,23 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
                 ScheduledDate = null,
                 ContentHash = null,
                 RemainingRetryAttempts = 0,
-                EventAddressId = eventArchiveV2.EventAddressId
+                EventAddressV2Id = eventArchiveV2.EventAddressV2Id
             };
 
         private static ListenerEventV2 MapToListenerEventV2(ListenerEventArchiveV2 listenerEventArchiveV2) =>
             new ListenerEventV2
             {
                 Id = listenerEventArchiveV2.Id,
+                CorrelationId = listenerEventArchiveV2.Id,
                 Status = ListenerEventStatusV2.Replay,
                 Response = null,
                 ResponseCode = null,
                 ResponseMessage = null,
                 CreatedDate = listenerEventArchiveV2.CreatedDate,
                 UpdatedDate = listenerEventArchiveV2.UpdatedDate,
-                EventId = listenerEventArchiveV2.EventId,
-                EventAddressId = listenerEventArchiveV2.EventAddressId,
-                EventListenerId = listenerEventArchiveV2.EventListenerId
+                EventV2Id = listenerEventArchiveV2.EventV2Id,
+                EventAddressV2Id = listenerEventArchiveV2.EventAddressV2Id,
+                EventListenerV2Id = listenerEventArchiveV2.EventListenerV2Id
             };
 
         private static int GetRandomNumber() =>
@@ -223,7 +224,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RestoringEvents.V
                 .OnProperty(eventListenerV2 => eventListenerV2.ListenerEventArchiveV2s)
                     .IgnoreIt()
 
-                .OnProperty(eventListenerV2 => eventListenerV2.Participant)
+                .OnProperty(eventListenerV2 => eventListenerV2.EventParticipantV2)
                     .IgnoreIt();
 
             return filler;

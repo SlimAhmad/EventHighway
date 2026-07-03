@@ -29,7 +29,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             ListenerEventV2 someListenerEventV2 =
                 CreateRandomListenerEventV2WithNavProps();
 
-            someListenerEventV2.EventListener.PromotedProperties = null;
+            someListenerEventV2.EventListenerV2.PromotedProperties = null;
 
             var expectedReplayingListenerEventV2OrchestrationDependencyValidationException =
                 new ReplayingListenerEventV2OrchestrationDependencyValidationException(
@@ -107,7 +107,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             ListenerEventV2 someListenerEventV2 =
                 CreateRandomListenerEventV2WithNavProps();
 
-            someListenerEventV2.EventListener.PromotedProperties = null;
+            someListenerEventV2.EventListenerV2.PromotedProperties = null;
 
             var expectedReplayingListenerEventV2OrchestrationDependencyException =
                 new ReplayingListenerEventV2OrchestrationDependencyException(
@@ -183,7 +183,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             ListenerEventV2 someListenerEventV2 =
                 CreateRandomListenerEventV2WithNavProps();
 
-            someListenerEventV2.EventListener.PromotedProperties = null;
+            someListenerEventV2.EventListenerV2.PromotedProperties = null;
 
             var serviceException = new Exception();
 
@@ -264,7 +264,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ReplayingListener
             ListenerEventV2 someListenerEventV2 =
                 CreateRandomListenerEventV2WithNavProps();
 
-            someListenerEventV2.EventListener.PromotedProperties = null;
+            someListenerEventV2.EventListenerV2.PromotedProperties = null;
 
             var operationCanceledException = new OperationCanceledException();
 

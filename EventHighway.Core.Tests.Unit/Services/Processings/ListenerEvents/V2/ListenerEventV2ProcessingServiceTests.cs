@@ -98,13 +98,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
                 .OnType<EventParticipantV2>().IgnoreIt()
 
-                .OnProperty(listenerEventV2 => listenerEventV2.Event)
+                .OnProperty(listenerEventV2 => listenerEventV2.EventV2)
                     .IgnoreIt()
 
-                .OnProperty(listenerEventV2 => listenerEventV2.EventAddress)
+                .OnProperty(listenerEventV2 => listenerEventV2.EventAddressV2)
                     .IgnoreIt()
 
-                .OnProperty(listenerEventV2 => listenerEventV2.EventListener)
+                .OnProperty(listenerEventV2 => listenerEventV2.EventListenerV2)
                     .IgnoreIt();
 
             return filler;

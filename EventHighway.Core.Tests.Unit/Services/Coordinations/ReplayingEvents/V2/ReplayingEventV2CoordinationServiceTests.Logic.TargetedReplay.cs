@@ -30,7 +30,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
 
             EventArchiveV2 eventArchiveV2 = CreateRandomEventArchiveV2s().First();
             eventArchiveV2.Id = eventV2Id;
-            eventArchiveV2.EventAddressId = eventAddressId.Value;
+            eventArchiveV2.EventAddressV2Id = eventAddressId.Value;
             eventArchiveV2.Status = EventArchiveStatusV2.Active;
 
             List<EventArchiveV2> retrievedEventArchiveV2s =
@@ -102,7 +102,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
 
             EventArchiveV2 quarantinedEventArchiveV2 = CreateRandomEventArchiveV2s().First();
             quarantinedEventArchiveV2.Id = eventV2Id;
-            quarantinedEventArchiveV2.EventAddressId = eventAddressId.Value;
+            quarantinedEventArchiveV2.EventAddressV2Id = eventAddressId.Value;
             quarantinedEventArchiveV2.Status = EventArchiveStatusV2.Quarantined;
 
             List<EventArchiveV2> retrievedEventArchiveV2s =
@@ -157,7 +157,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
 
             EventArchiveV2 quarantinedEventArchiveV2 = CreateRandomEventArchiveV2s().First();
             quarantinedEventArchiveV2.Id = eventV2Id;
-            quarantinedEventArchiveV2.EventAddressId = eventAddressId.Value;
+            quarantinedEventArchiveV2.EventAddressV2Id = eventAddressId.Value;
             quarantinedEventArchiveV2.Status = EventArchiveStatusV2.Quarantined;
 
             List<EventArchiveV2> retrievedEventArchiveV2s =

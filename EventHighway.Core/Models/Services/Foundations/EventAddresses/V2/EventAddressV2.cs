@@ -45,7 +45,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventAddresses.V2
         /// <summary>
         /// Gets or sets the collection of events associated with this event address.
         /// </summary>
-        public IEnumerable<EventV2> Events { get; set; }
+        public IEnumerable<EventV2> EventV2s { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of event listeners associated with this event address.

@@ -144,13 +144,13 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(dates)
 
-                .OnProperty(listenerEventV2 => listenerEventV2.Event)
+                .OnProperty(listenerEventV2 => listenerEventV2.EventV2)
                     .IgnoreIt()
 
-                .OnProperty(listenerEventV2 => listenerEventV2.EventAddress)
+                .OnProperty(listenerEventV2 => listenerEventV2.EventAddressV2)
                     .IgnoreIt()
 
-                .OnProperty(listenerEventV2 => listenerEventV2.EventListener)
+                .OnProperty(listenerEventV2 => listenerEventV2.EventListenerV2)
                     .IgnoreIt()
 
                 .OnType<EventV2>().IgnoreIt()

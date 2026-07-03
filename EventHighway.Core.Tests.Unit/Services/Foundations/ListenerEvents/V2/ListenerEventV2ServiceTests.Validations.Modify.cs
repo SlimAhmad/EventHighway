@@ -90,9 +90,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                 Id = Guid.Empty,
                 Response = invalidText,
                 Status = invalidListenerEventV2Status,
-                EventId = Guid.Empty,
-                EventAddressId = Guid.Empty,
-                EventListenerId = Guid.Empty
+                EventV2Id = Guid.Empty,
+                EventAddressV2Id = Guid.Empty,
+                EventListenerV2Id = Guid.Empty
             };
 
             var invalidListenerEventV2Exception =
@@ -108,15 +108,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                 values: "Required");
 
             invalidListenerEventV2Exception.AddData(
-                key: nameof(ListenerEventV2.EventId),
+                key: nameof(ListenerEventV2.EventV2Id),
                 values: "Required");
 
             invalidListenerEventV2Exception.AddData(
-                key: nameof(ListenerEventV2.EventAddressId),
+                key: nameof(ListenerEventV2.EventAddressV2Id),
                 values: "Required");
 
             invalidListenerEventV2Exception.AddData(
-                key: nameof(ListenerEventV2.EventListenerId),
+                key: nameof(ListenerEventV2.EventListenerV2Id),
                 values: "Required");
 
             invalidListenerEventV2Exception.AddData(

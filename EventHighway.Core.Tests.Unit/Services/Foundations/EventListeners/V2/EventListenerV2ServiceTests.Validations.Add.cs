@@ -82,7 +82,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
                 Name = invalidText,
                 Description = invalidText,
                 HandlerName = invalidText,
-                EventAddressId = Guid.Empty
+                EventAddressV2Id = Guid.Empty
             };
 
             var invalidEventListenerV2Exception =
@@ -106,7 +106,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventListeners.V2
                 values: "Required");
 
             invalidEventListenerV2Exception.AddData(
-                key: nameof(EventListenerV2.EventAddressId),
+                key: nameof(EventListenerV2.EventAddressV2Id),
                 values: "Required");
 
             invalidEventListenerV2Exception.AddData(

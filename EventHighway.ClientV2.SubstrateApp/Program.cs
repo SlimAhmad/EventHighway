@@ -176,8 +176,8 @@ public partial class Program
                     Description = "Ann, a late joiner who wants the back-catalogue.",
                     HandlerId = handlers.Ann.Id,
                     HandlerName = handlers.Ann.Name,
-                    EventAddressId = newReleases.Id,
-                    ParticipantId = ann.Id,
+                    EventAddressV2Id = newReleases.Id,
+                    EventParticipantV2Id = ann.Id,
                     CreatedDate = lateNow,
                     UpdatedDate = lateNow
                 });
@@ -260,7 +260,7 @@ public partial class Program
                 {
                     Id = SeedIdentifiers.NFlixSecret,
                     Secret = "NFlix",
-                    ParticipantId = nflixParticipant.Id,
+                    EventParticipantV2Id = nflixParticipant.Id,
                     IsActive = true,
                     CreatedDate = now,
                     UpdatedDate = now
@@ -343,8 +343,8 @@ public partial class Program
                     Description = "Internal process that receives every NFlix new release.",
                     HandlerId = mediaItemReceivedHandler.Id,
                     HandlerName = mediaItemReceivedHandler.Name,
-                    EventAddressId = newReleases.Id,
-                    ParticipantId = mediaService.Id,
+                    EventAddressV2Id = newReleases.Id,
+                    EventParticipantV2Id = mediaService.Id,
                     CreatedDate = now,
                     UpdatedDate = now
                 });
@@ -358,8 +358,8 @@ public partial class Program
                         Description = "Receives every NFlix new release.",
                         HandlerId = handlers.BingeBox.Id,
                         HandlerName = handlers.BingeBox.Name,
-                        EventAddressId = newReleases.Id,
-                        ParticipantId = bingeBox.Id,
+                        EventAddressV2Id = newReleases.Id,
+                        EventParticipantV2Id = bingeBox.Id,
                         CreatedDate = now,
                         UpdatedDate = now
                     });
@@ -373,8 +373,8 @@ public partial class Program
                         Description = "Forwards movies rated 8.0 or higher to Joe's API.",
                         HandlerId = handlers.Joe.Id,
                         HandlerName = handlers.Joe.Name,
-                        EventAddressId = newReleases.Id,
-                        ParticipantId = joe.Id,
+                        EventAddressV2Id = newReleases.Id,
+                        EventParticipantV2Id = joe.Id,
                         PromotedProperties = "Title,Type,Rating",
                         FilterCriteria =
                             "meta(\"Type\") == \"Movie\" && double.Parse(meta(\"Rating\")) >= 8.0",
@@ -421,10 +421,10 @@ public partial class Program
                 Id = Guid.NewGuid(),
                 Content = MediaItemSerializer.Serialize(item),
                 EventName = "AddNewRelease",
-                EventAddressId = newReleases.Id,
+                EventAddressV2Id = newReleases.Id,
                 ScheduledDate = now.AddSeconds(1),
-                ParticipantId = participantId,
-                ParticipantSecret = secret,
+                EventParticipantV2Id = participantId,
+                EventParticipantV2Secret = secret,
                 CreatedDate = now,
                 UpdatedDate = now
             };
@@ -459,11 +459,11 @@ public partial class Program
                 Id = Guid.NewGuid(),
                 Content = MediaItemSerializer.Serialize(item),
                 EventName = "AddNewRelease",
-                EventAddressId = eventAddressId,
+                EventAddressV2Id = eventAddressId,
                 ScheduledDate = null,
                 RemainingRetryAttempts = remainingRetryAttempts,
-                ParticipantId = nflix.Id,
-                ParticipantSecret = "NFlix",
+                EventParticipantV2Id = nflix.Id,
+                EventParticipantV2Secret = "NFlix",
                 CreatedDate = now,
                 UpdatedDate = now
             };
@@ -498,7 +498,7 @@ public partial class Program
             foreach ((Guid listenerId, string participant) in listeners)
             {
                 List<ListenerEventV2> events =
-                    all.Where(listenerEvent => listenerEvent.EventListenerId == listenerId)
+                    all.Where(listenerEvent => listenerEvent.EventListenerV2Id == listenerId)
                         .ToList();
 
                 int handled = events.Count(listenerEvent => listenerEvent.ResponseCode == "200");

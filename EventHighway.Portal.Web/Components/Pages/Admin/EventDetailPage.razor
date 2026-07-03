@@ -68,13 +68,13 @@ else if (eventView is not null)
                 <dd class="col-sm-9">@eventView.RemainingRetryAttempts</dd>
 
                 <dt class="col-sm-3">Event Address Id</dt>
-                <dd class="col-sm-9">@eventView.EventAddressId</dd>
+                <dd class="col-sm-9">@eventView.EventAddressV2Id</dd>
 
                 <dt class="col-sm-3">Event Address</dt>
                 <dd class="col-sm-9">@DisplayOrDash(eventView.EventAddressName)</dd>
 
                 <dt class="col-sm-3">Participant Id</dt>
-                <dd class="col-sm-9">@(eventView.ParticipantId?.ToString() ?? "—")</dd>
+                <dd class="col-sm-9">@(eventView.EventParticipantV2Id?.ToString() ?? "—")</dd>
 
                 <dt class="col-sm-3">Scheduled</dt>
                 <dd class="col-sm-9">@(eventView.ScheduledDate?.ToString("u") ?? "—")</dd>
@@ -210,7 +210,7 @@ else
             },
             new DataTableColumn<ListenerEventView>
             {
-                Title = "Listener", Value = e => e.EventListenerId
+                Title = "Listener", Value = e => e.EventListenerV2Id
             },
             new DataTableColumn<ListenerEventView>
             {

@@ -64,7 +64,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
             await this.clientBroker.FireScheduledPendingEventV2sAsync();
 
             return await RetrieveAllListenerEventV2sUntilAsync(
-                listenerEventV2 => listenerEventV2.EventAddressId == inputEventAddressV2Id);
+                listenerEventV2 => listenerEventV2.EventAddressV2Id == inputEventAddressV2Id);
         }
 
         private async ValueTask<IQueryable<ListenerEventV2>>
@@ -135,7 +135,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
                 Description = GetRandomString(),
                 HandlerId = this.delegateEventHandler.Id,
                 HandlerName = this.delegateEventHandler.Name,
-                EventAddressId = eventAddressId,
+                EventAddressV2Id = eventAddressId,
                 CreatedDate = now,
                 UpdatedDate = now,
             };
@@ -148,7 +148,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(now)
-                .OnProperty(eventAddressV2 => eventAddressV2.Events).IgnoreIt()
+                .OnProperty(eventAddressV2 => eventAddressV2.EventV2s).IgnoreIt()
                 .OnProperty(eventAddressV2 => eventAddressV2.EventListenerV2s).IgnoreIt()
                 .OnProperty(eventAddressV2 => eventAddressV2.ListenerEventV2s).IgnoreIt()
                 .OnProperty(eventAddressV2 => eventAddressV2.EventArchiveV2s).IgnoreIt();
@@ -166,11 +166,11 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ListenerEvents.V2
             filler.Setup()
                 .OnProperty(eventV2 => eventV2.EventAddressV2).IgnoreIt()
                 .OnProperty(eventV2 => eventV2.ListenerEventV2s).IgnoreIt()
-                .OnProperty(eventV2 => eventV2.EventAddressId).Use(eventAddressV2Id)
+                .OnProperty(eventV2 => eventV2.EventAddressV2Id).Use(eventAddressV2Id)
                 .OnProperty(eventV2 => eventV2.ScheduledDate).Use(scheduledDate)
                 .OnType<DateTimeOffset>().Use(now)
-                .OnProperty(eventV2 => eventV2.ParticipantId).IgnoreIt()
-                .OnProperty(eventV2 => eventV2.ParticipantSecret).IgnoreIt()
+                .OnProperty(eventV2 => eventV2.EventParticipantV2Id).IgnoreIt()
+                .OnProperty(eventV2 => eventV2.EventParticipantV2Secret).IgnoreIt()
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;

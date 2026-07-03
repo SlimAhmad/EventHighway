@@ -18,6 +18,7 @@ using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Services.Orchestrations.ListenerEvents.V2;
 
 namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 {
@@ -25,6 +26,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
     {
         private readonly IArchivingEventV2OrchestrationService archivingEventV2OrchestrationService;
         private readonly IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService;
+        private readonly IListenerEventV2OrchestrationService listenerEventV2OrchestrationService;
         private readonly IConfigurationBroker configurationBroker;
         private readonly IDateTimeBroker dateTimeBroker;
         private readonly ILoggingBroker loggingBroker;
@@ -32,12 +34,14 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
         public ArchivingEventV2CoordinationService(
             IArchivingEventV2OrchestrationService archivingEventV2OrchestrationService,
             IEventArchiveV2OrchestrationService eventArchiveV2OrchestrationService,
+            IListenerEventV2OrchestrationService listenerEventV2OrchestrationService,
             IConfigurationBroker configurationBroker,
             IDateTimeBroker dateTimeBroker,
             ILoggingBroker loggingBroker)
         {
             this.archivingEventV2OrchestrationService = archivingEventV2OrchestrationService;
             this.eventArchiveV2OrchestrationService = eventArchiveV2OrchestrationService;
+            this.listenerEventV2OrchestrationService = listenerEventV2OrchestrationService;
             this.configurationBroker = configurationBroker;
             this.dateTimeBroker = dateTimeBroker;
             this.loggingBroker = loggingBroker;
@@ -139,6 +143,9 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 
         private async ValueTask ArchiveDeadEventsV2sAsync(CancellationToken cancellationToken)
         {
+            BatchConfiguration batchConfiguration = this.configurationBroker.GetBatchConfiguration();
+            int take = batchConfiguration.BatchSizeForBulkProcessing;
+
             var faultedEventV2Ids = new HashSet<Guid>();
             var failedEventV2Ids = new List<Guid>();
             var failedListenerEventV2Ids = new List<Guid>();
@@ -180,8 +187,9 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 
                 do
                 {
-                    listenerEventV2s = await this.archivingEventV2OrchestrationService
-                        .RetrieveBatchOfListenerEventV2sAsync(pendingEventV2Ids, cancellationToken);
+                    listenerEventV2s = await this.listenerEventV2OrchestrationService
+                        .RetrieveBatchOfListenerEventV2sByEventIdsAsync(
+                            pendingEventV2Ids, take, cancellationToken);
 
                     if (!listenerEventV2s.Any())
                         break;
@@ -189,13 +197,25 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                     IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s =
                         listenerEventV2s.Select(MapToListenerEventArchiveV2).ToList();
 
-                    IEnumerable<ListenerEventArchiveV2> addedListenerEventArchiveV2s =
+                    IEnumerable<EventArchiveV2> eventArchiveV2sWithListenerEventArchiveV2s =
+                        listenerEventArchiveV2s
+                            .GroupBy(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
+                            .Select(listenerEventArchiveV2Group => new EventArchiveV2
+                            {
+                                Id = listenerEventArchiveV2Group.Key,
+                                ListenerEventArchiveV2s = listenerEventArchiveV2Group.ToList()
+                            }).ToList();
+
+                    IEnumerable<EventArchiveV2> archivedEventArchiveV2s =
                         await this.eventArchiveV2OrchestrationService
-                            .BulkAddListenerEventArchiveV2sAsync(listenerEventArchiveV2s, cancellationToken);
+                            .BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+                                eventArchiveV2sWithListenerEventArchiveV2s, cancellationToken);
 
                     var addedListenerEventArchiveIds =
-                        addedListenerEventArchiveV2s.Select(listenerEventArchiveV2 =>
-                            listenerEventArchiveV2.Id).ToHashSet();
+                        archivedEventArchiveV2s
+                            .SelectMany(eventArchiveV2 => eventArchiveV2.ListenerEventArchiveV2s)
+                            .Select(listenerEventArchiveV2 => listenerEventArchiveV2.Id)
+                            .ToHashSet();
 
                     IEnumerable<ListenerEventV2> addedListenerEventV2s =
                         listenerEventV2s
@@ -204,7 +224,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
 
                     if (addedListenerEventV2s.Any())
                     {
-                        await this.archivingEventV2OrchestrationService
+                        await this.listenerEventV2OrchestrationService
                             .BulkRemoveListenerEventV2sAsync(addedListenerEventV2s, cancellationToken);
                     }
 
@@ -213,7 +233,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                             !addedListenerEventArchiveIds.Contains(listenerEventV2.Id)))
                     {
                         failedListenerEventV2Ids.Add(unarchivedListenerEventV2.Id);
-                        faultedEventV2Ids.Add(unarchivedListenerEventV2.EventId);
+                        faultedEventV2Ids.Add(unarchivedListenerEventV2.EventV2Id);
                     }
 
                     pendingEventV2Ids =
@@ -283,7 +303,7 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                 UpdatedDate = eventV2.CreatedDate,
                 ScheduledDate = eventV2.ScheduledDate,
                 RemainingRetryAttempts = eventV2.RemainingRetryAttempts,
-                EventAddressId = eventV2.EventAddressId
+                EventAddressV2Id = eventV2.EventAddressV2Id
             };
         }
 
@@ -299,10 +319,10 @@ namespace EventHighway.Core.Services.Coordinations.ArchivingEvents.V2
                 ResponseMessage = listenerEventV2.ResponseMessage,
                 CreatedDate = listenerEventV2.CreatedDate,
                 UpdatedDate = listenerEventV2.CreatedDate,
-                EventId = listenerEventV2.EventId,
-                EventAddressId = listenerEventV2.EventAddressId,
-                EventListenerId = listenerEventV2.EventListenerId,
-                EventArchiveV2Id = listenerEventV2.EventId
+                EventV2Id = listenerEventV2.EventV2Id,
+                EventAddressV2Id = listenerEventV2.EventAddressV2Id,
+                EventListenerV2Id = listenerEventV2.EventListenerV2Id,
+                EventArchiveV2Id = listenerEventV2.EventV2Id
             };
         }
     }

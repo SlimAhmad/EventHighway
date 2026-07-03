@@ -57,7 +57,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventArchives.V2
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(now)
 
-                .OnProperty(eventAddressV2 => eventAddressV2.Events)
+                .OnProperty(eventAddressV2 => eventAddressV2.EventV2s)
                     .IgnoreIt()
 
                 .OnProperty(eventAddressV2 => eventAddressV2.EventListenerV2s)
@@ -85,7 +85,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventArchives.V2
                     eventV2.ListenerEventV2s).IgnoreIt()
 
                 .OnProperty(eventV2 =>
-                    eventV2.EventAddressId).Use(eventAddressV2Id)
+                    eventV2.EventAddressV2Id).Use(eventAddressV2Id)
 
                 .OnProperty(eventV2 =>
                     eventV2.ScheduledDate).Use(now.AddSeconds(seconds: -1))
@@ -94,8 +94,8 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventArchives.V2
                     eventV2.RemainingRetryAttempts).Use(0)
 
                 .OnType<DateTimeOffset>().Use(now)
-                .OnProperty(eventV2 => eventV2.ParticipantId).IgnoreIt()
-                .OnProperty(eventV2 => eventV2.ParticipantSecret).IgnoreIt()
+                .OnProperty(eventV2 => eventV2.EventParticipantV2Id).IgnoreIt()
+                .OnProperty(eventV2 => eventV2.EventParticipantV2Secret).IgnoreIt()
                 .OnType<EventParticipantV2>().IgnoreIt();
 
             return filler;

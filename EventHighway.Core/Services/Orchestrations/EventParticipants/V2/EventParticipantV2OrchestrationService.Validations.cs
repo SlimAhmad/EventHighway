@@ -13,7 +13,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventParticipants.V2
     {
         private static void ValidateParticipantSecretHasParticipantId(EventV2 eventV2)
         {
-            if (string.IsNullOrWhiteSpace(eventV2.ParticipantSecret) is false)
+            if (string.IsNullOrWhiteSpace(eventV2.EventParticipantV2Secret) is false)
             {
                 throw new InvalidEventParticipantV2OrchestrationException(
                     message: "Event participant secret requires a participant id.");

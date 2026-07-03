@@ -49,8 +49,8 @@ namespace EventHighway.Core.Services.Foundations.EventArchives.V2
                 (Rule: await IsNotRecentAsync(eventArchiveV2.ArchivedDate),
                 Parameter: nameof(EventArchiveV2.ArchivedDate)),
 
-                (Rule: IsInvalid(eventArchiveV2.EventAddressId),
-                Parameter: nameof(EventArchiveV2.EventAddressId)));
+                (Rule: IsInvalid(eventArchiveV2.EventAddressV2Id),
+                Parameter: nameof(EventArchiveV2.EventAddressV2Id)));
         }
 
         private static void ValidateEventArchiveV2IsNotNull(EventArchiveV2 eventArchiveV2)

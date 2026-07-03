@@ -31,8 +31,8 @@ namespace EventHighway.Portal.Web.Services.Views.Replays
         TryCatch(async () =>
         {
             await this.eventHighwayBroker.ReplayEventArchiveV2sAsync(
-                eventAddressId: replayRequest.EventAddressId,
-                eventListenerIds: replayRequest.EventListenerIds ?? new List<Guid>(),
+                eventAddressId: replayRequest.EventAddressV2Id,
+                eventListenerIds: replayRequest.EventListenerV2Ids ?? new List<Guid>(),
                 startDate: replayRequest.StartDate,
                 endDate: replayRequest.EndDate,
                 cancellationToken: cancellationToken);

@@ -82,7 +82,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventAddresses.V2
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(dates)
 
-                .OnProperty(eventAddressV2 => eventAddressV2.Events)
+                .OnProperty(eventAddressV2 => eventAddressV2.EventV2s)
                     .IgnoreIt()
 
                 .OnProperty(eventAddressV2 => eventAddressV2.EventListenerV2s)

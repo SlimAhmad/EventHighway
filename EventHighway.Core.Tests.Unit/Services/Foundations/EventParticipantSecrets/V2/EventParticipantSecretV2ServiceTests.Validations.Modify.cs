@@ -115,7 +115,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.EventParticipantSecr
                 ]);
 
             invalidEventParticipantSecretV2Exception.AddData(
-                key: nameof(EventParticipantSecretV2.ParticipantId),
+                key: nameof(EventParticipantSecretV2.EventParticipantV2Id),
                 values: "Required");
 
             var expectedEventParticipantSecretV2ValidationException =

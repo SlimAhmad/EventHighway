@@ -93,7 +93,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
 
             randomEventListenerV2s.ToList().ForEach(listener =>
             {
-                listener.EventAddressId = eventAddressId;
+                listener.EventAddressV2Id = eventAddressId;
             });
 
             return randomEventListenerV2s;
@@ -124,7 +124,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.EventListeners.V2
                 .OnProperty(eventListenerV2 => eventListenerV2.ListenerEventArchiveV2s)
                     .IgnoreIt()
 
-                .OnProperty(eventListenerV2 => eventListenerV2.Participant)
+                .OnProperty(eventListenerV2 => eventListenerV2.EventParticipantV2)
                     .IgnoreIt();
 
             return filler;

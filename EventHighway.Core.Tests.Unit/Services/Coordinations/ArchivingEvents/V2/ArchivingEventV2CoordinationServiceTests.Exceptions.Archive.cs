@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Coordinations.ArchivingEvents.V2.Exceptions;
-using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
+using EventHighway.Core.Models.Services.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using FluentAssertions;
 using Moq;
@@ -90,6 +90,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
             this.archivingEventV2OrchestrationServiceMock.Setup(service =>
                 service.RetrieveBatchOfDeadEventV2sAsync(It.IsAny<CancellationToken>()))
                     .ReturnsAsync(Enumerable.Empty<EventV2>());
+
+            this.configurationBrokerMock.Setup(broker =>
+                broker.GetBatchConfiguration())
+                    .Returns(CreateRandomBatchConfiguration());
 
             // when
             ValueTask archiveEventV2sTask =

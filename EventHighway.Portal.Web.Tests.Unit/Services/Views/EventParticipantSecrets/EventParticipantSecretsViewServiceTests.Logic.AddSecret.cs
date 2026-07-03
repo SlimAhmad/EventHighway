@@ -27,7 +27,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventParticipantSecr
                 IsActive = true,
                 ActiveFrom = null,
                 ActiveTo = null,
-                ParticipantId = participantId
+                EventParticipantV2Id = participantId
             };
 
             var returnedSecret = new EventParticipantSecretV2
@@ -39,7 +39,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventParticipantSecr
                 ActiveTo = inputView.ActiveTo,
                 CreatedDate = now,
                 UpdatedDate = now,
-                ParticipantId = participantId
+                EventParticipantV2Id = participantId
             };
 
             EventParticipantSecretView expectedView =
@@ -70,7 +70,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventParticipantSecr
                 broker.AddEventParticipantSecretV2Async(
                     It.Is<EventParticipantSecretV2>(secret =>
                         secret.Secret == inputView.Secret
-                        && secret.ParticipantId == participantId
+                        && secret.EventParticipantV2Id == participantId
                         && secret.IsActive == inputView.IsActive
                         && secret.CreatedDate == now
                         && secret.UpdatedDate == now),

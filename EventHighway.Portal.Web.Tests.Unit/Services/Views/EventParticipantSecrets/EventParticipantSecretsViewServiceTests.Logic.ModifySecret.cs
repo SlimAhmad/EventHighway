@@ -34,7 +34,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventParticipantSecr
                 IsActive = false,
                 ActiveFrom = GetRandomDateTimeOffset(),
                 ActiveTo = GetRandomDateTimeOffset(),
-                ParticipantId = participantId
+                EventParticipantV2Id = participantId
             };
 
             EventParticipantSecretV2 returnedSecret = new EventParticipantSecretV2
@@ -44,7 +44,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventParticipantSecr
                 IsActive = inputView.IsActive,
                 ActiveFrom = inputView.ActiveFrom,
                 ActiveTo = inputView.ActiveTo,
-                ParticipantId = participantId,
+                EventParticipantV2Id = participantId,
                 CreatedDate = targetSecret.CreatedDate,
                 UpdatedDate = now
             };

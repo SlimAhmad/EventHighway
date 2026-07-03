@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -11,19 +10,15 @@ using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
-using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
-using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
-using EventHighway.Core.Models.Services.Orchestrations.EventListeners.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.EventParticipants.V2.Exceptions;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
 using EventHighway.Core.Services.Coordinations.Events.V2;
-using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
+using EventHighway.Core.Services.Orchestrations.EventFirings.V2;
 using EventHighway.Core.Services.Orchestrations.EventParticipants.V2;
 using EventHighway.Core.Services.Orchestrations.Events.V2;
-using KellermanSoftware.CompareNetObjects;
 using Moq;
 using Tynamix.ObjectFiller;
 using Xeptions;
@@ -33,11 +28,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
     public partial class EventV2CoordinationServiceTests
     {
         private readonly Mock<IEventV2OrchestrationService> eventV2OrchestrationServiceMock;
-        private readonly Mock<IEventListenerV2OrchestrationService> eventListenerV2OrchestrationServiceMock;
+        private readonly Mock<IEventFiringV2OrchestrationService> eventFiringV2OrchestrationServiceMock;
         private readonly Mock<IEventParticipantV2OrchestrationService> eventParticipantV2OrchestrationServiceMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
-        private readonly ICompareLogic compareLogic;
         private readonly IEventV2CoordinationService eventV2CoordinationService;
 
         public EventV2CoordinationServiceTests()
@@ -45,8 +39,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             this.eventV2OrchestrationServiceMock =
                 new Mock<IEventV2OrchestrationService>();
 
-            this.eventListenerV2OrchestrationServiceMock =
-                new Mock<IEventListenerV2OrchestrationService>(
+            this.eventFiringV2OrchestrationServiceMock =
+                new Mock<IEventFiringV2OrchestrationService>(
                     behavior: MockBehavior.Strict);
 
             this.eventParticipantV2OrchestrationServiceMock =
@@ -57,17 +51,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                 behavior: MockBehavior.Strict);
 
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
-            var compareConfiguration = new ComparisonConfig();
-
-            compareConfiguration.IgnoreProperty<ListenerEventV2>(listenerEventV2 =>
-                listenerEventV2.Id);
-
-            this.compareLogic = new CompareLogic(compareConfiguration);
 
             this.eventV2CoordinationService =
                 new EventV2CoordinationService(
                     eventV2OrchestrationService: this.eventV2OrchestrationServiceMock.Object,
-                    eventListenerV2OrchestrationService: this.eventListenerV2OrchestrationServiceMock.Object,
+                    eventFiringV2OrchestrationService: this.eventFiringV2OrchestrationServiceMock.Object,
                     eventParticipantV2OrchestrationService: this.eventParticipantV2OrchestrationServiceMock.Object,
                     dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
@@ -85,14 +73,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     someInnerException),
 
                 new EventV2OrchestrationDependencyValidationException(
-                    someMessage,
-                    someInnerException),
-
-                new EventListenerV2OrchestrationValidationException(
-                    someMessage,
-                    someInnerException),
-
-                new EventListenerV2OrchestrationDependencyValidationException(
                     someMessage,
                     someInnerException),
 
@@ -121,14 +101,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
                     someMessage,
                     someInnerException),
 
-                new EventListenerV2OrchestrationDependencyException(
-                    someMessage,
-                    someInnerException),
-
-                new EventListenerV2OrchestrationServiceException(
-                    someMessage,
-                    someInnerException),
-
                 new EventParticipantV2OrchestrationDependencyException(
                     someMessage,
                     someInnerException),
@@ -144,20 +116,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
             return new TheoryData<Exception>
             {
                 new Exception()
-            };
-        }
-
-        public static TheoryData<DateTimeOffset, DateTimeOffset?, string> InvalidContentWithScheduledDates()
-        {
-            DateTimeOffset fixedDateTimeOffset =
-                new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
-
-            return new TheoryData<DateTimeOffset, DateTimeOffset?, string>
-            {
-                { fixedDateTimeOffset, fixedDateTimeOffset.AddDays(-2), null },
-                { fixedDateTimeOffset, null, null },
-                { fixedDateTimeOffset, fixedDateTimeOffset.AddDays(-2), "not valid json" },
-                { fixedDateTimeOffset, null, "not valid json" },
             };
         }
 
@@ -213,16 +171,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
         private static EventV2 CreateRandomEventV2() =>
             CreateEventV2Filler().Create();
 
-        private static IQueryable<EventListenerV2> CreateRandomEventListenerV2s() =>
-            CreateEventListenerV2Filler().Create(count: GetRandomNumber())
-                .Select(l => { l.PromotedProperties = null; l.FilterCriteria = null; return l; })
-                    .AsQueryable();
-
-        private static IQueryable<EventListenerV2> CreateRandomEventListenerV2s(int count) =>
-            CreateEventListenerV2Filler().Create(count)
-                .Select(l => { l.PromotedProperties = null; l.FilterCriteria = null; return l; })
-                    .AsQueryable();
-
         private static Guid GetRandomId() =>
             Guid.NewGuid();
 
@@ -234,26 +182,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
-
-        private Expression<Func<ListenerEventV2, bool>> SameListenerEventAs(
-           ListenerEventV2 expectedListenerEventV2)
-        {
-            return actualListenerEventV2 =>
-                this.compareLogic.Compare(
-                    expectedListenerEventV2,
-                    actualListenerEventV2)
-                        .AreEqual;
-        }
-
-        private Expression<Func<EventCallV2, bool>> SameEventCallAs(
-           EventCallV2 expectedEventCallV2)
-        {
-            return actualEventCallV2 =>
-                this.compareLogic.Compare(
-                    expectedEventCallV2,
-                    actualEventCallV2)
-                        .AreEqual;
-        }
 
         private static Filler<EventV2> CreateEventV2Filler()
         {
@@ -278,38 +206,6 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.V2
 
                 .OnProperty(eventV2 =>
                     eventV2.Status).Use(EventStatusV2.Active);
-
-            return filler;
-        }
-
-        private static IEnumerable<string> SplitPromotedPropertyKeys(string promotedProperties) =>
-            string.IsNullOrWhiteSpace(promotedProperties)
-                ? Array.Empty<string>()
-                : promotedProperties.Split(
-                    ',',
-                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        private static Filler<EventListenerV2> CreateEventListenerV2Filler()
-        {
-            var filler = new Filler<EventListenerV2>();
-
-            filler.Setup()
-                .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
-
-                .OnProperty(eventListenerV2 =>
-                    eventListenerV2.EventAddressV2).IgnoreIt()
-
-                .OnProperty(eventListenerV2 =>
-                    eventListenerV2.ListenerEventV2s).IgnoreIt()
-
-                .OnProperty(eventListenerV2 =>
-                    eventListenerV2.ListenerEventArchiveV2s).IgnoreIt()
-
-                .OnProperty(eventListenerV2 =>
-                    eventListenerV2.Participant).IgnoreIt()
-
-                .OnType<EventAddressV2>().IgnoreIt()
-                .OnType<EventV2>().IgnoreIt();
 
             return filler;
         }

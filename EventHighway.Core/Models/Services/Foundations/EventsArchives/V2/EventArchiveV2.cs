@@ -70,7 +70,7 @@ namespace EventHighway.Core.Models.Services.Foundations.EventsArchives.V2
         /// <summary>
         /// Gets or sets the identifier of the event address associated with this archived event.
         /// </summary>
-        public Guid EventAddressId { get; set; }
+        public Guid EventAddressV2Id { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="EventAddressV2"/> navigation property associated with this archived event.
@@ -85,17 +85,17 @@ namespace EventHighway.Core.Models.Services.Foundations.EventsArchives.V2
         /// <summary>
         /// Gets or sets the secret associated with the participant for this event.
         /// </summary>
-        public string ParticipantSecret { get; set; }
+        public string EventParticipantV2Secret { get; set; }
 
         /// <summary>
-        /// Gets or sets the identifier of the <see cref="EventParticipantV2"/> that created or is responsible for this archived event.
+        /// Gets or sets the identifier of the <see cref="EventParticipants.V2.EventParticipantV2"/> that created or is responsible for this archived event.
         /// A null value indicates no participant is associated with this event.
         /// </summary>
-        public Guid? ParticipantId { get; set; }
+        public Guid? EventParticipantV2Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="EventParticipantV2"/> navigation property associated with this archived event.
+        /// Gets or sets the <see cref="EventParticipants.V2.EventParticipantV2"/> navigation property associated with this archived event.
         /// </summary>
-        public EventParticipantV2 Participant { get; set; }
+        public EventParticipantV2 EventParticipantV2 { get; set; }
     }
 }

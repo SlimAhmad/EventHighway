@@ -43,7 +43,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
                     .Returns(batchConfiguration);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
                     It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
@@ -62,7 +62,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             actualException.Should().BeEquivalentTo(expectedException);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
                     It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()),
@@ -107,7 +107,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
                     .Returns(batchConfiguration);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
                     It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
@@ -126,7 +126,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             actualException.Should().BeEquivalentTo(expectedException);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
                     It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()),
@@ -176,7 +176,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
                     .Returns(batchConfiguration);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
                     It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
@@ -196,7 +196,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             actualException.Should().BeEquivalentTo(expectedException);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
                     It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()),
@@ -246,7 +246,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
                     .Returns(batchConfiguration);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
                     It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
@@ -265,7 +265,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ReplayingEvents.V2
             actualException.Should().BeEquivalentTo(expectedException);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveBatchOfListenerEventArchiveV2sAsync(
+                service.RetrieveBatchOfEventArchiveV2sMatchingAsync(
                     It.IsAny<Guid?>(), It.IsAny<IEnumerable<Guid>>(),
                     It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>(),
                     It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()),

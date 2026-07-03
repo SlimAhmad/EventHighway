@@ -3,18 +3,14 @@
 // ----------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Hashings;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
-using EventHighway.Core.Models.Services.Foundations.EventCall.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
-using EventHighway.Core.Models.Services.Foundations.PromotedProperties;
 using EventHighway.Core.Services.Processings.EventAddresses.V2;
-using EventHighway.Core.Services.Processings.EventCalls.V2;
 using EventHighway.Core.Services.Processings.Events.V2;
 
 namespace EventHighway.Core.Services.Orchestrations.Events.V2
@@ -23,20 +19,17 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
     {
         private readonly IEventV2ProcessingService eventV2ProcessingService;
         private readonly IEventAddressV2ProcessingService eventAddressV2ProcessingService;
-        private readonly IEventCallV2ProcessingService eventCallV2ProcessingService;
         private readonly IHashBroker hashBroker;
         private readonly ILoggingBroker loggingBroker;
 
         public EventV2OrchestrationService(
             IEventV2ProcessingService eventV2ProcessingService,
             IEventAddressV2ProcessingService eventAddressV2ProcessingService,
-            IEventCallV2ProcessingService eventCallV2ProcessingService,
             IHashBroker hashBroker,
             ILoggingBroker loggingBroker)
         {
             this.eventV2ProcessingService = eventV2ProcessingService;
             this.eventAddressV2ProcessingService = eventAddressV2ProcessingService;
-            this.eventCallV2ProcessingService = eventCallV2ProcessingService;
             this.hashBroker = hashBroker;
             this.loggingBroker = loggingBroker;
         }
@@ -93,12 +86,12 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             EventAddressV2 maybeEventAddressV2 =
                 await this.eventAddressV2ProcessingService
                     .RetrieveEventAddressV2ByIdAsync(
-                        eventV2.EventAddressId,
+                        eventV2.EventAddressV2Id,
                         cancellationToken);
 
             ValidateEventAddressV2Exists(
                 maybeEventAddressV2,
-                eventV2.EventAddressId);
+                eventV2.EventAddressV2Id);
 
             return await this.eventV2ProcessingService
                 .AddEventV2Async(eventV2, cancellationToken);
@@ -158,19 +151,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
                 .RemoveEventV2ByIdAsync(eventV2Id, cancellationToken);
         });
 
-        public ValueTask<EventCallV2> RunEventCallV2Async(
-            EventCallV2 eventCallV2,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ValidateEventCallV2IsNotNull(eventCallV2);
-
-            return await this.eventCallV2ProcessingService.RunEventCallV2Async(
-                eventCallV2,
-                cancellationToken);
-        });
-
         public ValueTask<bool> IsLoopDetectedAsync(
             EventV2 eventV2,
             CancellationToken cancellationToken = default) =>
@@ -182,29 +162,5 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             return await this.eventV2ProcessingService
                 .IsLoopDetectedAsync(eventV2, cancellationToken);
         });
-
-        public ValueTask<IEnumerable<string>> SplitPromotedPropertyKeysAsync(
-            string promotedProperties,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await this.eventCallV2ProcessingService
-                .SplitPromotedPropertyKeysAsync(promotedProperties, cancellationToken);
-        });
-
-        public ValueTask<List<PromotedProperty>> PromotePropertiesAsync(
-            string content,
-            string promotedProperties,
-            CancellationToken cancellationToken = default) =>
-        TryCatch(async () =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await this.eventCallV2ProcessingService
-                .PromotePropertiesAsync(content, promotedProperties, cancellationToken);
-        });
-
     }
 }

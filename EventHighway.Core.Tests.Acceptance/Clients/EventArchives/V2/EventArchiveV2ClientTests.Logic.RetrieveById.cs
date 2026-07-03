@@ -40,7 +40,7 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventArchives.V2
             actualEventArchiveV2.Should().NotBeNull();
             actualEventArchiveV2.Id.Should().Be(inputEventArchiveV2Id);
             actualEventArchiveV2.EventName.Should().Be(randomDeadEventV2.EventName);
-            actualEventArchiveV2.EventAddressId.Should().Be(inputEventAddressV2Id);
+            actualEventArchiveV2.EventAddressV2Id.Should().Be(inputEventAddressV2Id);
 
             await this.clientBroker
                 .PurgeEventArchiveV2sAsync(DateTimeOffset.UtcNow.AddSeconds(1));

@@ -33,11 +33,11 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
                 CreateRandomListenerEventV2s();
 
             foreach (ListenerEventV2 listenerEventV2 in allListenerEventV2s)
-                listenerEventV2.EventId = inputEventIds[0];
+                listenerEventV2.EventV2Id = inputEventIds[0];
 
             IQueryable<ListenerEventV2> expectedListenerEventV2s =
                 allListenerEventV2s.Where(
-                    listenerEvent => inputEventIds.Contains(listenerEvent.EventId));
+                    listenerEvent => inputEventIds.Contains(listenerEvent.EventV2Id));
 
             this.storageBrokerMock.Setup(broker =>
                 broker.SelectAllListenerEventV2sAsync(randomCancellationToken))

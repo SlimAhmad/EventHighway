@@ -404,7 +404,7 @@ else if (participant is not null)
 
     private void OpenAddSecretModal()
     {
-        newSecret = new EventParticipantSecretView { ParticipantId = ParticipantId, IsActive = true };
+        newSecret = new EventParticipantSecretView { EventParticipantV2Id = ParticipantId, IsActive = true };
         addSecretError = null;
         showAddSecretModal = true;
     }

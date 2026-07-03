@@ -11,7 +11,7 @@ using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Configurations.BatchProcessings;
-using EventHighway.Core.Models.Orchestrations.ArchivingEvents.V2.Exceptions;
+using EventHighway.Core.Models.Services.Orchestrations.ArchivingEvents.V2.Exceptions;
 using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.EventListeners.V2;
 using EventHighway.Core.Models.Services.Foundations.EventParticipants.V2;
@@ -23,6 +23,7 @@ using EventHighway.Core.Models.Services.Orchestrations.EventArchives.V2.Exceptio
 using EventHighway.Core.Services.Coordinations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
+using EventHighway.Core.Services.Orchestrations.ListenerEvents.V2;
 using KellermanSoftware.CompareNetObjects;
 using Moq;
 using Tynamix.ObjectFiller;
@@ -34,6 +35,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
     {
         private readonly Mock<IArchivingEventV2OrchestrationService> archivingEventV2OrchestrationServiceMock;
         private readonly Mock<IEventArchiveV2OrchestrationService> eventArchiveV2OrchestrationServiceMock;
+        private readonly Mock<IListenerEventV2OrchestrationService> listenerEventV2OrchestrationServiceMock;
         private readonly Mock<IConfigurationBroker> configurationBrokerMock;
         private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
@@ -48,6 +50,10 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
 
             this.eventArchiveV2OrchestrationServiceMock =
                 new Mock<IEventArchiveV2OrchestrationService>(
+                    behavior: MockBehavior.Strict);
+
+            this.listenerEventV2OrchestrationServiceMock =
+                new Mock<IListenerEventV2OrchestrationService>(
                     behavior: MockBehavior.Strict);
 
             this.configurationBrokerMock = new Mock<IConfigurationBroker>(
@@ -66,6 +72,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                         this.archivingEventV2OrchestrationServiceMock.Object,
                     eventArchiveV2OrchestrationService:
                         this.eventArchiveV2OrchestrationServiceMock.Object,
+                    listenerEventV2OrchestrationService:
+                        this.listenerEventV2OrchestrationServiceMock.Object,
                     configurationBroker: this.configurationBrokerMock.Object,
                     dateTimeBroker: this.dateTimeBrokerMock.Object,
                     loggingBroker: this.loggingBrokerMock.Object);
@@ -223,6 +231,12 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
+        private static BatchConfiguration CreateRandomBatchConfiguration() =>
+            new BatchConfiguration
+            {
+                BatchSizeForBulkProcessing = GetRandomNumber()
+            };
+
         private Expression<Func<EventV2, bool>> SameEventV2As(EventV2 expectedEventV2)
         {
             return actualEventV2 =>
@@ -290,6 +304,18 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.ArchivingEvents.V2
                     expectedListenerEventArchiveV2s,
                     actualListenerEventArchiveV2s)
                         .AreEqual;
+        }
+
+        private static IEnumerable<EventArchiveV2> MapToEventArchiveV2sWithListenerEventArchiveV2s(
+            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s)
+        {
+            return listenerEventArchiveV2s
+                .GroupBy(listenerEventArchiveV2 => listenerEventArchiveV2.EventArchiveV2Id)
+                .Select(listenerEventArchiveV2Group => new EventArchiveV2
+                {
+                    Id = listenerEventArchiveV2Group.Key,
+                    ListenerEventArchiveV2s = listenerEventArchiveV2Group.ToList()
+                }).ToList();
         }
 
         private static List<dynamic> CreateRandomEventV2sProperties()

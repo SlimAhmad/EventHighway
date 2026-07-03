@@ -70,13 +70,13 @@ else if (eventArchive is not null)
                 <dd class="col-sm-9">@eventArchive.RemainingRetryAttempts</dd>
 
                 <dt class="col-sm-3">Event Address Id</dt>
-                <dd class="col-sm-9">@eventArchive.EventAddressId</dd>
+                <dd class="col-sm-9">@eventArchive.EventAddressV2Id</dd>
 
                 <dt class="col-sm-3">Event Address</dt>
                 <dd class="col-sm-9">@DisplayOrDash(eventArchive.EventAddressName)</dd>
 
                 <dt class="col-sm-3">Participant Id</dt>
-                <dd class="col-sm-9">@(eventArchive.ParticipantId?.ToString() ?? "—")</dd>
+                <dd class="col-sm-9">@(eventArchive.EventParticipantV2Id?.ToString() ?? "—")</dd>
 
                 <dt class="col-sm-3">Scheduled</dt>
                 <dd class="col-sm-9">@(eventArchive.ScheduledDate?.ToString("u") ?? "—")</dd>
@@ -238,7 +238,7 @@ else
             },
             new DataTableColumn<ListenerEventArchiveView>
             {
-                Title = "Listener", Value = a => a.EventListenerId
+                Title = "Listener", Value = a => a.EventListenerV2Id
             },
             new DataTableColumn<ListenerEventArchiveView>
             {
@@ -300,13 +300,13 @@ else
         {
             await ReplayViewService.ReplayListenerEventArchiveAsync(
                 eventV2Id: archiveRow.EventArchiveV2Id,
-                eventAddressId: archiveRow.EventAddressId,
-                eventListenerId: archiveRow.EventListenerId);
+                eventAddressId: archiveRow.EventAddressV2Id,
+                eventListenerId: archiveRow.EventListenerV2Id);
 
             replayAlertClass = "alert-success";
 
             replayMessage =
-                $"Replay queued for {archiveRow.ListenerName ?? archiveRow.EventListenerId.ToString()}.";
+                $"Replay queued for {archiveRow.ListenerName ?? archiveRow.EventListenerV2Id.ToString()}.";
         }
         catch
         {

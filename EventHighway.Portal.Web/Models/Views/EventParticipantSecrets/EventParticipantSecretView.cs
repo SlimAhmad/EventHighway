@@ -13,6 +13,6 @@ namespace EventHighway.Portal.Web.Models.Views.EventParticipantSecrets
         public bool IsActive { get; set; }
         public DateTimeOffset? ActiveFrom { get; set; }
         public DateTimeOffset? ActiveTo { get; set; }
-        public Guid ParticipantId { get; set; }
+        public Guid EventParticipantV2Id { get; set; }
     }
 }

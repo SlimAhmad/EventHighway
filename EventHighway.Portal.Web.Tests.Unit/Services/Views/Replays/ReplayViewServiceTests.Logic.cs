@@ -24,7 +24,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.Replays
 
             ReplayRequestView replayRequest = new ReplayRequestView
             {
-                EventAddressId = addressId,
+                EventAddressV2Id = addressId,
                 StartDate = startDate,
                 EndDate = endDate
             };

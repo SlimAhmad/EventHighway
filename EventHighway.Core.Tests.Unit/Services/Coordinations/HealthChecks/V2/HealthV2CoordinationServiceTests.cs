@@ -174,7 +174,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     Description = GetRandomString(),
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
-                    EventAddressId = Guid.NewGuid()
+                    EventAddressV2Id = Guid.NewGuid()
                 })
                 .AsQueryable();
         }
@@ -202,7 +202,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     EventName = GetRandomString(),
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
-                    EventAddressId = Guid.NewGuid()
+                    EventAddressV2Id = Guid.NewGuid()
                 });
             }
 
@@ -218,7 +218,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     EventName = GetRandomString(),
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
-                    EventAddressId = Guid.NewGuid()
+                    EventAddressV2Id = Guid.NewGuid()
                 });
             }
 
@@ -234,7 +234,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     EventName = GetRandomString(),
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
-                    EventAddressId = Guid.NewGuid()
+                    EventAddressV2Id = Guid.NewGuid()
                 });
             }
 
@@ -250,7 +250,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     EventName = GetRandomString(),
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
-                    EventAddressId = Guid.NewGuid()
+                    EventAddressV2Id = Guid.NewGuid()
                 });
             }
 
@@ -276,9 +276,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     Status = ListenerEventStatusV2.Success,
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
-                    EventId = Guid.NewGuid(),
-                    EventAddressId = Guid.NewGuid(),
-                    EventListenerId = Guid.NewGuid()
+                    EventV2Id = Guid.NewGuid(),
+                    EventAddressV2Id = Guid.NewGuid(),
+                    EventListenerV2Id = Guid.NewGuid()
                 });
             }
 
@@ -290,9 +290,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     Status = ListenerEventStatusV2.Pending,
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
-                    EventId = Guid.NewGuid(),
-                    EventAddressId = Guid.NewGuid(),
-                    EventListenerId = Guid.NewGuid()
+                    EventV2Id = Guid.NewGuid(),
+                    EventAddressV2Id = Guid.NewGuid(),
+                    EventListenerV2Id = Guid.NewGuid()
                 });
             }
 
@@ -304,9 +304,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     Status = ListenerEventStatusV2.Error,
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
-                    EventId = Guid.NewGuid(),
-                    EventAddressId = Guid.NewGuid(),
-                    EventListenerId = Guid.NewGuid()
+                    EventV2Id = Guid.NewGuid(),
+                    EventAddressV2Id = Guid.NewGuid(),
+                    EventListenerV2Id = Guid.NewGuid()
                 });
             }
 
@@ -318,9 +318,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     Status = ListenerEventStatusV2.Replay,
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
-                    EventId = Guid.NewGuid(),
-                    EventAddressId = Guid.NewGuid(),
-                    EventListenerId = Guid.NewGuid()
+                    EventV2Id = Guid.NewGuid(),
+                    EventAddressV2Id = Guid.NewGuid(),
+                    EventListenerV2Id = Guid.NewGuid()
                 });
             }
 
@@ -367,9 +367,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 EventName = GetRandomString(),
                 CreatedDate = createdDate,
                 UpdatedDate = createdDate,
-                EventAddressId = eventAddressId,
-                ParticipantId = participantId,
-                Participant = participant
+                EventAddressV2Id = eventAddressId,
+                EventParticipantV2Id = participantId,
+                EventParticipantV2 = participant
             };
         }
 
@@ -386,9 +386,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 Description = GetRandomString(),
                 CreatedDate = GetRandomDateTimeOffset(),
                 UpdatedDate = GetRandomDateTimeOffset(),
-                EventAddressId = eventAddressId,
-                ParticipantId = participantId,
-                Participant = participant
+                EventAddressV2Id = eventAddressId,
+                EventParticipantV2Id = participantId,
+                EventParticipantV2 = participant
             };
         }
 
@@ -405,9 +405,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 Status = status,
                 CreatedDate = createdDate,
                 UpdatedDate = createdDate,
-                EventId = eventId,
-                EventAddressId = eventAddressId,
-                EventListenerId = eventListenerId
+                EventV2Id = eventId,
+                EventAddressV2Id = eventAddressId,
+                EventListenerV2Id = eventListenerId
             };
         }
 
@@ -444,7 +444,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 EventName = GetRandomString(),
                 CreatedDate = createdDate,
                 UpdatedDate = createdDate,
-                EventAddressId = eventAddressId
+                EventAddressV2Id = eventAddressId
             };
         }
 
@@ -459,9 +459,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 Status = status,
                 CreatedDate = createdDate,
                 UpdatedDate = createdDate,
-                EventId = Guid.NewGuid(),
-                EventAddressId = eventAddressId,
-                EventListenerId = Guid.NewGuid()
+                EventV2Id = Guid.NewGuid(),
+                EventAddressV2Id = eventAddressId,
+                EventListenerV2Id = Guid.NewGuid()
             };
         }
 
@@ -474,7 +474,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 Description = GetRandomString(),
                 CreatedDate = GetRandomDateTimeOffset(),
                 UpdatedDate = GetRandomDateTimeOffset(),
-                EventAddressId = eventAddressId
+                EventAddressV2Id = eventAddressId
             };
         }
 
@@ -492,7 +492,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 CreatedDate = archivedDate,
                 UpdatedDate = archivedDate,
                 ArchivedDate = archivedDate,
-                EventAddressId = eventAddressId
+                EventAddressV2Id = eventAddressId
             };
         }
 
@@ -511,7 +511,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 CreatedDate = archivedDate,
                 UpdatedDate = archivedDate,
                 ArchivedDate = archivedDate,
-                EventAddressId = eventAddressId
+                EventAddressV2Id = eventAddressId
             };
         }
 
@@ -526,9 +526,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 CreatedDate = archivedDate,
                 UpdatedDate = archivedDate,
                 ArchivedDate = archivedDate,
-                EventId = Guid.NewGuid(),
-                EventAddressId = eventAddressId,
-                EventListenerId = Guid.NewGuid()
+                EventV2Id = Guid.NewGuid(),
+                EventAddressV2Id = eventAddressId,
+                EventListenerV2Id = Guid.NewGuid()
             };
         }
 
@@ -546,7 +546,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 EventName = GetRandomString(),
                 CreatedDate = createdDate,
                 UpdatedDate = createdDate,
-                EventAddressId = Guid.NewGuid()
+                EventAddressV2Id = Guid.NewGuid()
             };
         }
 
@@ -560,9 +560,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 Status = status,
                 CreatedDate = createdDate,
                 UpdatedDate = createdDate,
-                EventId = Guid.NewGuid(),
-                EventAddressId = Guid.NewGuid(),
-                EventListenerId = Guid.NewGuid()
+                EventV2Id = Guid.NewGuid(),
+                EventAddressV2Id = Guid.NewGuid(),
+                EventListenerV2Id = Guid.NewGuid()
             };
         }
 
@@ -595,7 +595,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
                     ArchivedDate = GetRandomDateTimeOffset(),
-                    EventAddressId = Guid.NewGuid()
+                    EventAddressV2Id = Guid.NewGuid()
                 });
             }
 
@@ -611,7 +611,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
                     ArchivedDate = GetRandomDateTimeOffset(),
-                    EventAddressId = Guid.NewGuid()
+                    EventAddressV2Id = Guid.NewGuid()
                 });
             }
 
@@ -627,7 +627,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
                     ArchivedDate = GetRandomDateTimeOffset(),
-                    EventAddressId = Guid.NewGuid()
+                    EventAddressV2Id = Guid.NewGuid()
                 });
             }
 
@@ -651,9 +651,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
                     ArchivedDate = GetRandomDateTimeOffset(),
-                    EventId = Guid.NewGuid(),
-                    EventAddressId = Guid.NewGuid(),
-                    EventListenerId = Guid.NewGuid()
+                    EventV2Id = Guid.NewGuid(),
+                    EventAddressV2Id = Guid.NewGuid(),
+                    EventListenerV2Id = Guid.NewGuid()
                 });
             }
 
@@ -666,13 +666,31 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     CreatedDate = GetRandomDateTimeOffset(),
                     UpdatedDate = GetRandomDateTimeOffset(),
                     ArchivedDate = GetRandomDateTimeOffset(),
-                    EventId = Guid.NewGuid(),
-                    EventAddressId = Guid.NewGuid(),
-                    EventListenerId = Guid.NewGuid()
+                    EventV2Id = Guid.NewGuid(),
+                    EventAddressV2Id = Guid.NewGuid(),
+                    EventListenerV2Id = Guid.NewGuid()
                 });
             }
 
             return archives.AsQueryable();
+        }
+
+        private static IQueryable<EventArchiveV2> AttachListenerEventArchiveV2s(
+            IQueryable<EventArchiveV2> eventArchiveV2s,
+            IQueryable<ListenerEventArchiveV2> listenerEventArchiveV2s)
+        {
+            List<EventArchiveV2> eventArchives = eventArchiveV2s.ToList();
+            List<ListenerEventArchiveV2> listenerArchives = listenerEventArchiveV2s.ToList();
+
+            for (int i = 0; i < eventArchives.Count; i++)
+            {
+                eventArchives[i].ListenerEventArchiveV2s =
+                    i == 0
+                        ? listenerArchives
+                        : new List<ListenerEventArchiveV2>();
+            }
+
+            return eventArchives.AsQueryable();
         }
 
         private void SetupHealthOrchestrationMocks(
@@ -706,12 +724,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                     .ReturnsAsync(handlers);
 
             this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllEventArchiveV2sAsync(cancellationToken))
-                    .ReturnsAsync(archives);
-
-            this.eventArchiveV2OrchestrationServiceMock.Setup(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(cancellationToken))
-                    .ReturnsAsync(listenerArchives);
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken))
+                    .ReturnsAsync(AttachListenerEventArchiveV2s(archives, listenerArchives));
         }
 
         private void VerifyHealthOrchestrationMocksOnce(CancellationToken cancellationToken)
@@ -732,10 +746,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 service.RetrieveAllEventHandlerV2sAsync(cancellationToken), Times.Once);
 
             this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllEventArchiveV2sAsync(cancellationToken), Times.Once);
-
-            this.eventArchiveV2OrchestrationServiceMock.Verify(service =>
-                service.RetrieveAllListenerEventArchiveV2sAsync(cancellationToken), Times.Once);
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken), Times.Once);
 
             this.configurationBrokerMock.Verify(broker =>
                 broker.GetHealthConfiguration(), Times.Once);
@@ -755,7 +766,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Coordinations.HealthChecks.V2
                 .OnType<DateTimeOffset>()
                     .Use(GetRandomDateTimeOffset)
 
-                .OnProperty(e => e.Events).IgnoreIt()
+                .OnProperty(e => e.EventV2s).IgnoreIt()
                 .OnProperty(e => e.EventListenerV2s).IgnoreIt()
                 .OnProperty(e => e.ListenerEventV2s).IgnoreIt()
                 .OnProperty(e => e.EventArchiveV2s).IgnoreIt();

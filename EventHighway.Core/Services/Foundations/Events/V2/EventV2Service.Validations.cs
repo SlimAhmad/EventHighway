@@ -32,8 +32,8 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 (Rule: IsExceedingLengthOf(eventV2.EventName, 450),
                 Parameter: nameof(EventV2.EventName)),
 
-                (Rule: IsInvalid(eventV2.EventAddressId),
-                Parameter: nameof(EventV2.EventAddressId)),
+                (Rule: IsInvalid(eventV2.EventAddressV2Id),
+                Parameter: nameof(EventV2.EventAddressV2Id)),
 
                 (Rule: IsInvalid(eventV2.Type),
                 Parameter: nameof(EventV2.Type)),
@@ -74,8 +74,8 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 (Rule: IsExceedingLengthOf(eventV2.EventName, 450),
                 Parameter: nameof(EventV2.EventName)),
 
-                (Rule: IsInvalid(eventV2.EventAddressId),
-                Parameter: nameof(EventV2.EventAddressId)),
+                (Rule: IsInvalid(eventV2.EventAddressV2Id),
+                Parameter: nameof(EventV2.EventAddressV2Id)),
 
                 (Rule: IsInvalid(eventV2.Type),
                 Parameter: nameof(EventV2.Type)),
@@ -116,8 +116,8 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
                 (Rule: IsExceedingLengthOf(eventV2.EventName, 450),
                 Parameter: nameof(EventV2.EventName)),
 
-                (Rule: IsInvalid(eventV2.EventAddressId),
-                Parameter: nameof(EventV2.EventAddressId)),
+                (Rule: IsInvalid(eventV2.EventAddressV2Id),
+                Parameter: nameof(EventV2.EventAddressV2Id)),
 
                 (Rule: IsInvalid(eventV2.Type),
                 Parameter: nameof(EventV2.Type)),
@@ -169,8 +169,8 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             Validate(
                 message: "Arguments are invalid, fix the errors and try again.",
 
-                (Rule: IsInvalid(eventV2.EventAddressId),
-                Parameter: nameof(EventV2.EventAddressId)),
+                (Rule: IsInvalid(eventV2.EventAddressV2Id),
+                Parameter: nameof(EventV2.EventAddressV2Id)),
 
                 (Rule: IsInvalid(eventV2.EventName),
                 Parameter: nameof(EventV2.EventName)),
@@ -192,8 +192,8 @@ namespace EventHighway.Core.Services.Foundations.Events.V2
             Validate(
                 message: "Event is invalid, fix the errors and try again.",
 
-                (Rule: IsInvalid(eventV2.EventAddressId),
-                Parameter: nameof(EventV2.EventAddressId)));
+                (Rule: IsInvalid(eventV2.EventAddressV2Id),
+                Parameter: nameof(EventV2.EventAddressV2Id)));
         }
 
         private static void ValidateEventV2IsNotNull(EventV2 eventV2)

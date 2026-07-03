@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.EventsArchives.V2;
-using EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2;
 
 namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
 {
@@ -17,7 +16,7 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
         ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sAsync(
             CancellationToken cancellationToken = default);
 
-        ValueTask<IQueryable<ListenerEventArchiveV2>> RetrieveAllListenerEventArchiveV2sAsync(
+        ValueTask<IQueryable<EventArchiveV2>> RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(
             CancellationToken cancellationToken = default);
 
         ValueTask AddEventArchiveV2WithListenerEventArchiveV2sAsync(
@@ -28,8 +27,8 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IEnumerable<ListenerEventArchiveV2>> BulkAddListenerEventArchiveV2sAsync(
-            IEnumerable<ListenerEventArchiveV2> listenerEventArchiveV2s,
+        ValueTask<IEnumerable<EventArchiveV2>> BulkAddEventArchiveV2sWithListenerEventArchiveV2sAsync(
+            IEnumerable<EventArchiveV2> eventArchiveV2s,
             CancellationToken cancellationToken = default);
 
         ValueTask BulkRemoveEventArchiveV2sAsync(
@@ -41,7 +40,11 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             int take,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IEnumerable<ListenerEventArchiveV2>> RetrieveBatchOfListenerEventArchiveV2sAsync(
+        ValueTask<IEnumerable<EventArchiveV2>> RetrieveEventArchiveV2sByIdsAsync(
+            IEnumerable<Guid> eventArchiveIds,
+            CancellationToken cancellationToken = default);
+
+        ValueTask<IEnumerable<EventArchiveV2>> RetrieveBatchOfEventArchiveV2sMatchingAsync(
             Guid? eventAddressId,
             IEnumerable<Guid> eventListenerIds,
             DateTimeOffset? startDate,
@@ -50,8 +53,13 @@ namespace EventHighway.Core.Services.Orchestrations.EventArchives.V2
             int take,
             CancellationToken cancellationToken = default);
 
-        ValueTask<IEnumerable<EventArchiveV2>> RetrieveEventArchiveV2sByIdsAsync(
-            IEnumerable<Guid> eventArchiveIds,
+        ValueTask<EventArchiveV2> RetrieveEventArchiveV2WithListenerEventArchiveV2sByIdAsync(
+            Guid eventArchiveId,
+            IEnumerable<Guid> eventListenerIds,
+            DateTimeOffset? startDate,
+            DateTimeOffset? endDate,
+            int skip,
+            int take,
             CancellationToken cancellationToken = default);
     }
 }

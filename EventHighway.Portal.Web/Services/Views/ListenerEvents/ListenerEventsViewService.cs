@@ -51,7 +51,7 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEvents
                     .RetrieveAllListenerEventV2sWithEventListenerV2Async(cancellationToken);
 
             return listenerEvents
-                .Where(listenerEvent => listenerEvent.EventId == eventId)
+                .Where(listenerEvent => listenerEvent.EventV2Id == eventId)
                 .OrderByDescending(listenerEvent => listenerEvent.CreatedDate)
                 .Select(AsViewWithEventListener)
                 .ToList();
@@ -113,10 +113,10 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEvents
                 Status = listenerEvent.Status.ToString(),
                 ResponseCode = listenerEvent.ResponseCode,
                 ResponseMessage = listenerEvent.ResponseMessage,
-                EventId = listenerEvent.EventId,
-                EventAddressId = listenerEvent.EventAddressId,
-                EventListenerId = listenerEvent.EventListenerId,
-                ParticipantId = listenerEvent.ParticipantId,
+                EventV2Id = listenerEvent.EventV2Id,
+                EventAddressV2Id = listenerEvent.EventAddressV2Id,
+                EventListenerV2Id = listenerEvent.EventListenerV2Id,
+                EventParticipantV2Id = listenerEvent.EventParticipantV2Id,
                 CreatedDate = listenerEvent.CreatedDate
             };
 
@@ -127,11 +127,11 @@ namespace EventHighway.Portal.Web.Services.Views.ListenerEvents
                 Status = listenerEvent.Status.ToString(),
                 ResponseCode = listenerEvent.ResponseCode,
                 ResponseMessage = listenerEvent.ResponseMessage,
-                EventId = listenerEvent.EventId,
-                EventAddressId = listenerEvent.EventAddressId,
-                EventListenerId = listenerEvent.EventListenerId,
-                ListenerName = listenerEvent.EventListener?.Name,
-                ParticipantId = listenerEvent.ParticipantId,
+                EventV2Id = listenerEvent.EventV2Id,
+                EventAddressV2Id = listenerEvent.EventAddressV2Id,
+                EventListenerV2Id = listenerEvent.EventListenerV2Id,
+                ListenerName = listenerEvent.EventListenerV2?.Name,
+                EventParticipantV2Id = listenerEvent.EventParticipantV2Id,
                 CreatedDate = listenerEvent.CreatedDate
             };
     }

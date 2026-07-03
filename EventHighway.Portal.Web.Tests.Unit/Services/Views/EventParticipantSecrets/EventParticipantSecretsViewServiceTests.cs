@@ -55,7 +55,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventParticipantSecr
                 ActiveTo = null,
                 CreatedDate = now,
                 UpdatedDate = now,
-                ParticipantId = participantId
+                EventParticipantV2Id = participantId
             }).ToList();
         }
 
@@ -68,7 +68,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Services.Views.EventParticipantSecr
                 IsActive = secret.IsActive,
                 ActiveFrom = secret.ActiveFrom,
                 ActiveTo = secret.ActiveTo,
-                ParticipantId = secret.ParticipantId
+                EventParticipantV2Id = secret.EventParticipantV2Id
             }).ToList();
     }
 }

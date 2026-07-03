@@ -24,8 +24,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = GetRandomId();
-            inputEventV2.ParticipantSecret = null;
+            inputEventV2.EventParticipantV2Id = GetRandomId();
+            inputEventV2.EventParticipantV2Secret = null;
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
@@ -38,7 +38,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Setup(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()))
                         .ReturnsAsync(nullEventParticipantV2);
 
@@ -64,7 +64,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Verify(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -96,8 +96,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = inactiveEventParticipantV2.Id;
-            inputEventV2.ParticipantSecret = null;
+            inputEventV2.EventParticipantV2Id = inactiveEventParticipantV2.Id;
+            inputEventV2.EventParticipantV2Secret = null;
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
@@ -110,7 +110,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Setup(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()))
                         .ReturnsAsync(inactiveEventParticipantV2);
 
@@ -136,7 +136,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Verify(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -168,8 +168,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = notYetActiveEventParticipantV2.Id;
-            inputEventV2.ParticipantSecret = null;
+            inputEventV2.EventParticipantV2Id = notYetActiveEventParticipantV2.Id;
+            inputEventV2.EventParticipantV2Secret = null;
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
@@ -182,7 +182,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Setup(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()))
                         .ReturnsAsync(notYetActiveEventParticipantV2);
 
@@ -208,7 +208,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Verify(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -240,8 +240,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = expiredEventParticipantV2.Id;
-            inputEventV2.ParticipantSecret = null;
+            inputEventV2.EventParticipantV2Id = expiredEventParticipantV2.Id;
+            inputEventV2.EventParticipantV2Secret = null;
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(
@@ -254,7 +254,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Setup(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()))
                         .ReturnsAsync(expiredEventParticipantV2);
 
@@ -280,7 +280,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
 
             this.eventParticipantV2ServiceMock.Verify(service =>
                 service.RetrieveEventParticipantV2ByIdAsync(
-                    inputEventV2.ParticipantId.Value,
+                    inputEventV2.EventParticipantV2Id.Value,
                     It.IsAny<CancellationToken>()),
                         Times.Once);
 
@@ -305,8 +305,8 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.EventParticipants
             // given
             EventV2 randomEventV2 = CreateRandomEventV2();
             EventV2 inputEventV2 = randomEventV2;
-            inputEventV2.ParticipantId = null;
-            inputEventV2.ParticipantSecret = GetRandomString();
+            inputEventV2.EventParticipantV2Id = null;
+            inputEventV2.EventParticipantV2Secret = GetRandomString();
 
             var invalidEventParticipantV2OrchestrationException =
                 new InvalidEventParticipantV2OrchestrationException(

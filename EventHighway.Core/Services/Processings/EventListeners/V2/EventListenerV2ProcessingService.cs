@@ -58,7 +58,7 @@ namespace EventHighway.Core.Services.Processings.EventListeners.V2
                 await this.eventListenerV2Service.RetrieveAllEventListenerV2sAsync(cancellationToken);
 
             return eventListenerV2s.Where(eventListenerV2 =>
-                eventListenerV2.EventAddressId == eventAddressId);
+                eventListenerV2.EventAddressV2Id == eventAddressId);
         });
 
         public ValueTask<EventListenerV2> RemoveEventListenerV2ByIdAsync(

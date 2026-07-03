@@ -54,19 +54,19 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
             ValidateListenerEventV2IsNotNull(listenerEventV2);
 
             IEnumerable<string> requiredKeys =
-                string.IsNullOrWhiteSpace(listenerEventV2.EventListener.PromotedProperties)
+                string.IsNullOrWhiteSpace(listenerEventV2.EventListenerV2.PromotedProperties)
                     ? Array.Empty<string>()
                     : await this.eventCallV2ProcessingService
                         .SplitPromotedPropertyKeysAsync(
-                            listenerEventV2.EventListener.PromotedProperties,
+                            listenerEventV2.EventListenerV2.PromotedProperties,
                             cancellationToken);
 
             var eventCallV2 = new EventCallV2
             {
-                Content = listenerEventV2.Event.Content,
-                HandlerId = listenerEventV2.EventListener.HandlerId,
-                HandlerName = listenerEventV2.EventListener.HandlerName,
-                FilterCriteria = listenerEventV2.EventListener.FilterCriteria,
+                Content = listenerEventV2.EventV2.Content,
+                HandlerId = listenerEventV2.EventListenerV2.HandlerId,
+                HandlerName = listenerEventV2.EventListenerV2.HandlerName,
+                FilterCriteria = listenerEventV2.EventListenerV2.FilterCriteria,
                 RequiredPromotedProperties = requiredKeys,
                 Response = null
             };
@@ -74,13 +74,13 @@ namespace EventHighway.Core.Services.Orchestrations.ReplayingListenerEvents.V2
             try
             {
                 eventCallV2.PromotedProperties =
-                    string.IsNullOrWhiteSpace(listenerEventV2.Event.Content)
-                        || string.IsNullOrWhiteSpace(listenerEventV2.EventListener.PromotedProperties)
+                    string.IsNullOrWhiteSpace(listenerEventV2.EventV2.Content)
+                        || string.IsNullOrWhiteSpace(listenerEventV2.EventListenerV2.PromotedProperties)
                     ? new List<PromotedProperty>()
                     : await this.eventCallV2ProcessingService
                         .PromotePropertiesAsync(
-                            listenerEventV2.Event.Content,
-                            listenerEventV2.EventListener.PromotedProperties,
+                            listenerEventV2.EventV2.Content,
+                            listenerEventV2.EventListenerV2.PromotedProperties,
                             cancellationToken);
 
                 EventCallV2 ranEventCallV2 =

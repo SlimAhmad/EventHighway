@@ -8,6 +8,7 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEventArchives.V2
     {
         Pending,
         Success,
-        Error
+        Error,
+        Replay
     }
 }

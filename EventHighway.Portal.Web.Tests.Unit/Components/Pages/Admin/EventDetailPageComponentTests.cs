@@ -42,7 +42,7 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
                 Content = content,
                 Type = "Immediate",
                 Status = "Active",
-                EventAddressId = Guid.NewGuid(),
+                EventAddressV2Id = Guid.NewGuid(),
                 EventAddressName = GetRandomString(),
                 CreatedDate = DateTimeOffset.UtcNow
             };
@@ -54,9 +54,9 @@ namespace EventHighway.Portal.Web.Tests.Unit.Components.Pages.Admin
                 Status = status,
                 ResponseCode = status == "Success" ? "200" : "503",
                 ResponseMessage = status,
-                EventId = eventId,
-                EventAddressId = Guid.NewGuid(),
-                EventListenerId = Guid.NewGuid(),
+                EventV2Id = eventId,
+                EventAddressV2Id = Guid.NewGuid(),
+                EventListenerV2Id = Guid.NewGuid(),
                 ListenerName = GetRandomString(),
                 CreatedDate = DateTimeOffset.UtcNow
             };
