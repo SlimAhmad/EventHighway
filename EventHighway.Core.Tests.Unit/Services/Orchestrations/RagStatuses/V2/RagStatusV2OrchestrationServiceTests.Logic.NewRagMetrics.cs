@@ -231,5 +231,102 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RagStatuses.V2
 
             VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
         }
+
+        [Fact]
+        public async Task ShouldReturnAmberForReplayRateWhenBetweenGreenAndRedAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var events = AttachListenerEventV2s(
+                CreateRandomEventV2s(immediateCount: 2, scheduledCount: 1, deadCount: 0),
+                CreateRandomListenerEventV2s(successCount: 9, pendingCount: 0, errorCount: 0, replayCount: 1));
+
+            var archives = AttachListenerEventArchiveV2s(
+                CreateRandomEventArchiveV2s(),
+                CreateRandomListenerEventArchiveV2s(successCount: 9, errorCount: 0));
+
+            SetupRagStatusFoundationMocks(
+                randomCancellationToken, CreateAddressesWithListeners(5, 1), events, archives);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.ragStatusV2OrchestrationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Replay Rate %")
+                .StatusCode.Should().Be((int)HealthStatusV2.Amber);
+
+            VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
+        }
+
+        [Fact]
+        public async Task ShouldReturnRedForReplayRateWhenAtOrAboveRedAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var events = AttachListenerEventV2s(
+                CreateRandomEventV2s(immediateCount: 2, scheduledCount: 1, deadCount: 0),
+                CreateRandomListenerEventV2s(successCount: 7, pendingCount: 0, errorCount: 0, replayCount: 3));
+
+            var archives = AttachListenerEventArchiveV2s(
+                CreateRandomEventArchiveV2s(),
+                CreateRandomListenerEventArchiveV2s(successCount: 9, errorCount: 0));
+
+            SetupRagStatusFoundationMocks(
+                randomCancellationToken, CreateAddressesWithListeners(5, 1), events, archives);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.ragStatusV2OrchestrationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Replay Rate %")
+                .StatusCode.Should().Be((int)HealthStatusV2.Red);
+
+            VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
+        }
+
+        [Fact]
+        public async Task ShouldReturnNAForReplayRateWhenNoThresholdIsConfiguredAsync()
+        {
+            // given
+            CancellationToken randomCancellationToken =
+                TestContext.Current.CancellationToken;
+
+            var configWithoutReplayRate = new HealthConfiguration();
+            configWithoutReplayRate.Thresholds.RemoveAll(t => t.Metric == HealthMetric.ReplayRate);
+
+            this.configurationBrokerMock
+                .Setup(broker => broker.GetHealthConfiguration())
+                .Returns(configWithoutReplayRate);
+
+            var events = AttachListenerEventV2s(
+                CreateRandomEventV2s(immediateCount: 2, scheduledCount: 1, deadCount: 0),
+                CreateRandomListenerEventV2s(successCount: 7, pendingCount: 0, errorCount: 0, replayCount: 3));
+
+            var archives = AttachListenerEventArchiveV2s(
+                CreateRandomEventArchiveV2s(),
+                CreateRandomListenerEventArchiveV2s(successCount: 9, errorCount: 0));
+
+            SetupRagStatusFoundationMocks(
+                randomCancellationToken, CreateAddressesWithListeners(5, 1), events, archives);
+
+            // when
+            IEnumerable<HealthCheckItemV2> actualResult =
+                await this.ragStatusV2OrchestrationService
+                    .RetrieveHealthRagStatusV2Async(randomCancellationToken);
+
+            // then
+            actualResult.Single(i => i.Grouping == "Listener Events" && i.Item == "Replay Rate %")
+                .StatusCode.Should().Be((int)HealthStatusV2.NA);
+
+            VerifyRagStatusFoundationMocksOnce(randomCancellationToken);
+        }
     }
 }
