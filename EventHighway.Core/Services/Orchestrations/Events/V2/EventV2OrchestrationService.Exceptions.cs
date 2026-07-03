@@ -6,7 +6,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EventHighway.Core.Models.Services.Foundations.EventAddresses.V2;
 using EventHighway.Core.Models.Services.Foundations.Events.V2;
 using EventHighway.Core.Models.Services.Orchestrations.Events.V2.Exceptions;
 using EventHighway.Core.Models.Services.Processings.EventAddresses.V2.Exceptions;
@@ -19,7 +18,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
     {
         private delegate ValueTask<EventV2> ReturningEventV2Function();
         private delegate ValueTask<IQueryable<EventV2>> ReturningEventV2sFunction();
-        private delegate ValueTask<IQueryable<EventAddressV2>> ReturningEventAddressV2sFunction();
         private delegate ValueTask<bool> ReturningBoolFunction();
 
         private async ValueTask<EventV2> TryCatch(ReturningEventV2Function returningEventV2Function)
@@ -201,91 +199,6 @@ namespace EventHighway.Core.Services.Orchestrations.Events.V2
             }
             catch (EventAddressV2ProcessingServiceException
                 eventAddressV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventAddressV2ProcessingServiceException);
-            }
-            catch (Exception exception)
-            {
-                var failedEventV2OrchestrationServiceException =
-                    new FailedEventV2OrchestrationServiceException(
-                        message: "Failed event service error occurred, contact support.",
-                        innerException: exception,
-                        data: exception.Data);
-
-                throw await CreateAndLogServiceExceptionAsync(failedEventV2OrchestrationServiceException);
-            }
-        }
-
-        private async ValueTask<IQueryable<EventAddressV2>> TryCatch(
-            ReturningEventAddressV2sFunction returningEventAddressV2sFunction)
-        {
-            try
-            {
-                return await returningEventAddressV2sFunction();
-            }
-            catch (OperationCanceledException operationCanceledException)
-                when (operationCanceledException.CancellationToken.IsCancellationRequested is false)
-            {
-                var timeoutException =
-                    new TimeoutException("The dependency operation timed out.");
-
-                var timeoutEventV2OrchestrationException =
-                    new TimeoutEventV2OrchestrationException(
-                        message: "Failed event orchestration timeout error occurred, contact support.",
-                        innerException: timeoutException,
-                        data: timeoutException.Data);
-
-                var eventV2OrchestrationDependencyException =
-                    new EventV2OrchestrationDependencyException(
-                        message: "Event dependency error occurred, contact support.",
-                        innerException: timeoutEventV2OrchestrationException);
-
-                await this.loggingBroker.LogErrorAsync(eventV2OrchestrationDependencyException);
-                throw eventV2OrchestrationDependencyException;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (EventV2ProcessingValidationException
-                eventV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventV2ProcessingValidationException);
-            }
-            catch (EventV2ProcessingDependencyValidationException
-                eventV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventV2ProcessingDependencyValidationException);
-            }
-            catch (EventAddressV2ProcessingValidationException
-                eventAddressV2ProcessingValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventAddressV2ProcessingValidationException);
-            }
-            catch (EventAddressV2ProcessingDependencyValidationException
-                eventAddressV2ProcessingDependencyValidationException)
-            {
-                throw await CreateAndLogDependencyValidationExceptionAsync(
-                    eventAddressV2ProcessingDependencyValidationException);
-            }
-            catch (EventV2ProcessingDependencyException
-                eventV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventV2ProcessingDependencyException);
-            }
-            catch (EventV2ProcessingServiceException
-                eventV2ProcessingServiceException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventV2ProcessingServiceException);
-            }
-            catch (EventAddressV2ProcessingDependencyException eventAddressV2ProcessingDependencyException)
-            {
-                throw await CreateAndLogDependencyExceptionAsync(eventAddressV2ProcessingDependencyException);
-            }
-            catch (EventAddressV2ProcessingServiceException eventAddressV2ProcessingServiceException)
             {
                 throw await CreateAndLogDependencyExceptionAsync(eventAddressV2ProcessingServiceException);
             }
