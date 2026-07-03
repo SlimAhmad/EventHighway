@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2;
@@ -12,6 +13,9 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
 {
     public interface IListenerEventV2OrchestrationService
     {
+        ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
+            CancellationToken cancellationToken = default);
+
         ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
             IEnumerable<Guid> eventV2Ids,
             int take,

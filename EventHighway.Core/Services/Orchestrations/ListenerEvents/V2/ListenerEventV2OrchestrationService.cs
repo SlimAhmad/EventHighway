@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
@@ -24,6 +25,10 @@ namespace EventHighway.Core.Services.Orchestrations.ListenerEvents.V2
             this.listenerEventV2ProcessingService = listenerEventV2ProcessingService;
             this.loggingBroker = loggingBroker;
         }
+
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveAllListenerEventV2sAsync(
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
 
         public ValueTask<IEnumerable<ListenerEventV2>> RetrieveBatchOfListenerEventV2sByEventIdsAsync(
             IEnumerable<Guid> eventV2Ids,
