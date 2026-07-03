@@ -67,6 +67,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ListenerEvents.V2
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
+        private static Guid GetRandomId() =>
+            Guid.NewGuid();
+
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 9).GetValue();
 
@@ -82,6 +85,9 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.ListenerEvents.V2
             CreateListenerEventV2Filler()
                 .Create(count: GetRandomNumber())
                     .ToList();
+
+        private static ListenerEventV2 CreateRandomListenerEventV2() =>
+            CreateListenerEventV2Filler().Create();
 
         private static Filler<ListenerEventV2> CreateListenerEventV2Filler()
         {
