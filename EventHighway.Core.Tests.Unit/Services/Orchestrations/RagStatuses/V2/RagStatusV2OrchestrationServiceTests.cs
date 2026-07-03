@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Models.Configurations.Healths;
@@ -78,6 +79,59 @@ namespace EventHighway.Core.Tests.Unit.Services.Orchestrations.RagStatuses.V2
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
+
+        private void SetupRagStatusFoundationMocks(
+            CancellationToken cancellationToken,
+            IQueryable<EventAddressV2> addresses,
+            IQueryable<EventV2> events,
+            IQueryable<EventArchiveV2> archives)
+        {
+            this.eventAddressV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventAddressV2sWithEventListenerV2sAsync(cancellationToken))
+                    .ReturnsAsync(addresses);
+
+            this.eventV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(cancellationToken))
+                    .ReturnsAsync(events);
+
+            this.eventArchiveV2ServiceMock.Setup(service =>
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken))
+                    .ReturnsAsync(archives);
+        }
+
+        private void VerifyRagStatusFoundationMocksOnce(CancellationToken cancellationToken)
+        {
+            this.eventAddressV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventAddressV2sWithEventListenerV2sAsync(cancellationToken),
+                    Times.Once);
+
+            this.eventV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventV2sWithListenerEventV2sAsync(cancellationToken),
+                    Times.Once);
+
+            this.eventArchiveV2ServiceMock.Verify(service =>
+                service.RetrieveAllEventArchiveV2sWithListenerEventArchiveV2sAsync(cancellationToken),
+                    Times.Once);
+
+            this.configurationBrokerMock.Verify(broker =>
+                broker.GetHealthConfiguration(),
+                    Times.Once);
+
+            this.eventAddressV2ServiceMock.VerifyNoOtherCalls();
+            this.eventV2ServiceMock.VerifyNoOtherCalls();
+            this.eventArchiveV2ServiceMock.VerifyNoOtherCalls();
+            this.configurationBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        private static IQueryable<EventAddressV2> CreateAddressesWithListeners(
+            int listenerCount,
+            int handlerCount)
+        {
+            return AttachEventListenerV2s(
+                CreateRandomEventAddressV2s(),
+                CreateRandomEventListenerV2s(listenerCount, handlerCount));
+        }
 
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
