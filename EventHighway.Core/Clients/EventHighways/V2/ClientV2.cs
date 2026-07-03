@@ -39,6 +39,7 @@ using EventHighway.Core.Services.Foundations.ListenerEventArchives.V2;
 using EventHighway.Core.Services.Foundations.ListenerEvents.V2;
 using EventHighway.Core.Services.Orchestrations.AddressSummaries.V2;
 using EventHighway.Core.Services.Orchestrations.ArchivingEvents.V2;
+using EventHighway.Core.Services.Orchestrations.DuplicateSummaries.V2;
 using EventHighway.Core.Services.Orchestrations.EventArchives.V2;
 using EventHighway.Core.Services.Orchestrations.EventFirings.V2;
 using EventHighway.Core.Services.Orchestrations.EventListeners.V2;
@@ -387,6 +388,10 @@ namespace EventHighway.Core.Clients.EventHighways.V2
             services.AddTransient<
                 ILoopDetectionV2OrchestrationService,
                 LoopDetectionV2OrchestrationService>();
+
+            services.AddTransient<
+                IDuplicateSummaryV2OrchestrationService,
+                DuplicateSummaryV2OrchestrationService>();
         }
 
         private static void RegisterCoordinationServices(IServiceCollection services)
