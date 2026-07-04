@@ -47,5 +47,10 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             RetrieveReplayBatchListenerEventV2sWithEventWithEventListenerAsync(
                 int take,
                 CancellationToken cancellationToken = default);
+
+        ValueTask<IEnumerable<ListenerEventV2>>
+            RetrieveRetryBatchListenerEventV2sWithEventWithEventListenerAsync(
+                int take,
+                CancellationToken cancellationToken = default);
     }
 }

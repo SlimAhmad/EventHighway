@@ -181,5 +181,11 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 ? replayListenerEventV2s.ToList()
                 : replayListenerEventV2s.Take(take).ToList();
         });
+
+        public ValueTask<IEnumerable<ListenerEventV2>>
+            RetrieveRetryBatchListenerEventV2sWithEventWithEventListenerAsync(
+                int take,
+                CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
     }
 }
