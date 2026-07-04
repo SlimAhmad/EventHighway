@@ -220,9 +220,14 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
         {
             ValidateListenerEventV2Id(listenerEventV2Id);
 
-            return await this.storageBroker.SelectListenerEventV2ByIdAsync(
-                listenerEventV2Id,
-                cancellationToken);
+            ListenerEventV2 maybeListenerEventV2 =
+                await this.storageBroker.SelectListenerEventV2ByIdAsync(
+                    listenerEventV2Id,
+                    cancellationToken);
+
+            ValidateListenerEventV2Exists(maybeListenerEventV2, listenerEventV2Id);
+
+            return maybeListenerEventV2;
         });
     }
 }
