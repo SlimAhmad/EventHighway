@@ -7,11 +7,22 @@ using System.Collections.Generic;
 using EventHighway.Core.Brokers.Configurations;
 using EventHighway.Core.Models.Configurations;
 using EventHighway.Core.Models.Configurations.LoopDetections;
+using EventHighway.Core.Models.Configurations.Retries;
 
 namespace EventHighway.Core.Tests.Unit.Brokers.Configurations
 {
     public partial class ConfigurationBrokerTests
     {
+        private static RetryConfiguration CreateRandomRetryConfiguration()
+        {
+            return new RetryConfiguration
+            {
+                RetryAttemptsAllowed = GetRandomNumber(),
+                RetryBackoffMaxMinutes = GetRandomNumber(),
+                DeadAfterMinutes = GetRandomNumber()
+            };
+        }
+
         private static LoopDetection CreateRandomLoopDetection()
         {
             return new LoopDetection
