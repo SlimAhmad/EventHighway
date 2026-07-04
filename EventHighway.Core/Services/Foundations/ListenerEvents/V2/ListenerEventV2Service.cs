@@ -182,10 +182,31 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 : replayListenerEventV2s.Take(take).ToList();
         });
 
-        public ValueTask<IEnumerable<ListenerEventV2>>
+        public async ValueTask<IEnumerable<ListenerEventV2>>
             RetrieveRetryBatchListenerEventV2sWithEventWithEventListenerAsync(
                 int take,
-                CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+                CancellationToken cancellationToken = default)
+        {
+            IQueryable<ListenerEventV2> listenerEventV2s =
+                await this.storageBroker
+                    .SelectAllListenerEventV2sWithEventV2WithEventListenerV2Async(
+                        cancellationToken);
+
+            DateTimeOffset now =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            IQueryable<ListenerEventV2> retryListenerEventV2s =
+                listenerEventV2s
+                    .Where(listenerEventV2 =>
+                        listenerEventV2.Status == ListenerEventStatusV2.Error
+                        && listenerEventV2.RemainingRetryAttempts > 0
+                        && (listenerEventV2.NextRetryAttemptNotBefore == null
+                            || listenerEventV2.NextRetryAttemptNotBefore <= now))
+                    .OrderBy(listenerEventV2 => listenerEventV2.CreatedDate);
+
+            return take == 0
+                ? retryListenerEventV2s.ToList()
+                : retryListenerEventV2s.Take(take).ToList();
+        }
     }
 }
