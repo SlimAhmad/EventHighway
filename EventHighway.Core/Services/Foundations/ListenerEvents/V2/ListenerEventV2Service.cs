@@ -212,5 +212,10 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 ? retryListenerEventV2s.ToList()
                 : retryListenerEventV2s.Take(take).ToList();
         });
+
+        public ValueTask<ListenerEventV2> RetrieveListenerEventV2ByIdAsync(
+            Guid listenerEventV2Id,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
     }
 }

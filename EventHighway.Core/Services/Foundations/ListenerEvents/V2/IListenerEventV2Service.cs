@@ -52,5 +52,9 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             RetrieveRetryBatchListenerEventV2sWithEventWithEventListenerAsync(
                 int take,
                 CancellationToken cancellationToken = default);
+
+        ValueTask<ListenerEventV2> RetrieveListenerEventV2ByIdAsync(
+            Guid listenerEventV2Id,
+            CancellationToken cancellationToken = default);
     }
 }
