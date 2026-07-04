@@ -213,9 +213,13 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 : retryListenerEventV2s.Take(take).ToList();
         });
 
-        public ValueTask<ListenerEventV2> RetrieveListenerEventV2ByIdAsync(
+        public async ValueTask<ListenerEventV2> RetrieveListenerEventV2ByIdAsync(
             Guid listenerEventV2Id,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            return await this.storageBroker.SelectListenerEventV2ByIdAsync(
+                listenerEventV2Id,
+                cancellationToken);
+        }
     }
 }
