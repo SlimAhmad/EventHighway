@@ -230,5 +230,10 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
 
             return maybeListenerEventV2;
         });
+
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveListenerEventV2sByEventListenerV2IdAsync(
+            Guid eventListenerV2Id,
+            CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
     }
 }
