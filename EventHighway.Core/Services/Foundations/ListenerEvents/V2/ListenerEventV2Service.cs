@@ -231,9 +231,15 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             return maybeListenerEventV2;
         });
 
-        public ValueTask<IQueryable<ListenerEventV2>> RetrieveListenerEventV2sByEventListenerV2IdAsync(
+        public async ValueTask<IQueryable<ListenerEventV2>> RetrieveListenerEventV2sByEventListenerV2IdAsync(
             Guid eventListenerV2Id,
-            CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            CancellationToken cancellationToken = default)
+        {
+            IQueryable<ListenerEventV2> listenerEventV2s =
+                await this.storageBroker.SelectAllListenerEventV2sAsync(cancellationToken);
+
+            return listenerEventV2s.Where(listenerEventV2 =>
+                listenerEventV2.EventListenerV2Id == eventListenerV2Id);
+        }
     }
 }
