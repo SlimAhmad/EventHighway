@@ -188,6 +188,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateOnRetrieveRetryBatch(take);
 
             IQueryable<ListenerEventV2> listenerEventV2s =
