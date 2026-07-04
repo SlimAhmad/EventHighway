@@ -236,6 +236,7 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             CancellationToken cancellationToken = default) =>
         TryCatch(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ValidateEventListenerV2Id(eventListenerV2Id);
 
             IQueryable<ListenerEventV2> listenerEventV2s =
