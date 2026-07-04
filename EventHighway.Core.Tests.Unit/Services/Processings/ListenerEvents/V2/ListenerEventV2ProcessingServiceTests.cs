@@ -96,6 +96,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.ListenerEvents.V2
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(GetRandomDateTimeOffset)
+                .OnType<DateTimeOffset?>().Use(GetRandomDateTimeOffset())
                 .OnType<EventParticipantV2>().IgnoreIt()
 
                 .OnProperty(listenerEventV2 => listenerEventV2.EventV2)

@@ -59,6 +59,30 @@ namespace EventHighway.Core.Models.Services.Foundations.ListenerEvents.V2
         public DateTimeOffset UpdatedDate { get; set; }
 
         /// <summary>
+        /// Gets or sets the number of additional dispatch attempts remaining after the initial dispatch.
+        /// A value of <c>0</c> indicates the delivery is dead (retry budget exhausted).
+        /// </summary>
+        public int RemainingRetryAttempts { get; set; }
+
+        /// <summary>
+        /// Gets or sets the attempts ceiling for this delivery. The Fibonacci backoff index is
+        /// <c>RetryAttemptsAllowed − RemainingRetryAttempts</c>. Seeded from configuration and grown on extend.
+        /// </summary>
+        public int RetryAttemptsAllowed { get; set; }
+
+        /// <summary>
+        /// Gets or sets the earliest time the next retry may run (the Fibonacci backoff gate).
+        /// A null value indicates the delivery is eligible now.
+        /// </summary>
+        public DateTimeOffset? NextRetryAttemptNotBefore { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp of the most recent actual dispatch. It slides forward on each retry and
+        /// anchors the dead/archive grace window. Null until first dispatched (e.g. freshly-restored replay rows).
+        /// </summary>
+        public DateTimeOffset? DispatchedDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the identifier of the <see cref="Events.V2.EventV2"/> being delivered.
         /// </summary>
         public Guid EventV2Id { get; set; }
