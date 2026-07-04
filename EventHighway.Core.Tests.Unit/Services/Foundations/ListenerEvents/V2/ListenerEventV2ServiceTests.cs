@@ -143,6 +143,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(dates)
+                .OnType<DateTimeOffset?>().Use((DateTimeOffset?)dates)
 
                 .OnProperty(listenerEventV2 => listenerEventV2.EventV2)
                     .IgnoreIt()
