@@ -210,6 +210,13 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 (Rule: IsInvalid(take), Parameter: "Take"));
         }
 
+        private static void ValidateOnRetrieveRetryBatch(int take)
+        {
+            Validate(
+                message: "Listener event is invalid, fix the errors and try again.",
+                (Rule: IsInvalid(take), Parameter: "Take"));
+        }
+
         private static dynamic IsInvalid(int take) => new
         {
             Condition = take < 0,

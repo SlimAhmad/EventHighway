@@ -182,11 +182,14 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 : replayListenerEventV2s.Take(take).ToList();
         });
 
-        public async ValueTask<IEnumerable<ListenerEventV2>>
+        public ValueTask<IEnumerable<ListenerEventV2>>
             RetrieveRetryBatchListenerEventV2sWithEventWithEventListenerAsync(
                 int take,
-                CancellationToken cancellationToken = default)
+                CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateOnRetrieveRetryBatch(take);
+
             IQueryable<ListenerEventV2> listenerEventV2s =
                 await this.storageBroker
                     .SelectAllListenerEventV2sWithEventV2WithEventListenerV2Async(
@@ -207,6 +210,6 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
             return take == 0
                 ? retryListenerEventV2s.ToList()
                 : retryListenerEventV2s.Take(take).ToList();
-        }
+        });
     }
 }
