@@ -5,6 +5,7 @@
 using EventHighway.Core.Models.Configurations.BatchProcessings;
 using EventHighway.Core.Models.Configurations.Healths;
 using EventHighway.Core.Models.Configurations.LoopDetections;
+using EventHighway.Core.Models.Configurations.Retries;
 
 namespace EventHighway.Core.Models.Configurations
 {
@@ -31,5 +32,11 @@ namespace EventHighway.Core.Models.Configurations
         /// Defaults to a <see cref="LoopDetection"/> with standard thresholds.
         /// </summary>
         public LoopDetection LoopDetection { get; set; } = new LoopDetection();
+
+        /// <summary>
+        /// Gets or sets the retry configuration for durable, spaced-out re-dispatch of failed listener deliveries.
+        /// Defaults to a <see cref="RetryConfiguration"/> with standard budget and backoff values.
+        /// </summary>
+        public RetryConfiguration RetryConfiguration { get; set; } = new RetryConfiguration();
     }
 }
