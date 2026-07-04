@@ -122,5 +122,58 @@ namespace EventHighway.Core.Tests.Unit.Services.Foundations.ListenerEvents.V2
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        public async Task ShouldThrowDependencyExceptionOnRetrieveByEventListenerV2IdIfTimeoutOccursAndLogItAsync()
+        {
+            // given
+            Guid someEventListenerV2Id = GetRandomId();
+            var operationCanceledException = new OperationCanceledException();
+
+            var timeoutException =
+                new TimeoutException("The dependency operation timed out.");
+
+            var timeoutListenerEventV2Exception =
+                new TimeoutListenerEventV2Exception(
+                    message: "Failed listener event timeout error occurred, contact support.",
+                    innerException: timeoutException,
+                    data: timeoutException.Data);
+
+            var expectedListenerEventV2DependencyException =
+                new ListenerEventV2DependencyException(
+                    message: "Listener event dependency error occurred, contact support.",
+                    innerException: timeoutListenerEventV2Exception);
+
+            this.storageBrokerMock.Setup(broker =>
+                broker.SelectAllListenerEventV2sAsync(It.IsAny<CancellationToken>()))
+                    .ThrowsAsync(operationCanceledException);
+
+            // when
+            ValueTask<IQueryable<ListenerEventV2>> retrieveByEventListenerV2IdTask =
+                this.listenerEventV2Service.RetrieveListenerEventV2sByEventListenerV2IdAsync(
+                    someEventListenerV2Id,
+                    TestContext.Current.CancellationToken);
+
+            ListenerEventV2DependencyException actualListenerEventV2DependencyException =
+                await Assert.ThrowsAsync<ListenerEventV2DependencyException>(
+                    retrieveByEventListenerV2IdTask.AsTask);
+
+            // then
+            actualListenerEventV2DependencyException.Should().BeEquivalentTo(
+                expectedListenerEventV2DependencyException);
+
+            this.storageBrokerMock.Verify(broker =>
+                broker.SelectAllListenerEventV2sAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogErrorAsync(It.Is(SameExceptionAs(
+                    expectedListenerEventV2DependencyException))),
+                        Times.Once);
+
+            this.storageBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }
