@@ -213,13 +213,16 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 : retryListenerEventV2s.Take(take).ToList();
         });
 
-        public async ValueTask<ListenerEventV2> RetrieveListenerEventV2ByIdAsync(
+        public ValueTask<ListenerEventV2> RetrieveListenerEventV2ByIdAsync(
             Guid listenerEventV2Id,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
         {
+            ValidateListenerEventV2Id(listenerEventV2Id);
+
             return await this.storageBroker.SelectListenerEventV2ByIdAsync(
                 listenerEventV2Id,
                 cancellationToken);
-        }
+        });
     }
 }
