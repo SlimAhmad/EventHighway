@@ -181,5 +181,69 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 ? replayListenerEventV2s.ToList()
                 : replayListenerEventV2s.Take(take).ToList();
         });
+
+        public ValueTask<IEnumerable<ListenerEventV2>>
+            RetrieveRetryBatchListenerEventV2sWithEventWithEventListenerAsync(
+                int take,
+                CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateOnRetrieveRetryBatch(take);
+
+            IQueryable<ListenerEventV2> listenerEventV2s =
+                await this.storageBroker
+                    .SelectAllListenerEventV2sWithEventV2WithEventListenerV2Async(
+                        cancellationToken);
+
+            DateTimeOffset now =
+                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            IQueryable<ListenerEventV2> retryListenerEventV2s =
+                listenerEventV2s
+                    .Where(listenerEventV2 =>
+                        listenerEventV2.Status == ListenerEventStatusV2.Error
+                        && listenerEventV2.RemainingRetryAttempts > 0
+                        && (listenerEventV2.NextRetryAttemptNotBefore == null
+                            || listenerEventV2.NextRetryAttemptNotBefore <= now))
+                    .OrderBy(listenerEventV2 => listenerEventV2.CreatedDate);
+
+            return take == 0
+                ? retryListenerEventV2s.ToList()
+                : retryListenerEventV2s.Take(take).ToList();
+        });
+
+        public ValueTask<ListenerEventV2> RetrieveListenerEventV2ByIdAsync(
+            Guid listenerEventV2Id,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateListenerEventV2Id(listenerEventV2Id);
+
+            ListenerEventV2 maybeListenerEventV2 =
+                await this.storageBroker.SelectListenerEventV2ByIdAsync(
+                    listenerEventV2Id,
+                    cancellationToken);
+
+            ValidateListenerEventV2Exists(maybeListenerEventV2, listenerEventV2Id);
+
+            return maybeListenerEventV2;
+        });
+
+        public ValueTask<IQueryable<ListenerEventV2>> RetrieveListenerEventV2sByEventListenerV2IdAsync(
+            Guid eventListenerV2Id,
+            CancellationToken cancellationToken = default) =>
+        TryCatch(async () =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidateEventListenerV2Id(eventListenerV2Id);
+
+            IQueryable<ListenerEventV2> listenerEventV2s =
+                await this.storageBroker.SelectAllListenerEventV2sAsync(cancellationToken);
+
+            return listenerEventV2s.Where(listenerEventV2 =>
+                listenerEventV2.EventListenerV2Id == eventListenerV2Id);
+        });
     }
 }

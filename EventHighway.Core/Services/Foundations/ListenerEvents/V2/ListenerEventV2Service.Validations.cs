@@ -167,6 +167,15 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
                 Parameter: nameof(ListenerEventV2.Id)));
         }
 
+        private static void ValidateEventListenerV2Id(Guid eventListenerV2Id)
+        {
+            Validate(
+                message: "Listener event is invalid, fix the errors and try again.",
+
+                (Rule: IsInvalid(eventListenerV2Id),
+                Parameter: nameof(ListenerEventV2.EventListenerV2Id)));
+        }
+
         private static void ValidateListenerEventV2Exists(ListenerEventV2 listenerEventV2, Guid listenerEventV2Id)
         {
             if (listenerEventV2 is null)
@@ -204,6 +213,13 @@ namespace EventHighway.Core.Services.Foundations.ListenerEvents.V2
         }
 
         private static void ValidateOnRetrieveReplayBatch(int take)
+        {
+            Validate(
+                message: "Listener event is invalid, fix the errors and try again.",
+                (Rule: IsInvalid(take), Parameter: "Take"));
+        }
+
+        private static void ValidateOnRetrieveRetryBatch(int take)
         {
             Validate(
                 message: "Listener event is invalid, fix the errors and try again.",
