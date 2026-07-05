@@ -42,7 +42,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
             ValidateEventV1IsNotNull(eventV1);
 
             DateTimeOffset now =
-                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+                await this.GetCurrentDateTimeOffsetAsync();
 
             eventV1.Type = eventV1.ScheduledDate switch
             {
@@ -70,7 +70,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
             ValidateEventV1IsNotNull(eventV1);
 
             DateTimeOffset now =
-                await this.dateTimeBroker.GetDateTimeOffsetAsync();
+                await this.GetCurrentDateTimeOffsetAsync();
 
             eventV1.Type = eventV1.ScheduledDate switch
             {
@@ -122,15 +122,15 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
 
         private async ValueTask ProcessEventListenerV1sAsync(EventV1 eventV1)
         {
-            IQueryable<EventListenerV1> eventListenerV1s =
-                await this.eventListenerV1OrchestrationService
+            List<EventListenerV1> eventListenerV1s =
+                (await this.eventListenerV1OrchestrationService
                     .RetrieveEventListenerV1sByEventAddressIdAsync(
-                        eventV1.EventAddressId);
+                        eventV1.EventAddressId)).ToList();
 
             foreach (EventListenerV1 eventListenerV1 in eventListenerV1s)
             {
                 DateTimeOffset now =
-                    await this.dateTimeBroker.GetDateTimeOffsetAsync();
+                    await this.GetCurrentDateTimeOffsetAsync();
 
                 ListenerEventV1 listenerEventV1 =
                     CreateEventListenerV1(
@@ -161,7 +161,7 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
             foreach (EventListenerV1 eventListenerV1 in eventListenerV1s)
             {
                 DateTimeOffset now =
-                    await this.dateTimeBroker.GetDateTimeOffsetAsync();
+                    await this.GetCurrentDateTimeOffsetAsync();
 
                 ListenerEventV1 listenerEventV1 =
                     CreateEventListenerV1(
@@ -290,6 +290,22 @@ namespace EventHighway.Core.Services.Coordinations.Events.V1
                 CreatedDate = now,
                 UpdatedDate = now,
             };
+        }
+
+        private async ValueTask<DateTimeOffset> GetCurrentDateTimeOffsetAsync()
+        {
+            DateTimeOffset now = await this.dateTimeBroker.GetDateTimeOffsetAsync();
+
+            return TruncateToMicroseconds(now);
+        }
+
+        private static DateTimeOffset TruncateToMicroseconds(
+            DateTimeOffset dateTimeOffset)
+        {
+            long ticksToRemove =
+                dateTimeOffset.Ticks % TimeSpan.TicksPerMicrosecond;
+
+            return dateTimeOffset.AddTicks(-ticksToRemove);
         }
     }
 }

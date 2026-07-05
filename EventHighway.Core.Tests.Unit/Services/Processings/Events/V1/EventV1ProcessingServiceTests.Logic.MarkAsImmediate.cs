@@ -21,7 +21,7 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V1
                 GetRandomDateTimeOffset();
 
             DateTimeOffset retrievedDateTimeOffset =
-                randomDateTimeOffset;
+                TruncateToMicroseconds(randomDateTimeOffset);
 
             EventV1 randomEventV1 =
                 CreateRandomEventV1(

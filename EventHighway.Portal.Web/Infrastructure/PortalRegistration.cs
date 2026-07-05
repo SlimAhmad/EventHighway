@@ -28,6 +28,7 @@ using EventHighway.Portal.Web.Services.Views.ListenerEventArchives;
 using EventHighway.Portal.Web.Services.Views.ListenerEvents;
 using EventHighway.Portal.Web.Services.Views.Replays;
 using EventHighway.Portal.Web.Services.Views.Users;
+using EventHighway.SqlServer.Brokers;
 
 namespace EventHighway.Portal.Web.Infrastructure
 {
@@ -133,10 +134,13 @@ namespace EventHighway.Portal.Web.Infrastructure
                     ?? throw new InvalidOperationException(
                         "Missing connection string 'EventHighwayCoreConnection'.");
 
+            SqlServerStorageBrokerProvider storageProvider =
+                new SqlServerStorageBrokerProvider(connectionString);
+
             var eventHighwayConfiguration = new EventHighwayConfiguration();
 
             var eventHighwayClient =
-                new EventHighwayClient(connectionString, eventHighwayConfiguration);
+                new EventHighwayClient(storageProvider, eventHighwayConfiguration);
 
             return eventHighwayClient.V2;
         }
