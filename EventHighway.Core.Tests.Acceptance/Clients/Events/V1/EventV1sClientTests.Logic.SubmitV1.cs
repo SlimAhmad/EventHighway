@@ -23,13 +23,13 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.Events.V1
                 randomEventAddressV1;
 
             Guid inputEventAddressV1Id =
-                inputEventAddressV1.Id;
+                inputEventAddressV1.Id; 
 
             int randomSeconds = GetRandomNumber();
 
             DateTimeOffset scheduledDate =
-                DateTimeOffset.Now
-                    .AddSeconds(randomSeconds);
+                TruncateToMicroseconds(DateTimeOffset.UtcNow
+                    .AddSeconds(randomSeconds));
 
             EventV1 randomEventV1 =
                 CreateRandomEventV1(
