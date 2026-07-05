@@ -79,6 +79,16 @@ namespace EventHighway.Core.Services.Foundations.Events.V1
 
                 throw await CreateAndLogDependencyValidationExceptionAsync(lockedEventV1Exception);
             }
+            catch (InvalidCastException invalidCastException)
+            {
+                var failedStorageEventV1Exception =
+                    new FailedStorageEventV1Exception(
+                        message: "Failed event storage error occurred, contact support.",
+                        innerException: invalidCastException,
+                        data: invalidCastException.Data);
+
+                throw await CreateAndLogDependencyExceptionAsync(failedStorageEventV1Exception);
+            }
             catch (DbUpdateException dbUpdateException)
             {
                 var failedStorageEventV1Exception =
