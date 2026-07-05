@@ -10,6 +10,10 @@
     <Project Path="EventHighway.EventHandlers.Tests.Unit/EventHighway.EventHandlers.Tests.Unit.csproj" />
     <Project Path="EventHighway.EventHandlers/EventHighway.EventHandlers.csproj" />
   </Folder>
+  <Folder Name="/Proivders/">
+    <Project Path="EventHighway.PostgresSql/EventHighway.PostgresSql.csproj" Id="2c6fdfd5-073c-4042-bc4f-d0c233327d5e" />
+    <Project Path="EventHighway.SqlServer/EventHighway.SqlServer.csproj" Id="8fc48d07-835d-4282-87d3-148ad2341c92" />
+  </Folder>
   <Folder Name="/Samples/" />
   <Folder Name="/Samples/ClientV1/">
     <Project Path="EventHighway.App/EventHighway.App.csproj">
