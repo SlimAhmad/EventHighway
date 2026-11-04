@@ -19,10 +19,10 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.ArchivingEvents.V2
         private readonly WireMockServer wireMockServer;
         private readonly ClientBroker clientBroker;
 
-        public ArchivingEventV2ClientTests()
+        public ArchivingEventV2ClientTests(ClientBroker clientBroker)
         {
             this.wireMockServer = WireMockServer.Start();
-            this.clientBroker = new ClientBroker();
+            this.clientBroker = clientBroker;
         }
 
         private async ValueTask<EventAddressV2> CreateRandomEventAddressV2Async()

@@ -5,6 +5,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using EventHighway.Core.Brokers.Loggings;
 using EventHighway.Core.Brokers.Times;
 using EventHighway.Core.Models.Services.Foundations.Events.V1;
@@ -150,6 +151,15 @@ namespace EventHighway.Core.Tests.Unit.Services.Processings.Events.V1
                     .IgnoreIt();
 
             return filler;
+        }
+
+        private static DateTimeOffset TruncateToMicroseconds(
+            DateTimeOffset dateTimeOffset)
+        {
+            long ticksToRemove =
+                dateTimeOffset.Ticks % TimeSpan.TicksPerMicrosecond;
+
+            return dateTimeOffset.AddTicks(-ticksToRemove);
         }
     }
 }

@@ -19,10 +19,10 @@ namespace EventHighway.Core.Tests.Acceptance.Clients.EventArchives.V2
         private readonly WireMockServer wireMockServer;
         private readonly ClientBroker clientBroker;
 
-        public EventArchiveV2ClientTests()
+        public EventArchiveV2ClientTests(ClientBroker clientBroker)
         {
             this.wireMockServer = WireMockServer.Start();
-            this.clientBroker = new ClientBroker();
+            this.clientBroker = clientBroker;
         }
 
         private static int GetRandomNumber() =>
